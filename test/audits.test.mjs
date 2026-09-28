@@ -6,19 +6,25 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
+  buildCorpusFromProvider,
+  buildStatus,
   gradeForScore,
   loadAudits,
+  loadCorpus,
   renderBacklog,
   renderIndex,
+  renderStatus,
 } from "../scripts/audit-index.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-test("generated audit index and backlog are up to date", async () => {
+test("generated audit views are up to date", async () => {
   const audits = await loadAudits(path.join(root, "audits"));
+  const corpus = await loadCorpus(path.join(root, "audits", "CORPUS.json"));
   for (const [name, render] of [
     ["INDEX.md", renderIndex],
     ["BACKLOG.md", renderBacklog],
+    ["STATUS.md", (data) => renderStatus(buildStatus(data, corpus))],
   ]) {
     const current = (
       await readFile(path.join(root, "audits", name), "utf8")
@@ -59,6 +65,7 @@ async function writeVersion(directory, skillId, version, options) {
         grade: options.grade ?? "Beta Only",
         deployable: options.deployable ?? false,
       },
+      meta: { category: options.category ?? "Data Analysis" },
       recommendations: options.recommendations,
     }),
   );
@@ -117,4 +124,141 @@ test("AIPOCH release grades follow the score thresholds", async () => {
     recommendations: [],
   });
   await assert.rejects(loadAudits(directory), /requires grade Production Ready/);
+});
+
+test("status separates ready, untouched, and out-of-scope Skills", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "audits-"));
+  await writeVersion(directory, "skill-ready", "current", {
+    score: 90,
+    grade: "Production Ready",
+    deployable: true,
+    recommendations: [],
+    category: "Data Analysis",
+  });
+  await writeVersion(directory, "skill-excluded", "current", {
+    score: 70,
+    recommendations: [recommendation("P1", "Needs work")],
+    category: "Protocol Design",
+  });
+  const audits = await loadAudits(directory);
+  const corpus = {
+    schema_version: 1,
+    source: { upstream: "example/skills@abc" },
+    skills: [
+      {
+        id: "skill-ready",
+        upstream_path: "data/ready",
+        category: "Data Analysis",
+        state: "ready",
+      },
+      {
+        id: "skill-excluded",
+        upstream_path: "protocol/excluded",
+        category: null,
+        state: "excluded",
+      },
+      {
+        id: "skill-new",
+        upstream_path: "unknown/new",
+        category: null,
+        state: "remaining",
+      },
+      {
+        id: "installer",
+        upstream_path: "installer",
+        category: null,
+        state: "out_of_scope",
+      },
+    ],
+  };
+  const status = buildStatus(audits, corpus);
+  assert.deepEqual(status.totals, {
+    known: 4,
+    audited: 2,
+    untouched: 1,
+    ready: 1,
+    outOfScope: 1,
+  });
+  const rendered = renderStatus(status);
+  assert.match(rendered, /Audit coverage: \*\*2 \/ 3 \(66\.7%\)\*\*/);
+  assert.match(rendered, /\| Protocol Design \| 1 \| 1 \| 0 \| 0 \| 0 \|/);
+  assert.match(rendered, /\| Unclassified \| 2 \| 0 \| 1 \| 0 \| 1 \|/);
+  assert.match(rendered, /`skill-excluded`/);
+});
+
+test("provider inventory refresh is deterministic and fail-closed", async () => {
+  const provider = await mkdtemp(path.join(os.tmpdir(), "provider-"));
+  await writeFile(
+    path.join(provider, "PROVENANCE.json"),
+    JSON.stringify({
+      generated: "2026-09-28",
+      sources: {
+        example: {
+          provider_repository: "https://github.com/example/optimized",
+          provider_ref: "main",
+          provider_skills_tree: "tree",
+        },
+      },
+      skills: [
+        {
+          id: "skill-ready",
+          upstream_path: "data/ready",
+          category: "Data Analysis",
+          score: 95,
+          grade: "Production Ready",
+          deployable: true,
+          open_p0: 0,
+          fix_pass: "done",
+          reaudit: "not needed",
+        },
+        {
+          id: "skill-refined",
+          upstream_path: "data/refined",
+          category: "Data Analysis",
+          score: 80,
+          grade: "Limited Release",
+          deployable: true,
+          open_p0: 0,
+          fix_pass: "done",
+          reaudit: "not needed",
+        },
+      ],
+    }),
+  );
+  await writeFile(
+    path.join(provider, "REMAINING.json"),
+    JSON.stringify({
+      generated: "2026-09-28",
+      source: "example/source@abc",
+      reconciliation: { skills_in_source_tree: 4 },
+      remaining: [{ id: "skill-new", upstream_path: "data/new" }],
+      excluded: [],
+      out_of_scope: [{ id: "installer", upstream_path: "installer" }],
+    }),
+  );
+  const corpus = await buildCorpusFromProvider(provider);
+  assert.deepEqual(
+    corpus.skills.map(({ id, state }) => [id, state]),
+    [
+      ["installer", "out_of_scope"],
+      ["skill-new", "remaining"],
+      ["skill-ready", "ready"],
+      ["skill-refined", "refined"],
+    ],
+  );
+
+  await writeFile(
+    path.join(provider, "REMAINING.json"),
+    JSON.stringify({
+      source: "example/source@abc",
+      reconciliation: { skills_in_source_tree: 4 },
+      remaining: [{ id: "skill-ready", upstream_path: "data/duplicate" }],
+      excluded: [],
+      out_of_scope: [{ id: "installer", upstream_path: "installer" }],
+    }),
+  );
+  await assert.rejects(
+    buildCorpusFromProvider(provider),
+    /provider inventory has duplicate IDs: skill-ready/,
+  );
 });

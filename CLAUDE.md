@@ -1,81 +1,74 @@
 # Optimizing Agent Science Skills
 
-The records repo for refining agent science Skills. The method, and every rule agents follow, lives in
-`process/` (start at `process/COMMON.md`). This file only says how the orchestrator runs the work.
+Use the modular process suite under `skill/`. Start with
+`skill/optimize-scientific-skills/SKILL.md`; it routes fresh phase workers to
+the five focused worker Skills and shared contracts. The removed `process/`
+briefs are historical and are not active instructions.
 
-| repo | role |
-| --- | --- |
-| `F:\optimizing-agent-science-skills\external\GPTomics__bioSkills` | read-only upstream at `d91ed3d`; provenance comparison only |
-| `F:\optimizing-agent-science-skills` (this repo) | records: `process/`, `audits/`, `fixes/`, `tools/` |
-| `F:\optimized-scientific-skills` | provider and published shelf; `main` is shipped Skill bytes |
-| `F:\OpenScience\audits\`, `audit-envs\`, `wt\` | live working area, not a repo; raw runs stay here |
+## Repository contract
 
-## Consolidation (Sam, completed 2026-09-27)
+| Repository or path | Role |
+|---|---|
+| `F:\optimizing-agent-science-skills` | Control state, evidence, generated audit views, handoffs, and process Skills |
+| `F:\optimized-scientific-skills` | Canonical editing source and shipped Skill bytes |
+| `F:\OpenScience` | Disposable worktrees, WSL-visible inputs, environments, caches, and raw output |
+| `mrsonord2240/bioSkills-Improved` | Downstream compatibility fork for accepted bio-derived Skills |
+| Provider source checkouts | Read-only provenance comparison |
 
-The two-repo contract is active. The provider is the only place Skill bytes are edited (`main` = shipped;
-import from upstream onto a provider branch, then fix and independently re-audit there). This repo keeps
-records and process instructions. The original upstream clone is read-only. The former
-`bioSkills-Improved` staging fork is archived and must not be used by promotion tooling.
+Inspect Git status before mutation and preserve all unrelated work. No phase
+worker commits a product repository. Pushes, pull requests, releases,
+Marketplace submission/publication, and other remote mutations need separate
+authorization.
 
-## The goal and its order (Sam, 2026-09-17)
+## Relay
 
-1. **Audit every remaining Skill** (`F:\optimized-scientific-skills\REMAINING.md`), one folder at a time.
-2. **Fix pass** from the audit reports, then a re-audit by a third agent.
-3. **Promote** every Skill that passes.
+Run at most five Skill lanes plus the orchestrator. A fresh worker owns one
+Skill and one phase, writes the canonical compact handoff, and retires. Use this
+order:
 
-Tooling → audit → fix → re-audit; the auditor, fixer and re-auditor are different agents. **Exception
-(Sam, 2026-09-21):** the final pass on an already-fixed batch (`process/FINAL_PASS_BRIEF.md`), reserved for
-a consolidation pass Sam has explicitly called.
+```text
+normalize -> full tooling -> initial audit when needed -> fix
+          -> tooling delta when changed or uncertain -> independent re-audit
+          -> repeat fix/delta/re-audit until candidate-ready or blocked
+```
 
-## Dispatching
+Use the `science` WSL distro first and preserve its `/mnt/openscience`-only,
+interop-disabled boundary. Docker and justified native-Windows execution are
+allowed under
+`skill/optimize-scientific-skills/references/environment-policy.md`.
 
-- **One fresh Sonnet per unit** (tooling per folder; auditor, fixer, re-auditor per Skill). Never brief one
-  agent for a list. State passes through files (`TOOLS.md`, reports, fix logs, `STATUS.md`).
-- Dispatch every unblocked unit in parallel, at most 10 subagents at once.
-- Every dispatch names the exact Skill, source path and commit, the env and its `TOOLS.md`, and the brief.
-  A wind-down message asks agents to finish their unit or write `STATUS.md` for a fresh agent.
-- A folder is tooled **before** its first auditor starts: audits after a tooling pass executed 66/67 and
-  51/53 inputs; one without spent five passes discovering tools.
-- Other sessions may work this corpus. Check `ListAgents` and existing claims (`F:\OpenScience\audits\<skill-id>\`,
-  `wt\` worktrees) first; claims are by atomic `mkdir`. Agree a split rather than stacking agents.
+## Records
 
-## Backlog maintenance
+`audits/BACKLOG.md` and `audits/INDEX.md` are generated. After every initial or
+final audit:
 
-`audits/BACKLOG.md` and `audits/INDEX.md` are generated; never hand-edit them. After **every** audit or
-re-audit lands:
-
-```bash
-python tools/publish_audits.py --repo F:/optimizing-agent-science-skills --skill <skill-id>
+```powershell
+python tools/publish_audits.py --repo <provider-root> --skill <skill-id>
 npm run audits:index
 ```
 
-Commit the record, the regenerated index and any fix log together. An audit only under
-`F:\OpenScience\audits\` is not in the backlog; that is how causal-genomics went untracked on 2026-09-17.
+The index command regenerates `audits/INDEX.md`, `audits/BACKLOG.md`, and the
+category-level `audits/STATUS.md`. After provider inventory, readiness, or
+source metadata changes, refresh the committed corpus snapshot and every view:
 
-## Fixing, landing, promoting
+```powershell
+npm run audits:inventory
+```
 
-- One worktree and branch per fix from provider `main`: `F:\OpenScience\wt\<short>`, `fix/<short>`. Archive
-  the pre-fix report to `F:\OpenScience\audits\_pre-fix-<yyyymmdd>\<skill-id>\` before the re-audit.
-- A fix lands when its re-audit passes: core ≥ 85, deployable, no open P0, no veto. Merge `--no-ff` into
-  provider `main`, push when authorized, then delete the branch and worktree.
-- **Promote every audited Skill that did not fail, whatever its score** (Sam, 2026-09-17): deployable, no
-  open P0. Promotion is part of landing; do not wait to be asked. Failed Skills stay in `REMAINING.md`
-  under `excluded` until a fix passes re-audit.
-- `promote_skills.py` is an append-only metadata reconciler. It preserves published provenance rows and
-  adds a provider Skill only when the latest published audit is deployable, has no open P0/veto, names an
-  ancestor of provider `main`, and the current Skill tree exactly matches the audited commit. It updates
-  only `PROVENANCE.json`, `REMAINING.json`, and `REMAINING.md`; it never rebuilds `skills/`.
-- To promote: land the independently re-audited provider commit, publish its audit record, run
-  `python tools/promote_skills.py` as a dry run, inspect the proposed additions and marketplace-readiness
-  holds, then run `--apply`. Update the provider README status table, commit the metadata, and push only
-  when authorized.
-- **The goal is the Open Science skill marketplace** (`aipoch/openscience-skill-marketplace`,
-  `authoring/README.md`): one `release.config.json` per Skill pinned to a shelf commit, every version
-  immutable and reviewed. `promote_skills.py` sets `marketplace_ready`. After pushing the shelf, run
-  `python tools/marketplace_manifests.py --intake F:/OpenScience/marketplace-intake/openscience-skill-marketplace`;
-  it writes manifests to `F:\OpenScience\marketplace-submissions\`, refuses ids already in the
-  marketplace, and fails unless the marketplace's own `intake:skill` accepts every one. **Never rewrite
-  shelf history:** a force-push breaks the pinned SHAs.
-- `config/marketplace_submission_holds.json` is a machine-readable maintainer-decision hold. A held ID
-  remains eligible for shelf promotion but is never marketplace-ready, written as a manifest, or passed
-  to `intake:skill`—including via `marketplace_manifests.py --skill`.
+Commit only explicit run-owned paths in the records repository. An audit that
+exists only under `F:\OpenScience` is not published evidence. Never edit
+generated counts by hand.
+
+## Completion and commits
+
+Final re-audit must execute every accessible advertised runnable surface and
+inspect scientifically meaningful, useful, readable output. A passing final
+audit makes the exact bytes `candidate-ready`, not done.
+
+One invocation is one product batch. At run close, create at most one local
+optimized-shelf commit containing all and only the run's candidate-ready
+Skills. Committing exact audited bytes makes them `ready`. Run the
+Marketplace's own local `intake:skill` validator against that exact commit;
+only accepted Skills become `done`. Form at most one corresponding
+bioSkills-Improved commit for the accepted bio-derived subset. Do not preserve
+phase-by-phase commits in either product history.

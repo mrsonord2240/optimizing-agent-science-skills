@@ -1,0 +1,29 @@
+# Environment policy
+
+Use the `science` WSL distro first. Preserve its boundary:
+
+- `/mnt/openscience` is the only Windows filesystem mount;
+- Windows interop remains disabled;
+- use the existing `science` user and micromamba-based environments;
+- never widen visibility or enable interop for convenience.
+
+Stage inputs and outputs under `F:\OpenScience`. Record the distro,
+environment, relevant versions, launch command, mounts, and checked smoke
+result. Prefer an isolated environment when one Skill would downgrade or
+materially alter a shared environment.
+
+Use Docker when it is the cleaner supported route; record image version or
+digest, mounts, command, resource assumptions, and output checks. Use native
+Windows only when the actual tool or integration requires it, and record why
+WSL and Docker are unsuitable and how to repeat the native run.
+
+Install or update dependencies only in a tooling phase. Coordinate shared
+mutations with a lock, snapshot relevant versions, run from saved scripts when
+practical, kill only run-owned PIDs, and keep heavy artifacts outside the Skill
+product and records repository.
+
+Private, authenticated, paid, license-bound, registration-gated, unavailable,
+or resource-infeasible requirements remain explicit blockers. Record the exact
+error, affected workflow, evidence obtained, user action, and rerun steps.
+Never silently replace the advertised workflow with a materially different
+public alternative.

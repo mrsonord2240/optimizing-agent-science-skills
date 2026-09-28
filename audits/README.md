@@ -19,9 +19,16 @@ One directory per audited version, so a Skill audited before and after a fix kee
 **Not kept here:** raw run outputs, generated test data and downloaded datasets. A record names the
 dataset accession or the generator script that produced its inputs.
 
-`INDEX.md` lists every Skill with its latest score and open findings; `BACKLOG.md` lists every open
-recommendation, most severe first. Both are generated — don't hand-edit them.
+`CORPUS.json` snapshots the canonical provider inventory and readiness state.
+`INDEX.md` lists every Skill with its latest score and open findings;
+`BACKLOG.md` lists every open recommendation, most severe first; and
+`STATUS.md` summarizes known, audited, untouched, ready, and out-of-scope
+Skills by category. These files are generated; do not hand-edit them.
 
-Records are published here by `tools/publish_audits.py`, and the index is regenerated afterwards.
+Records are published here by `tools/publish_audits.py`, then all views are
+regenerated with `npm run audits:index`. Refresh the provider snapshot and all
+views with `npm run audits:inventory` after provider inventory, readiness, or
+source metadata changes.
+
 The per-candidate Specialist audits moved to `authoring/audits/` in
 [mrsonord2240/openscience-specialists](https://github.com/mrsonord2240/openscience-specialists).

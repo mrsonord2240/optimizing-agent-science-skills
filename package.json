@@ -9,6 +9,7 @@
   "scripts": {
     "audits:check": "node scripts/audit-index.mjs --check",
     "audits:index": "node scripts/audit-index.mjs",
+    "audits:inventory": "node scripts/audit-index.mjs --refresh-inventory",
     "test": "node --test \"test/**/*.test.mjs\""
   }
 }

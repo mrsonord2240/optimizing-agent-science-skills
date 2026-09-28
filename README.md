@@ -1,53 +1,95 @@
 # Optimizing Agent Science Skills
 
-Working repository for improving open agent Skills for science: audit what they actually do when the
-code runs, fix what is broken, re-audit, and publish every result.
+Working repository for refining open scientific agent Skills: normalize their
+structure, prepare reproducible tooling, audit real behavior, fix evidenced
+defects, independently re-audit every accessible runnable surface, and retain
+the evidence.
 
-Skills in this repository come from other people's public repositories. They are not ours. Each one
-keeps its author's licence and records the exact upstream commit it was taken from, plus every change
-we made and how that change was verified.
+Skills come from public provider repositories and remain their authors' work.
+Each finished Skill preserves its license and exact provenance. Final Skill
+bytes live in
+[optimized-scientific-skills](https://github.com/mrsonord2240/optimized-scientific-skills);
+this repository holds the control plane and evidence.
 
-## How a Skill moves through here
+## Active method
 
-1. **Audit** — a Claude agent follows the [skill-auditor](https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor)
-   method (AIPOCH, MIT): static score, real inputs, run the code, score what it produced. Reports and
-   viewers land in [`audits/`].
-2. **Fix** — a different agent corrects only audit-evidenced defects (broken commands, version drift,
-   code that runs but computes the wrong thing) and verifies each fix by running it. Fix logs are in
-   [`fixes/`].
-3. **Re-audit** — a fresh agent re-scores the fixed Skill, re-running the original inputs as
-   regression tests plus new ones of its own.
-4. **Promote** — Skills that did not fail move to the published shelf, `optimized-scientific-skills`,
-   with their audit status flagged (`fix_pass`, `reaudit`).
+The modular Skill suite under [`skill/`](skill/) is the active process:
 
-Fixes are made in a fork of the original repository. Where that upstream is still maintained they
-go back as pull requests; `GPTomics/bioSkills` was archived on 2026-08-15, so for those Skills the
-fork is the maintained line rather than a staging area.
+1. `normalize-scientific-skill` removes instruction redundancy and routes
+   reusable code and conditional detail.
+2. `prepare-scientific-skill-tooling` builds or refreshes the WSL-first
+   environment and proves each accessible primary tool with checked output.
+3. `audit-scientific-skill` performs a bounded diagnostic initial audit.
+4. `fix-scientific-skill` resolves the durable finding ledger and reports
+   tooling impact.
+5. `reaudit-scientific-skill` independently executes and inspects every
+   accessible advertised surface.
+6. `optimize-scientific-skills` coordinates five lanes, lands one completed
+   batch, and requires the Marketplace's local intake validator to pass before
+   calling a Skill done.
+
+Each phase uses a fresh worker and one compact canonical handoff. The final
+auditor is never the fixer. Marketplace review, bundle building, submission,
+registration, publication, pushes, and pull requests require separate
+authorization.
+
+## Repository topology
+
+| Location | Role |
+|---|---|
+| `F:\optimizing-agent-science-skills` | Control state, audits, fix evidence, handoffs, generators, and the active Skill suite |
+| `F:\optimized-scientific-skills` | Canonical editing source and final cross-source Skill product |
+| `F:\OpenScience` | Disposable worktrees, environments, public caches, and heavy run output |
+| `mrsonord2240/bioSkills-Improved` | Maintained bioSkills-shaped compatibility fork, fed one way from accepted optimized bytes |
+| Original provider repositories | Read-only provenance sources |
+
+The maintained bioSkills fork is not a staging editor and is not archived as a
+consequence of removing a redundant local checkout.
 
 ## Layout
 
 | Path | What |
-| --- | --- |
-| `audits/skills/<skill-id>/<owner>-<repo>@<sha7>/` | `report.json`, `viewer.md`, `record.json`, `fixes.md`, and the scripts the auditor ran |
-| `fixes/<skill-id>.md` | What changed, why, and how it was verified, per fix pass |
-| `process/` | The briefs agents follow; `COMMON.md` holds the shared rules and thresholds |
-| `tools/` | `publish_audits.py` (audit records into `audits/`), `promote_skills.py` (append-only provider metadata reconciliation; never rewrites `skills/`), `marketplace_manifests.py` (Open Science marketplace manifests) |
-| `scripts/` | `audit-index.mjs`, which generates `audits/INDEX.md` and `BACKLOG.md` (`npm run audits:index`) |
+|---|---|
+| `skill/` | Modular orchestrator and independently distributable worker Skills |
+| `audits/skills/<skill-id>/<owner>-<repo>@<sha7>/` | Reports, viewers, records, fix summaries, and saved audit scripts |
+| `fixes/<skill-id>.md` | Durable finding dispositions and verification summaries |
+| `tools/` | Audit publication, provider reconciliation, manifest support, and other deterministic control tooling |
+| `scripts/` | Corpus-snapshot, audit-index, backlog, and status generation |
 
-## What is deliberately not here
+The former monolithic files under `process/` were intentionally removed after
+their live rules migrated into the modular suite. Historical audit records may
+still mention those filenames; those mentions are provenance, not active
+instructions.
 
-Raw run outputs, generated test data, downloaded public datasets, Python virtual environments and
-installed binaries. They are large and reproducible: each audit record names the dataset accession or
-the generator script that produced its input. Fixed Skill trees live on the published shelf
-([optimized-scientific-skills](https://github.com/mrsonord2240/optimized-scientific-skills)), not here.
-The staging fork ([bioSkills-Improved](https://github.com/mrsonord2240/bioSkills-Improved)) is archived
-as of 2026-09-27; every fix it held had already landed on the shelf.
+## Generated records
 
-## Credit and licences
+`audits/CORPUS.json` is the committed snapshot of the canonical provider
+inventory. Refresh it after provider inventory, readiness, or source metadata
+changes:
 
-- Skills belong to their authors; the shelf's `PROVENANCE.json` names each one's upstream commit, and its `LICENSE` is the upstream licence, unmodified.
-- The audit method is AIPOCH's, MIT licensed.
-- Audits and fixes are performed by Claude (Anthropic) agents, commissioned by Samuel Nord. They are
-  not reviewed or endorsed by the Skills' authors.
-- Everything in this repository that is ours — tooling, briefs, audit records — is MIT licensed. See
-  [LICENSE] and [NOTICE].
+```powershell
+npm run audits:inventory
+```
+
+`audits/INDEX.md`, `audits/BACKLOG.md`, and `audits/STATUS.md` are generated
+from that snapshot and the published audit records:
+
+```powershell
+npm run audits:index
+```
+
+The inventory command also regenerates all three views. Never edit their
+counts by hand.
+
+Raw run outputs, downloaded public datasets, environments, and installed tools
+remain under `F:\OpenScience`. They are reproducible evidence inputs, not Git
+product files.
+
+## Credit and licenses
+
+- Provider Skills retain their original authorship, license, and provenance.
+- The audit method is derived from AIPOCH's MIT-licensed `skill-auditor`.
+- Audit and fix work is commissioned by Samuel Nord and is not an endorsement
+  by the original Skill authors.
+- Repository-owned tooling, process Skills, and records are MIT licensed; see
+  [LICENSE](LICENSE) and [NOTICE](NOTICE).

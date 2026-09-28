@@ -1,0 +1,3384 @@
+{
+  "schema_version": 1,
+  "generated": "2026-09-27",
+  "source": {
+    "upstream": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
+    "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "provider_ref": "main",
+    "provider_skills_tree": "f6f667d061dc2ac8eab9ee261b97301c5eb873d2"
+  },
+  "skills": [
+    {
+      "id": "bio-admet-prediction",
+      "upstream_path": "chemoinformatics/admet-prediction",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-amplicon-clipping",
+      "upstream_path": "alignment-files/alignment-amplicon-clipping",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-filtering",
+      "upstream_path": "alignment-files/alignment-filtering",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-indexing",
+      "upstream_path": "alignment-files/alignment-indexing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-io",
+      "upstream_path": "alignment/alignment-io",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-msa-parsing",
+      "upstream_path": "alignment/msa-parsing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-msa-statistics",
+      "upstream_path": "alignment/msa-statistics",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-multiple",
+      "upstream_path": "alignment/multiple-alignment",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-pairwise",
+      "upstream_path": "alignment/pairwise-alignment",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-sorting",
+      "upstream_path": "alignment-files/alignment-sorting",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-structural",
+      "upstream_path": "alignment/structural-alignment",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-trimming",
+      "upstream_path": "alignment/alignment-trimming",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-alignment-validation",
+      "upstream_path": "alignment-files/alignment-validation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-analytical-validation",
+      "upstream_path": "liquid-biopsy/analytical-validation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-allele-specific-accessibility",
+      "upstream_path": "atac-seq/allele-specific-accessibility",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-atac-peak-calling",
+      "upstream_path": "atac-seq/atac-peak-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-atac-qc",
+      "upstream_path": "atac-seq/atac-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-co-accessibility",
+      "upstream_path": "atac-seq/co-accessibility",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-consensus-peakset",
+      "upstream_path": "atac-seq/consensus-peakset",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-deep-learning-atac",
+      "upstream_path": "atac-seq/deep-learning-atac",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-differential-accessibility",
+      "upstream_path": "atac-seq/differential-accessibility",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-enhancer-gene-linking",
+      "upstream_path": "atac-seq/enhancer-gene-linking",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-footprinting",
+      "upstream_path": "atac-seq/footprinting",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-motif-deviation",
+      "upstream_path": "atac-seq/motif-deviation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-nucleosome-positioning",
+      "upstream_path": "atac-seq/nucleosome-positioning",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-atac-seq-single-cell-atac",
+      "upstream_path": "atac-seq/single-cell-atac",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-bam-statistics",
+      "upstream_path": "alignment-files/bam-statistics",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-batch-downloads",
+      "upstream_path": "database-access/batch-downloads",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-batch-processing",
+      "upstream_path": "sequence-io/batch-processing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-biomart-queries",
+      "upstream_path": "database-access/biomart-queries",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-blast-searches",
+      "upstream_path": "database-access/blast-searches",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-colocalization-analysis",
+      "upstream_path": "causal-genomics/colocalization-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-effector-gene-prioritization",
+      "upstream_path": "causal-genomics/effector-gene-prioritization",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-fine-mapping",
+      "upstream_path": "causal-genomics/fine-mapping",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-genetic-correlation",
+      "upstream_path": "causal-genomics/genetic-correlation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-genomic-sem",
+      "upstream_path": "causal-genomics/genomic-sem",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-heritability-partitioning",
+      "upstream_path": "causal-genomics/heritability-partitioning",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-mediation-analysis",
+      "upstream_path": "causal-genomics/mediation-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-mendelian-randomization",
+      "upstream_path": "causal-genomics/mendelian-randomization",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-pleiotropy-detection",
+      "upstream_path": "causal-genomics/pleiotropy-detection",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-proteome-mr-drug-target",
+      "upstream_path": "causal-genomics/proteome-mr-drug-target",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-causal-genomics-transcriptome-wide-association",
+      "upstream_path": "causal-genomics/transcriptome-wide-association",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-cfdna-preprocessing",
+      "upstream_path": "liquid-biopsy/cfdna-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-allele-specific-binding",
+      "upstream_path": "chip-seq/allele-specific-binding",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-chip-deep-learning",
+      "upstream_path": "chip-seq/chip-deep-learning",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-chromatin-state-segmentation",
+      "upstream_path": "chip-seq/chromatin-state-segmentation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-cut-and-run-tag",
+      "upstream_path": "chip-seq/cut-and-run-tag",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-differential-binding",
+      "upstream_path": "chip-seq/differential-binding",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-motif-analysis",
+      "upstream_path": "chip-seq/motif-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-peak-annotation",
+      "upstream_path": "chip-seq/peak-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-peak-calling",
+      "upstream_path": "chip-seq/peak-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-qc",
+      "upstream_path": "chip-seq/chipseq-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-spike-in-normalization",
+      "upstream_path": "chip-seq/spike-in-normalization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-super-enhancers",
+      "upstream_path": "chip-seq/super-enhancers",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-chipseq-visualization",
+      "upstream_path": "chip-seq/chipseq-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-adaptive-designs",
+      "upstream_path": "clinical-biostatistics/adaptive-designs",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-bayesian-trials",
+      "upstream_path": "clinical-biostatistics/bayesian-trials",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-categorical-tests",
+      "upstream_path": "clinical-biostatistics/categorical-tests",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-cdisc-data",
+      "upstream_path": "clinical-biostatistics/cdisc-data-handling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-effect-measures",
+      "upstream_path": "clinical-biostatistics/effect-measures",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-logistic-regression",
+      "upstream_path": "clinical-biostatistics/logistic-regression",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-missing-data",
+      "upstream_path": "clinical-biostatistics/missing-data-sensitivity",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-multiplicity-graphical",
+      "upstream_path": "clinical-biostatistics/multiplicity-graphical",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-power-sample-size",
+      "upstream_path": "clinical-biostatistics/power-and-sample-size",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-subgroup-analysis",
+      "upstream_path": "clinical-biostatistics/subgroup-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-survival-analysis",
+      "upstream_path": "clinical-biostatistics/survival-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-biostatistics-trial-reporting",
+      "upstream_path": "clinical-biostatistics/trial-reporting",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-acmg-classification",
+      "upstream_path": "clinical-databases/acmg-classification",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-clinvar-lookup",
+      "upstream_path": "clinical-databases/clinvar-lookup",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-clinical-databases-dbsnp-queries",
+      "upstream_path": "clinical-databases/dbsnp-queries",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-clinical-databases-gnomad-frequencies",
+      "upstream_path": "clinical-databases/gnomad-frequencies",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-clinical-databases-hla-typing",
+      "upstream_path": "clinical-databases/hla-typing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-msi-detection",
+      "upstream_path": "clinical-databases/msi-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-myvariant-queries",
+      "upstream_path": "clinical-databases/myvariant-queries",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-clinical-databases-pharmacogenomics",
+      "upstream_path": "clinical-databases/pharmacogenomics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-polygenic-risk",
+      "upstream_path": "clinical-databases/polygenic-risk",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-somatic-signatures",
+      "upstream_path": "clinical-databases/somatic-signatures",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-tumor-mutational-burden",
+      "upstream_path": "clinical-databases/tumor-mutational-burden",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clinical-databases-variant-prioritization",
+      "upstream_path": "clinical-databases/variant-prioritization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-ago-clip-mirna-targets",
+      "upstream_path": "clip-seq/ago-clip-mirna-targets",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-binding-site-annotation",
+      "upstream_path": "clip-seq/binding-site-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-clip-alignment",
+      "upstream_path": "clip-seq/clip-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-clip-deep-learning",
+      "upstream_path": "clip-seq/clip-deep-learning",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-clip-motif-analysis",
+      "upstream_path": "clip-seq/clip-motif-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-clip-peak-calling",
+      "upstream_path": "clip-seq/clip-peak-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-clip-preprocessing",
+      "upstream_path": "clip-seq/clip-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-clip-qc",
+      "upstream_path": "clip-seq/clip-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-crosslink-site-detection",
+      "upstream_path": "clip-seq/crosslink-site-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-differential-clip",
+      "upstream_path": "clip-seq/differential-clip",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-m6a-clip",
+      "upstream_path": "clip-seq/m6a-clip",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-clip-seq-stamp-antibody-free",
+      "upstream_path": "clip-seq/stamp-antibody-free",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-codon-usage",
+      "upstream_path": "sequence-manipulation/codon-usage",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-ancestral-reconstruction",
+      "upstream_path": "comparative-genomics/ancestral-reconstruction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-comparative-annotation-projection",
+      "upstream_path": "comparative-genomics/comparative-annotation-projection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-gene-family-evolution",
+      "upstream_path": "comparative-genomics/gene-family-evolution",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-gene-tree-species-tree-reconciliation",
+      "upstream_path": "comparative-genomics/gene-tree-species-tree-reconciliation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-genome-distance-and-species-delineation",
+      "upstream_path": "comparative-genomics/genome-distance-and-species-delineation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-hgt-detection",
+      "upstream_path": "comparative-genomics/hgt-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-introgression-detection",
+      "upstream_path": "comparative-genomics/introgression-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-ortholog-inference",
+      "upstream_path": "comparative-genomics/ortholog-inference",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-pangenome-analysis",
+      "upstream_path": "comparative-genomics/pangenome-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-positive-selection",
+      "upstream_path": "comparative-genomics/positive-selection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-synteny-analysis",
+      "upstream_path": "comparative-genomics/synteny-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-whole-genome-alignment",
+      "upstream_path": "comparative-genomics/whole-genome-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-comparative-genomics-whole-genome-duplication",
+      "upstream_path": "comparative-genomics/whole-genome-duplication",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-compressed-files",
+      "upstream_path": "sequence-io/compressed-files",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-conformer-generation",
+      "upstream_path": "chemoinformatics/conformer-generation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-consensus-sequences",
+      "upstream_path": "variant-calling/consensus-sequences",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-allele-specific-copy-number",
+      "upstream_path": "copy-number/allele-specific-copy-number",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-cnv-annotation",
+      "upstream_path": "copy-number/cnv-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-cnv-visualization",
+      "upstream_path": "copy-number/cnv-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-cnvkit-analysis",
+      "upstream_path": "copy-number/cnvkit-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-copy-ratio-segmentation",
+      "upstream_path": "copy-number/copy-ratio-segmentation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-focal-amplification-ecdna",
+      "upstream_path": "copy-number/focal-amplification-ecdna",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-gatk-cnv",
+      "upstream_path": "copy-number/gatk-cnv",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-germline-cnv-interpretation",
+      "upstream_path": "copy-number/germline-cnv-interpretation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-hrd-scoring",
+      "upstream_path": "copy-number/hrd-scoring",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-recurrent-cnv",
+      "upstream_path": "copy-number/recurrent-cnv",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-copy-number-subclonal-copy-number",
+      "upstream_path": "copy-number/subclonal-copy-number",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-covalent-design",
+      "upstream_path": "chemoinformatics/covalent-design",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-bagel-essentiality",
+      "upstream_path": "crispr-screens/bagel-essentiality",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-base-editing-analysis",
+      "upstream_path": "crispr-screens/base-editing-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-batch-correction",
+      "upstream_path": "crispr-screens/batch-correction",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-combinatorial-screens",
+      "upstream_path": "crispr-screens/combinatorial-screens",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-copy-number-correction",
+      "upstream_path": "crispr-screens/copy-number-correction",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-crispresso-editing",
+      "upstream_path": "crispr-screens/crispresso-editing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-drugz-chemogenomic",
+      "upstream_path": "crispr-screens/drugz-chemogenomic",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-hit-calling",
+      "upstream_path": "crispr-screens/hit-calling",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-in-vivo-screens",
+      "upstream_path": "crispr-screens/in-vivo-screens",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-jacks-analysis",
+      "upstream_path": "crispr-screens/jacks-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-library-design",
+      "upstream_path": "crispr-screens/library-design",
+      "category": "Protocol Design",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-mageck-analysis",
+      "upstream_path": "crispr-screens/mageck-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-perturb-seq-analysis",
+      "upstream_path": "crispr-screens/perturb-seq-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-prime-editing-screens",
+      "upstream_path": "crispr-screens/prime-editing-screens",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-crispr-screens-screen-qc",
+      "upstream_path": "crispr-screens/screen-qc",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-ctdna-mutation-detection",
+      "upstream_path": "liquid-biopsy/ctdna-mutation-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-circos-plots",
+      "upstream_path": "data-visualization/circos-plots",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-color-palettes",
+      "upstream_path": "data-visualization/color-palettes",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-data-visualization-dimensionality-reduction-plots",
+      "upstream_path": "data-visualization/dimensionality-reduction-plots",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-data-visualization-distribution-plots",
+      "upstream_path": "data-visualization/distribution-plots",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-flow-and-transition-plots",
+      "upstream_path": "data-visualization/flow-and-transition-plots",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-forest-funnel-plots",
+      "upstream_path": "data-visualization/forest-funnel-plots",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-data-visualization-genome-tracks",
+      "upstream_path": "data-visualization/genome-tracks",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-ggplot2-fundamentals",
+      "upstream_path": "data-visualization/ggplot2-fundamentals",
+      "category": null,
+      "state": "excluded"
+    },
+    {
+      "id": "bio-data-visualization-heatmaps-clustering",
+      "upstream_path": "data-visualization/heatmaps-clustering",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-interactive-visualization",
+      "upstream_path": "data-visualization/interactive-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-lollipop-protein-maps",
+      "upstream_path": "data-visualization/lollipop-protein-maps",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-manhattan-qq-locuszoom",
+      "upstream_path": "data-visualization/manhattan-qq-locuszoom",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-matplotlib-fundamentals",
+      "upstream_path": "data-visualization/matplotlib-fundamentals",
+      "category": null,
+      "state": "excluded"
+    },
+    {
+      "id": "bio-data-visualization-multipanel-figures",
+      "upstream_path": "data-visualization/multipanel-figures",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-network-visualization",
+      "upstream_path": "data-visualization/network-visualization",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-data-visualization-oncoprint-mutation-matrices",
+      "upstream_path": "data-visualization/oncoprint-mutation-matrices",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-data-visualization-sequence-logos",
+      "upstream_path": "data-visualization/sequence-logos",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-data-visualization-statistical-annotation",
+      "upstream_path": "data-visualization/statistical-annotation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-data-visualization-upset-plots",
+      "upstream_path": "data-visualization/upset-plots",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-data-visualization-volcano-and-ma-plots",
+      "upstream_path": "data-visualization/volcano-and-ma-plots",
+      "category": null,
+      "state": "excluded"
+    },
+    {
+      "id": "bio-differential-expression-batch-correction",
+      "upstream_path": "differential-expression/batch-correction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-differential-expression-de-results",
+      "upstream_path": "differential-expression/de-results",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-differential-expression-de-visualization",
+      "upstream_path": "differential-expression/de-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-differential-expression-deseq2-basics",
+      "upstream_path": "differential-expression/deseq2-basics",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-differential-expression-edger-basics",
+      "upstream_path": "differential-expression/edger-basics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-differential-expression-timeseries-de",
+      "upstream_path": "differential-expression/timeseries-de",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-differential-splicing",
+      "upstream_path": "alternative-splicing/differential-splicing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-duplicate-handling",
+      "upstream_path": "alignment-files/duplicate-handling",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-ecological-genomics-biodiversity-metrics",
+      "upstream_path": "ecological-genomics/biodiversity-metrics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ecological-genomics-community-ecology",
+      "upstream_path": "ecological-genomics/community-ecology",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ecological-genomics-conservation-genetics",
+      "upstream_path": "ecological-genomics/conservation-genetics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ecological-genomics-edna-metabarcoding",
+      "upstream_path": "ecological-genomics/edna-metabarcoding",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ecological-genomics-landscape-genomics",
+      "upstream_path": "ecological-genomics/landscape-genomics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ecological-genomics-species-delimitation",
+      "upstream_path": "ecological-genomics/species-delimitation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ensembl-rest",
+      "upstream_path": "database-access/ensembl-rest",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-entrez-fetch",
+      "upstream_path": "database-access/entrez-fetch",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-entrez-link",
+      "upstream_path": "database-access/entrez-link",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-entrez-search",
+      "upstream_path": "database-access/entrez-search",
+      "category": "Evidence Insight",
+      "state": "ready"
+    },
+    {
+      "id": "bio-epidemiological-genomics-amr-surveillance",
+      "upstream_path": "epidemiological-genomics/amr-surveillance",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epidemiological-genomics-pathogen-typing",
+      "upstream_path": "epidemiological-genomics/pathogen-typing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epidemiological-genomics-phylodynamics",
+      "upstream_path": "epidemiological-genomics/phylodynamics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epidemiological-genomics-transmission-inference",
+      "upstream_path": "epidemiological-genomics/transmission-inference",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epidemiological-genomics-variant-surveillance",
+      "upstream_path": "epidemiological-genomics/variant-surveillance",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epitranscriptomics-m6a-differential",
+      "upstream_path": "epitranscriptomics/m6a-differential",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epitranscriptomics-m6a-peak-calling",
+      "upstream_path": "epitranscriptomics/m6a-peak-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epitranscriptomics-m6anet-analysis",
+      "upstream_path": "epitranscriptomics/m6anet-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epitranscriptomics-merip-preprocessing",
+      "upstream_path": "epitranscriptomics/merip-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-epitranscriptomics-modification-visualization",
+      "upstream_path": "epitranscriptomics/modification-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-experimental-design-batch-design",
+      "upstream_path": "experimental-design/batch-design",
+      "category": "Protocol Design",
+      "state": "ready"
+    },
+    {
+      "id": "bio-experimental-design-multiple-testing",
+      "upstream_path": "experimental-design/multiple-testing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-experimental-design-power-analysis",
+      "upstream_path": "experimental-design/power-analysis",
+      "category": "Protocol Design",
+      "state": "ready"
+    },
+    {
+      "id": "bio-experimental-design-randomization-blocking",
+      "upstream_path": "experimental-design/randomization-blocking",
+      "category": "Protocol Design",
+      "state": "ready"
+    },
+    {
+      "id": "bio-experimental-design-sample-size",
+      "upstream_path": "experimental-design/sample-size",
+      "category": "Protocol Design",
+      "state": "ready"
+    },
+    {
+      "id": "bio-expression-matrix-counts-ingest",
+      "upstream_path": "expression-matrix/counts-ingest",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-expression-matrix-gene-id-mapping",
+      "upstream_path": "expression-matrix/gene-id-mapping",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-expression-matrix-metadata-joins",
+      "upstream_path": "expression-matrix/metadata-joins",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-expression-matrix-normalization",
+      "upstream_path": "expression-matrix/normalization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-expression-matrix-sparse-handling",
+      "upstream_path": "expression-matrix/sparse-handling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-fastq-quality",
+      "upstream_path": "sequence-io/fastq-quality",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-filter-sequences",
+      "upstream_path": "sequence-io/filter-sequences",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-bead-normalization",
+      "upstream_path": "flow-cytometry/bead-normalization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-clustering-phenotyping",
+      "upstream_path": "flow-cytometry/clustering-phenotyping",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-compensation-transformation",
+      "upstream_path": "flow-cytometry/compensation-transformation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-cytometry-qc",
+      "upstream_path": "flow-cytometry/cytometry-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-differential-analysis",
+      "upstream_path": "flow-cytometry/differential-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-doublet-detection",
+      "upstream_path": "flow-cytometry/doublet-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-fcs-handling",
+      "upstream_path": "flow-cytometry/fcs-handling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-flow-cytometry-gating-analysis",
+      "upstream_path": "flow-cytometry/gating-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-format-conversion",
+      "upstream_path": "sequence-io/format-conversion",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-fragment-analysis",
+      "upstream_path": "liquid-biopsy/fragment-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-free-energy-calculations",
+      "upstream_path": "chemoinformatics/free-energy-calculations",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-gatk-variant-calling",
+      "upstream_path": "variant-calling/gatk-variant-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-gene-regulatory-networks-coexpression-networks",
+      "upstream_path": "gene-regulatory-networks/coexpression-networks",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-gene-regulatory-networks-differential-networks",
+      "upstream_path": "gene-regulatory-networks/differential-networks",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-gene-regulatory-networks-grn-inference",
+      "upstream_path": "gene-regulatory-networks/grn-inference",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-gene-regulatory-networks-multiomics-grn",
+      "upstream_path": "gene-regulatory-networks/multiomics-grn",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-gene-regulatory-networks-perturbation-simulation",
+      "upstream_path": "gene-regulatory-networks/perturbation-simulation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-gene-regulatory-networks-scenic-regulons",
+      "upstream_path": "gene-regulatory-networks/scenic-regulons",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-generative-design",
+      "upstream_path": "chemoinformatics/generative-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-annotation-annotation-qc",
+      "upstream_path": "genome-annotation/annotation-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-annotation-annotation-transfer",
+      "upstream_path": "genome-annotation/annotation-transfer",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-annotation-eukaryotic-gene-prediction",
+      "upstream_path": "genome-annotation/eukaryotic-gene-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-annotation-functional-annotation",
+      "upstream_path": "genome-annotation/functional-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-annotation-ncrna-annotation",
+      "upstream_path": "genome-annotation/ncrna-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-annotation-prokaryotic-annotation",
+      "upstream_path": "genome-annotation/prokaryotic-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-annotation-repeat-annotation",
+      "upstream_path": "genome-annotation/repeat-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-assembly-polishing",
+      "upstream_path": "genome-assembly/assembly-polishing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-assembly-qc",
+      "upstream_path": "genome-assembly/assembly-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-contamination-detection",
+      "upstream_path": "genome-assembly/contamination-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-genome-profiling",
+      "upstream_path": "genome-assembly/genome-profiling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-hifi-assembly",
+      "upstream_path": "genome-assembly/hifi-assembly",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-long-read-assembly",
+      "upstream_path": "genome-assembly/long-read-assembly",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-metagenome-assembly",
+      "upstream_path": "genome-assembly/metagenome-assembly",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-scaffolding",
+      "upstream_path": "genome-assembly/scaffolding",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-assembly-short-read-assembly",
+      "upstream_path": "genome-assembly/short-read-assembly",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-engineering-base-editing-design",
+      "upstream_path": "genome-engineering/base-editing-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-engineering-grna-design",
+      "upstream_path": "genome-engineering/grna-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-engineering-hdr-template-design",
+      "upstream_path": "genome-engineering/hdr-template-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-engineering-off-target-prediction",
+      "upstream_path": "genome-engineering/off-target-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-engineering-prime-editing-design",
+      "upstream_path": "genome-engineering/prime-editing-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-bed-file-basics",
+      "upstream_path": "genome-intervals/bed-file-basics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-bedgraph-handling",
+      "upstream_path": "genome-intervals/bedgraph-handling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-bigwig-tracks",
+      "upstream_path": "genome-intervals/bigwig-tracks",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-coverage-analysis",
+      "upstream_path": "genome-intervals/coverage-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-gtf-gff-handling",
+      "upstream_path": "genome-intervals/gtf-gff-handling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-interval-arithmetic",
+      "upstream_path": "genome-intervals/interval-arithmetic",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-overlap-significance",
+      "upstream_path": "genome-intervals/overlap-significance",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-genome-intervals-proximity-operations",
+      "upstream_path": "genome-intervals/proximity-operations",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-geo-data",
+      "upstream_path": "database-access/geo-data",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-hi-c-analysis-compartment-analysis",
+      "upstream_path": "hi-c-analysis/compartment-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-contact-pairs",
+      "upstream_path": "hi-c-analysis/contact-pairs",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-hic-data-io",
+      "upstream_path": "hi-c-analysis/hic-data-io",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-hic-differential",
+      "upstream_path": "hi-c-analysis/hic-differential",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-hic-visualization",
+      "upstream_path": "hi-c-analysis/hic-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-hichip-plac-loops",
+      "upstream_path": "hi-c-analysis/hichip-plac-loops",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-loop-calling",
+      "upstream_path": "hi-c-analysis/loop-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-matrix-operations",
+      "upstream_path": "hi-c-analysis/matrix-operations",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-hi-c-analysis-tad-detection",
+      "upstream_path": "hi-c-analysis/tad-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-imaging-mass-cytometry-cell-segmentation",
+      "upstream_path": "imaging-mass-cytometry/cell-segmentation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-imaging-mass-cytometry-data-preprocessing",
+      "upstream_path": "imaging-mass-cytometry/data-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-imaging-mass-cytometry-differential-analysis",
+      "upstream_path": "imaging-mass-cytometry/differential-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-imaging-mass-cytometry-interactive-annotation",
+      "upstream_path": "imaging-mass-cytometry/interactive-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-imaging-mass-cytometry-phenotyping",
+      "upstream_path": "imaging-mass-cytometry/phenotyping",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-imaging-mass-cytometry-quality-metrics",
+      "upstream_path": "imaging-mass-cytometry/quality-metrics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-imaging-mass-cytometry-spatial-analysis",
+      "upstream_path": "imaging-mass-cytometry/spatial-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-immunoinformatics-epitope-prediction",
+      "upstream_path": "immunoinformatics/epitope-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-immunoinformatics-immunogenicity-scoring",
+      "upstream_path": "immunoinformatics/immunogenicity-scoring",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-immunoinformatics-mhc-binding-prediction",
+      "upstream_path": "immunoinformatics/mhc-binding-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-immunoinformatics-mhc-class-ii-prediction",
+      "upstream_path": "immunoinformatics/mhc-class-ii-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-immunoinformatics-neoantigen-prediction",
+      "upstream_path": "immunoinformatics/neoantigen-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-immunoinformatics-tcr-epitope-binding",
+      "upstream_path": "immunoinformatics/tcr-epitope-binding",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-interaction-databases",
+      "upstream_path": "database-access/interaction-databases",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-isoform-switching",
+      "upstream_path": "alternative-splicing/isoform-switching",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-local-blast",
+      "upstream_path": "database-access/local-blast",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-long-read-sequencing-basecalling",
+      "upstream_path": "long-read-sequencing/basecalling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-clair3-variants",
+      "upstream_path": "long-read-sequencing/clair3-variants",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-haplotype-phasing",
+      "upstream_path": "long-read-sequencing/haplotype-phasing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-isoseq-analysis",
+      "upstream_path": "long-read-sequencing/isoseq-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-long-read-alignment",
+      "upstream_path": "long-read-sequencing/long-read-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-long-read-qc",
+      "upstream_path": "long-read-sequencing/long-read-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-medaka-polishing",
+      "upstream_path": "long-read-sequencing/medaka-polishing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-nanopore-methylation",
+      "upstream_path": "long-read-sequencing/nanopore-methylation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-sequencing-structural-variants",
+      "upstream_path": "long-read-sequencing/structural-variants",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-long-read-splicing",
+      "upstream_path": "alternative-splicing/long-read-splicing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-longitudinal-monitoring",
+      "upstream_path": "liquid-biopsy/longitudinal-monitoring",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-machine-learning-atlas-mapping",
+      "upstream_path": "machine-learning/atlas-mapping",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-machine-learning-biomarker-discovery",
+      "upstream_path": "machine-learning/biomarker-discovery",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-machine-learning-model-validation",
+      "upstream_path": "machine-learning/model-validation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-machine-learning-omics-classifiers",
+      "upstream_path": "machine-learning/omics-classifiers",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-machine-learning-prediction-explanation",
+      "upstream_path": "machine-learning/prediction-explanation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-machine-learning-survival-analysis",
+      "upstream_path": "machine-learning/survival-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metabolomics-isotope-tracing",
+      "upstream_path": "metabolomics/isotope-tracing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-lipidomics",
+      "upstream_path": "metabolomics/lipidomics",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-metabolite-annotation",
+      "upstream_path": "metabolomics/metabolite-annotation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-msdial-preprocessing",
+      "upstream_path": "metabolomics/msdial-preprocessing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-normalization-qc",
+      "upstream_path": "metabolomics/normalization-qc",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-pathway-mapping",
+      "upstream_path": "metabolomics/pathway-mapping",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-statistical-analysis",
+      "upstream_path": "metabolomics/statistical-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-targeted-analysis",
+      "upstream_path": "metabolomics/targeted-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metabolomics-xcms-preprocessing",
+      "upstream_path": "metabolomics/xcms-preprocessing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-metagenomics-abundance",
+      "upstream_path": "metagenomics/abundance-estimation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metagenomics-amr-detection",
+      "upstream_path": "metagenomics/amr-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metagenomics-contamination-controls",
+      "upstream_path": "metagenomics/contamination-controls",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metagenomics-functional-profiling",
+      "upstream_path": "metagenomics/functional-profiling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metagenomics-kraken",
+      "upstream_path": "metagenomics/kraken-classification",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metagenomics-metaphlan",
+      "upstream_path": "metagenomics/metaphlan-profiling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metagenomics-strain-tracking",
+      "upstream_path": "metagenomics/strain-tracking",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-metagenomics-visualization",
+      "upstream_path": "metagenomics/metagenome-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-array-preprocessing",
+      "upstream_path": "methylation-analysis/array-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-array-qc-filtering",
+      "upstream_path": "methylation-analysis/array-qc-filtering",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-based-detection",
+      "upstream_path": "liquid-biopsy/methylation-based-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-bismark-alignment",
+      "upstream_path": "methylation-analysis/bismark-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-calling",
+      "upstream_path": "methylation-analysis/methylation-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-cell-type-deconvolution",
+      "upstream_path": "methylation-analysis/cell-type-deconvolution",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-differential-cpg",
+      "upstream_path": "methylation-analysis/differential-cpg-testing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-dmr-detection",
+      "upstream_path": "methylation-analysis/dmr-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-epigenetic-clocks",
+      "upstream_path": "methylation-analysis/epigenetic-clocks",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-ewas-design",
+      "upstream_path": "methylation-analysis/ewas-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-methylation-methylkit",
+      "upstream_path": "methylation-analysis/methylkit-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-microbiome-amplicon-processing",
+      "upstream_path": "microbiome/amplicon-processing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-microbiome-differential-abundance",
+      "upstream_path": "microbiome/differential-abundance",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-microbiome-diversity-analysis",
+      "upstream_path": "microbiome/diversity-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-microbiome-functional-prediction",
+      "upstream_path": "microbiome/functional-prediction",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-microbiome-qiime2-workflow",
+      "upstream_path": "microbiome/qiime2-workflow",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-microbiome-taxonomy-assignment",
+      "upstream_path": "microbiome/taxonomy-assignment",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-ml-docking-rescoring",
+      "upstream_path": "chemoinformatics/ml-docking-rescoring",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-molecular-descriptors",
+      "upstream_path": "chemoinformatics/molecular-descriptors",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-molecular-io",
+      "upstream_path": "chemoinformatics/molecular-io",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-molecular-standardization",
+      "upstream_path": "chemoinformatics/molecular-standardization",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-motif-search",
+      "upstream_path": "sequence-manipulation/motif-search",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-multi-omics-data-harmonization",
+      "upstream_path": "multi-omics-integration/data-harmonization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-multi-omics-integration-design",
+      "upstream_path": "multi-omics-integration/integration-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-multi-omics-mixomics-analysis",
+      "upstream_path": "multi-omics-integration/mixomics-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-multi-omics-mofa-integration",
+      "upstream_path": "multi-omics-integration/mofa-integration",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-multi-omics-similarity-network",
+      "upstream_path": "multi-omics-integration/similarity-network",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ncbi-datasets-cli",
+      "upstream_path": "database-access/ncbi-datasets-cli",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-ortholog-inference",
+      "upstream_path": "database-access/ortholog-inference",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-outlier-splicing-detection",
+      "upstream_path": "alternative-splicing/outlier-splicing-detection",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-paired-end-fastq",
+      "upstream_path": "sequence-io/paired-end-fastq",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-pathway-enrichment-visualization",
+      "upstream_path": "pathway-analysis/enrichment-visualization",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-pathway-go-enrichment",
+      "upstream_path": "pathway-analysis/go-enrichment",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-pathway-gsea",
+      "upstream_path": "pathway-analysis/gsea",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-pathway-kegg-pathways",
+      "upstream_path": "pathway-analysis/kegg-pathways",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-pathway-reactome",
+      "upstream_path": "pathway-analysis/reactome-pathways",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-pathway-wikipathways",
+      "upstream_path": "pathway-analysis/wikipathways",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-pharmacophore-modeling",
+      "upstream_path": "chemoinformatics/pharmacophore-modeling",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phasing-imputation-genotype-imputation",
+      "upstream_path": "phasing-imputation/genotype-imputation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-phasing-imputation-haplotype-phasing",
+      "upstream_path": "phasing-imputation/haplotype-phasing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-phasing-imputation-imputation-qc",
+      "upstream_path": "phasing-imputation/imputation-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-phasing-imputation-reference-panels",
+      "upstream_path": "phasing-imputation/reference-panels",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-phylo-bayesian-inference",
+      "upstream_path": "phylogenetics/bayesian-inference",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phylo-distance-calculations",
+      "upstream_path": "phylogenetics/distance-calculations",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phylo-divergence-dating",
+      "upstream_path": "phylogenetics/divergence-dating",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phylo-modern-tree-inference",
+      "upstream_path": "phylogenetics/modern-tree-inference",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phylo-species-trees",
+      "upstream_path": "phylogenetics/species-trees",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phylo-tree-io",
+      "upstream_path": "phylogenetics/tree-io",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phylo-tree-manipulation",
+      "upstream_path": "phylogenetics/tree-manipulation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-phylo-tree-visualization",
+      "upstream_path": "phylogenetics/tree-visualization",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-pileup-generation",
+      "upstream_path": "alignment-files/pileup-generation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-population-genetics-association-testing",
+      "upstream_path": "population-genetics/association-testing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-population-genetics-linkage-disequilibrium",
+      "upstream_path": "population-genetics/linkage-disequilibrium",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-population-genetics-plink-basics",
+      "upstream_path": "population-genetics/plink-basics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-population-genetics-population-structure",
+      "upstream_path": "population-genetics/population-structure",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-population-genetics-rare-variant-association",
+      "upstream_path": "population-genetics/rare-variant-association",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-population-genetics-scikit-allel-analysis",
+      "upstream_path": "population-genetics/scikit-allel-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-population-genetics-selection-statistics",
+      "upstream_path": "population-genetics/selection-statistics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-pose-validation",
+      "upstream_path": "chemoinformatics/pose-validation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-primer-design-primer-basics",
+      "upstream_path": "primer-design/primer-basics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-primer-design-primer-specificity",
+      "upstream_path": "primer-design/primer-specificity",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-primer-design-primer-validation",
+      "upstream_path": "primer-design/primer-validation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-primer-design-qpcr-primers",
+      "upstream_path": "primer-design/qpcr-primers",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-protac-degraders",
+      "upstream_path": "chemoinformatics/protac-degraders",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-data-import",
+      "upstream_path": "proteomics/data-import",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-dia-analysis",
+      "upstream_path": "proteomics/dia-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-differential-abundance",
+      "upstream_path": "proteomics/differential-abundance",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-peptide-identification",
+      "upstream_path": "proteomics/peptide-identification",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-protein-inference",
+      "upstream_path": "proteomics/protein-inference",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-proteomics-qc",
+      "upstream_path": "proteomics/proteomics-qc",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-ptm-analysis",
+      "upstream_path": "proteomics/ptm-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-quantification",
+      "upstream_path": "proteomics/quantification",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-proteomics-spectral-libraries",
+      "upstream_path": "proteomics/spectral-libraries",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-qsar-modeling",
+      "upstream_path": "chemoinformatics/qsar-modeling",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-reaction-enumeration",
+      "upstream_path": "chemoinformatics/reaction-enumeration",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-alignment-bowtie2-alignment",
+      "upstream_path": "read-alignment/bowtie2-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-alignment-bwa-alignment",
+      "upstream_path": "read-alignment/bwa-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-alignment-hisat2-alignment",
+      "upstream_path": "read-alignment/hisat2-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-alignment-star-alignment",
+      "upstream_path": "read-alignment/star-alignment",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-qc-adapter-trimming",
+      "upstream_path": "read-qc/adapter-trimming",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-qc-contamination-screening",
+      "upstream_path": "read-qc/contamination-screening",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-qc-fastp-workflow",
+      "upstream_path": "read-qc/fastp-workflow",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-qc-quality-filtering",
+      "upstream_path": "read-qc/quality-filtering",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-qc-quality-reports",
+      "upstream_path": "read-qc/quality-reports",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-qc-rnaseq-qc",
+      "upstream_path": "read-qc/rnaseq-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-qc-umi-processing",
+      "upstream_path": "read-qc/umi-processing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-read-sequences",
+      "upstream_path": "sequence-io/read-sequences",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-reference-operations",
+      "upstream_path": "alignment-files/reference-operations",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-remote-homology",
+      "upstream_path": "database-access/remote-homology",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-reporting-automated-qc-reports",
+      "upstream_path": "reporting/automated-qc-reports",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-reporting-figure-export",
+      "upstream_path": "reporting/figure-export",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-reporting-jupyter-reports",
+      "upstream_path": "reporting/jupyter-reports",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-reporting-publication-tables",
+      "upstream_path": "reporting/publication-tables",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-reporting-quarto-reports",
+      "upstream_path": "reporting/quarto-reports",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-reporting-rmarkdown-reports",
+      "upstream_path": "reporting/rmarkdown-reports",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-restriction-enzyme-selection",
+      "upstream_path": "restriction-analysis/enzyme-selection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-restriction-fragment-analysis",
+      "upstream_path": "restriction-analysis/fragment-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-restriction-golden-gate-assembly",
+      "upstream_path": "restriction-analysis/golden-gate-assembly",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-restriction-mapping",
+      "upstream_path": "restriction-analysis/restriction-mapping",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-restriction-sites",
+      "upstream_path": "restriction-analysis/restriction-sites",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-retrosynthesis",
+      "upstream_path": "chemoinformatics/retrosynthesis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-reverse-complement",
+      "upstream_path": "sequence-manipulation/reverse-complement",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ribo-seq-initiation-site-mapping",
+      "upstream_path": "ribo-seq/initiation-site-mapping",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ribo-seq-orf-detection",
+      "upstream_path": "ribo-seq/orf-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ribo-seq-riboseq-preprocessing",
+      "upstream_path": "ribo-seq/riboseq-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ribo-seq-ribosome-periodicity",
+      "upstream_path": "ribo-seq/ribosome-periodicity",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ribo-seq-ribosome-stalling",
+      "upstream_path": "ribo-seq/ribosome-stalling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-ribo-seq-translation-efficiency",
+      "upstream_path": "ribo-seq/translation-efficiency",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-quantification-alignment-free-quant",
+      "upstream_path": "rna-quantification/alignment-free-quant",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-quantification-count-matrix-qc",
+      "upstream_path": "rna-quantification/count-matrix-qc",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-quantification-featurecounts-counting",
+      "upstream_path": "rna-quantification/featurecounts-counting",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-quantification-tximport-workflow",
+      "upstream_path": "rna-quantification/tximport-workflow",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-structure-covariation-analysis",
+      "upstream_path": "rna-structure/covariation-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-structure-ncrna-search",
+      "upstream_path": "rna-structure/ncrna-search",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-structure-secondary-structure-prediction",
+      "upstream_path": "rna-structure/secondary-structure-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-rna-structure-structure-probing",
+      "upstream_path": "rna-structure/structure-probing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-sam-bam-basics",
+      "upstream_path": "alignment-files/sam-bam-basics",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-sashimi-plots",
+      "upstream_path": "alternative-splicing/sashimi-plots",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-scaffold-analysis",
+      "upstream_path": "chemoinformatics/scaffold-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-seq-objects",
+      "upstream_path": "sequence-manipulation/seq-objects",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-sequence-properties",
+      "upstream_path": "sequence-manipulation/sequence-properties",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-sequence-slicing",
+      "upstream_path": "sequence-manipulation/sequence-slicing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-sequence-statistics",
+      "upstream_path": "sequence-io/sequence-statistics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-shape-similarity",
+      "upstream_path": "chemoinformatics/shape-similarity",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-similarity-searching",
+      "upstream_path": "chemoinformatics/similarity-searching",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-batch-integration",
+      "upstream_path": "single-cell/batch-integration",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-cell-annotation",
+      "upstream_path": "single-cell/cell-annotation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-cell-communication",
+      "upstream_path": "single-cell/cell-communication",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-clustering",
+      "upstream_path": "single-cell/clustering",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-cnv-inference",
+      "upstream_path": "single-cell/cnv-inference",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-data-io",
+      "upstream_path": "single-cell/data-io",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-differential-abundance",
+      "upstream_path": "single-cell/differential-abundance",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-doublet-detection",
+      "upstream_path": "single-cell/doublet-detection",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-hashing-demultiplexing",
+      "upstream_path": "single-cell/hashing-demultiplexing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-lineage-tracing",
+      "upstream_path": "single-cell/lineage-tracing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-markers-annotation",
+      "upstream_path": "single-cell/markers-annotation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-metabolite-communication",
+      "upstream_path": "single-cell/metabolite-communication",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-multimodal-integration",
+      "upstream_path": "single-cell/multimodal-integration",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-perturb-seq",
+      "upstream_path": "single-cell/perturb-seq",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-preprocessing",
+      "upstream_path": "single-cell/preprocessing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-scatac-analysis",
+      "upstream_path": "single-cell/scatac-analysis",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-splicing",
+      "upstream_path": "alternative-splicing/single-cell-splicing",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-single-cell-trajectory-inference",
+      "upstream_path": "single-cell/trajectory-inference",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-small-rna-seq-differential-mirna",
+      "upstream_path": "small-rna-seq/differential-mirna",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-small-rna-seq-mirdeep2-analysis",
+      "upstream_path": "small-rna-seq/mirdeep2-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-small-rna-seq-mirge3-analysis",
+      "upstream_path": "small-rna-seq/mirge3-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-small-rna-seq-smrna-preprocessing",
+      "upstream_path": "small-rna-seq/smrna-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-small-rna-seq-target-prediction",
+      "upstream_path": "small-rna-seq/target-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-small-rna-seq-trf-pirna-profiling",
+      "upstream_path": "small-rna-seq/trf-pirna-profiling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-high-resolution-binning",
+      "upstream_path": "spatial-transcriptomics/high-resolution-binning",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-image-analysis",
+      "upstream_path": "spatial-transcriptomics/image-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-communication",
+      "upstream_path": "spatial-transcriptomics/spatial-communication",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-data-io",
+      "upstream_path": "spatial-transcriptomics/spatial-data-io",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-deconvolution",
+      "upstream_path": "spatial-transcriptomics/spatial-deconvolution",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-domains",
+      "upstream_path": "spatial-transcriptomics/spatial-domains",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-multiomics",
+      "upstream_path": "spatial-transcriptomics/spatial-multiomics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-neighbors",
+      "upstream_path": "spatial-transcriptomics/spatial-neighbors",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-preprocessing",
+      "upstream_path": "spatial-transcriptomics/spatial-preprocessing",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-proteomics",
+      "upstream_path": "spatial-transcriptomics/spatial-proteomics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-statistics",
+      "upstream_path": "spatial-transcriptomics/spatial-statistics",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-spatial-transcriptomics-spatial-visualization",
+      "upstream_path": "spatial-transcriptomics/spatial-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-splice-variant-prediction",
+      "upstream_path": "alternative-splicing/splice-variant-prediction",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-splicing-qc",
+      "upstream_path": "alternative-splicing/splicing-qc",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-splicing-quantification",
+      "upstream_path": "alternative-splicing/splicing-quantification",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-sra-data",
+      "upstream_path": "database-access/sra-data",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-structural-biology-alphafold-predictions",
+      "upstream_path": "structural-biology/alphafold-predictions",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-binding-site-detection",
+      "upstream_path": "structural-biology/binding-site-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-geometric-analysis",
+      "upstream_path": "structural-biology/geometric-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-interface-analysis",
+      "upstream_path": "structural-biology/interface-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-modern-structure-prediction",
+      "upstream_path": "structural-biology/modern-structure-prediction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-structure-io",
+      "upstream_path": "structural-biology/structure-io",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-structure-modification",
+      "upstream_path": "structural-biology/structure-modification",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-structure-navigation",
+      "upstream_path": "structural-biology/structure-navigation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-structure-preparation",
+      "upstream_path": "structural-biology/structure-preparation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-structural-biology-structure-validation",
+      "upstream_path": "structural-biology/structure-validation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-substructure-search",
+      "upstream_path": "chemoinformatics/substructure-search",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-systems-biology-community-metabolic-modeling",
+      "upstream_path": "systems-biology/community-metabolic-modeling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-systems-biology-context-specific-models",
+      "upstream_path": "systems-biology/context-specific-models",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-systems-biology-flux-balance-analysis",
+      "upstream_path": "systems-biology/flux-balance-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-systems-biology-gene-essentiality",
+      "upstream_path": "systems-biology/gene-essentiality",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-systems-biology-metabolic-reconstruction",
+      "upstream_path": "systems-biology/metabolic-reconstruction",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-systems-biology-model-curation",
+      "upstream_path": "systems-biology/model-curation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-systems-biology-strain-design",
+      "upstream_path": "systems-biology/strain-design",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-tcr-bcr-analysis-immcantation-analysis",
+      "upstream_path": "tcr-bcr-analysis/immcantation-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-tcr-bcr-analysis-mixcr-analysis",
+      "upstream_path": "tcr-bcr-analysis/mixcr-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-tcr-bcr-analysis-repertoire-visualization",
+      "upstream_path": "tcr-bcr-analysis/repertoire-visualization",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-tcr-bcr-analysis-scirpy-analysis",
+      "upstream_path": "tcr-bcr-analysis/scirpy-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-tcr-bcr-analysis-specificity-annotation",
+      "upstream_path": "tcr-bcr-analysis/specificity-annotation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-tcr-bcr-analysis-vdjtools-analysis",
+      "upstream_path": "tcr-bcr-analysis/vdjtools-analysis",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-temporal-genomics-circadian-rhythms",
+      "upstream_path": "temporal-genomics/circadian-rhythms",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-temporal-genomics-differential-rhythmicity",
+      "upstream_path": "temporal-genomics/differential-rhythmicity",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-temporal-genomics-periodicity-detection",
+      "upstream_path": "temporal-genomics/periodicity-detection",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-temporal-genomics-temporal-clustering",
+      "upstream_path": "temporal-genomics/temporal-clustering",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-temporal-genomics-temporal-grn",
+      "upstream_path": "temporal-genomics/temporal-grn",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-temporal-genomics-trajectory-modeling",
+      "upstream_path": "temporal-genomics/trajectory-modeling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-transcription-translation",
+      "upstream_path": "sequence-manipulation/transcription-translation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-tumor-fraction-estimation",
+      "upstream_path": "liquid-biopsy/tumor-fraction-estimation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-uniprot-access",
+      "upstream_path": "database-access/uniprot-access",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-variant-annotation",
+      "upstream_path": "variant-calling/variant-annotation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-variant-calling",
+      "upstream_path": "variant-calling/variant-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-variant-calling-clinical-interpretation",
+      "upstream_path": "variant-calling/clinical-interpretation",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-variant-calling-deepvariant",
+      "upstream_path": "variant-calling/deepvariant",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-variant-calling-filtering-best-practices",
+      "upstream_path": "variant-calling/filtering-best-practices",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-variant-calling-joint-calling",
+      "upstream_path": "variant-calling/joint-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-variant-calling-structural-variant-calling",
+      "upstream_path": "variant-calling/structural-variant-calling",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-variant-normalization",
+      "upstream_path": "variant-calling/variant-normalization",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-vcf-basics",
+      "upstream_path": "variant-calling/vcf-basics",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-vcf-manipulation",
+      "upstream_path": "variant-calling/vcf-manipulation",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-vcf-statistics",
+      "upstream_path": "variant-calling/vcf-statistics",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-virtual-screening",
+      "upstream_path": "chemoinformatics/virtual-screening",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-workflow-management-cwl-workflows",
+      "upstream_path": "workflow-management/cwl-workflows",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflow-management-nextflow-pipelines",
+      "upstream_path": "workflow-management/nextflow-pipelines",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflow-management-nf-core-pipelines",
+      "upstream_path": "workflow-management/nf-core-pipelines",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflow-management-snakemake-workflows",
+      "upstream_path": "workflow-management/snakemake-workflows",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflow-management-wdl-workflows",
+      "upstream_path": "workflow-management/wdl-workflows",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-atacseq-pipeline",
+      "upstream_path": "workflows/atacseq-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-biomarker-pipeline",
+      "upstream_path": "workflows/biomarker-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-causal-genomics-pipeline",
+      "upstream_path": "workflows/causal-genomics-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-chipseq-pipeline",
+      "upstream_path": "workflows/chipseq-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-clinical-trial-pipeline",
+      "upstream_path": "workflows/clinical-trial-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-clip-pipeline",
+      "upstream_path": "workflows/clip-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-cnv-pipeline",
+      "upstream_path": "workflows/cnv-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-crispr-editing-pipeline",
+      "upstream_path": "workflows/crispr-editing-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-crispr-screen-pipeline",
+      "upstream_path": "workflows/crispr-screen-pipeline",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-workflows-cytometry-pipeline",
+      "upstream_path": "workflows/cytometry-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-edna-pipeline",
+      "upstream_path": "workflows/edna-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-expression-to-pathways",
+      "upstream_path": "workflows/expression-to-pathways",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-fastq-to-variants",
+      "upstream_path": "workflows/fastq-to-variants",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-genome-annotation-pipeline",
+      "upstream_path": "workflows/genome-annotation-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-genome-assembly-pipeline",
+      "upstream_path": "workflows/genome-assembly-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-grn-pipeline",
+      "upstream_path": "workflows/grn-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-gwas-pipeline",
+      "upstream_path": "workflows/gwas-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-hic-pipeline",
+      "upstream_path": "workflows/hic-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-imc-pipeline",
+      "upstream_path": "workflows/imc-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-liquid-biopsy-pipeline",
+      "upstream_path": "workflows/liquid-biopsy-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-longread-sv-pipeline",
+      "upstream_path": "workflows/longread-sv-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-merip-pipeline",
+      "upstream_path": "workflows/merip-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-metabolic-modeling-pipeline",
+      "upstream_path": "workflows/metabolic-modeling-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-metabolomics-pipeline",
+      "upstream_path": "workflows/metabolomics-pipeline",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-workflows-metagenomics-pipeline",
+      "upstream_path": "workflows/metagenomics-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-methylation-pipeline",
+      "upstream_path": "workflows/methylation-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-microbiome-pipeline",
+      "upstream_path": "workflows/microbiome-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-multi-omics-pipeline",
+      "upstream_path": "workflows/multi-omics-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-multiome-pipeline",
+      "upstream_path": "workflows/multiome-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-neoantigen-pipeline",
+      "upstream_path": "workflows/neoantigen-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-outbreak-pipeline",
+      "upstream_path": "workflows/outbreak-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-proteomics-pipeline",
+      "upstream_path": "workflows/proteomics-pipeline",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-workflows-riboseq-pipeline",
+      "upstream_path": "workflows/riboseq-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-rnaseq-to-de",
+      "upstream_path": "workflows/rnaseq-to-de",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-scrnaseq-pipeline",
+      "upstream_path": "workflows/scrnaseq-pipeline",
+      "category": "Data Analysis",
+      "state": "ready"
+    },
+    {
+      "id": "bio-workflows-smrna-pipeline",
+      "upstream_path": "workflows/smrna-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-somatic-variant-pipeline",
+      "upstream_path": "workflows/somatic-variant-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-spatial-pipeline",
+      "upstream_path": "workflows/spatial-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-splicing-pipeline",
+      "upstream_path": "workflows/splicing-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-tcr-pipeline",
+      "upstream_path": "workflows/tcr-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-workflows-timecourse-pipeline",
+      "upstream_path": "workflows/timecourse-pipeline",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "bio-write-sequences",
+      "upstream_path": "sequence-io/write-sequences",
+      "category": null,
+      "state": "remaining"
+    },
+    {
+      "id": "clawhub-installer",
+      "upstream_path": "clawhub-installer",
+      "category": null,
+      "state": "out_of_scope"
+    }
+  ]
+}
