@@ -1,0 +1,6 @@
+BaalChIP_requireNamespace_exit	1
+Rsamtools_requireNamespace_exit	1
+GenomicAlignments_requireNamespace_exit	1
+rtracklayer_requireNamespace_exit	1
+install_probe_exit	1
+classification	RESOURCE_INFEASIBLE_BOUNDED_NOT_CREDITED

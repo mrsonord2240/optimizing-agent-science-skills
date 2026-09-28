@@ -1,0 +1,4 @@
+ERROR: dependencies ‘Rsamtools’, ‘GenomicAlignments’ are not available for package ‘BaalChIP’
+Perhaps try a variation of:
+install.packages(c('Rsamtools', 'GenomicAlignments'))
+* removing ‘/mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit2-opt10-20260928/evidence/run-artifacts/install-probe-lib/BaalChIP’

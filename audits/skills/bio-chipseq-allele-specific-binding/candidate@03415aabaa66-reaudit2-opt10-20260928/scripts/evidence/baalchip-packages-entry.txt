@@ -1,0 +1,9 @@
+Package: BaalChIP
+Version: 1.36.0
+Depends: R (>= 3.3.1), GenomicRanges, IRanges, Rsamtools,
+Imports: GenomicAlignments, GenomeInfoDb, doParallel, parallel, doBy,
+        reshape2, scales, coda, foreach, ggplot2, methods, utils,
+        graphics, stats
+Suggests: RUnit, BiocGenerics, knitr, rmarkdown, BiocStyle
+License: Artistic-2.0
+MD5sum: 80430e4f4313bd04fff6a297daa390ea

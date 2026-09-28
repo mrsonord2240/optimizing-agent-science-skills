@@ -38,7 +38,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The selected pipeline has unresolved multi-hit or tie behavior and the skill defines no deterministic seed, single-thread mode, consensus, or ambiguity exclusion rule.
 - Fix: Identify the source of pair variance, configure a reproducible route where supported, and otherwise exclude or explicitly mark ambiguous assignments using a deterministic policy tested across repeated clean runs.
 
-## P1 (54)
+## P1 (53)
 
 ### `bio-clip-seq-ago-clip-mirna-targets` — Make preprocessing and TargetScan integration executable
 
@@ -280,14 +280,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The shipped Stage 1 script leaves BiocParallel backend selection implicit.
 - Fix: Accept an explicit BPPARAM or register a documented bounded backend before xcms calls, with SerialParam as the safe Windows fallback. Preserve user override for larger hosts.
 
-### `bio-chipseq-allele-specific-binding` — CBA-009: Correct the BaalChIP release binding
-
-- Skill: 92, Production Ready · candidate `944f85222453` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chip-seq/allele-specific-binding) · [viewer](skills/bio-chipseq-allele-specific-binding/candidate@944f85222453-reaudit-opt10-20260928/viewer.md)
-- Observed in inputs: 2
-- Problem: The candidate states that BaalChIP 1.38.0 is a Bioconductor 3.22 contract, but the exact staged package identifies itself as RELEASE_3_23 and Repository Bioconductor 3.23. The prepared R library is BiocVersion 3.22.0, so the documented installation command cannot reproduce the runner's enforced version in the stated environment.
-- Root cause: The tested source version was updated without updating the release label and base R/Bioconductor compatibility contract.
-- Fix: Choose one coherent binding: either move the documented and tested environment to Bioconductor 3.23 with its compatible R release, or pin the runner and documentation to the actual BaalChIP version supplied by Bioconductor 3.22. Rebuild the bounded environment and rerun the package-load, full-model, no-variant, and no-call paths.
-
 ### `bio-crispr-screens-base-editing-analysis` — Validate allele-string coordinate bounds before classification
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@dd1d90a](https://github.com/mrsonord2240/bioSkills/tree/dd1d90a9ae607f068d5ffda2e761e869f07decce/crispr-screens/base-editing-analysis) · [viewer](skills/bio-crispr-screens-base-editing-analysis/mrsonord2240-bioSkills@dd1d90a/viewer.md)
@@ -472,7 +464,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (139)
+## P2 (138)
 
 ### `bio-clip-seq-ago-clip-mirna-targets` — Add structured reports and focused regressions
 
@@ -1025,14 +1017,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: mediation, TwoSampleMR, and HIMA can finish valid computations and then exit 139 in the supplied R runtime, even for a one-line library load.
 - Root cause: The failure is reproduced without Skill code, so it belongs to the shared runtime or compiled package stack rather than this Skill.
 - Fix: Audit-environment owner should repair or rebuild the affected R package/runtime stack and repeat the smoke tests. No change to this Skill is indicated by the evidence.
-
-### `bio-chipseq-allele-specific-binding` — CBA-010: Bind AlleleSeq to the tested repository
-
-- Skill: 92, Production Ready · candidate `944f85222453` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chip-seq/allele-specific-binding) · [viewer](skills/bio-chipseq-allele-specific-binding/candidate@944f85222453-reaudit-opt10-20260928/viewer.md)
-- Observed in inputs: 5
-- Problem: The claim-level source table links gersteinlab/AlleleSeq while the exact prepared checkout for commit cfe8acf is trgaleev/AlleleSeq2.
-- Root cause: The method's canonical project link and the concrete implementation checkout were treated as the same source identity.
-- Fix: Name and link the exact implementation repository used for cfe8acf, while retaining the paper and canonical project separately if both are scientifically useful.
 
 ### `bio-covalent-design` — State the alpha-helper single-site limit
 

@@ -1,0 +1,5 @@
+snp_index.h5	/chr22	(np.int64(51304566),)
+snp_tab.h5	/chr22	(np.int64(247303),)
+haps.h5	/chr22	(np.int64(247303), np.int64(120))
+geno_probs.h5	/chr22	(np.int64(247303), np.int64(180))
+status	PASS

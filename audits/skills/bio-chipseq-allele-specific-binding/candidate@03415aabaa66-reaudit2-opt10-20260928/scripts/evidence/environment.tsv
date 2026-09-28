@@ -1,0 +1,11 @@
+python	Python 3.10.21
+r	R version 4.5.3 (2026-03-11) -- "Reassured Reassurer"
+bioconductor	3.22
+samtools	samtools 1.21
+tabix	tabix (htslib) 1.21
+wasp_commit	f980683cff5638660a966ff0d7c69598bc056e98
+rasqual_commit	5aa553cf1b6501cf7ecd61a5efb34f7f20d354c6
+alleleseq_remote	https://github.com/trgaleev/AlleleSeq2.git
+alleleseq_commit	cfe8acf88989922da841e71238b360f8f57e813a
+environment_lock_sha256	5c1f84081967c537196e341afe8a3d5e0913258f0232b873af650dc2aebd9247
+r_packages_sha256	2facdaed4d0b50854506d79161341114dda38f9fea4000601ef6f3cf4282734b
