@@ -1,0 +1,314 @@
+{
+  "meta": {
+    "skill_name": "bio-cfdna-preprocessing",
+    "description": "Decides how to preprocess plasma cfDNA sequencing data so recoverable signal survives, including library-aware fragment interpretation, simplex or duplex UMI consensus with fgbio, safe alignment and filtering order, and fragment-size QC.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All six DOI identifiers resolve to the cited primary publications, quantitative claims are attributed, and no output fabricates clinical or analytical performance."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill stays within preprocessing and analytical interpretation, requires assay-specific validation, and makes no patient-specific diagnostic or treatment recommendation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Live evidence confirms the required UMI extraction, paired FASTQ alignment and metadata zipper, template-coordinate grouping, consensus realignment, query-grouped filtering, and final coordinate sort/index topology. Duplex and chemistry guidance is explicitly assay-conditional."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every accessible runnable surface executed in the pinned environment. Four independent workflows and all six shipped tests completed, including ten consecutive end-to-end calls."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "The skill covers the promised library-choice, UMI consensus, fragment-preservation, and insert-size QC use cases with executable and documented routes."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Input domains and topology are validated, subprocess failures propagate, and reruns are stable; failed external-tool runs can leave diagnostic intermediate files for the caller to inspect or remove."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The core file routes detail into focused references and the executable chain avoids redundant scientific stages."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "The decision table, required order, validation rules, failure modes, and reporting checklist are explicit; external tools still report their native diagnostics."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger examples, readable scenario guidance, and literal path support make the skill usable without weakening scientific input checks."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials or sensitive values are embedded, all process launches are argv-only, user paths remain literal, and no eval, exec, or shell=True surface exists."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Responsibilities are split across one importable module and focused references, with a six-test live regression suite; tool-version semantics still require periodic live verification as documented."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Trigger precision, routed detail, stable return types, idempotent reruns, explicit stop conditions, and composable functions are strong; run-summary assembly remains the invoking agent's responsibility."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Public cfDNA insert-size QC",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Two independent calls returned identical public-BAM values and explicit filter counts plus interpretation context.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The public output reports observation count, mode, median, 90-150 bp fraction, and greater-than-250 bp fraction.",
+            "result": "PASS",
+            "note": "It reports n=2819, mode=96, median=123, short fraction=0.64349059950337, and long fraction=0.0."
+          },
+          {
+            "text": "The accepted population enforces primary, proper-pair, PF, nonduplicate, positive-template-length records.",
+            "result": "PASS",
+            "note": "The result provides overlapping counts for unmapped, improper, secondary, supplementary, duplicate, QC-fail, nonpositive, and over-bound records."
+          },
+          {
+            "text": "Repeated execution on the same BAM is deterministic.",
+            "result": "PASS",
+            "note": "The two complete result dictionaries are identical."
+          },
+          {
+            "text": "A fresh alternate maximum-size case changes the population coherently.",
+            "result": "PASS",
+            "note": "max_size=150 accepts 2190 records, reports 630 over-bound records, and yields a 0.828310502283105 short fraction."
+          },
+          {
+            "text": "The output preserves scientific interpretation boundaries.",
+            "result": "PASS",
+            "note": "It names library chemistry, collection and plasma processing, and physical or in-silico size selection as required context."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Simplex UMI consensus wrapper",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "A fresh full-stack simplex run produced four filtered coordinate-sorted consensus records and a valid index.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Each molecular UMI segment is mapped to a distinct tag while combined RX is retained.",
+            "result": "PASS",
+            "note": "All 32 extracted records carry RX, ZA, and ZB."
+          },
+          {
+            "text": "The uBAM is query-grouped, converted to paired FASTQ, aligned with BWA, and zipped to restore metadata.",
+            "result": "PASS",
+            "note": "Captured argv shows samtools fastq -T RX,ZA,ZB, bwa mem -C -p, and ZipperBams; the first zipped BAM retains all three tags on 32 records."
+          },
+          {
+            "text": "Simplex processing uses adjacency grouping and molecular consensus.",
+            "result": "PASS",
+            "note": "Captured commands use GroupReadsByUmi --strategy adjacency and CallMolecularConsensusReads; grouped MI is present on 32 records."
+          },
+          {
+            "text": "Consensus filtering receives queryname-sorted mapped consensus reads.",
+            "result": "PASS",
+            "note": "The filter input and output headers declare queryname order."
+          },
+          {
+            "text": "The final simplex BAM is useful and readable by downstream tools.",
+            "result": "PASS",
+            "note": "The final BAM has four records, coordinate order, an index, RX and MI tags, and samtools quickcheck return code 0."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Reciprocal duplex UMI consensus wrapper",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Two independent duplex executions each emitted two true-duplex consensus records with identical structural results.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Reciprocal duplex UMIs retain RX, ZA, and ZB through extraction and the first metadata zipper.",
+            "result": "PASS",
+            "note": "Both duplex runs preserve all three tags on all 32 raw-family records."
+          },
+          {
+            "text": "Duplex processing uses paired grouping and the duplex consensus caller.",
+            "result": "PASS",
+            "note": "Captured commands use GroupReadsByUmi --strategy paired and CallDuplexConsensusReads."
+          },
+          {
+            "text": "The duplex filter enforces the documented total and two-strand threshold after realignment.",
+            "result": "PASS",
+            "note": "Captured argv uses FilterConsensusReads --min-reads 2 1 1 on queryname-sorted mapped consensus."
+          },
+          {
+            "text": "Two fresh duplex executions are structurally deterministic.",
+            "result": "PASS",
+            "note": "Each run accepts 32 grouped records and emits two final consensus records with the same stage counts and sort orders."
+          },
+          {
+            "text": "Final duplex output is coordinate-sorted, indexed, nonempty, and parseable.",
+            "result": "PASS",
+            "note": "Both final BAMs contain two records, have coordinate order and indexes, and pass samtools quickcheck."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "QC flags, bounds, and empty BAM",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Flag policy, invalid parameter bounds, empty input, and alternate cutoff behavior all match the documented contract.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Secondary, supplementary, duplicate, and QC-fail records are excluded and counted.",
+            "result": "PASS",
+            "note": "The five-record fixture accepts one record and reports one record in each named flag category."
+          },
+          {
+            "text": "Invalid maximum-size values fail with specific domain errors.",
+            "result": "PASS",
+            "note": "0 and -1 raise ValueError; True and 1.5 raise TypeError with specific messages."
+          },
+          {
+            "text": "An empty BAM returns a stable typed zero summary rather than crashing or fabricating observations.",
+            "result": "PASS",
+            "note": "All numeric outputs and filter counts are zero and interpretation_context remains present."
+          },
+          {
+            "text": "Filter counts are explicitly documented as overlapping reasons rather than a false partition.",
+            "result": "PASS",
+            "note": "The function docstring states the overlapping-count contract and the returned fields follow it."
+          },
+          {
+            "text": "No output turns preprocessing QC into a patient-specific clinical conclusion.",
+            "result": "PASS",
+            "note": "The output is an analytical summary with required assay context and no diagnosis or treatment claim."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Literal metacharacter paths and ten-call stability",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "A full metacharacter-path workflow and the separate six-test live suite completed with no side effect or stability failure.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Input, reference, intermediate, and output paths with spaces and shell metacharacters remain literal argv values.",
+            "result": "PASS",
+            "note": "The path containing spaces, semicolon, dollar sign, and brackets completed and captured commands preserve each full path as one argument."
+          },
+          {
+            "text": "No shell command execution or code-evaluation surface is present.",
+            "result": "PASS",
+            "note": "AST inspection finds zero shell=True, eval, or exec calls, and the metacharacter run creates no shell side-effect path."
+          },
+          {
+            "text": "The metacharacter workflow produces a useful final BAM.",
+            "result": "PASS",
+            "note": "It contains four coordinate-sorted records, has an index, and passes samtools quickcheck."
+          },
+          {
+            "text": "Ten consecutive complete calls meet the stability gate.",
+            "result": "PASS",
+            "note": "The shipped live suite executes ten calls and asserts an identical four-record count on every call; the full suite exits 0 with no skips."
+          },
+          {
+            "text": "The executable and documentation retain assay-conditional scientific boundaries.",
+            "result": "PASS",
+            "note": "Guidance requires recovery, molecular depth, background, targets, pre-analytics, caller, and validated LoD context, and all six cited DOI identifiers resolve."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 57.7,
+    "score": 96,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The executable preserves the required cfDNA UMI topology from per-segment tag extraction through consensus realignment and filtering.",
+    "All process execution is argv-only and literal-path regressions cover spaces and multiple shell metacharacters.",
+    "Fragment QC exposes the selected population, overlapping exclusion counts, parameter errors, and assay interpretation context.",
+    "The scientific guidance separates method capability from achieved assay performance and routes quantitative claims to six resolvable primary references."
+  ],
+  "recommendations": []
+}

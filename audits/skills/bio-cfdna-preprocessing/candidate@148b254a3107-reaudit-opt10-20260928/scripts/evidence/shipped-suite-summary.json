@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/conda-env/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "/mnt/openscience/wt/opt10-cfdna/skills/bio-cfdna-preprocessing/tests",
+    "-v"
+  ],
+  "elapsed_seconds": 427.209,
+  "returncode": 0,
+  "fixture": "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi",
+  "stdout": "evidence/shipped-suite.stdout.txt",
+  "stderr": "evidence/shipped-suite.stderr.txt",
+  "candidate_tests": [
+    "validation",
+    "argv-only",
+    "simplex",
+    "duplex",
+    "literal metacharacter paths",
+    "QC flags/bounds/empty",
+    "ten consecutive complete calls"
+  ]
+}

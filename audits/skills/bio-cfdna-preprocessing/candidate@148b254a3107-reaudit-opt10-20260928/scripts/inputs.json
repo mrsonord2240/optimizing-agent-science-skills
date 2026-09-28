@@ -1,0 +1,38 @@
+{
+  "skill": "bio-cfdna-preprocessing",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "complexity": "Moderate",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "Public cfDNA insert-size QC",
+      "prompt": "Summarize the insert-size distribution of this public paired-end human BAM, including observation count, mode, median, 90-150 bp fraction, fraction above 250 bp, filter counts, and interpretation context."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "Simplex UMI consensus wrapper",
+      "prompt": "Run preprocess_cfdna() on the prepared paired-end inline-UMI uBAM using the 6M11S+T read structure and simplex path; inspect each stage, UMI tags, sort order, and final indexed output."
+    },
+    {
+      "index": 3,
+      "type": "Variant B",
+      "label": "Reciprocal duplex UMI consensus wrapper",
+      "prompt": "Run preprocess_cfdna() twice on reciprocal paired UMIs with duplex=True; verify paired grouping, true-duplex output, tag topology, query-grouped filtering, coordinate sort, and index."
+    },
+    {
+      "index": 4,
+      "type": "Edge",
+      "label": "QC flags, bounds, and empty BAM",
+      "prompt": "Run insert_size_qc() on public, flag-contaminated, empty, and alternate-bound BAM cases; verify the primary/PF/nonduplicate policy, invalid-bound failures, deterministic values, and contextual output."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "Literal metacharacter paths and ten-call stability",
+      "prompt": "Execute the complete wrapper using literal paths with spaces and shell metacharacters, then run the shipped suite including ten consecutive complete calls; verify argv-only execution and stable useful outputs."
+    }
+  ]
+}
