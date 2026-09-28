@@ -83,8 +83,8 @@ then any required tooling delta, then a fresh re-auditor. A user-action blocker
 may be parked without occupying a worker slot once its exact state is durable.
 
 After every audit pass, publish its records and regenerate the canonical audit
-index, backlog, and `audits/STATUS.md` category table. Keep each freed lane
-filled while eligible work remains.
+index, backlog, Markdown status, and HTML dashboard. Keep each freed lane filled
+while eligible work remains.
 
 ### 5. Stage candidate-ready Skills
 
@@ -100,7 +100,7 @@ Treat one invocation as one product batch:
 1. Create one unpublished optimized-shelf commit containing all and only this
    run's candidate-ready Skills and required shared metadata.
 2. Refresh the corpus snapshot with `npm run audits:inventory`; this updates
-   `audits/CORPUS.json` and all three generated audit views.
+   `audits/CORPUS.json` and all four generated audit views.
 3. Run the Marketplace's local intake gate against that full commit.
 4. Resolve failures according to the gate. A Skill-byte change returns through
    fix and fresh re-audit; a manifest-only change does not.

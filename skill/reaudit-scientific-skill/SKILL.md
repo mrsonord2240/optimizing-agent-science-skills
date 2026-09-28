@@ -69,10 +69,10 @@ passing output. This result makes the exact working bytes `candidate-ready`;
 the orchestrator must still commit them to make them `ready` and pass intake to
 make them `done`.
 
-Publish the record and regenerate the audit index, backlog, and category status
-view at `audits/STATUS.md`. The generator derives its counts from
-`audits/CORPUS.json` and published audits; never edit the counts by hand. If it
-fails, resolve or report the concrete blocker before transition.
+Publish the record and regenerate the audit index, backlog, and status outputs
+at `audits/STATUS.md` and `audits/STATUS.html`. The generator derives their
+counts from `audits/CORPUS.json` and published audits; never edit the counts by
+hand. If it fails, resolve or report the concrete blocker before transition.
 
 ## Hand off
 

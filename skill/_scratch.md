@@ -684,11 +684,11 @@ optimizing-agent-science-skills = audit records, fix evidence, process, status
 - Audit-local repair is capped at one localized defect, two files, and 20
   changed lines excluding mechanical formatting, with no dependency,
   scientific, interface, claim, security, licensing, or access judgment.
-- The generated category view is `audits/STATUS.md`. It derives known, audited,
-  untouched, optimized-shelf-ready, and out-of-scope counts from the committed
-  corpus snapshot and published audit records. The generator and corpus
-  refresh command are implemented; intake acceptance remains the separate
-  `done` gate.
+- The generated category views are `audits/STATUS.md` and the human-facing
+  `audits/STATUS.html` dashboard. They derive known, audited, untouched,
+  optimized-shelf-ready, and out-of-scope counts from the committed corpus
+  snapshot and published audit records. The generator and corpus refresh
+  command are implemented; intake acceptance remains the separate `done` gate.
 - A durably recorded user-action blocker may be parked so its lane can accept
   another Skill.
 - Native Windows is an evidence-driven exception after WSL-first evaluation;

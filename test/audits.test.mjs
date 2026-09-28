@@ -15,6 +15,7 @@ import {
   renderIndex,
   renderStatus,
 } from "../scripts/audit-index.mjs";
+import { renderStatusDashboard } from "../scripts/status-dashboard.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -25,6 +26,10 @@ test("generated audit views are up to date", async () => {
     ["INDEX.md", renderIndex],
     ["BACKLOG.md", renderBacklog],
     ["STATUS.md", (data) => renderStatus(buildStatus(data, corpus))],
+    [
+      "STATUS.html",
+      (data) => renderStatusDashboard(buildStatus(data, corpus)),
+    ],
   ]) {
     const current = (
       await readFile(path.join(root, "audits", name), "utf8")
@@ -184,6 +189,36 @@ test("status separates ready, untouched, and out-of-scope Skills", async () => {
   assert.match(rendered, /\| Protocol Design \| 1 \| 1 \| 0 \| 0 \| 0 \|/);
   assert.match(rendered, /\| Unclassified \| 2 \| 0 \| 1 \| 0 \| 1 \|/);
   assert.match(rendered, /`skill-excluded`/);
+
+  const dashboard = renderStatusDashboard(status);
+  assert.match(dashboard, /^<!doctype html>/);
+  assert.match(dashboard, /66\.7%/);
+  assert.match(dashboard, /skill-excluded/);
+  assert.match(dashboard, /Protocol Design/);
+  assert.match(dashboard, /href="skills\/skill-excluded\/current\/viewer\.md"/);
+  assert.doesNotMatch(dashboard, /Lorem ipsum/);
+});
+
+test("provider-ready Skills require a published audit", () => {
+  assert.throws(
+    () =>
+      buildStatus(
+        { skills: [] },
+        {
+          schema_version: 1,
+          source: { upstream: "example/skills@abc" },
+          skills: [
+            {
+              id: "missing-audit",
+              upstream_path: "data/missing-audit",
+              category: "Data Analysis",
+              state: "ready",
+            },
+          ],
+        },
+      ),
+    /provider-ready Skill\(s\) missing a published audit: missing-audit/,
+  );
 });
 
 test("provider inventory refresh is deterministic and fail-closed", async () => {

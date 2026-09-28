@@ -36,4 +36,4 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-data-visualization-upset-plots` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md) |
 | `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 76 | Beta Only | 0 / 3 / 6 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md) |
 
-See [INDEX.md](INDEX.md) for every latest audit and [BACKLOG.md](BACKLOG.md) for open findings.
+Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.

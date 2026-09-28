@@ -47,9 +47,10 @@ python tools/publish_audits.py --repo <provider-root> --skill <skill-id>
 npm run audits:index
 ```
 
-The index command regenerates `audits/INDEX.md`, `audits/BACKLOG.md`, and the
-category-level `audits/STATUS.md`. After provider inventory, readiness, or
-source metadata changes, refresh the committed corpus snapshot and every view:
+The index command regenerates `audits/INDEX.md`, `audits/BACKLOG.md`, the
+category-level `audits/STATUS.md`, and the human-facing
+`audits/STATUS.html` dashboard. After provider inventory, readiness, or source
+metadata changes, refresh the committed corpus snapshot and every view:
 
 ```powershell
 npm run audits:inventory

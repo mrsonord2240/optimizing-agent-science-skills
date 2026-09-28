@@ -23,7 +23,8 @@ dataset accession or the generator script that produced its inputs.
 `INDEX.md` lists every Skill with its latest score and open findings;
 `BACKLOG.md` lists every open recommendation, most severe first; and
 `STATUS.md` summarizes known, audited, untouched, ready, and out-of-scope
-Skills by category. These files are generated; do not hand-edit them.
+Skills by category; and `STATUS.html` presents the same canonical state as a
+responsive human dashboard. These files are generated; do not hand-edit them.
 
 Records are published here by `tools/publish_audits.py`, then all views are
 regenerated with `npm run audits:index`. Refresh the provider snapshot and all

@@ -3,6 +3,8 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { renderStatusDashboard } from "./status-dashboard.mjs";
+
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const PRIORITIES = ["P0", "P1", "P2"];
 const CORPUS_STATES = new Set([
@@ -331,6 +333,14 @@ export function buildStatus({ skills }, corpus) {
       `published audit Skill(s) absent from audits/CORPUS.json: ${unknownAudits.join(", ")}`,
     );
   }
+  const readyWithoutAudit = rows
+    .filter((row) => row.ready && !row.audit)
+    .map((row) => row.id);
+  if (readyWithoutAudit.length > 0) {
+    throw new Error(
+      `provider-ready Skill(s) missing a published audit: ${readyWithoutAudit.join(", ")}`,
+    );
+  }
 
   const categories = new Map();
   for (const row of rows) {
@@ -431,7 +441,7 @@ export function renderStatus(status) {
     lines.push("");
   }
   lines.push(
-    "See [INDEX.md](INDEX.md) for every latest audit and [BACKLOG.md](BACKLOG.md) for open findings.",
+    "Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.",
   );
   return finish(lines);
 }
@@ -472,6 +482,7 @@ async function main() {
     "INDEX.md": renderIndex(audits),
     "BACKLOG.md": renderBacklog(audits),
     "STATUS.md": renderStatus(status),
+    "STATUS.html": renderStatusDashboard(status),
   };
   const stale = [];
   for (const [name, text] of Object.entries(outputs)) {
@@ -497,7 +508,7 @@ async function main() {
   console.log(
     check
       ? "Generated audit views are up to date"
-      : `Wrote audits/INDEX.md, audits/BACKLOG.md, and audits/STATUS.md${refreshInventory ? "; refreshed audits/CORPUS.json" : ""}`,
+      : `Wrote audits/INDEX.md, audits/BACKLOG.md, audits/STATUS.md, and audits/STATUS.html${refreshInventory ? "; refreshed audits/CORPUS.json" : ""}`,
   );
 }
 

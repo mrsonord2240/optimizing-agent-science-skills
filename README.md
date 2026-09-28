@@ -54,7 +54,7 @@ consequence of removing a redundant local checkout.
 | `audits/skills/<skill-id>/<owner>-<repo>@<sha7>/` | Reports, viewers, records, fix summaries, and saved audit scripts |
 | `fixes/<skill-id>.md` | Durable finding dispositions and verification summaries |
 | `tools/` | Audit publication, provider reconciliation, manifest support, and other deterministic control tooling |
-| `scripts/` | Corpus-snapshot, audit-index, backlog, and status generation |
+| `scripts/` | Corpus-snapshot, audit-index, backlog, and status-dashboard generation |
 
 The former monolithic files under `process/` were intentionally removed after
 their live rules migrated into the modular suite. Historical audit records may
@@ -71,15 +71,16 @@ changes:
 npm run audits:inventory
 ```
 
-`audits/INDEX.md`, `audits/BACKLOG.md`, and `audits/STATUS.md` are generated
-from that snapshot and the published audit records:
+`audits/INDEX.md`, `audits/BACKLOG.md`, `audits/STATUS.md`, and the human-facing
+`audits/STATUS.html` dashboard are generated from that snapshot and the
+published audit records:
 
 ```powershell
 npm run audits:index
 ```
 
-The inventory command also regenerates all three views. Never edit their
-counts by hand.
+The inventory command also regenerates all four views. Never edit their counts
+by hand.
 
 Raw run outputs, downloaded public datasets, environments, and installed tools
 remain under `F:\OpenScience`. They are reproducible evidence inputs, not Git

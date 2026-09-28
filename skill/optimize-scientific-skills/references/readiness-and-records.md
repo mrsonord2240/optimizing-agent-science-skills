@@ -32,10 +32,11 @@ python tools/publish_audits.py --repo <provider-root> --skill <skill-id>
 npm run audits:index
 ```
 
-Regenerate the canonical index, backlog, and `audits/STATUS.md` from records.
-`STATUS.md` groups the canonical known Skill inventory by category and shows at
-least total known, audited, untouched, ready, and out-of-scope counts plus a
-total row. `Audited` includes ready Skills. Derive:
+Regenerate the canonical index, backlog, `audits/STATUS.md`, and
+`audits/STATUS.html` from records. The two status outputs present the same
+canonical known Skill inventory by category and show at least total known,
+audited, untouched, ready, and out-of-scope counts plus totals. `Audited`
+includes ready Skills. Derive:
 
 - category, total known, ready, and out-of-scope states from
   `audits/CORPUS.json`;

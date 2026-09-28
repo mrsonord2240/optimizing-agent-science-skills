@@ -78,9 +78,10 @@ IDs, minor-repair evidence, and restricted-access after-action items. Keep a
 single ordered finding ledger for the fixer.
 
 Publish through the records repository tooling and regenerate the audit index,
-backlog, and `audits/STATUS.md` category table. The generator derives its counts
-from `audits/CORPUS.json` and published audit records; never edit the counts by
-hand. A diagnostic score does not make the Skill `candidate-ready` or `ready`.
+backlog, and status outputs at `audits/STATUS.md` and `audits/STATUS.html`. The
+generator derives their counts from `audits/CORPUS.json` and published audit
+records; never edit the counts by hand. A diagnostic score does not make the
+Skill `candidate-ready` or `ready`.
 
 ## Hand off
 
