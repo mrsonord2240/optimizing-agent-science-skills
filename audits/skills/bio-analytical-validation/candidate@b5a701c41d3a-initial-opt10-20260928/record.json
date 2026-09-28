@@ -1,0 +1,84 @@
+{
+  "skill_id": "bio-analytical-validation",
+  "version": "candidate@b5a701c41d3a-initial-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "liquid-biopsy/analytical-validation",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/liquid-biopsy/analytical-validation",
+    "subtree": "798bd55e904f3ab813a2a37ac5989febb4d1d2a7"
+  },
+  "candidate": {
+    "identity": "b5a701c41d3afe697766a02a11b2954e12ff9d42",
+    "identity_kind": "git-tree",
+    "branch": "optimize/ten-20260928-lane1-analytical",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "subtree": "b5a701c41d3afe697766a02a11b2954e12ff9d42",
+    "path": "F:\\OpenScience\\wt\\opt10-analytical-validation\\skills\\bio-analytical-validation",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "git_blob": "e87e11ca009cb3bba5390352cc24d498d3dacd8f",
+        "sha256": "77ce4f9f306b6a822f252926e8bedcbc0eac71f47081b5c29b8427050debe62a",
+        "bytes": 14577
+      },
+      {
+        "path": "usage-guide.md",
+        "git_blob": "3e6f4564fb2fe58cc24bca11495c9b8221195051",
+        "sha256": "0c056e4caf629ce79abb8435acff2b5fc9612d41798a01921474d82dc8179565",
+        "bytes": 3796
+      },
+      {
+        "path": "examples/detection_limits.py",
+        "git_blob": "8a403bc32c2f2b7164114d96d4223ecec892be76",
+        "sha256": "9c329f9f78139e698fe1be7aab84d78d662224a2403d28d685fc588d4eb26fe5",
+        "bytes": 4075
+      },
+      {
+        "path": "scripts/ge_and_poisson.py",
+        "git_blob": "bea063667b070660fbc033edd8c2abc2779bcf90",
+        "sha256": "f4710d7ecc3aafd25a09e2375060c2cd4b41c533ada94ff390e70292af762324",
+        "bytes": 2227
+      },
+      {
+        "path": "scripts/lod95_probit.py",
+        "git_blob": "23c3909ac2ec5ee50cfb9ebeb73014149c2cc03b",
+        "sha256": "81e0629a25e4984b08339c7174bf15033db4ca901bc06a9ef39837d619e1f693",
+        "bytes": 2293
+      },
+      {
+        "path": "scripts/panel_integrated_lod.py",
+        "git_blob": "473e26063cbf6be186e34da2cdf246e8b63ec4c4",
+        "sha256": "d356241369f68ff5cf2e44e7e576c7bd48583fe9cac7e8d2893cfe723d0d02fb",
+        "bytes": 2306
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 6
+  }
+}

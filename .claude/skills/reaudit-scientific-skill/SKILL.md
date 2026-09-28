@@ -74,6 +74,23 @@ at `audits/STATUS.md` and `audits/STATUS.html`. The generator derives their
 counts from `audits/CORPUS.json` and published audits; never edit the counts by
 hand. If it fails, resolve or report the concrete blocker before transition.
 
+For modular raw evidence, keep origin provenance and exact candidate identity
+in `source-identity.json`, not as extra fields in the strict report schema. An
+uncommitted candidate needs a deterministic 64-character content SHA-256 plus
+its file manifest; a 40-character Git tree id is valid only when it identifies
+the exact audited subtree. Publish the explicit run root and only the named
+saved scripts/inputs, then check the generated views:
+
+```powershell
+python tools/publish_audits.py --repo <records-root> --skill <skill-id> `
+  --run-dir <raw-run-root> --artifact <script-or-input> [...]
+npm run audits:index
+npm run audits:check
+```
+
+This local records write does not authorize any push, submission, release, or
+other remote mutation.
+
 ## Hand off
 
 Replace the canonical handoff's current state, keep it under 120 lines, and

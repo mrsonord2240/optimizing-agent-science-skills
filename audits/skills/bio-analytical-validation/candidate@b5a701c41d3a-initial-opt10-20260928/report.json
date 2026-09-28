@@ -1,0 +1,330 @@
+{
+  "meta": {
+    "skill_name": "bio-analytical-validation",
+    "description": "Treats a ctDNA assay as a molecule-counting experiment at the Poisson edge and builds its analytical-validation case the measurement-science way. Covers genome equivalents, sampling limits, error suppression, CLSI EP17 limits, panel integration, reference standards, and conditioned LoD reporting.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No tested output fabricated DOI, PMID, clinical trial, sample-size, p-value, or efficacy data. The public aggregate fixture is explicitly labeled as rounded smoke-test data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The tested outputs remain analytical-method calculations and make no patient-specific diagnostic or treatment recommendation."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "Input 4 labels a Poisson template-presence and independent-binomial calculation as panel-integrated LoD95 even though the implementation has no recovery, consensus-depth, locus-specific background-error, false-positive, or empirically fitted detection component. This is a sampling-only lower bound, not an achieved assay LoD95."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All four shipped Python entry points executed in the pinned environment with no syntax, dependency, or infinite-loop failure. Robustness defects are recorded separately."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 59,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "Core Poisson and LoB calculations work, but the promised LoD95 confidence interval and full LoD/LoQ workflow are not implemented, and panel sampling is mislabeled as achieved LoD95."
+      },
+      "reliability": {
+        "score": 3,
+        "max": 12,
+        "note": "Invalid physical and statistical inputs produce NaN, zero, or raw library exceptions; separated probit fits still produce a printed estimate."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "The 124-line primary document and small scripts are bounded, though content is duplicated across the unlinked usage guide and implementations."
+      },
+      "agent_usability": {
+        "score": 9,
+        "max": 16,
+        "note": "The decision tree and common-error table are learnable, but input contracts, output schemas, failure behavior, and fit acceptance criteria are underspecified."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural trigger language and examples are strong, but the public functions are unforgiving in unsafe ways because they fail without actionable domain messages."
+      },
+      "security": {
+        "score": 8,
+        "max": 12,
+        "note": "No credentials, shell execution, destructive operations, or sensitive-data logging are present; numeric and array inputs nevertheless lack domain validation."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Responsibilities are split into short scripts, but duplicated constants and functions drift, no regression tests ship, and one documented public parameter is inert."
+      },
+      "agent_specific": {
+        "score": 13,
+        "max": 20,
+        "note": "Trigger precision, deterministic examples, and progressive disclosure are useful; composable structured I/O, explicit stop conditions, and reliable escape hatches are missing."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 58.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Single-locus Poisson sampling calculation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Numerics agree with the analytical Poisson formula, but the CLI does not explicitly bound the result to sampling-only sensitivity.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The genome-equivalent conversion and lambda calculation are internally consistent.",
+            "result": "PASS",
+            "note": "Observed 8,250 GE and lambda 4.125 for 25 ng at VAF 0.0005."
+          },
+          {
+            "text": "The Poisson probability agrees with the analytical one-or-more-event formula.",
+            "result": "PASS",
+            "note": "Observed and reference values both equal 0.983836505412."
+          },
+          {
+            "text": "The lambda-equals-three inversion returns the corresponding GE and mass.",
+            "result": "PASS",
+            "note": "The result is 6,000 GE and 18.1818 ng under the shipped 330 GE/ng convention."
+          },
+          {
+            "text": "The executable output is explicitly bounded to sampling probability rather than assay sensitivity.",
+            "result": "FAIL",
+            "note": "The CLI says sampling ceiling but does not state that error floor, recovery, consensus depth, and calling rules remain excluded."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Blank plus public aggregate LoD95 fit",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The bounded aggregate fit is stable, but the shipped demonstration prints a numerical result despite repeated PerfectSeparationWarning messages.",
+        "basic": 29,
+        "specialized": 34,
+        "total": 63,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The LoB implementation equals mean plus 1.645 sample standard deviations.",
+            "result": "PASS",
+            "note": "Observed and independently calculated values both equal 0.000242202728163."
+          },
+          {
+            "text": "The bounded public aggregate pseudo-replicate fit returns a finite LoD95 without fit warnings.",
+            "result": "PASS",
+            "note": "The smoke-only fit returns 0.00396833096549 with no warnings."
+          },
+          {
+            "text": "The shipped CLI refuses or suppresses a numerical LoD95 when separation makes the demo fit unstable.",
+            "result": "FAIL",
+            "note": "Statsmodels emitted PerfectSeparationWarning repeatedly while the CLI still printed LoD95 0.000779 VAF."
+          },
+          {
+            "text": "The public aggregate result is labeled smoke-only rather than a clinical validation result.",
+            "result": "PASS",
+            "note": "The evidence retains the rounded-pseudo-replicate limitation and makes no clinical claim."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Invalid physical and statistical inputs",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "All four domain-validation assertions fail: invalid inputs return NaN or zero or expose raw exceptions.",
+        "basic": 14,
+        "specialized": 20,
+        "total": 34,
+        "assertions_passed": 0,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Zero VAF is rejected with an actionable domain error.",
+            "result": "FAIL",
+            "note": "The function exposes a raw ZeroDivisionError."
+          },
+          {
+            "text": "Negative mass and an undersized blank are rejected rather than converted to NaN.",
+            "result": "FAIL",
+            "note": "Both calls return NaN; the one-value blank additionally emits NumPy warnings."
+          },
+          {
+            "text": "Mismatched probit arrays are rejected with a skill-level actionable message.",
+            "result": "FAIL",
+            "note": "The function exposes a raw statsmodels matrix-size ValueError."
+          },
+          {
+            "text": "A positivity threshold greater than the number of loci is rejected.",
+            "result": "FAIL",
+            "note": "The impossible three-of-two request silently returns probability 0.0."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Panel-integrated LoD resolution and monotonicity",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Grid arithmetic and monotonicity pass, but the output omits the assumptions that distinguish a sampling lower bound from achieved assay LoD95.",
+        "basic": 25,
+        "specialized": 25,
+        "total": 50,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The 48-locus LoD95 is lower than the 16-locus LoD95.",
+            "result": "PASS",
+            "note": "The grid values are 0.0000102927 and 0.0000311698, respectively."
+          },
+          {
+            "text": "The default grid agrees with a continuous root solve within its approximately 2.3 percent log-grid step.",
+            "result": "PASS",
+            "note": "Grid overestimation is 0.69 percent for 16 loci and 2.02 percent for 48 loci."
+          },
+          {
+            "text": "The entry point runs successfully and reports both panel sizes.",
+            "result": "PASS",
+            "note": "The entry point exits zero and reports 16- and 48-variant results."
+          },
+          {
+            "text": "The output states the independence, equal-VAF, recovery, and background-error assumptions needed for interpretation.",
+            "result": "FAIL",
+            "note": "The CLI reports assay-looking LoD95 values without those decisive biological and analytical assumptions."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full example reproducibility and parameter sensitivity",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The full example is deterministic and warning-free, but changing true_lod_vaf by three orders of magnitude has no effect.",
+        "basic": 31,
+        "specialized": 38,
+        "total": 69,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Two complete example runs are byte-for-byte reproducible.",
+            "result": "PASS",
+            "note": "Both exit zero and produce identical stdout and stderr."
+          },
+          {
+            "text": "The complete example executes without fit warnings or errors.",
+            "result": "PASS",
+            "note": "The entry point exits zero with empty stderr."
+          },
+          {
+            "text": "Changing true_lod_vaf with the same seed changes the simulated dilution series.",
+            "result": "FAIL",
+            "note": "The output arrays are identical because true_lod_vaf is accepted but never used."
+          },
+          {
+            "text": "The example labels its simulation as contrived and avoids a clinical-performance claim.",
+            "result": "PASS",
+            "note": "The output calls the series simulated and makes no patient-level claim."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 23.6,
+    "dynamic_weighted": 35.3,
+    "score": 59,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Core Poisson sampling and LoB arithmetic agree with independent formulas on meaningful bounded inputs.",
+    "All shipped Python entry points are deterministic and runnable in the pinned environment.",
+    "The primary instructions clearly distinguish detection from quantitation and emphasize conditioning VAF claims on molecule input.",
+    "The skill tree is compact, readable, and covered by the repository MIT license."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ADV-001: Sampling floor mislabeled as panel LoD95",
+      "observed_in": [4],
+      "problem": "The panel function and CLI present a sampling-only independent-binomial threshold as panel-integrated LoD95, omitting recovery, consensus depth, background error, false positives, and fitted assay detection behavior.",
+      "root_cause": "The implementation reuses Poisson template-presence probability as if it were complete per-locus assay detection probability.",
+      "fix": "Rename the current result as a theoretical sampling floor and prohibit assay-performance interpretation, or accept and validate an empirically fitted per-locus detection model that includes background and recovery. State assumptions in every output."
+    },
+    {
+      "priority": "P1",
+      "title": "ADV-002: Public functions lack domain validation",
+      "observed_in": [3],
+      "problem": "Zero or negative VAF and mass, undersized blanks, mismatched arrays, and impossible k-of-N rules yield NaN, zero, or raw library exceptions.",
+      "root_cause": "No shared numeric and shape validation layer exists before NumPy, SciPy, or statsmodels calls.",
+      "fix": "Add explicit finite-range, length, binary-outcome, replicate-count, and k-of-N validation with stable actionable error messages, then test each rejected case."
+    },
+    {
+      "priority": "P1",
+      "title": "ADV-003: Probit demo reports an unidentified fit",
+      "observed_in": [2],
+      "problem": "The shipped five-point one-observation demonstration triggers PerfectSeparationWarning repeatedly but still prints a precise LoD95; the public fit returns no diagnostics or confidence interval.",
+      "root_cause": "Warnings are not promoted to fit failure and the demo does not use replicated levels that bracket the target detection probability.",
+      "fix": "Replace the demo with replicated non-separated data, reject or clearly flag separation and nonpositive slopes, require adequate bracketing, and return a confidence interval plus fit diagnostics."
+    },
+    {
+      "priority": "P1",
+      "title": "ADV-004: true_lod_vaf parameter is inert",
+      "observed_in": [5],
+      "problem": "Changing true_lod_vaf from 0.00001 to 0.01 with the same seed produces identical simulated outcomes.",
+      "root_cause": "simulate_dilution_series accepts true_lod_vaf but never reads it; the simulator is driven only by input mass and level VAF.",
+      "fix": "Remove the parameter and document the pure sampling model, or make it control an explicit calibrated detection curve and add parameter-sensitivity tests."
+    },
+    {
+      "priority": "P2",
+      "title": "ADV-005: Conventions and provenance need precision",
+      "observed_in": [1, 2],
+      "problem": "The 330 GE/ng explanation conflicts with the stated 3.3 pg haploid mass, and the reference-standard text collapses SEQC2 Sample A materials and HCC1395 truth sets under one citation.",
+      "root_cause": "Approximate conventions and distinct reference-material programs were summarized without stable identifiers or source-specific boundaries.",
+      "fix": "Choose and justify a GE/ng convention, expose it as a parameter where appropriate, add DOI or PMID identifiers, and distinguish HCC1395/HCC1395BL call sets from fragmented SEQC2 Sample A-derived materials."
+    }
+  ]
+}

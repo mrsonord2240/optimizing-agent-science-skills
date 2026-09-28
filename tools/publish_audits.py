@@ -10,6 +10,9 @@ Each audited Skill version lands in audits/skills/<skill-id>/<owner>-<repo>@<sha
 
 Usage:
   publish_audits.py --repo F:/optimizing-agent-science-skills --skill ID [--skill ID ...]
+  publish_audits.py --repo F:/optimizing-agent-science-skills --skill ID \
+      --run-dir F:/OpenScience/audits/ID/initial-RUN \
+      [--artifact run_cases.py --artifact data/input.tsv ...]
 
 Afterwards regenerate the index: npm run audits:index
 
@@ -197,13 +200,23 @@ def collect_scripts(folder, subdirectories, modified_before=None, modified_after
     return found
 
 
-def header(skill_id, source, report):
+def header(skill_id, source, report, candidate=None):
     performed_by = report.get("meta", {}).get("performed_by", PERFORMED_BY)
     lines = [
         f"> **Audit record for `{skill_id}`**",
-        f"> - Skill authored by [{source['author']}]({source['author_url']}); audited version "
-        f"[{source['repository']}@{source['commit'][:7]}]({source['url']}) ({source['license']}).",
     ]
+    if candidate:
+        lines += [
+            f"> - Audited working candidate `{candidate['identity']}`; exact candidate provenance is in "
+            "[source-identity.json](source-identity.json).",
+            f"> - Derived from [{source['repository']}@{source['commit'][:7]}]({source['url']}), authored by "
+            f"[{source['author']}]({source['author_url']}) ({source['license']}).",
+        ]
+    else:
+        lines.append(
+            f"> - Skill authored by [{source['author']}]({source['author_url']}); audited version "
+            f"[{source['repository']}@{source['commit'][:7]}]({source['url']}) ({source['license']})."
+        )
     if source.get("fork_of"):
         base = source["fork_of"]
         lines.append(
@@ -227,6 +240,180 @@ def header(skill_id, source, report):
         "",
     ]
     return "\n".join(lines)
+
+
+def _modular_source(identity, where):
+    origin = identity.get("origin")
+    if not isinstance(origin, dict):
+        raise SystemExit(f"{where}: source-identity.json has no origin object")
+    repository = origin.get("repository")
+    commit = origin.get("commit")
+    path = origin.get("path")
+    if repository not in REPOSITORIES:
+        raise SystemExit(f"{where}: no author/license known for {repository!r}")
+    if not re.fullmatch(r"[0-9a-f]{40}", str(commit or "")):
+        raise SystemExit(f"{where}: origin commit must be a full 40-character SHA")
+    if not isinstance(path, str) or not path.strip():
+        raise SystemExit(f"{where}: origin path is missing")
+    source = {"repository": repository, "commit": commit, "path": path}
+    source.update(REPOSITORIES[repository])
+    source["url"] = f"https://github.com/{repository}/tree/{commit}/{path}"
+    if origin.get("subtree"):
+        source["subtree"] = origin["subtree"]
+    return source
+
+
+def _modular_candidate(identity, where):
+    raw = identity.get("candidate")
+    if not isinstance(raw, dict):
+        raise SystemExit(f"{where}: source-identity.json has no candidate object")
+    value = raw.get("content_sha256") or raw.get("sha256") or raw.get("digest") or raw.get("subtree")
+    value = str(value or "").lower()
+    if not re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", value):
+        raise SystemExit(
+            f"{where}: candidate needs a 40-character tree id or 64-character content SHA-256"
+        )
+    candidate = {
+        "identity": value,
+        "identity_kind": "git-tree" if len(value) == 40 else "sha256-manifest",
+    }
+    for key in ("branch", "commit", "subtree", "content_sha256", "path"):
+        if raw.get(key) is not None:
+            candidate[key] = raw[key]
+    files = identity.get("files")
+    if isinstance(files, list):
+        candidate["files"] = files
+    return candidate
+
+
+def _latest_published_version(repo, skill_id):
+    root = os.path.join(repo, "audits", "skills", skill_id)
+    if not os.path.isdir(root):
+        return None
+    records = {}
+    superseded = set()
+    for version in sorted(os.listdir(root)):
+        record_path = os.path.join(root, version, "record.json")
+        if not os.path.isfile(record_path):
+            continue
+        record = read_json(record_path)
+        if record.get("skill_id") != skill_id or record.get("version") != version:
+            raise SystemExit(f"{record_path}: record identity does not match its directory")
+        records[version] = record
+        if record.get("supersedes"):
+            superseded.add(record["supersedes"])
+    latest = [version for version in records if version not in superseded]
+    if len(latest) > 1:
+        raise SystemExit(f"{root}: expected at most one latest version, found {len(latest)}")
+    return latest[0] if latest else None
+
+
+def _modular_artifacts(run_dir, artifacts):
+    selected = []
+    root = os.path.realpath(run_dir)
+    for relative in artifacts:
+        normalized = relative.replace("\\", "/").lstrip("/")
+        if not normalized or normalized == ".." or normalized.startswith("../") or "/../" in normalized:
+            raise SystemExit(f"{run_dir}: unsafe artifact path {relative!r}")
+        path = os.path.realpath(os.path.join(root, *normalized.split("/")))
+        try:
+            inside = os.path.commonpath([root, path]) == root
+        except ValueError:
+            inside = False
+        if not inside or not os.path.isfile(path):
+            raise SystemExit(f"{run_dir}: artifact is missing or outside the run root: {relative!r}")
+        if os.path.getsize(path) > MAX_SCRIPT_BYTES:
+            raise SystemExit(f"{path}: artifact exceeds {MAX_SCRIPT_BYTES} bytes")
+        selected.append((normalized, path))
+    if len({relative for relative, _ in selected}) != len(selected):
+        raise SystemExit(f"{run_dir}: duplicate --artifact path")
+    return selected
+
+
+def _same_bytes(first, second):
+    with open(first, "rb") as left, open(second, "rb") as right:
+        return left.read() == right.read()
+
+
+def publish_modular(repo, skill_id, run_dir, artifacts):
+    """Publish one explicit modular audit run without rewriting its strict report schema."""
+    run_dir = os.path.abspath(run_dir)
+    report_path = os.path.join(run_dir, "report.json")
+    viewer_path = os.path.join(run_dir, "viewer.md")
+    identity_path = os.path.join(run_dir, "source-identity.json")
+    for path in (report_path, viewer_path, identity_path):
+        if not os.path.isfile(path):
+            raise SystemExit(f"{run_dir}: required modular audit file missing: {os.path.basename(path)}")
+
+    report = read_json(report_path)
+    meta = report.get("meta", {})
+    if meta.get("skill_name") != skill_id:
+        raise SystemExit(
+            f"{report_path}: report names {meta.get('skill_name')!r}, expected {skill_id!r}"
+        )
+    identity = read_json(identity_path)
+    source = _modular_source(identity, identity_path)
+    candidate = _modular_candidate(identity, identity_path)
+    label = re.sub(r"[^A-Za-z0-9._-]+", "-", os.path.basename(run_dir)).strip("-")
+    if not label:
+        raise SystemExit(f"{run_dir}: cannot derive a safe run label")
+    version = f"candidate@{candidate['identity'][:12]}-{label}"
+    target = os.path.join(repo, "audits", "skills", skill_id, version)
+
+    selected = _modular_artifacts(run_dir, artifacts)
+    if os.path.isdir(target):
+        existing_report = os.path.join(target, "report.json")
+        existing_identity = os.path.join(target, "source-identity.json")
+        if (
+            os.path.isfile(existing_report)
+            and os.path.isfile(existing_identity)
+            and _same_bytes(existing_report, report_path)
+            and _same_bytes(existing_identity, identity_path)
+        ):
+            record = read_json(os.path.join(target, "record.json"))
+            return version, record.get("files", {}).get("scripts", 0)
+        raise SystemExit(f"{target}: existing modular record differs; refusing to overwrite")
+
+    supersedes = _latest_published_version(repo, skill_id)
+    os.makedirs(target)
+    with open(viewer_path, encoding="utf-8") as f:
+        viewer = f.read().replace("\r\n", "\n")
+    write_text(os.path.join(target, "viewer.md"), header(skill_id, source, report, candidate) + "\n" + viewer)
+    shutil.copyfile(report_path, os.path.join(target, "report.json"))
+    shutil.copyfile(identity_path, os.path.join(target, "source-identity.json"))
+    for relative, path in selected:
+        destination = os.path.join(target, "scripts", *relative.split("/"))
+        os.makedirs(os.path.dirname(destination), exist_ok=True)
+        shutil.copyfile(path, destination)
+
+    performed_by = meta.get("performed_by", PERFORMED_BY)
+    audit_record = {
+        "method": AUDIT_METHOD,
+        "evaluator_version": meta.get("evaluator_version"),
+        "audited_on": meta.get("evaluated_on"),
+        "performed_by": performed_by,
+        "commissioned_by": COMMISSIONED_BY,
+        "test_data": "see published scripts and inputs",
+    }
+    if "auditor_independent" in meta:
+        audit_record["auditor_independent"] = meta["auditor_independent"]
+    record = {
+        "skill_id": skill_id,
+        "version": version,
+        "source": source,
+        "candidate": candidate,
+        "audit": audit_record,
+        "supersedes": supersedes,
+        "files": {
+            "report": "report.json",
+            "viewer": "viewer.md",
+            "source_identity": "source-identity.json",
+            "fixes": None,
+            "scripts": len(selected),
+        },
+    }
+    write_text(os.path.join(target, "record.json"), json.dumps(record, indent=2) + "\n")
+    return version, len(selected)
 
 
 def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes, fixes_path, scripts_folder=None,
@@ -399,7 +586,25 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", required=True)
     parser.add_argument("--skill", action="append", default=[])
+    parser.add_argument(
+        "--run-dir",
+        help="explicit modular audit root containing report.json, viewer.md, and source-identity.json",
+    )
+    parser.add_argument(
+        "--artifact",
+        action="append",
+        default=[],
+        help="run-root-relative saved script or input to publish (repeatable; modular mode only)",
+    )
     args = parser.parse_args()
+    if args.run_dir:
+        if len(args.skill) != 1:
+            parser.error("--run-dir requires exactly one --skill")
+        name, count = publish_modular(args.repo, args.skill[0], args.run_dir, args.artifact)
+        print(f"{args.skill[0]}: {name} ({count} scripts/inputs)")
+        return
+    if args.artifact:
+        parser.error("--artifact requires --run-dir")
     for skill_id in args.skill:
         supersedes, name, count = publish_skill(args.repo, skill_id)
         print(f"{skill_id}: {name} ({count} scripts)" + (f", supersedes {supersedes}" if supersedes else ""))

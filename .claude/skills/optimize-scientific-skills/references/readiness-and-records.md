@@ -25,12 +25,30 @@ saved run scripts and inputs, command/output evidence, source identity, and
 explicit execution classifications. Do not claim evidence that exists only in
 chat.
 
-After every audit, publish with the repository tooling when applicable:
+After every audit, publish with the repository tooling. Legacy flat audit roots
+remain supported:
 
 ```powershell
 python tools/publish_audits.py --repo <provider-root> --skill <skill-id>
 npm run audits:index
 ```
+
+For the active modular run layout, preserve the strict report unchanged and
+pass source/candidate provenance through `source-identity.json`. Publish the
+exact run explicitly and enumerate every saved script or bounded input selected
+for the public record:
+
+```powershell
+python tools/publish_audits.py --repo <records-root> --skill <skill-id> `
+  --run-dir <raw-run-root> --artifact <script-or-input> [...]
+npm run audits:index
+npm run audits:check
+```
+
+Candidate records use a deterministic content or Git-tree identity and retain
+the immutable origin for attribution. They do not satisfy provider-promotion
+gates until exact audited bytes are committed on the optimized shelf and the
+final accepted audit is bound to that full provider commit.
 
 Regenerate the canonical index, backlog, `audits/STATUS.md`, and
 `audits/STATUS.html` from records. The two status outputs present the same

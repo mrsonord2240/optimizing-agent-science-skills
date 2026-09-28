@@ -212,8 +212,10 @@ const cell = (text) =>
 const observedIn = ({ observed_in: observed }) =>
   cell(Array.isArray(observed) ? observed.join(", ") : observed) || "—";
 
-const sourceLink = ({ source }) =>
-  `[${source.repository}@${source.commit.slice(0, 7)}](${source.url})`;
+const sourceLink = ({ source, candidate }) =>
+  candidate
+    ? `candidate \`${candidate.identity.slice(0, 12)}\` from [${source.repository}@${source.commit.slice(0, 7)}](${source.url})`
+    : `[${source.repository}@${source.commit.slice(0, 7)}](${source.url})`;
 
 const recordLink = (entry, label = "viewer") =>
   `[${label}](skills/${entry.skillId}/${encodeURI(entry.version)}/viewer.md)`;

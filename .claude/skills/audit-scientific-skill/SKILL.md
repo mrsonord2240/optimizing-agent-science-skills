@@ -77,11 +77,31 @@ source identity, execution classifications, findings with severity and stable
 IDs, minor-repair evidence, and restricted-access after-action items. Keep a
 single ordered finding ledger for the fixer.
 
+For a modular run root, `source-identity.json` must keep the immutable origin
+repository/commit/path separate from the exact working candidate. Identify an
+uncommitted candidate with a deterministic 64-character content SHA-256 (and
+its file manifest); use a 40-character Git tree id only when it identifies the
+exact audited subtree. Never put publication metadata into the strict audit
+report merely to satisfy older tooling.
+
 Publish through the records repository tooling and regenerate the audit index,
 backlog, and status outputs at `audits/STATUS.md` and `audits/STATUS.html`. The
 generator derives their counts from `audits/CORPUS.json` and published audit
 records; never edit the counts by hand. A diagnostic score does not make the
 Skill `candidate-ready` or `ready`.
+
+Use the explicit modular mode and name every saved script or bounded input that
+belongs in the public record:
+
+```powershell
+python tools/publish_audits.py --repo <records-root> --skill <skill-id> `
+  --run-dir <raw-run-root> --artifact <script-or-input> [...]
+npm run audits:index
+npm run audits:check
+```
+
+Local records publication is required audit evidence. It is not authorization
+to push, submit, release, or otherwise mutate remote state.
 
 ## Hand off
 

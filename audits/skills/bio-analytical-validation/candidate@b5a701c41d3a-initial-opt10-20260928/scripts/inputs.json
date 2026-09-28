@@ -1,0 +1,32 @@
+[
+  {
+    "index": 1,
+    "type": "Canonical",
+    "label": "Single-locus Poisson sampling calculation",
+    "prompt": "Given 25 ng of cfDNA, calculate the haploid genome-equivalent count, expected mutant molecules, and sampling-only detection probability for a 0.05% VAF single-locus variant. Also report the mass required for the lambda=3 sampling threshold and state what this calculation does not prove."
+  },
+  {
+    "index": 2,
+    "type": "Variant A",
+    "label": "Blank plus public aggregate LoD95 fit",
+    "prompt": "Using a bounded analyte-free blank fixture and the five aggregate Laboratory 1 sensitivity rows transcribed from Forshew et al. Table 2, compute LoB and fit the shipped probit LoD95 path. Treat rounded pseudo-replicates as smoke-test data only, report warnings, and do not present the result as clinical validation."
+  },
+  {
+    "index": 3,
+    "type": "Edge",
+    "label": "Invalid physical and statistical inputs",
+    "prompt": "Exercise the calculators with zero VAF, negative input mass, a one-value blank, mismatched probit arrays, and a panel positivity threshold larger than the number of loci. Each invalid case should be rejected with an actionable error rather than returning NaN, infinity, or a misleading number."
+  },
+  {
+    "index": 4,
+    "type": "Variant B",
+    "label": "Panel-integrated LoD resolution and monotonicity",
+    "prompt": "For 30 ng and a two-of-N positivity rule, compare panel-integrated LoD95 for N=16 and N=48. Verify the shipped grid result against a continuous root solve, confirm monotonicity, and identify the modeling assumptions needed before interpreting the result."
+  },
+  {
+    "index": 5,
+    "type": "Stress",
+    "label": "Full example reproducibility and parameter sensitivity",
+    "prompt": "Run the complete detection_limits.py example twice for reproducibility, then verify that every public simulation parameter materially controls the generated dilution series. In particular, compare identical seeds with two very different true_lod_vaf values and report any inert parameter."
+  }
+]
