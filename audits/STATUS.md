@@ -35,7 +35,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-clinical-biostatistics-adaptive-designs` | Protocol Design | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-biostatistics-adaptive-designs/candidate@19824f36846d-reaudit-opt10-20260928/viewer.md) |
 | `bio-clinical-databases-acmg-classification` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-databases-acmg-classification/candidate@286df2647ef2-reaudit2-opt10-20260928/viewer.md) |
 | `bio-clip-seq-ago-clip-mirna-targets` | Data Analysis | 37 | Reject | 4 / 3 / 1 | [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/candidate@9eb490f452b4-initial-opt10-20260928/viewer.md) |
-| `bio-codon-usage` | Data Analysis | 58 | Reject | 2 / 2 / 0 | [viewer](skills/bio-codon-usage/candidate@13d831f93500-initial-opt10-20260928/viewer.md) |
+| `bio-codon-usage` | Data Analysis | 97 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-codon-usage/candidate@3186a1debc80-reaudit-opt10-20260928/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |

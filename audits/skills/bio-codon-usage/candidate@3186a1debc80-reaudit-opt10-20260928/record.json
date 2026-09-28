@@ -1,0 +1,44 @@
+{
+  "skill_id": "bio-codon-usage",
+  "version": "candidate@3186a1debc80-reaudit-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "sequence-manipulation/codon-usage",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/sequence-manipulation/codon-usage",
+    "subtree": "3874a00444ef0856451fece587c051cfc34aaf80"
+  },
+  "candidate": {
+    "identity": "3186a1debc804852b3ea016b9aeabebc4436a04791b84b13dba8669878d7e4dd",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane2-codon-usage",
+    "path": "F:\\OpenScience\\wt\\opt10-codon-usage\\skills\\bio-codon-usage"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@13d831f93500-initial-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 14
+  }
+}
