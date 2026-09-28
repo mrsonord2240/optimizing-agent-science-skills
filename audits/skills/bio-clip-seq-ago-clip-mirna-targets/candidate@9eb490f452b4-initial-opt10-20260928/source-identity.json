@@ -1,0 +1,119 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clip-seq/ago-clip-mirna-targets",
+    "subtree": "6326a423789826240d0840be6897ddd69b21d940",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane4-ago-clip",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-ago-clip\\skills\\bio-clip-seq-ago-clip-mirna-targets",
+    "status_before": "untracked normalized subtree only",
+    "status_after_execution": "untracked normalized subtree only",
+    "content_sha256": "9eb490f452b4c0e4a27a95986816e7d84d689e6077a537e057368b9e471cf7e7",
+    "content_manifest": {
+      "file_count": 6,
+      "bytes": 591,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; paths sorted with ordinal bytewise ordering; LF joins; no trailing LF"
+    },
+    "files": [
+      {
+        "path": "SKILL.md",
+        "bytes": 6712,
+        "git_blob": "6771aeee947d34753d532e6ef244693d058ccedd",
+        "sha256": "64fa4e32e14f6bd5628baeb670b53f92e1c5ba87f52238f41bc856998fb0f08e"
+      },
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 4156,
+        "git_blob": "9f56f74341dc57911d1a95d836c85b092f9faf6f",
+        "sha256": "9e9acae61f1c15ea2d7d18b7420b83cdb0a31dbca12b807fba802b47195d2f40"
+      },
+      {
+        "path": "references/method-selection-and-pairing.md",
+        "bytes": 5863,
+        "git_blob": "e7122b488f34d9c10413da29ce5c58cee12e3b07",
+        "sha256": "daf843ae02eba9feb4aab5c2858564fed4d66d9929a20091b33e37e643bbb04d"
+      },
+      {
+        "path": "references/provenance.md",
+        "bytes": 1215,
+        "git_blob": "3d9cd5fbf9e6ed8885e9989c817cf31b56e74437",
+        "sha256": "822c4b9fa2eafcd528a9945227472d74ea050b70fd602ee0e5f0c4a3bb4fee1f"
+      },
+      {
+        "path": "references/workflows-and-commands.md",
+        "bytes": 3922,
+        "git_blob": "dcaa58743932564177f0d4f7ae94c014c30d234a",
+        "sha256": "86f679847359af416e6e614e423a3eb9024c056586f43f322c20cea50cc51519"
+      },
+      {
+        "path": "scripts/run_chimeric_eclip.sh",
+        "bytes": 3293,
+        "git_blob": "a28f9d5955b47aafa03a94da72113880d5a7c488",
+        "sha256": "b776f3c05e7fb3c335cdd18f59bb7120e17cf3cdd1688211e685fcf3b23cd6e0"
+      }
+    ]
+  },
+  "tooling": {
+    "tools_md_sha256": "3cfec99140011ae7f8130fb2501cffbf37c1f74d1d1ed0e8098bb19f623fdc0f",
+    "environment_fingerprint_sha256": "dc64dc57f17e3f0de31a8d348a0c7045f7bc3b4e92c5191051a8249e8ac0bae3",
+    "environment_lock_sha256": "ba5f355bb2d907197f723c7424742517b0e4fb4839a4273382d2293c5b2f3340",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "execution_classification": {
+    "accessible_and_rerun": [
+      "current Hyb official-data route, repeated twice after a Git-blob runtime rebuild",
+      "exact candidate wrapper against current Hyb",
+      "wrapper contract and adversarial matrix",
+      "UMI-tools and cutadapt paired preprocessing patterns",
+      "samtools/awk soft-clip diagnostic",
+      "bedtools unstranded and stranded overlap controls",
+      "TargetScanHuman 8 archive schema and human row parsing"
+    ],
+    "public_source_and_interface_inspection": [
+      "Hyb",
+      "Yeo Lab chim-eCLIP",
+      "HEAP and CLIPanalyze",
+      "TargetScanHuman 8",
+      "miRDB 6.0",
+      "DIANA microT-CDS",
+      "pyHyb and hybkit package indexes"
+    ],
+    "resource_infeasible_bounded": [
+      "complete human Yeo chim-eCLIP CWL workflow"
+    ],
+    "wet_lab_unavailable": [
+      "HEAP Halo-Ago2 library preparation",
+      "orthogonal reporter validation"
+    ],
+    "remote_unavailable": [
+      "documented DIANA example endpoint returned HTTP 500"
+    ]
+  },
+  "audit_artifacts": {
+    "report.json": "ebe0e70aeb3d781470e8a2ae69fdc4a242235e0afdc2a1f4b7b5bc44a3ac23e2",
+    "viewer.md": "684ab43c02e1f4a8eddb33cd5074f2c38df2d1ca8931e9bfaa8565dfbb35b79f",
+    "finding-ledger.md": "2ae38e4b72d0c34f95fe6419f0eec0ac07c4ef11e5578f70e0cd74c5e31ab117",
+    "scientific-source-notes.md": "6a70960aae317c8ac9e3e78bd306ae3390867c8fc06526d9de230acb07e3eaa3",
+    "inputs/test-inputs.md": "aab2809803787b8590282ce6efe0b09cf03c6bd153e186964e67f5b56e8aecbe",
+    "scripts/run_candidate_against_real_hyb.sh": "342eb51d5816b19f85934882916da75d66c8034b3e390e60b06bba0276fcaf4f",
+    "validate_report.py": "11f8789a5b04c0693c3b39dcd8f4ccef2a1b2a77ba7eba22d137c389a77ae0b1",
+    "evidence/wrapper-contract-results.json": "39dae996e74ed3ff6a944522cde654848beff450d1ab1b90969c28fa9c6c23de",
+    "evidence/adjacent-surface-results.json": "2cbfeaa6e90eece56ac597582faa947b72ff6876ee6535d4afe37a6f74be8b3c",
+    "evidence/real-hyb-schema-sample.tsv": "b27746414f7c0b4bcae48acb5de51fe82c6c455eb7d22f69e4ab37c1535738db",
+    "evidence/official_test_comp_hOH7_hybrids_ua.hyb": "46298f5a39dea534b1cd3baef04d7cde52a0b11c333eafb47ffc838297fb5bcc",
+    "evidence/official_test_comp_hOH7_hybrids_ua_run2.hyb": "074b883a7768bb3431b6e70da311f110bbfe665d7f2a30d6cfdeab866bb53653",
+    "evidence/hyb-repeatability.txt": "a46b2548dd9789d51cb24a474f55e21a6a70fcec7f6fd53b5c1166a2e4565588",
+    "evidence/real-wrapper-summary.txt": "e7e90c76d8050cce07e96bf06728f4bbcf20e1495721a40c130e3a95c18a427c",
+    "evidence/real-wrapper.stdout": "b49a877d9648c1aaa69bb6dd26fbd83029c27cf32c8195f9ce21e8b8adab71c9",
+    "evidence/real-wrapper.stderr": "575479caf619a2d87a9a9a748181da883974584e324b54cebbd3e722d88aca5a",
+    "evidence/access-classifications.md": "867e05fceb9fdecdbb70f1c236c0f30762634cd3f3df7c0ea9a7dda16703734a",
+    "evidence/access-live.log": "49c456cc5b82c324fa7635ea9e887e4f004e59f391633db80b0c290a443d0fbb",
+    "evidence/schema-validation.json": "204a78e66d4ddbb67c60fd4a7e60052563b9bf8e3e9126d6c91d47303aab9308"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

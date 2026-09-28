@@ -1,0 +1,48 @@
+{
+  "checks": {
+    "cutadapt_r1_insert_is_20nt": true,
+    "cutadapt_r2_retains_10nt_prefix_without_bc_pattern2": true,
+    "soft_clip_diagnostic_count": true,
+    "stranded_intersection_has_one_row": true,
+    "targetscan_header_matches_release8_schema": true,
+    "targetscan_sample_is_human": true,
+    "targetscan_sample_seed_is_documented_class": true,
+    "umi_header_contains_10nt_umi": true,
+    "umi_r1_is_41nt_after_extraction": true,
+    "unstranded_pattern_overlaps_opposite_strand": true
+  },
+  "stranded_overlap": [
+    "chr1\t100\t120\tchimA\t1\t+\tchr1\t110\t115\tmiR-21\t1\t+"
+  ],
+  "targetscan_first_human_row": [
+    "miR-23-3p",
+    "ENSG00000121410.7",
+    "A1BG",
+    "ENST00000263100.3",
+    "9606",
+    "143",
+    "150",
+    "219",
+    "231",
+    "8mer",
+    "0.00"
+  ],
+  "targetscan_header": [
+    "miR Family",
+    "Gene ID",
+    "Gene Symbol",
+    "Transcript ID",
+    "Species ID",
+    "UTR start",
+    "UTR end",
+    "MSA start",
+    "MSA end",
+    "Seed match",
+    "PCT"
+  ],
+  "targetscan_member": "Predicted_Targets_Info.default_predictions.txt",
+  "unstranded_overlap": [
+    "chr1\t100\t120\tchimA\t1\t+\tchr1\t110\t115\tmiR-21\t1\t+",
+    "chr1\t300\t320\tchimB\t1\t-\tchr1\t305\t310\tmiR-X\t1\t+"
+  ]
+}

@@ -1,0 +1,10 @@
+Total chimeras: 
+Human mRNA chimeras: 0
+Expressed-miRNA chimeras: 0
+
+Top miRNAs by target count:
+
+Cross-validate with TargetScan conserved predictions:
+  bedtools intersect -wa -wb -a chimera_targets_3utr.bed -b targetscan_conserved.bed
+
+Chimeric methods recover non-canonical 3'-compensatory pairing missed by seed-only methods

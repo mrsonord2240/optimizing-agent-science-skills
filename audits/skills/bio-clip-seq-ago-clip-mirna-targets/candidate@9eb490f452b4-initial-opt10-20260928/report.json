@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "skill_name": "bio-clip-seq-ago-clip-mirna-targets",
+    "description": "Identify direct miRNA-target interactions from AGO HITS-CLIP, AGO-CLEAR-CLIP (chimeric reads), HEAP (Halo-Ago2 mouse), chimeric eCLIP / miR-eCLIP (deep miRNA-target profiling), or CLASH using chimeric-read processing pipelines, seed-pairing analysis, and 3' auxiliary pairing rules. Use when distinguishing direct miRNA targets from indirect, integrating CLIP-derived target maps with TargetScan / miRDB / DIANA predictions, applying canonical 7mer-8mer seed matching with 3' UTR context, or recovering miRNA-mRNA chimeras at scale.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "FAIL"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No retained output fabricated a DOI, PMID, study size, p-value, or biological result. Live, source-inspected, unavailable, and resource-infeasible surfaces remain explicitly separated."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill stays within research analysis and does not make patient-specific diagnoses, prescribe treatment, or represent computational predictions as clinical advice."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The wrapper discards valid current Hyb rows through false field semantics, the advertised TargetScan command lacks a validated strand and coordinate transformation, read counts are treated as an affinity proxy, and absence of an AGO peak is overinterpreted as biological non-function."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "Against current pinned Hyb the exact wrapper passes a FASTA where a database name is required, assumes a nonexistent output name, returns zero after the tool fails, and emits empty results. Spaces, glob metacharacters, and subprocess failures also violate the executable contract."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 46,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 4,
+        "max": 12,
+        "note": "The method-selection prose covers direct and indirect routes, but the only shipped implementation is incompatible with current Hyb, parses the wrong fields, and does not implement seed validation or a standard AGO assignment path."
+      },
+      "reliability": {
+        "score": 1,
+        "max": 12,
+        "note": "The wrapper swallows Hyb and downstream errors, accepts missing inputs, produces empty partial tables, breaks on ordinary paths, and has no retry-safe output contract."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Progressive disclosure and the decision table are efficient; the broken wrapper and unresolved external interfaces cause avoidable failed runs."
+      },
+      "agent_usability": {
+        "score": 9,
+        "max": 16,
+        "note": "Direct-versus-indirect labeling and reporting fields are clear, while executable preconditions, stage postconditions, real schemas, and current tool identities are missing or contradictory."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural trigger language and failure guidance aid discovery, but the apparent reusable wrapper silently reports success for invalid analyses and cannot tolerate normal path variants."
+      },
+      "security": {
+        "score": 5,
+        "max": 12,
+        "note": "No credentials, eval, or destructive broad deletion appears. Unquoted user-controlled paths and prefixes permit unintended pathname expansion and input inclusion, and validation is absent."
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "The tree separates method, command, failure, and provenance references cleanly, but the preserved script has no contract tests, version pin, structured parser, or safe extension boundary."
+      },
+      "agent_specific": {
+        "score": 8,
+        "max": 20,
+        "note": "Trigger precision and progressive disclosure are strong. Composition, idempotency, deterministic output, current interface routing, and enforceable escape hatches are weak."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 31.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 10,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Current Hyb official-data route",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Pinned Hyb produced 111 valid rows directly, but the exact wrapper rejected its own generated FASTA as a database, returned zero, and wrote empty derived tables.",
+        "basic": 8,
+        "specialized": 10,
+        "total": 18,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The pinned current Hyb implementation is executable on its official public data",
+            "result": "PASS",
+            "note": "The direct control produced 111 non-empty 16-field miRNA-mRNA rows."
+          },
+          {
+            "text": "The wrapper supplies the installed-database contract required by current Hyb",
+            "result": "FAIL",
+            "note": "It passes exact_prefix_combined.fa as db, which current Hyb resolves beneath its installed database directory and rejects."
+          },
+          {
+            "text": "The wrapper discovers the actual Hyb output name",
+            "result": "FAIL",
+            "note": "Current output is <id>_comp_<db>_hybrids_ua.hyb; the wrapper reads exact_prefix.hyb and supplies no output id."
+          },
+          {
+            "text": "A failed Hyb analysis produces a nonzero wrapper exit",
+            "result": "FAIL",
+            "note": "The exact real run exits zero after the Hyb database failure."
+          },
+          {
+            "text": "Unavailable full Yeo execution is not represented as a successful candidate run",
+            "result": "PASS",
+            "note": "The full CWL workflow remains resource-infeasible and is not credited as executed."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Paths, globs, and failure propagation",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "A missing Hyb binary returns nonzero, but spaces and a Hyb exit of 42 return zero, glob characters inject a sibling FASTA, and empty partial outputs remain.",
+        "basic": 5,
+        "specialized": 8,
+        "total": 13,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "A missing Hyb executable is rejected",
+            "result": "PASS",
+            "note": "The missing-tool case returns exit 1, although it already creates the combined FASTA."
+          },
+          {
+            "text": "A Hyb exit status of 42 is propagated",
+            "result": "FAIL",
+            "note": "The wrapper returns zero and continues through empty downstream files."
+          },
+          {
+            "text": "Input paths and output prefixes containing spaces are preserved",
+            "result": "FAIL",
+            "note": "Unquoted variables split into multiple arguments and ambiguous redirects while the wrapper exits zero."
+          },
+          {
+            "text": "A literal glob character cannot include an unintended sibling input",
+            "result": "FAIL",
+            "note": "A literal mir*.fa path expands and adds mir_extra.fa to the combined reference."
+          },
+          {
+            "text": "Failed stages do not leave plausible empty result tables",
+            "result": "FAIL",
+            "note": "Empty mRNA, expressed-chimera, and count tables remain after failure."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "True 16-column schema and expression filter",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The current schema is independently verified, but a valid matching row is dropped because energy and coordinate fields are treated as RNA ids.",
+        "basic": 6,
+        "specialized": 9,
+        "total": 15,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The audit verifies the real current Hyb schema before parsing",
+            "result": "PASS",
+            "note": "Both direct runs produced 111 rows with exactly 16 fields; RNA ids are in fields 4 and 10."
+          },
+          {
+            "text": "The mRNA filter reads an RNA-identifier field",
+            "result": "FAIL",
+            "note": "It checks field 5, a segment coordinate, against ENST/NM_/XM_."
+          },
+          {
+            "text": "The expression filter reads the miRNA identifier regardless of segment order",
+            "result": "FAIL",
+            "note": "It checks field 3, which is folding energy, and has no orientation-aware selection between fields 4 and 10."
+          },
+          {
+            "text": "A valid expressed miRNA-mRNA row is retained",
+            "result": "FAIL",
+            "note": "The bounded true-schema row yields empty mRNA and expressed-chimera tables."
+          },
+          {
+            "text": "Per-miRNA counts retain site and target identifiers needed for audit",
+            "result": "FAIL",
+            "note": "The command emits only an assumed field-3 count and loses target and site identity."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Preprocessing and TargetScan overlap",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The exact tools run, and the prose warns about library and coordinate context, but the examples leave R2 prefix bases intact and accept an opposite-strand overlap without a TargetScan coordinate conversion.",
+        "basic": 26,
+        "specialized": 31,
+        "total": 57,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The UMI-tools and cutadapt examples execute on a bounded paired fixture",
+            "result": "PASS",
+            "note": "UMI-tools 1.1.6 and cutadapt 5.1 completed and produced expected R1 trimming."
+          },
+          {
+            "text": "The example handles the UMI orientation used by the selected library",
+            "result": "FAIL",
+            "note": "The one-sided ten-base pattern leaves the R2 ten-base prefix intact; current Yeo chimeric-eCLIP uses library-specific R2 handling."
+          },
+          {
+            "text": "The skill labels soft-clipped-read counting as diagnostic rather than a chimera call",
+            "result": "PASS",
+            "note": "The reference states this boundary explicitly, and the fixture count was one."
+          },
+          {
+            "text": "The displayed TargetScan intersection is strand-safe and coordinate-compatible",
+            "result": "FAIL",
+            "note": "Without -s the exact command accepts an opposite-strand row, and official TargetScan 8 sites are UTR-relative rather than genomic BED."
+          },
+          {
+            "text": "TargetScan overlap is labeled prediction support rather than functional validation",
+            "result": "PASS",
+            "note": "The workflow reference gives the correct evidence label for an overlap once coordinates are valid."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "External surfaces and evidence interpretation",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Most method boundaries are thoughtful, but several tool identities are unavailable or misnamed and two interpretation rules overstate what counts and negative CLIP evidence establish.",
+        "basic": 22,
+        "specialized": 32,
+        "total": 54,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The skill distinguishes direct chimeras from standard AGO-binding evidence",
+            "result": "PASS",
+            "note": "This distinction is repeated clearly in method selection and reporting."
+          },
+          {
+            "text": "The HEAP human-transfer boundary is explicit",
+            "result": "PASS",
+            "note": "HEAP is correctly constrained to the engineered mouse context."
+          },
+          {
+            "text": "Advertised package and pipeline identities resolve to current public interfaces",
+            "result": "FAIL",
+            "note": "pyHyb 0.4+ does not exist, Hyb lacks a semantic release identity, and no standalone HEAP pipeline CLI was found."
+          },
+          {
+            "text": "Read counts are not represented as a binding-affinity measurement",
+            "result": "FAIL",
+            "note": "The workflow calls counts an affinity proxy without accounting for expression, ligation, amplification, and recovery biases."
+          },
+          {
+            "text": "Quantitative thresholds are presented as contextual heuristics rather than universal rules",
+            "result": "PASS",
+            "note": "The main workflow tells users to state and justify the >100 TPM threshold, although claim-level provenance remains incomplete."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 18.4,
+    "dynamic_weighted": 18.8,
+    "score": 37,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The skill consistently separates direct miRNA-target chimeras from computational assignment to ordinary AGO peaks.",
+    "Method selection, species/model context, non-canonical pairing, and orthogonal validation are organized through effective progressive disclosure.",
+    "The reporting checklist asks for library method, organism, references, thresholds, strand handling, controls, and validation status.",
+    "Pinned public Hyb, preprocessing, interval, and prediction fixtures provide a strong basis for focused repairs and regression tests."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Implement the current Hyb database and output contract",
+      "observed_in": [1],
+      "problem": "The wrapper passes a generated FASTA where current Hyb requires an installed database name and then reads a filename Hyb does not create.",
+      "root_cause": "A historical command sketch was preserved as an executable wrapper without validating the pinned current Make-based interface.",
+      "fix": "Require or build a named Hyb database through a validated preparation stage, invoke an explicit goal and id, discover the exact expected output, and assert it is non-empty before parsing."
+    },
+    {
+      "priority": "P0",
+      "title": "Parse the real orientation-aware 16-column schema",
+      "observed_in": [3],
+      "problem": "The wrapper interprets energy and coordinate fields as RNA identifiers and drops a valid current Hyb row.",
+      "root_cause": "Filtering and aggregation were written against an invented six-column layout rather than current fields 4 and 10 and their variable orientation.",
+      "fix": "Ship a schema-validating parser that identifies microRNA and mRNA by typed fields 4 and 10 in either orientation, preserves coordinates and scores, then applies expression filtering and site-aware aggregation."
+    },
+    {
+      "priority": "P0",
+      "title": "Fail closed and quote every shell input",
+      "observed_in": [1, 2],
+      "problem": "Tool errors and ordinary path variants return success, globs include unintended data, and empty partial outputs appear plausible.",
+      "root_cause": "The shell script lacks strict mode, argument validation, quoting, staged output publication, and postconditions.",
+      "fix": "Use strict shell settings, validate every input and prefix, quote expansions, write to a guarded temporary directory, propagate subprocess status, validate row counts and schemas, and atomically publish only complete outputs."
+    },
+    {
+      "priority": "P0",
+      "title": "Define and test a deterministic chimera policy",
+      "observed_in": [1],
+      "problem": "Two identical pinned Hyb runs assigned 18 of the same 111 read ids to different RNA pairs.",
+      "root_cause": "The selected pipeline has unresolved multi-hit or tie behavior and the skill defines no deterministic seed, single-thread mode, consensus, or ambiguity exclusion rule.",
+      "fix": "Identify the source of pair variance, configure a reproducible route where supported, and otherwise exclude or explicitly mark ambiguous assignments using a deterministic policy tested across repeated clean runs."
+    },
+    {
+      "priority": "P1",
+      "title": "Make preprocessing and TargetScan integration executable",
+      "observed_in": [4],
+      "problem": "The example UMI orientation is not tied to the selected library, and unstranded genomic BED intersection is shown for transcript-relative TargetScan data.",
+      "root_cause": "Protocol-dependent preprocessing and coordinate conversion are described as cautions rather than validated interfaces.",
+      "fix": "Route by declared library layout, validate the exact UMI and adapter contract, provide a versioned transcript-to-genome conversion, require assembly and transcript compatibility, and use explicit strand handling."
+    },
+    {
+      "priority": "P1",
+      "title": "Correct current tool identities and access states",
+      "observed_in": [5],
+      "problem": "pyHyb 0.4+ is unavailable, Hyb has no semantic release identity, and Yeo and HEAP are represented too loosely as interchangeable pipelines.",
+      "root_cause": "Provider-era names and version floors were retained without a current authoritative interface map.",
+      "fix": "Pin public commits and exact interfaces, remove or correct pyHyb, distinguish Yeo CWL from Hyb, and describe HEAP as an experimental method plus data and CLIPanalyze rather than a standalone CLI."
+    },
+    {
+      "priority": "P1",
+      "title": "Narrow affinity and negative-evidence conclusions",
+      "observed_in": [5],
+      "problem": "Raw chimera counts are treated as affinity and an absent AGO peak is treated as proof that a prediction is false or non-functional.",
+      "root_cause": "Source heuristics were promoted into interpretation rules without accounting for assay sensitivity and multiple technical biases.",
+      "fix": "Report counts as recovery evidence normalized to declared library factors, and label absent overlap as unsupported in the assayed context rather than biologically disproven. Add claim-level sources and uncertainty for quantitative heuristics."
+    },
+    {
+      "priority": "P2",
+      "title": "Add structured reports and focused regressions",
+      "observed_in": [2, 3],
+      "problem": "Outputs omit site and target identity, versions, stage status, ambiguity, exclusions, and safe rerun metadata; substring grep is used for selected-miRNA filtering.",
+      "root_cause": "The shipped asset is a demonstration shell fragment rather than an agent-facing analysis contract.",
+      "fix": "Define TSV or JSON schemas with provenance and reason codes, use field-aware filters, add overwrite and resume rules, and regress current schema, orientation, failure, path, empty-result, and repeatability cases."
+    }
+  ]
+}

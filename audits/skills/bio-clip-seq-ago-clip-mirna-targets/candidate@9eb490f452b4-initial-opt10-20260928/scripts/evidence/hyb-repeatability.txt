@@ -1,0 +1,19 @@
+Pinned Hyb commit: 028ab6371ce793ca5e86f475fce1f2cc6ad3c677
+Input: official data/fastq/testdata.txt from the pinned Git blobs
+Database: hOH7 rebuilt from the pinned Git blobs with Bowtie2 2.5.4
+Command: hyb detect in=<official-test> id=official_test db=hOH7 qc=none align=bowtie2 type=mim fold=UNAfold
+
+Run 1 SHA-256: 46298f5a39dea534b1cd3baef04d7cde52a0b11c333eafb47ffc838297fb5bcc
+Run 2 SHA-256: 074b883a7768bb3431b6e70da311f110bbfe665d7f2a30d6cfdeab866bb53653
+Rows in each run: 111
+Fields in every retained row: 16
+Unique read identifiers in each run: 111
+Read identifiers present in only one run: 0 / 0
+Unique RNA-pair assignments in each run: 111
+RNA-pair assignments present only in run 1 / run 2: 18 / 18
+
+Interpretation: identical pinned inputs and command selected a different RNA
+pair for 18 of the same 111 read identifiers. This is result-level variance,
+not merely line ordering. The candidate does not document or control this
+behavior and exposes no deterministic acceptance or consensus rule.
+

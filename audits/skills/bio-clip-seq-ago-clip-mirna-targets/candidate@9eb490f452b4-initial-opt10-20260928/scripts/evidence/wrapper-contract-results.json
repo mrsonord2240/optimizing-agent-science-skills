@@ -1,0 +1,198 @@
+{
+  "checks": {
+    "chosen_prefix_controls_hyb_output": false,
+    "hyb_failure_propagates": false,
+    "metachar_path_is_literal": false,
+    "missing_args_rejected": true,
+    "missing_hyb_rejected": true,
+    "nominal_assumed_schema_exit_zero": true,
+    "nominal_expression_filter_keeps_only_named_mirna": true,
+    "real_hyb_output_name_is_consumed": false,
+    "spaced_paths_fail": false,
+    "true_hyb_schema_is_dropped_by_column5_filter": true
+  },
+  "results": [
+    {
+      "case": "missing_args",
+      "files": [
+        "chimera_combined.fa"
+      ],
+      "hyb_args": [],
+      "outputs": {
+        "chimera_combined.fa": ""
+      },
+      "returncode": 1,
+      "stderr": "",
+      "stdout": "Hyb pipeline not on PATH; install from github.com/gkudla/hyb\n"
+    },
+    {
+      "case": "nominal_assumed_schema",
+      "files": [
+        "hyb.args",
+        "nominal.hyb",
+        "nominal_combined.fa",
+        "nominal_expressed_chimeras.tsv",
+        "nominal_mirna_target_counts.tsv",
+        "nominal_mrna_chimeras.tsv"
+      ],
+      "hyb_args": [
+        "in=/mnt/openscience/audit-envs/bio-clip-seq-ago-clip-mirna-targets/work/wrapper/inputs/reads.fastq",
+        "db=nominal_combined.fa",
+        "align=bowtie2",
+        "type=mim"
+      ],
+      "outputs": {
+        "nominal.hyb": "chim1\tmim\thsa-miR-21\t1\tENST000001\textra\nchim2\tmim\thsa-miR-999\t1\tENST000002\textra\nchim3\tmim\thsa-miR-21\t1\trRNA_1\textra\n",
+        "nominal_combined.fa": ">hsa-miR-21\nUAGCUUAUCAGACUGAUGUUGA\n>ENST000001\nACGTACGTACGT\n",
+        "nominal_expressed_chimeras.tsv": "chim1\tmim\thsa-miR-21\t1\tENST000001\textra\n",
+        "nominal_mirna_target_counts.tsv": "      1 hsa-miR-21\n",
+        "nominal_mrna_chimeras.tsv": "chim1\tmim\thsa-miR-21\t1\tENST000001\textra\nchim2\tmim\thsa-miR-999\t1\tENST000002\textra\n"
+      },
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Total chimeras: 3\nHuman mRNA chimeras: 2\nExpressed-miRNA chimeras: 1\n\nTop miRNAs by target count:\n      1 hsa-miR-21\n\nCross-validate with TargetScan conserved predictions:\n  bedtools intersect -wa -wb -a chimera_targets_3utr.bed -b targetscan_conserved.bed\n\nChimeric methods recover non-canonical 3'-compensatory pairing missed by seed-only methods\n"
+    },
+    {
+      "case": "real_hyb_schema",
+      "files": [
+        "hyb.args",
+        "real_schema.hyb",
+        "real_schema_combined.fa",
+        "real_schema_expressed_chimeras.tsv",
+        "real_schema_mirna_target_counts.tsv",
+        "real_schema_mrna_chimeras.tsv"
+      ],
+      "hyb_args": [
+        "in=/mnt/openscience/audit-envs/bio-clip-seq-ago-clip-mirna-targets/work/wrapper/inputs/reads.fastq",
+        "db=real_schema_combined.fa",
+        "align=bowtie2",
+        "type=mim"
+      ],
+      "outputs": {
+        "real_schema.hyb": "chim1\tACGT\t-12.3\tmicroRNA_hsa-miR-21\t1\t22\t1\t22\t1e-6\tmRNA_ENST000001\t23\t40\t10\t27\t1e-5\tcount_total=1\n",
+        "real_schema_combined.fa": ">hsa-miR-21\nUAGCUUAUCAGACUGAUGUUGA\n>ENST000001\nACGTACGTACGT\n",
+        "real_schema_expressed_chimeras.tsv": "",
+        "real_schema_mirna_target_counts.tsv": "",
+        "real_schema_mrna_chimeras.tsv": ""
+      },
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Total chimeras: 1\nHuman mRNA chimeras: 0\nExpressed-miRNA chimeras: 0\n\nTop miRNAs by target count:\n\nCross-validate with TargetScan conserved predictions:\n  bedtools intersect -wa -wb -a chimera_targets_3utr.bed -b targetscan_conserved.bed\n\nChimeric methods recover non-canonical 3'-compensatory pairing missed by seed-only methods\n"
+    },
+    {
+      "case": "spaced_paths_and_prefix",
+      "files": [
+        "hyb.args",
+        "prefix with space.hyb"
+      ],
+      "hyb_args": [
+        "in=/mnt/openscience/audit-envs/bio-clip-seq-ago-clip-mirna-targets/work/wrapper/inputs/space",
+        "dir/reads",
+        "one.fastq",
+        "db=prefix",
+        "with",
+        "space_combined.fa",
+        "align=bowtie2",
+        "type=mim"
+      ],
+      "outputs": {
+        "prefix with space.hyb": "chim1\tmim\thsa-miR-21\t1\tENST000001\textra\nchim2\tmim\thsa-miR-999\t1\tENST000002\textra\nchim3\tmim\thsa-miR-21\t1\trRNA_1\textra\n"
+      },
+      "returncode": 0,
+      "stderr": "/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 15: ${OUT_PREFIX}_combined.fa: ambiguous redirect\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 29: ${OUT_PREFIX}_mrna_chimeras.tsv: ambiguous redirect\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 31: ${OUT_PREFIX}.hyb: ambiguous redirect\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 32: ${OUT_PREFIX}_mrna_chimeras.tsv: ambiguous redirect\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 41: ${OUT_PREFIX}_expressed_chimeras.tsv: ambiguous redirect\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 44: ${OUT_PREFIX}_expressed_chimeras.tsv: ambiguous redirect\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 51: ${OUT_PREFIX}_mirna_target_counts.tsv: ambiguous redirect\nawk: fatal: cannot open file `prefix' for reading: No such file or directory\nhead: cannot open 'prefix' for reading: No such file or directory\nhead: cannot open 'with' for reading: No such file or directory\nhead: cannot open 'space_mirna_target_counts.tsv' for reading: No such file or directory\n",
+      "stdout": "Total chimeras: \nHuman mRNA chimeras: \nExpressed-miRNA chimeras: \n\nTop miRNAs by target count:\n\nCross-validate with TargetScan conserved predictions:\n  bedtools intersect -wa -wb -a chimera_targets_3utr.bed -b targetscan_conserved.bed\n\nChimeric methods recover non-canonical 3'-compensatory pairing missed by seed-only methods\n"
+    },
+    {
+      "case": "metachar_path_glob",
+      "files": [
+        "hyb.args",
+        "meta.hyb",
+        "meta_combined.fa",
+        "meta_expressed_chimeras.tsv",
+        "meta_mirna_target_counts.tsv",
+        "meta_mrna_chimeras.tsv"
+      ],
+      "hyb_args": [
+        "in=/mnt/openscience/audit-envs/bio-clip-seq-ago-clip-mirna-targets/work/wrapper/inputs/meta/reads.fastq",
+        "db=meta_combined.fa",
+        "align=bowtie2",
+        "type=mim"
+      ],
+      "outputs": {
+        "meta.hyb": "chim1\tmim\thsa-miR-21\t1\tENST000001\textra\nchim2\tmim\thsa-miR-999\t1\tENST000002\textra\nchim3\tmim\thsa-miR-21\t1\trRNA_1\textra\n",
+        "meta_combined.fa": ">literal-star\nAAAA\n>glob-injected\nCCCC\n>ENST000001\nACGTACGTACGT\n",
+        "meta_expressed_chimeras.tsv": "chim1\tmim\thsa-miR-21\t1\tENST000001\textra\nchim2\tmim\thsa-miR-999\t1\tENST000002\textra\n",
+        "meta_mirna_target_counts.tsv": "      1 hsa-miR-999\n      1 hsa-miR-21\n",
+        "meta_mrna_chimeras.tsv": "chim1\tmim\thsa-miR-21\t1\tENST000001\textra\nchim2\tmim\thsa-miR-999\t1\tENST000002\textra\n"
+      },
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Total chimeras: 3\nHuman mRNA chimeras: 2\nNo miRNA expression filter applied; consider matched small-RNA-seq filter\n\nTop miRNAs by target count:\n      1 hsa-miR-999\n      1 hsa-miR-21\n\nCross-validate with TargetScan conserved predictions:\n  bedtools intersect -wa -wb -a chimera_targets_3utr.bed -b targetscan_conserved.bed\n\nChimeric methods recover non-canonical 3'-compensatory pairing missed by seed-only methods\n"
+    },
+    {
+      "case": "hyb_subprocess_failure",
+      "files": [
+        "failed_combined.fa",
+        "failed_expressed_chimeras.tsv",
+        "failed_mirna_target_counts.tsv",
+        "failed_mrna_chimeras.tsv",
+        "hyb.args"
+      ],
+      "hyb_args": [
+        "in=/mnt/openscience/audit-envs/bio-clip-seq-ago-clip-mirna-targets/work/wrapper/inputs/reads.fastq",
+        "db=failed_combined.fa",
+        "align=bowtie2",
+        "type=mim"
+      ],
+      "outputs": {
+        "failed_combined.fa": ">hsa-miR-21\nUAGCUUAUCAGACUGAUGUUGA\n>ENST000001\nACGTACGTACGT\n",
+        "failed_expressed_chimeras.tsv": "",
+        "failed_mirna_target_counts.tsv": "",
+        "failed_mrna_chimeras.tsv": ""
+      },
+      "returncode": 0,
+      "stderr": "awk: fatal: cannot open file `failed.hyb' for reading: No such file or directory\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 31: failed.hyb: No such file or directory\n",
+      "stdout": "Total chimeras: \nHuman mRNA chimeras: 0\nNo miRNA expression filter applied; consider matched small-RNA-seq filter\n\nTop miRNAs by target count:\n\nCross-validate with TargetScan conserved predictions:\n  bedtools intersect -wa -wb -a chimera_targets_3utr.bed -b targetscan_conserved.bed\n\nChimeric methods recover non-canonical 3'-compensatory pairing missed by seed-only methods\n"
+    },
+    {
+      "case": "real_output_naming",
+      "files": [
+        "chosen_combined.fa",
+        "chosen_expressed_chimeras.tsv",
+        "chosen_mirna_target_counts.tsv",
+        "chosen_mrna_chimeras.tsv",
+        "hyb.args",
+        "reads_comp_db_hybrids_ua.hyb"
+      ],
+      "hyb_args": [
+        "in=/mnt/openscience/audit-envs/bio-clip-seq-ago-clip-mirna-targets/work/wrapper/inputs/reads.fastq",
+        "db=chosen_combined.fa",
+        "align=bowtie2",
+        "type=mim"
+      ],
+      "outputs": {
+        "chosen_combined.fa": ">hsa-miR-21\nUAGCUUAUCAGACUGAUGUUGA\n>ENST000001\nACGTACGTACGT\n",
+        "chosen_expressed_chimeras.tsv": "",
+        "chosen_mirna_target_counts.tsv": "",
+        "chosen_mrna_chimeras.tsv": "",
+        "reads_comp_db_hybrids_ua.hyb": "chim1\tACGT\t-12.3\tmicroRNA_hsa-miR-21\t1\t22\t1\t22\t1e-6\tmRNA_ENST000001\t23\t40\t10\t27\t1e-5\tcount_total=1\n"
+      },
+      "returncode": 0,
+      "stderr": "awk: fatal: cannot open file `chosen.hyb' for reading: No such file or directory\n/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/run_chimeric_eclip.sh: line 31: chosen.hyb: No such file or directory\n",
+      "stdout": "Total chimeras: \nHuman mRNA chimeras: 0\nNo miRNA expression filter applied; consider matched small-RNA-seq filter\n\nTop miRNAs by target count:\n\nCross-validate with TargetScan conserved predictions:\n  bedtools intersect -wa -wb -a chimera_targets_3utr.bed -b targetscan_conserved.bed\n\nChimeric methods recover non-canonical 3'-compensatory pairing missed by seed-only methods\n"
+    },
+    {
+      "case": "missing_hyb",
+      "files": [
+        "missing_tool_combined.fa"
+      ],
+      "hyb_args": [],
+      "outputs": {
+        "missing_tool_combined.fa": ">hsa-miR-21\nUAGCUUAUCAGACUGAUGUUGA\n>ENST000001\nACGTACGTACGT\n"
+      },
+      "returncode": 1,
+      "stderr": "",
+      "stdout": "Hyb pipeline not on PATH; install from github.com/gkudla/hyb\n"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+wrapper_exit=0
+created_files:
+exact_prefix_combined.fa	60 bytes
+exact_prefix_expressed_chimeras.tsv	0 bytes
+exact_prefix_mirna_target_counts.tsv	0 bytes
+exact_prefix_mrna_chimeras.tsv	0 bytes
+derived_line_counts:
+exact_prefix_mrna_chimeras.tsv	0
+exact_prefix_expressed_chimeras.tsv	0
+exact_prefix_mirna_target_counts.tsv	0
