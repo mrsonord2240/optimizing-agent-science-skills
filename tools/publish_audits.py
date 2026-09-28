@@ -273,7 +273,13 @@ def _modular_candidate(identity, where):
     raw = identity.get("candidate")
     if not isinstance(raw, dict):
         raise SystemExit(f"{where}: source-identity.json has no candidate object")
-    value = raw.get("content_sha256") or raw.get("sha256") or raw.get("digest") or raw.get("subtree")
+    value = (
+        raw.get("content_sha256")
+        or raw.get("sha256")
+        or raw.get("digest")
+        or raw.get("identity")
+        or raw.get("subtree")
+    )
     value = str(value or "").lower()
     if not re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", value):
         raise SystemExit(

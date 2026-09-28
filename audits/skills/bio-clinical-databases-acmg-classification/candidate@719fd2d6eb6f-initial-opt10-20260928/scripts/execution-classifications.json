@@ -1,0 +1,31 @@
+{
+  "executed": [
+    "standalone scripts/acmg_classify.py",
+    "all thirteen public Python functions through bounded normal, boundary, invalid, and adversarial fixtures",
+    "candidate GeneBe request against the public service",
+    "current GeneBe coordinate request control",
+    "candidate CSpec URL against the public service",
+    "current CSpec service and gene-version request controls"
+  ],
+  "documented_only": [
+    "AutoPVS1 integration",
+    "InterVar CLI integration",
+    "MAVEdb, SpliceVault, Pangolin, gnomAD, OncoKB, CIViC, CGI, JAX-CKB, and COSMIC evidence retrieval"
+  ],
+  "restricted": [
+    "VarSome account or commercial service",
+    "Franklin/Genoox account or commercial service",
+    "ANNOVAR registration, licensed scripts, and annotation databases",
+    "ClinGen VCI authenticated curation operations"
+  ],
+  "blocked": [
+    "InterVar end-to-end execution because no wrapper, release pin, ANNOVAR authorization, or databases are shipped",
+    "AutoPVS1 end-to-end execution because no wrapper, release pin, fixture, or reference-data recipe is shipped"
+  ],
+  "out_of_scope": [
+    "patient-specific classification or medical advice",
+    "use of private clinical records or credentials",
+    "installation of new scientific tooling during audit",
+    "candidate repair, commit, push, publication, or Marketplace intake"
+  ]
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "index": 1,
+    "type": "Canonical",
+    "label": "Default BRCA1-style demonstration",
+    "prompt": "Classify a rare BRCA1 missense example with REVEL 0.95, SpliceAI 0.05, functional OddsPath 8.0, and absent population frequency. Show retained criteria, points, and classification."
+  },
+  {
+    "index": 2,
+    "type": "Variant A",
+    "label": "PVS1 transcript relevance and escape branches",
+    "prompt": "Apply the PVS1 helper to a nonsense variant predicted to undergo NMD but located in a transcript that is not biologically relevant to the disease, and compare it with relevant-transcript, exact-10-percent, over-10-percent, and splice-escape cases."
+  },
+  {
+    "index": 3,
+    "type": "Edge",
+    "label": "PS3 and BS3 OddsPath boundaries",
+    "prompt": "Map exact and adjacent Brnich OddsPath boundaries on both pathogenic and benign sides, including 2.1, 4.3, 18.7, 350, 0.48, 0.23, and 0.053."
+  },
+  {
+    "index": 4,
+    "type": "Variant B",
+    "label": "Tavtigian endpoints and subsumption",
+    "prompt": "Verify classifications at Tavtigian point totals 10, 9, 6, 5, 0, -1, -6, and -7; apply PVS1/PP3/PM4 subsumption; then submit an unknown code and a duplicate criterion."
+  },
+  {
+    "index": 5,
+    "type": "Stress",
+    "label": "Bergquist AlphaMissense calibration",
+    "prompt": "Apply the advertised Bergquist 2025 AlphaMissense calibration at benign, indeterminate, supporting, moderate, and strong boundary-adjacent scores from 0.070 through 0.990."
+  },
+  {
+    "index": 6,
+    "type": "Scope Boundary",
+    "label": "Germline-somatic separation and invalid inputs",
+    "prompt": "Keep germline ACMG categories separate from AMP/ASCO/CAP somatic tiers, then test unknown and duplicate evidence codes, out-of-range predictor values, negative OddsPath, zero penetrance, negative prevalence, and an invalid negative OncoKB level."
+  },
+  {
+    "index": 7,
+    "type": "Adversarial",
+    "label": "Current GeneBe and CSpec interfaces",
+    "prompt": "Execute the shipped GeneBe helper and supplied CSpec registry URL against today's public services, then compare each with its documented current public interface without using credentials."
+  }
+]

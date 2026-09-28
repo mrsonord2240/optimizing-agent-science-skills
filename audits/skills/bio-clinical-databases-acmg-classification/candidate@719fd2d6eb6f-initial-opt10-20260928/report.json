@@ -1,0 +1,327 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-acmg-classification",
+    "description": "Applies ACMG/AMP 2015 framework with ClinGen SVI specifications, Tavtigian 2018/2020 Bayesian point system, Abou Tayoun 2018 PVS1 decision tree, Pejaver 2022 and Bergquist 2025 calibrated PP3/BP4 thresholds for REVEL/BayesDel/AlphaMissense, Brnich 2020 PS3/BS3 OddsPath, Walker 2023 SpliceAI splicing framework, and AMP/ASCO/CAP 2017 tumor tiers. Use when classifying germline variants P / LP / VUS / LB / B, applying VCEP-specific CSpec rules, computing Whiffin BS1, or assigning cancer Tier I-IV per Li 2017.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The retained execution did not fabricate patient results, studies, sample sizes, p-values, or treatment effects; observed values came from candidate calls, bounded controls, or cited primary guidance."
+      },
+      "practice_boundaries": {
+        "result": "FAIL",
+        "detail": "The executable emits definitive germline and somatic classification labels without a required non-diagnostic boundary, qualified clinical review, or explicit prohibition on patient-specific treatment decisions."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The candidate materially mis-maps Brnich PS3/BS3 OddsPath strengths, ignores disease-transcript relevance in PVS1, shortcuts splice PVS1, and applies unsupported AlphaMissense evidence inside the calibrated indeterminate interval."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The advertised live GeneBe helper uses a removed HGVS-style request contract and consistently receives HTTP 400 from the reachable current API; the supplied CSpec route also returns HTTP 400."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 56,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 5,
+        "max": 12,
+        "note": "The skill covers many promised evidence classes, but the load-bearing PVS1, OddsPath, AlphaMissense, GeneBe, and CSpec paths do not implement their advertised current methods."
+      },
+      "reliability": {
+        "score": 4,
+        "max": 12,
+        "note": "Deterministic helpers are present, but invalid domains, unknown codes, duplicate evidence, stale services, and zero penetrance are not handled safely or actionably."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The concise main skill routes detail to one reference and one script; the long reference repeats some tables and claims but remains conditionally loaded."
+      },
+      "agent_usability": {
+        "score": 10,
+        "max": 16,
+        "note": "Authority order and workflow are readable, but executable outputs omit required context, conflict handling, validation, and a reliable current-interface path."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural triggers and tables are discoverable, while definitive clinical labels and stale links make ordinary use insufficiently forgiving."
+      },
+      "security": {
+        "score": 6,
+        "max": 12,
+        "note": "No credentials or raw-code execution are present, but clinically consequential inputs are unsanitized and no protected-health-data or patient-use boundary is stated."
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "The single script is readable and modular, but method constants lack source-linked regression tests and several accepted parameters are unused or weakly typed."
+      },
+      "agent_specific": {
+        "score": 12,
+        "max": 20,
+        "note": "Triggering and progressive disclosure are adequate; deterministic composition is undermined by silent unknown-code acceptance, duplicate counting, and missing stop conditions for clinical use."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 38.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Default BRCA1-style demonstration",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "The script exited zero but summed discordant REVEL and SpliceAI evidence plus an over-strengthened PS3 call into a precise Likely Pathogenic result without required interpretation context.",
+        "basic": 20,
+        "specialized": 22,
+        "total": 42,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The documented standalone command executes and reports retained criteria, points, and category.", "result": "PASS", "note": "It exited zero and printed four criteria, eight points, and Likely Pathogenic."},
+          {"text": "Functional OddsPath 8.0 is mapped to the Brnich Moderate strength.", "result": "FAIL", "note": "The helper returned PS3 Strong instead of PS3 Moderate."},
+          {"text": "Discordant computational evidence is reconciled instead of blindly summed.", "result": "FAIL", "note": "PP3 Strong and BP4 Supporting were both retained and arithmetically combined."},
+          {"text": "The result records disease, transcript, VCEP, mechanism, assay validity, and uncertainty context.", "result": "FAIL", "note": "None of those load-bearing fields appears in the output."},
+          {"text": "The output states a non-diagnostic clinical-use boundary and requires qualified review.", "result": "FAIL", "note": "No medical or clinical-review boundary is printed."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "PVS1 transcript relevance and escape branches",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Three simple boundaries matched, but the helper ignored a false disease-relevant-transcript flag and assigned splice PVS1 Strong without determining the transcript consequence.",
+        "basic": 17,
+        "specialized": 19,
+        "total": 36,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "A relevant-transcript nonsense variant predicted to undergo NMD receives PVS1 Very Strong in the simplified branch.", "result": "PASS", "note": "The relevant-transcript control returned PVS1_VeryStrong."},
+          {"text": "Exactly ten percent and more than ten percent removed are distinguished at the documented boundary.", "result": "PASS", "note": "Exactly 0.10 returned Moderate and 0.100001 returned Strong."},
+          {"text": "A variant outside a biologically relevant disease transcript does not receive PVS1.", "result": "FAIL", "note": "The ignored false flag still returned PVS1_VeryStrong."},
+          {"text": "Canonical splice variants require predicted or observed transcript consequence and rescue-transcript review before strength assignment.", "result": "FAIL", "note": "A splice donor escaping NMD returned PVS1_Strong from booleans alone."},
+          {"text": "The callable contract enforces an established LoF disease mechanism before PVS1 application.", "result": "FAIL", "note": "No gene-disease mechanism input or validation exists in the helper."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "PS3 and BS3 OddsPath boundaries",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Only 4 of 14 exact Brnich boundary expectations matched; pathogenic strengths were shifted upward, benign mirrors were misplaced, and PS3 Very Strong was absent.",
+        "basic": 12,
+        "specialized": 10,
+        "total": 22,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The mapping is deterministic across exact and adjacent boundary values.", "result": "PASS", "note": "Repeated scalar calls returned stable code strings or null."},
+          {"text": "Pathogenic thresholds implement indeterminate through Very Strong exactly as Brnich Table 3 specifies.", "result": "FAIL", "note": "The helper adds 1.2, shifts 2.1 and 4.3 strengths upward, and never emits Very Strong above 350."},
+          {"text": "Benign thresholds implement 0.48, 0.23, and 0.053 boundaries without over-strengthening.", "result": "FAIL", "note": "Exact 0.48 was supporting and values near 0.23 and 0.053 were assigned Strong too early."},
+          {"text": "Reference prose and code agree on the evidence-strength names.", "result": "FAIL", "note": "The reference calls greater than 18.7 Very Strong while the code returns the generic Strong code."},
+          {"text": "Invalid nonpositive OddsPath is rejected before assigning benign evidence.", "result": "FAIL", "note": "Negative OddsPath was accepted as BS3 Strong."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Tavtigian endpoints and subsumption",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The signed point endpoints and PVS1 subsumption were correct, but unknown criteria silently became zero points and duplicate evidence was counted twice.",
+        "basic": 28,
+        "specialized": 40,
+        "total": 68,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Pathogenic, likely pathogenic, and VUS endpoints match 10, 6, and 0 to 5 points.", "result": "PASS", "note": "All checked positive and zero endpoints matched."},
+          {"text": "Likely benign and benign endpoints match -1 through -6 and at most -7.", "result": "PASS", "note": "The -1, -6, and -7 fixtures returned the documented categories."},
+          {"text": "PVS1 subsumes PP3 and PM4 when they represent the same mechanism.", "result": "PASS", "note": "PP3 Strong was removed and the retained PVS1 plus PM2 total was nine."},
+          {"text": "Unknown evidence codes fail explicitly instead of disappearing into a zero score.", "result": "FAIL", "note": "NOT_A_CRITERION was retained in output but silently contributed zero."},
+          {"text": "Duplicate evidence codes are rejected or de-duplicated before summation.", "result": "FAIL", "note": "Two PS3 strings were counted as eight points."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Bergquist AlphaMissense calibration",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Only 3 of 11 calibrated boundary expectations matched; the helper assigned evidence at 0.2 and 0.7 inside the calibrated indeterminate band and cannot emit graded strengths.",
+        "basic": 14,
+        "specialized": 14,
+        "total": 28,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The helper is deterministic and returns only documented evidence-code strings or null.", "result": "PASS", "note": "Every bounded scalar call returned a stable supporting code or null."},
+          {"text": "Scores from 0.170 through 0.791 remain indeterminate under the advertised Bergquist calibration.", "result": "FAIL", "note": "The helper returned BP4 Supporting at 0.2 and PP3 Supporting at 0.7 and 0.791."},
+          {"text": "Pathogenic supporting evidence begins at the calibrated threshold near 0.792.", "result": "FAIL", "note": "The implemented threshold begins at 0.7."},
+          {"text": "The implementation represents the advertised Moderate and Strong pathogenic evidence intervals.", "result": "FAIL", "note": "All values at 0.906, 0.972, and 0.990 remained PP3 Supporting."},
+          {"text": "AlphaMissense inputs outside the probability domain are rejected.", "result": "FAIL", "note": "Negative and greater-than-one scores were accepted and assigned evidence."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Germline-somatic separation and invalid inputs",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Normal germline and somatic labels stayed separate, but invalid evidence, numeric domains, and somatic levels were accepted or crashed, and Tier III/IV remained collapsed.",
+        "basic": 21,
+        "specialized": 23,
+        "total": 44,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Germline output uses P/LP/VUS/LB/B categories and somatic output uses Tier I-IV labels.", "result": "PASS", "note": "The normal fixtures returned separate classification vocabularies."},
+          {"text": "The five documented normal somatic branches remain independently reachable.", "result": "PASS", "note": "Tier I-A, I-B, II-C, II-D, and the combined III/IV fallback were observed."},
+          {"text": "Unknown and duplicate germline criteria are rejected before scoring.", "result": "FAIL", "note": "Unknown evidence scored zero and duplicate PS3 scored twice."},
+          {"text": "Predictor, prevalence, penetrance, OddsPath, and somatic evidence domains are validated actionably.", "result": "FAIL", "note": "Out-of-range and negative values were accepted, while zero penetrance raised a raw ZeroDivisionError."},
+          {"text": "Somatic Tier III and Tier IV are distinguishable and invalid levels cannot be promoted.", "result": "FAIL", "note": "The helper collapses III/IV and mapped level -1 to Tier II-C."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Current GeneBe and CSpec interfaces",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Both shipped routes returned HTTP 400, while the current GeneBe coordinate control and CSpec REST service/version controls returned HTTP 200.",
+        "basic": 14,
+        "specialized": 16,
+        "total": 30,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The shipped GeneBe helper succeeds against the documented current public endpoint.", "result": "FAIL", "note": "Its variant=HGVS request received HTTP 400 requiring chr, pos, ref, and alt."},
+          {"text": "A documented current GeneBe coordinate request succeeds and returns a parsed variant payload.", "result": "PASS", "note": "The bounded chr/pos/ref/alt/genome control returned HTTP 200 and variants."},
+          {"text": "The supplied CSpec authoritative registry URL succeeds for public GET access.", "result": "FAIL", "note": "The candidate /cspec/ui/svi/all route returned an explicit invalid-URL HTTP 400."},
+          {"text": "Current CSpec REST service and versioned gene routes are publicly reachable.", "result": "PASS", "note": "Both /cspec/srvc and the GATM version endpoint returned HTTP 200 JSON."},
+          {"text": "The skill provides an actionable fallback when a public interface drifts.", "result": "FAIL", "note": "The helper exposes a raw HTTP error and the reference points only to the stale route."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 22.4,
+    "dynamic_weighted": 23.2,
+    "score": 46,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The normalized package preserves MIT provenance and uses clear progressive disclosure across the main skill, reference, and reusable script.",
+    "The Tavtigian signed point endpoints and PVS1 subsumption of PP3 and PM4 are implemented deterministically and matched the bounded endpoint fixtures.",
+    "The main workflow explicitly prioritizes VCEP CSpec over ClinGen SVI and generic ACMG and warns against stacking correlated missense predictors.",
+    "Germline ACMG categories and somatic AMP/ASCO/CAP tier labels are kept in separate callable paths."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ACMG-001: Correct the OddsPath strength mapping",
+      "observed_in": [1, 3],
+      "problem": "The helper shifts most pathogenic and benign OddsPath intervals to the wrong strength and cannot represent PS3 Very Strong above 350.",
+      "root_cause": "The reference and function encode a non-Brnich threshold table with an extra 1.2 pathogenic boundary and incorrect reciprocal mirrors.",
+      "fix": "Implement the exact Brnich Table 3 intervals, including the indeterminate range and PS3 Very Strong. Add exact-and-adjacent regressions for 0.053, 0.23, 0.48, 2.1, 4.3, 18.7, and 350, and align the reference table."
+    },
+    {
+      "priority": "P0",
+      "title": "ACMG-002: Enforce the complete PVS1 prerequisites",
+      "observed_in": [2],
+      "problem": "A false disease-relevant-transcript flag still produces PVS1 Very Strong, and splice variants receive a fixed strength without consequence or rescue-transcript review.",
+      "root_cause": "The sketch accepts transcript relevance but never evaluates it and reduces the decision tree to variant type plus a few booleans.",
+      "fix": "Return no PVS1 when the affected transcript or exon is not biologically relevant. Require established LoF disease mechanism, transcript consequence, NMD location, rescue-transcript/cryptic-splice review, and VCEP overrides; otherwise return an explicit review-required state."
+    },
+    {
+      "priority": "P0",
+      "title": "ACMG-003: Implement or stop claiming AlphaMissense calibration",
+      "observed_in": [5],
+      "problem": "The skill promises Bergquist 2025 graded calibration but uses unsupported 0.2 and 0.7 supporting-only cutoffs that classify indeterminate scores as evidence.",
+      "root_cause": "A conservative placeholder was retained after the frontmatter and reference were updated to the newer calibration.",
+      "fix": "Either implement the current calibrated intervals with source/version metadata and boundary tests or remove AlphaMissense scoring from the executable and route users to a verified current table. Reject values outside zero to one."
+    },
+    {
+      "priority": "P1",
+      "title": "ACMG-004: Update the GeneBe API contract",
+      "observed_in": [7],
+      "problem": "The shipped helper always receives HTTP 400 because the current single-variant GET requires genomic coordinate fields rather than variant=HGVS.",
+      "root_cause": "The wrapper targets an older public request shape and has no compatibility check or conversion step.",
+      "fix": "Accept and validate chr, pos, ref, alt, and genome for the current GET, or explicitly call a documented conversion endpoint before annotation. Parse the current response schema and add a mocked request contract plus bounded live smoke."
+    },
+    {
+      "priority": "P1",
+      "title": "ACMG-005: Replace the stale CSpec registry route",
+      "observed_in": [7],
+      "problem": "The authoritative URL documented throughout the candidate returns HTTP 400 as an invalid GET path.",
+      "root_cause": "A legacy UI route was treated as a stable API and no versioned lookup recipe was retained.",
+      "fix": "Document the current CSpec REST service and gene/specification version endpoints, require access date and selected version, and add a non-mutating reachability/schema smoke."
+    },
+    {
+      "priority": "P1",
+      "title": "ACMG-006: Validate evidence and numerical domains",
+      "observed_in": [3, 4, 5, 6],
+      "problem": "Unknown and duplicate criteria, out-of-range predictors, negative OddsPath or prevalence, zero penetrance, and invalid somatic evidence can produce silent misclassification or raw exceptions.",
+      "root_cause": "The helpers use direct comparisons and dictionary get-with-zero without typed validation or evidence uniqueness rules.",
+      "fix": "Add typed finite-domain validation, require positive OddsPath and penetrance, bound probability scores, reject unknown codes, de-duplicate or reject repeated criteria, validate somatic evidence enums, and return actionable errors."
+    },
+    {
+      "priority": "P1",
+      "title": "ACMG-007: Rebuild the default example around an evidence trail",
+      "observed_in": [1],
+      "problem": "The demonstration sums discordant computational evidence and prints a precise category without the rule set, disease mechanism, transcript, VCEP, assay calibration, exclusions, or unresolved conflicts.",
+      "root_cause": "The example is a scalar helper showcase rather than the evidence-led clinical workflow described by the skill.",
+      "fix": "Use a synthetic explicitly non-clinical case with validated inputs, one selected predictor, exact OddsPath strength, conflict/exclusion reporting, rule-set version, and an uncertainty-first output schema."
+    },
+    {
+      "priority": "P1",
+      "title": "ACMG-008: Add a clinical practice boundary",
+      "observed_in": [1, 2, 6],
+      "problem": "The skill emits definitive variant classifications without requiring qualified clinical review or forbidding use as patient-specific diagnosis or treatment advice.",
+      "root_cause": "The documentation distinguishes frameworks but does not define a medical-use stop condition or review responsibility.",
+      "fix": "State that the helper is educational and not validated for clinical diagnosis, require expert review and current laboratory SOP/VCEP guidance, prohibit treatment decisions from the output alone, and avoid protected patient data in examples or logs."
+    },
+    {
+      "priority": "P2",
+      "title": "ACMG-009: Separate somatic Tier III and Tier IV",
+      "observed_in": [6],
+      "problem": "The somatic helper collapses VUS-somatic and benign-somatic and uses a loose numeric OncoKB surrogate.",
+      "root_cause": "The illustrative tier function lacks explicit validated evidence objects and benignity evidence.",
+      "fix": "Replace the scalar shortcut with explicit same-tumor, guideline, regulatory, investigational, and benignity evidence fields plus access dates, then return distinct Tier III and Tier IV states."
+    }
+  ]
+}

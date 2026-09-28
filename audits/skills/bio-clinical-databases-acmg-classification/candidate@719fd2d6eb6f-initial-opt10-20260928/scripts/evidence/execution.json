@@ -1,0 +1,501 @@
+{
+  "candidate_identity": {
+    "algorithm": "sha256-manifest-v1",
+    "digest": "719fd2d6eb6f21107a7b590de6d9c3c94930940d718509b7a9c43b55065f0678",
+    "file_count": 5,
+    "manifest_bytes": 446,
+    "rows": [
+      "LICENSE\t1065\tb6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "SKILL.md\t4927\t2c0bf84c3df9dbd337f82b36b9b1e6098ea61c27370436a649860f44a5580a9d",
+      "references/acmg-framework.md\t22476\tf37da5331508c671b04980689e0cb85c0d68d2c0e3e5979b4bcdeea6969bcb68",
+      "references/provenance.md\t623\t7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce",
+      "scripts/acmg_classify.py\t11240\td7752923c2d5847c5eccef67b334c2cbfc37c7266d4a21f5672921d81418c53c"
+    ]
+  },
+  "input_1_canonical_demo": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "Criteria: ['PP3_Strong', 'BP4_Supporting', 'PS3', 'PM2_Supporting']\nTavtigian points: 8 -> Likely Pathogenic\n\nSubsumption example (PVS1 + PP3 -> PVS1 only):\n  Input: ['PVS1_VeryStrong', 'PP3_Strong', 'PM2_Supporting']\n  Final criteria: ['PVS1_VeryStrong', 'PM2_Supporting']\n  Classification: Likely Pathogenic (points: 9)\n"
+  },
+  "input_2_pvs1": [
+    {
+      "actual": "PVS1_VeryStrong",
+      "args": [
+        "nonsense",
+        true,
+        0.01,
+        false,
+        true
+      ],
+      "expected": "PVS1_VeryStrong",
+      "label": "nonsense_nmd_relevant_transcript",
+      "match": true
+    },
+    {
+      "actual": "PVS1_VeryStrong",
+      "args": [
+        "nonsense",
+        true,
+        0.01,
+        false,
+        false
+      ],
+      "expected": null,
+      "label": "nonsense_nmd_irrelevant_transcript",
+      "match": false
+    },
+    {
+      "actual": "PVS1_Moderate",
+      "args": [
+        "nonsense",
+        false,
+        0.1,
+        false,
+        true
+      ],
+      "expected": "PVS1_Moderate",
+      "label": "nonsense_escape_exactly_ten_percent",
+      "match": true
+    },
+    {
+      "actual": "PVS1_Strong",
+      "args": [
+        "nonsense",
+        false,
+        0.100001,
+        false,
+        true
+      ],
+      "expected": "PVS1_Strong",
+      "label": "nonsense_escape_over_ten_percent",
+      "match": true
+    },
+    {
+      "actual": "PVS1_Strong",
+      "args": [
+        "splice_donor",
+        false,
+        0.0,
+        false,
+        true
+      ],
+      "expected": "requires_transcript_consequence_review",
+      "label": "splice_escape_without_consequence_context",
+      "match": false
+    }
+  ],
+  "input_3_oddspath": [
+    {
+      "actual": "PS3",
+      "expected": "PS3_VeryStrong",
+      "match": false,
+      "value": 350.000001
+    },
+    {
+      "actual": "PS3",
+      "expected": "PS3",
+      "match": true,
+      "value": 350.0
+    },
+    {
+      "actual": "PS3",
+      "expected": "PS3",
+      "match": true,
+      "value": 18.700001
+    },
+    {
+      "actual": "PS3",
+      "expected": "PS3_Moderate",
+      "match": false,
+      "value": 18.7
+    },
+    {
+      "actual": "PS3",
+      "expected": "PS3_Moderate",
+      "match": false,
+      "value": 4.300001
+    },
+    {
+      "actual": "PS3_Moderate",
+      "expected": "PS3_Supporting",
+      "match": false,
+      "value": 4.3
+    },
+    {
+      "actual": "PS3_Moderate",
+      "expected": "PS3_Supporting",
+      "match": false,
+      "value": 2.100001
+    },
+    {
+      "actual": "PS3_Supporting",
+      "expected": null,
+      "match": false,
+      "value": 2.1
+    },
+    {
+      "actual": "BS3_Supporting",
+      "expected": null,
+      "match": false,
+      "value": 0.48
+    },
+    {
+      "actual": "BS3_Supporting",
+      "expected": "BS3_Supporting",
+      "match": true,
+      "value": 0.479999
+    },
+    {
+      "actual": "BS3",
+      "expected": "BS3_Supporting",
+      "match": false,
+      "value": 0.23
+    },
+    {
+      "actual": "BS3",
+      "expected": "BS3_Moderate",
+      "match": false,
+      "value": 0.229999
+    },
+    {
+      "actual": "BS3",
+      "expected": "BS3_Moderate",
+      "match": false,
+      "value": 0.053
+    },
+    {
+      "actual": "BS3",
+      "expected": "BS3",
+      "match": true,
+      "value": 0.052999
+    }
+  ],
+  "input_4_tavtigian": {
+    "boundaries": [
+      {
+        "criteria": [
+          "PVS1_VeryStrong",
+          "PM2_Supporting",
+          "PP3_Supporting"
+        ],
+        "result": {
+          "classification": "Pathogenic",
+          "criteria": [
+            "PVS1_VeryStrong",
+            "PM2_Supporting",
+            "PP3_Supporting"
+          ],
+          "points": 10
+        },
+        "target_points": 10
+      },
+      {
+        "criteria": [
+          "PVS1_VeryStrong",
+          "PM2_Supporting"
+        ],
+        "result": {
+          "classification": "Likely Pathogenic",
+          "criteria": [
+            "PVS1_VeryStrong",
+            "PM2_Supporting"
+          ],
+          "points": 9
+        },
+        "target_points": 9
+      },
+      {
+        "criteria": [
+          "PS3",
+          "PM2_Supporting",
+          "PP3_Supporting"
+        ],
+        "result": {
+          "classification": "Likely Pathogenic",
+          "criteria": [
+            "PS3",
+            "PM2_Supporting",
+            "PP3_Supporting"
+          ],
+          "points": 6
+        },
+        "target_points": 6
+      },
+      {
+        "criteria": [
+          "PS3",
+          "PP3_Supporting"
+        ],
+        "result": {
+          "classification": "VUS",
+          "criteria": [
+            "PS3",
+            "PP3_Supporting"
+          ],
+          "points": 5
+        },
+        "target_points": 5
+      },
+      {
+        "criteria": [],
+        "result": {
+          "classification": "VUS",
+          "criteria": [],
+          "points": 0
+        },
+        "target_points": 0
+      },
+      {
+        "criteria": [
+          "BP1"
+        ],
+        "result": {
+          "classification": "Likely Benign",
+          "criteria": [
+            "BP1"
+          ],
+          "points": -1
+        },
+        "target_points": -1
+      },
+      {
+        "criteria": [
+          "BS1",
+          "BP1",
+          "BP2"
+        ],
+        "result": {
+          "classification": "Likely Benign",
+          "criteria": [
+            "BS1",
+            "BP1",
+            "BP2"
+          ],
+          "points": -6
+        },
+        "target_points": -6
+      },
+      {
+        "criteria": [
+          "BS1",
+          "BP1",
+          "BP2",
+          "BP3"
+        ],
+        "result": {
+          "classification": "Benign",
+          "criteria": [
+            "BS1",
+            "BP1",
+            "BP2",
+            "BP3"
+          ],
+          "points": -7
+        },
+        "target_points": -7
+      }
+    ],
+    "duplicate": {
+      "classification": "Likely Pathogenic",
+      "criteria": [
+        "PS3",
+        "PS3"
+      ],
+      "points": 8
+    },
+    "subsumption": {
+      "classification": "Likely Pathogenic",
+      "criteria": [
+        "PVS1_VeryStrong",
+        "PM2_Supporting"
+      ],
+      "points": 9
+    },
+    "unknown": {
+      "classification": "VUS",
+      "criteria": [
+        "NOT_A_CRITERION"
+      ],
+      "points": 0
+    }
+  },
+  "input_5_alphamissense": [
+    {
+      "actual": "BP4_Supporting",
+      "expected": "BP4_Strong",
+      "match": false,
+      "value": 0.07
+    },
+    {
+      "actual": "BP4_Supporting",
+      "expected": "BP4_Supporting",
+      "match": true,
+      "value": 0.1
+    },
+    {
+      "actual": "BP4_Supporting",
+      "expected": "BP4_Supporting",
+      "match": true,
+      "value": 0.169
+    },
+    {
+      "actual": "BP4_Supporting",
+      "expected": null,
+      "match": false,
+      "value": 0.17
+    },
+    {
+      "actual": "BP4_Supporting",
+      "expected": null,
+      "match": false,
+      "value": 0.2
+    },
+    {
+      "actual": "PP3_Supporting",
+      "expected": null,
+      "match": false,
+      "value": 0.7
+    },
+    {
+      "actual": "PP3_Supporting",
+      "expected": null,
+      "match": false,
+      "value": 0.791
+    },
+    {
+      "actual": "PP3_Supporting",
+      "expected": "PP3_Supporting",
+      "match": true,
+      "value": 0.792
+    },
+    {
+      "actual": "PP3_Supporting",
+      "expected": "PP3_Moderate",
+      "match": false,
+      "value": 0.906
+    },
+    {
+      "actual": "PP3_Supporting",
+      "expected": "PP3_Strong_3pt",
+      "match": false,
+      "value": 0.972
+    },
+    {
+      "actual": "PP3_Supporting",
+      "expected": "PP3_Strong",
+      "match": false,
+      "value": 0.99
+    }
+  ],
+  "input_6_framework_separation_and_validation": {
+    "germline": {
+      "classification": "Likely Pathogenic",
+      "criteria": [
+        "PVS1_VeryStrong",
+        "PM2_Supporting"
+      ],
+      "points": 9
+    },
+    "somatic": {
+      "invalid_negative_level": "Tier II-C: FDA drug in different tumor (off-label / basket)",
+      "tier_i_a": "Tier I-A: FDA drug + same tumor + biomarker (on-label)",
+      "tier_i_b": "Tier I-B: professional guideline (NCCN/ESMO)",
+      "tier_ii_c": "Tier II-C: FDA drug in different tumor (off-label / basket)",
+      "tier_ii_d": "Tier II-D: investigational / preclinical",
+      "tier_iii_iv": "Tier III/IV: VUS or benign-somatic"
+    },
+    "validation_probes": [
+      {
+        "accepted": true,
+        "label": "unknown_criterion",
+        "result": {
+          "classification": "VUS",
+          "criteria": [
+            "NOT_A_CRITERION"
+          ],
+          "points": 0
+        }
+      },
+      {
+        "accepted": true,
+        "label": "duplicate_criterion",
+        "result": {
+          "classification": "Likely Pathogenic",
+          "criteria": [
+            "PS3",
+            "PS3"
+          ],
+          "points": 8
+        }
+      },
+      {
+        "accepted": true,
+        "label": "negative_alpha",
+        "result": "BP4_Supporting"
+      },
+      {
+        "accepted": true,
+        "label": "alpha_over_one",
+        "result": "PP3_Supporting"
+      },
+      {
+        "accepted": true,
+        "label": "negative_oddspath",
+        "result": "BS3"
+      },
+      {
+        "accepted": false,
+        "error": "ZeroDivisionError: float division by zero",
+        "label": "zero_penetrance"
+      },
+      {
+        "accepted": true,
+        "label": "negative_prevalence",
+        "result": -0.05
+      },
+      {
+        "accepted": false,
+        "error": "TypeError: '<=' not supported between instances of 'float' and 'str'",
+        "label": "nonnumeric_score"
+      }
+    ]
+  },
+  "input_7_current_interfaces": {
+    "candidate_cspec_route": {
+      "body_excerpt": "{\"errCode\":400,\"errMsg\":\"INVALID URL - Your request is invalid. Specifically, the URL path you provided ('/cspec/ui/svi/all') is not valid for HTTP 'GET' requests to the CSPEC-UI-SVI API service.\",\"errName\":\"Bad Request\",\"errCat\":\"INVALID URL\"}",
+      "content_type": "application/json; charset=utf-8",
+      "status": 400,
+      "url": "https://cspec.genome.network/cspec/ui/svi/all"
+    },
+    "candidate_genebe": {
+      "body_excerpt": "{\"detail\":\"alt: must not be null; ref: must not be null; chr: must not be blank; pos: must not be null\",\"instance\":\"/cloud/api-public/v1/variant\",\"status\":400,\"title\":\"Validation Failed\"}",
+      "error": "HTTPError: 400 Client Error:  for url: https://api.genebe.net/cloud/api-public/v1/variant?variant=NM_000546.6%3Ac.215C%3EG&genome=hg38",
+      "http_status": 400,
+      "status": "error",
+      "url": "https://api.genebe.net/cloud/api-public/v1/variant?variant=NM_000546.6%3Ac.215C%3EG&genome=hg38"
+    },
+    "current_cspec_gene_versions": {
+      "body_excerpt": "{\n  \"data\": [\n    {\n      \"@id\": \"https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/2.0.1\"\n    },\n    {\n      \"@id\": \"https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/2.0.0\"\n    },\n    {\n      \"@id\": \"https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/1.1.1\"\n    },\n    {\n      \"@id\": \"https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/1.1.0\"\n    },\n    {\n      \"@id\": \"ht",
+      "content_type": "application/json; charset=utf-8",
+      "status": 200,
+      "url": "https://cspec.genome.network/cspec/Gene/id/GATM/SequenceVariantInterpretation/version"
+    },
+    "current_cspec_service": {
+      "body_excerpt": "{\n  \"data\": {\n    \"desc\": \"Criteria Specification Registry Service\",\n    \"disclaimer\": \"BETA RELEASE. This version of the Criteria Specification service is BETA. Additional features under development. Content and representations subject to change. Service and content addresses subject to change. Service and content IRIs not permalinks and subject to change. Intended for interoperability development, general assessment, and illustration.\",\n    \"entCount\": 78010,\n    \"entTypes\": {\n      \"Assertion",
+      "content_type": "application/json; charset=utf-8",
+      "status": 200,
+      "url": "https://cspec.genome.network/cspec/srvc"
+    },
+    "current_genebe_control": {
+      "body_excerpt": "{\"message\":null,\"variants\":[{\"acmg_by_gene\":[{\"benign_score\":2,\"criteria\":[\"PM2_Supporting\",\"BP4_Moderate\"],\"effects\":[\"missense_variant\"],\"gene_symbol\":\"SEBOX\",\"hgnc_id\":32942,\"hgvs_c\":\"c.430G>T\",\"hgvs_p\":\"p.Ala144Ser\",\"inheritance_mode\":\"unknown\",\"pathogenic_score\":1,\"score\":-1,\"transcript\":\"NM_001080837.4\",\"verdict\":\"Likely_benign\"},{\"benign_score\":2,\"criteria\":[\"PM2_Supporting\",\"BP4_Moderate\"],\"effects\":[\"3_prime_UTR_variant\"],\"gene_symbol\":\"ENSG00000273171\",\"hgnc_id\":null,\"hgvs_c\":\"c.*281G>",
+      "content_type": "application/json",
+      "status": 200,
+      "url": "https://api.genebe.net/cloud/api-public/v1/variant?chr=17&pos=28364411&ref=C&alt=A&genome=hg38"
+    }
+  },
+  "runtime": {
+    "pandas": "2.3.3",
+    "python": "3.12.14 (main, Sep  2 2026, 23:27:36) [GCC 15.3.0]",
+    "requests": "2.32.5"
+  }
+}

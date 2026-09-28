@@ -105,6 +105,22 @@ class ModularPublicationTests(unittest.TestCase):
                 80,
             )
 
+    def test_modular_run_accepts_normalized_identity_field(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            run = self.make_run(root)
+            identity_path = run / "source-identity.json"
+            identity = json.loads(identity_path.read_text(encoding="utf-8"))
+            digest = identity["candidate"].pop("content_sha256")
+            identity["candidate"]["identity"] = digest
+            write_json(identity_path, identity)
+
+            version, _ = publish.publish_modular(
+                str(root / "records"), "sample-skill", str(run), []
+            )
+
+            self.assertEqual(version, "candidate@333333333333-initial-opt10")
+
 
 if __name__ == "__main__":
     unittest.main()

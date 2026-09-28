@@ -1,0 +1,38 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clinical-databases/acmg-classification",
+    "subtree": "b4c1f4dd04a6a53f3eba2aa56da5d830ba325e1a",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane3-acmg-classification",
+    "base_commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "identity_algorithm": "sha256-manifest-v1",
+    "identity": "719fd2d6eb6f21107a7b590de6d9c3c94930940d718509b7a9c43b55065f0678",
+    "manifest_bytes": 446,
+    "path": "F:\\OpenScience\\wt\\opt10-acmg-classification\\skills\\bio-clinical-databases-acmg-classification",
+    "status_before": "candidate subtree only untracked",
+    "status_after_execution": "candidate subtree only untracked"
+  },
+  "files": [
+    {"path": "LICENSE", "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f", "bytes": 1065},
+    {"path": "SKILL.md", "sha256": "2c0bf84c3df9dbd337f82b36b9b1e6098ea61c27370436a649860f44a5580a9d", "bytes": 4927},
+    {"path": "references/acmg-framework.md", "sha256": "f37da5331508c671b04980689e0cb85c0d68d2c0e3e5979b4bcdeea6969bcb68", "bytes": 22476},
+    {"path": "references/provenance.md", "sha256": "7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce", "bytes": 623},
+    {"path": "scripts/acmg_classify.py", "sha256": "d7752923c2d5847c5eccef67b334c2cbfc37c7266d4a21f5672921d81418c53c", "bytes": 11240}
+  ],
+  "tooling": {
+    "tools_md_sha256": "8b11991a3126c0f80052f3ea0ba773334e18048e1e06d1aa8444af49e8ad70c7",
+    "environment_fingerprint_sha256": "a76d004791386c34a27531c4ba65dc1bbdfedc5ddea19269f522d2798fbead6c",
+    "environment_lock_sha256": "91e14260266a2c6d528847f13d1e004bf314de803d6b0c935509dc26136875cd",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "audit": {
+    "execution_sha256": "9c1b601e32edd0e43f177579d27eec5a14942c45e2a6b2ef3949854ecb5216f6",
+    "runner_sha256": "8ce0d8c7e9774b6b3113792cd4015e1127964a6f6f62ed03d986ce76a71c97d9"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}
