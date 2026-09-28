@@ -1,0 +1,319 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-biostatistics-adaptive-designs",
+    "description": "Designs adaptive clinical trials including group-sequential, blinded and unblinded sample-size re-estimation, treatment selection, enrichment, response-adaptive randomisation, platform trials, dose finding, and current regulatory review boundaries.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No retained output fabricated a trial result, sample size, p-value, efficacy claim, DOI, or PMID; numerical evidence came from exact candidate runs, bounded controls, or identified authoritative sources."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill is framed as protocol and statistical design support rather than patient-specific diagnosis or prescribing, and it repeatedly requires pre-specification, IDMC separation, simulation, and regulatory verification."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The EXNEX-labelled section does not implement EXNEX detachment, the promising-zone section omits its adaptation and preserved-weight rule, and the blinded-SSR code makes an unconditional Type-I statement."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "Three of seven executable candidate sections error, and the shipped full program stops at section 3 before later sections can run."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 71,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 6,
+        "max": 12,
+        "note": "The workflow covers the promised design families, but three executable sections fail and several named methods are only partial or conceptual implementations."
+      },
+      "reliability": {
+        "score": 5,
+        "max": 12,
+        "note": "Package errors are visible, but the advertised full runner halts at the first defect and the supplied examples lack structured validation and recovery guidance."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The main skill is concise and routes conditional detail into focused references and a single reusable script with little redundant loading."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "The workflow, design-selection table, guardrails, and deliverables are unusually clear, but executable-versus-conceptual boundaries and failure feedback are not consistently surfaced at invocation time."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Natural prompts and scenario tables are highly discoverable; users cannot recover cleanly from the current package-interface and shape errors without independent expertise."
+      },
+      "security": {
+        "score": 8,
+        "max": 12,
+        "note": "There are no credentials, destructive operations, or raw-string execution paths; numeric design inputs are not programmatically validated before entering statistical APIs."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "References are modular and the script is sectioned, but no shipped regression harness locks package contracts, random seeds, or method-level assertions."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger precision, progressive disclosure, composability, and stop conditions are strong; stochastic examples are not idempotent and runnable surfaces overstate some method coverage."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 50.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 18,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "OBF survival design",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Sections 1 and 2 ran successfully; independent controls reproduced sensible OBF boundaries, null crossing probability, events, and sample size.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The O'Brien-Fleming design executes on the exact candidate constants.", "result": "PASS", "note": "Section 1 completed and produced three efficacy boundaries."},
+          {"text": "The survival sample-size calculation executes and exposes accrual, dropout, follow-up, event, and subject assumptions.", "result": "PASS", "note": "Section 2 completed and printed 229.4 final events and about 449.4 subjects."},
+          {"text": "The independent control attains the one-sided null crossing probability near 0.025.", "result": "PASS", "note": "The retained control reported 0.025000000388."},
+          {"text": "The result remains tied to proportional-hazards assumptions and warns against using it unchanged for delayed effects.", "result": "PASS", "note": "The routed reference explicitly requires a non-PH method or simulation for delayed immunotherapy effects."},
+          {"text": "The candidate records installed-package compatibility expectations rather than silently assuming one version.", "result": "PASS", "note": "Version compatibility and help-page inspection are explicit in SKILL.md."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Blinded variance SSR",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The fixed rpact design errors before either sample-size calculation because asUser lacks userAlphaSpending; a valid current fixed-design control proves the intended SD comparison is otherwise available.",
+        "basic": 13,
+        "specialized": 18,
+        "total": 31,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The exact section executes through both the SD 12 and SD 14 sample-size calls.", "result": "FAIL", "note": "rpact 4.4.0 stops while constructing design_initial."},
+          {"text": "The valid current-interface control shows higher blinded SD increases required sample size.", "result": "PASS", "note": "The control increased total subjects from 182.78 to 248.08."},
+          {"text": "The implementation clearly distinguishes nuisance-only blinded recalculation from an unblinded treatment-effect adaptation.", "result": "PASS", "note": "The prose and section heading identify blinded pooled-SD re-estimation."},
+          {"text": "The Type-I claim is conditional and tied to the implemented final test and recalculation rule.", "result": "FAIL", "note": "The script states Type-I error is not affected without conditions or a matching simulation."},
+          {"text": "Failure output gives a candidate-level recovery action.", "result": "FAIL", "note": "Only the raw rpact missing-userAlphaSpending error is emitted."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Promising-zone combination design",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The inverse-normal design and baseline sample size execute, but no conditional-power calculation, increase rule, n_max, preserved original weights, or Type-I simulation is implemented.",
+        "basic": 27,
+        "specialized": 35,
+        "total": 62,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The current rpact inverse-normal design constructs with the declared information rates and spending.", "result": "PASS", "note": "Section 4 completed without warnings or errors."},
+          {"text": "The candidate warns that naive unblinded sample-size increases inflate Type-I error.", "result": "PASS", "note": "This is a non-negotiable guardrail in the main skill and reference."},
+          {"text": "The candidate presents 30% to 80% as an example design choice rather than a universal default.", "result": "PASS", "note": "The reference explicitly says these thresholds are design choices."},
+          {"text": "The executable computes conditional power and applies the promising-zone increase up to a specified n_max.", "result": "FAIL", "note": "Those steps appear only as comments and n_max is absent."},
+          {"text": "The executable demonstrates preserved original weights and calibrated Type-I error.", "result": "FAIL", "note": "No CHW weight application or null simulation is performed."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "BOIN operating characteristics",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The boundary table and 1,000-trial operating characteristics execute, but the candidate does not set a seed and overstates the FDA Fit-for-Purpose determination as a general preference.",
+        "basic": 31,
+        "specialized": 44,
+        "total": 75,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The exact BOIN boundary call executes for target 0.30, ten cohorts, and cohort size three.", "result": "PASS", "note": "Section 5 completed and returned escalation and de-escalation boundaries."},
+          {"text": "The exact six-dose operating-characteristic simulation executes and returns MTD selection and expected sample size.", "result": "PASS", "note": "The run returned six selection percentages and expected N 26.961."},
+          {"text": "An independent seeded control confirms the package and input family produce a valid reproducible result.", "result": "PASS", "note": "The seed-20260928 control passed all boundary and total assertions."},
+          {"text": "The reference correctly says Fit-for-Purpose does not approve a particular trial design.", "result": "PASS", "note": "The platform reference includes this exact qualification."},
+          {"text": "The shipped simulation itself records a seed and avoids implying that FDA generally prefers BOIN.", "result": "FAIL", "note": "No seed is set and the code comment says this is why FDA prefers BOIN."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "CRM comparator",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The exact section supplies a six-dose true curve and five-dose skeleton, emits recycling warnings, and fails when the malformed simulation object is printed.",
+        "basic": 11,
+        "specialized": 14,
+        "total": 25,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The candidate identifies CRM skeleton calibration as a material design requirement.", "result": "PASS", "note": "The reference warns that skeleton misspecification can redirect the trial."},
+          {"text": "The executable uses matching true-rate and skeleton dimensions.", "result": "FAIL", "note": "PI has six entries while prior has five."},
+          {"text": "The 1,000-trial result prints successfully and can be compared with BOIN.", "result": "FAIL", "note": "print(crm_sim) fails with a dimnames extent error."},
+          {"text": "The candidate validates dose-grid shape before expensive simulation.", "result": "FAIL", "note": "The mismatch survives through simulation and only fails during printing."},
+          {"text": "The CRM simulation is reproducible from a recorded seed.", "result": "FAIL", "note": "No seed is set or reported."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "EXNEX basket borrowing",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "gMAP fitting succeeds, but ess() rejects the raw fit and the code contains neither EX/NEX mixture weights nor independent stratum detachment.",
+        "basic": 10,
+        "specialized": 11,
+        "total": 21,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The current RBesT gMAP fit succeeds on the retained historical-data fixture.", "result": "PASS", "note": "map_prior is created before the subsequent error."},
+          {"text": "The executable converts the fit to a density object before computing effective sample size.", "result": "FAIL", "note": "ess(map_prior) fails with Unknown density; the valid control requires automixfit(map_prior)."},
+          {"text": "The executable implements exchangeable and non-exchangeable components for each basket stratum.", "result": "FAIL", "note": "Only one historical MAP prior is fit."},
+          {"text": "A prior-data-conflicting stratum can detach through explicit mixture weights.", "result": "FAIL", "note": "No stratum-level likelihood or EXNEX weight exists."},
+          {"text": "The output reports robustification or conflict-sensitivity operating characteristics.", "result": "FAIL", "note": "Execution stops before ESS and no sensitivity analysis is present."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Run all shipped adaptive examples",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The full program executes sections 1 and 2 then stops at section 3; sections 7, 9, and 10 are responsibly comments-only but cannot be treated as finished SAP implementations.",
+        "basic": 22,
+        "specialized": 31,
+        "total": 53,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The full shipped script exits successfully after all ten sections.", "result": "FAIL", "note": "It exits 1 at section 3."},
+          {"text": "Sections 7, 9, and 10 are visibly identified as conceptual scaffolds rather than silently masquerading as executions.", "result": "PASS", "note": "The code contains comments only and SKILL.md calls conceptual sections scaffolds."},
+          {"text": "Restricted commercial tools are not bypassed or represented as locally validated.", "result": "PASS", "note": "East, ADDPLAN, and FACTS are only documented and the tooling classifies them as restricted."},
+          {"text": "The full runner preserves later independent evidence after an earlier section fails.", "result": "FAIL", "note": "Ordinary R sourcing terminates at the first error."},
+          {"text": "Every named implementation produces SAP-ready boundaries, rules, simulations, and bias controls.", "result": "FAIL", "note": "Enrichment, graduation, and RAR remain conceptual only and multiple executable methods are partial or broken."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.4,
+    "dynamic_weighted": 30.2,
+    "score": 59,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The normalized package preserves MIT provenance and separates a concise core workflow from method-specific and regulatory references.",
+    "The design-selection table and non-negotiable guardrails correctly distinguish blinded from unblinded SSR, discourage two-arm RAR by default, and require selection-bias correction.",
+    "Group-sequential O'Brien-Fleming and survival examples execute successfully and agree with independently asserted current-package controls.",
+    "Conceptual and restricted surfaces are explicitly labelled, and the skill requires authoritative status checks before regulatory claims."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ADAPT-001: Repair the blinded SSR design",
+      "observed_in": [2, 7],
+      "problem": "The shipped program stops while constructing the fixed rpact design because typeOfDesign asUser lacks required user alpha spending.",
+      "root_cause": "A group-sequential asUser constructor is being used for a fixed final-analysis blinded-SSR example without its mandatory spending contract.",
+      "fix": "Use the current supported fixed-design contract, remove ignored or incompatible arguments, execute both SD scenarios, and add an assertion that the higher nuisance variance increases sample size while the prespecified final test remains unchanged."
+    },
+    {
+      "priority": "P0",
+      "title": "ADAPT-002: Align and validate CRM dose grids",
+      "observed_in": [5],
+      "problem": "The CRM example passes six true probabilities with a five-dose skeleton, returns a malformed object, and fails during printing.",
+      "root_cause": "The example lacks a preflight invariant requiring the true curve, skeleton, and dose labels to have identical lengths.",
+      "fix": "Provide a calibrated six-dose skeleton or reduce the true curve to five doses, reject dimension mismatches before simulation, set a seed, and assert the returned selection and allocation schema before comparison with BOIN."
+    },
+    {
+      "priority": "P0",
+      "title": "ADAPT-003: Implement EXNEX or relabel MAP",
+      "observed_in": [6],
+      "problem": "The EXNEX-labelled example fits a single MAP model, fails to convert it before ESS, and has no non-exchangeable stratum component.",
+      "root_cause": "A simplified historical MAP snippet was presented as a basket EXNEX implementation and uses a stale RBesT density contract.",
+      "fix": "Either implement an actual stratum-level EXNEX or robust mixture with explicit exchangeability weights and conflict sensitivity, or relabel the section as a MAP-prior demonstration. For ESS, use the current gMAP to mixture-fit conversion and test the resulting density."
+    },
+    {
+      "priority": "P1",
+      "title": "ADAPT-004: Make stochastic examples reproducible",
+      "observed_in": [4, 5, 6],
+      "problem": "BOIN, CRM, and Bayesian examples do not set or report seeds, so operating characteristics and fitted mixture approximations can change between runs.",
+      "root_cause": "The script treats simulation as an illustrative side effect rather than a versioned reproducible deliverable.",
+      "fix": "Set named seeds before every stochastic surface, record replicate counts and package versions with outputs, and add deterministic schema and tolerance assertions rather than locking incidental Monte Carlo values."
+    },
+    {
+      "priority": "P1",
+      "title": "ADAPT-005: Complete the promising-zone rule",
+      "observed_in": [3],
+      "problem": "The section labelled Mehta-Pocock with CHW weights only constructs a base inverse-normal design and sample size.",
+      "root_cause": "Conditional power, the adaptation function, maximum sample size, original-weight preservation, and null calibration were left as comments.",
+      "fix": "Implement and pre-specify the conditional-power zones, n_max, original weights, stagewise statistic, and IDMC output. Simulate null and alternative operating characteristics with Monte Carlo uncertainty, or clearly mark the entire section documented-only."
+    },
+    {
+      "priority": "P1",
+      "title": "ADAPT-006: Qualify the blinded SSR Type-I claim",
+      "observed_in": [2],
+      "problem": "The code says Type-I error is not affected solely because the test ignores SSR, while the main reference correctly uses conditional language.",
+      "root_cause": "An illustrative comment collapses the assumptions needed for nuisance-only blinded re-estimation to preserve the final test.",
+      "fix": "State the exact conditions: blinded nuisance estimation, a prespecified rule, unchanged valid final test, and no treatment-effect leakage. Add a bounded null simulation or cite the supported design contract and avoid an unconditional guarantee."
+    },
+    {
+      "priority": "P2",
+      "title": "ADAPT-007: Remove the FDA preference claim",
+      "observed_in": [4],
+      "problem": "The code comment says the pre-tabulated table is why FDA prefers BOIN.",
+      "root_cause": "A Fit-for-Purpose determination was paraphrased as broad regulatory preference.",
+      "fix": "Say that FDA issued a Fit-for-Purpose determination for the BOIN method in December 2021 and retain the existing warning that each proposed trial still requires calibration and review."
+    },
+    {
+      "priority": "P2",
+      "title": "ADAPT-008: Refresh regulatory status routing",
+      "observed_in": [],
+      "problem": "The regulatory reference does not mention FDA's June 2026 broader revised draft for master protocols and uses the June 2025 ICH milestone without distinguishing FDA's September 2025 draft issue date.",
+      "root_cause": "The source snapshot was frozen before the later FDA updates, while the skill is intended for current reviewer-facing work.",
+      "fix": "Add the June 2026 broader draft alongside the still-final March 2022 oncology guidance, record access dates, and distinguish ICH Step 2 endorsement from the later FDA draft-publication date."
+    }
+  ]
+}

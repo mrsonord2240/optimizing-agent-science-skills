@@ -1,0 +1,60 @@
+One-sided group sequential design with
+90 % power and 2.5 % Type I Error.
+           Sample
+            Size 
+  Analysis Ratio*  Z   Nominal p  Spend
+         1  0.334 3.73    0.0001 0.0001
+         2  0.678 2.50    0.0061 0.0061
+         3  1.012 1.99    0.0231 0.0188
+     Total                       0.0250 
+
+++ alpha spending:
+ Lan-DeMets O'Brien-Fleming approximation spending function (no parameters).
+* Sample size ratio compared to fixed design with no interim
+
+Boundary crossing probabilities and expected sample size
+assume any cross stops the trial
+
+Upper boundary (power or Type I Error)
+          Analysis
+   Theta      1      2      3 Total   E{N}
+  0.0000 0.0001 0.0061 0.0188 0.025 1.0100
+  3.2415 0.0316 0.5343 0.3340 0.900 0.8121
+Group sequential design (method=LachinFoulkes; k=3 analyses; Two-sided symmetric)
+HR=0.650 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%
+N=449.4 subjects | D=229.4 events | T=30.0 study duration | accrual=12.0 Accrual duration | minfup=18.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)
+
+Spending functions:
+  Bounds derived using a  Lan-DeMets O'Brien-Fleming approximation spending function (no parameters).
+
+Analysis summary:
+Method: LachinFoulkes 
+    Analysis               Value Efficacy Futility
+   IA 1: 33%                   Z   3.7103  -3.7103
+      N: 450         p (1-sided)   0.0001   0.0001
+  Events: 77        ~HR at bound   0.4280   2.3362
+   Month: 12    P(Cross) if HR=1   0.0001   0.0001
+             P(Cross) if HR=0.65   0.0338   0.0000
+   IA 2: 67%                   Z   2.5114  -2.5114
+      N: 450         p (1-sided)   0.0060   0.0060
+ Events: 153        ~HR at bound   0.6662   1.5010
+   Month: 19    P(Cross) if HR=1   0.0060   0.0060
+             P(Cross) if HR=0.65   0.5603   0.0000
+       Final                   Z   1.9930  -1.9930
+      N: 450         p (1-sided)   0.0231   0.0231
+ Events: 230        ~HR at bound   0.7686   1.3010
+   Month: 30    P(Cross) if HR=1   0.0250   0.0250
+             P(Cross) if HR=0.65   0.9000   0.0000
+
+Key inputs (names preserved):
+                               desc    item  value input
+                    Accrual rate(s)   gamma 37.447     1
+           Accrual rate duration(s)       R     12    12
+             Control hazard rate(s) lambdaC   0.04  0.04
+            Control dropout rate(s)     eta  0.005 0.005
+       Experimental dropout rate(s)    etaE  0.005  etaE
+ Event and dropout rate duration(s)       S   NULL     S
+Installation qualification for rpact 4.4.0 has not yet been performed.
+Please run testPackage() before using the package in GxP relevant environments.
+Error: Missing argument: parameter 'userAlphaSpending' must be specified in design
+Execution halted

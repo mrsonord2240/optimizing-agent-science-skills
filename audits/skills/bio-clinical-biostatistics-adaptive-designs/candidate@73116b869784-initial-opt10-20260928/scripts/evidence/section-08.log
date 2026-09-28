@@ -1,0 +1,17 @@
+Generalized Meta Analytic Predictive Prior Analysis
+
+Call:  gMAP(formula = cbind(r, n - r) ~ 1 | study, family = binomial, 
+    data = historical_data, tau.dist = "HalfNormal", tau.prior = 0.5, 
+    beta.prior = cbind(0, 2))
+
+Exchangeability tau strata: 1 
+Prediction tau stratum    : 1 
+Maximal Rhat              : 1 
+
+Between-trial heterogeneity of tau prediction stratum
+        mean median    sd  q2.5   q50 q97.5
+tau[1] 0.274  0.222 0.222 0.011 0.222 0.838
+
+MAP Prior MCMC sample
+                 mean median     sd   q2.5   q50 q97.5
+theta_resp_pred 0.217  0.208 0.0766 0.0927 0.208 0.399

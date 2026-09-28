@@ -1,0 +1,20 @@
+{
+  "candidate_identity": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+  "classifications": [
+    {"surface": "script section 1", "classification": "executed-pass", "evidence": "evidence/section-01.json"},
+    {"surface": "script section 2", "classification": "executed-pass", "evidence": "evidence/section-02.json"},
+    {"surface": "script section 3", "classification": "executed-error", "evidence": "evidence/section-03.json"},
+    {"surface": "script section 4", "classification": "executed-pass-partial-method", "evidence": "evidence/section-04.json"},
+    {"surface": "script section 5", "classification": "executed-pass-nondeterministic", "evidence": "evidence/section-05.json"},
+    {"surface": "script section 6", "classification": "executed-error", "evidence": "evidence/section-06.json"},
+    {"surface": "script section 7", "classification": "documented-only", "evidence": "evidence/section-07.json"},
+    {"surface": "script section 8", "classification": "executed-error-method-mismatch", "evidence": "evidence/section-08.json"},
+    {"surface": "script section 9", "classification": "documented-only", "evidence": "evidence/section-09.json"},
+    {"surface": "script section 10", "classification": "documented-only", "evidence": "evidence/section-10.json"},
+    {"surface": "full shipped script", "classification": "executed-error", "evidence": "evidence/full-script.log"},
+    {"surface": "valid current public API controls", "classification": "executed-pass-9-of-9", "evidence": "evidence/valid-api-smoke.json"},
+    {"surface": "trialr and escalation", "classification": "unavailable-bounded", "evidence": "evidence/optional-package-classification.md"},
+    {"surface": "East, EastHorizon, ADDPLAN, FACTS", "classification": "restricted-documented-only", "evidence": "evidence/TOOLS.md"},
+    {"surface": "FDA and ICH regulatory pages", "classification": "authoritative-source-checked-not-executed", "evidence": "scientific-source-notes.md"}
+  ]
+}

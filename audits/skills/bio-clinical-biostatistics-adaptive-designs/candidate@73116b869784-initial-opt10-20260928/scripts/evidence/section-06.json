@@ -1,0 +1,18 @@
+{
+  "section": 6,
+  "heading": "6. Continual Reassessment Method (CRM) -- alternative to BOIN",
+  "classification": "candidate-executable",
+  "required_package": "dfcrm",
+  "package_version": "0.2.2.1",
+  "candidate_identity": {
+    "sha256": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+    "file_count": 8,
+    "manifest_bytes": 764
+  },
+  "status": "ERROR",
+  "elapsed_seconds": 55.686,
+  "warnings": "number of rows of result is not a multiple of vector length (arg 2)",
+  "messages": [],
+  "error": "length of 'dimnames' [2] not equal to array extent",
+  "objects_created": ["crm_sim", "prior_skeleton", "target"]
+}

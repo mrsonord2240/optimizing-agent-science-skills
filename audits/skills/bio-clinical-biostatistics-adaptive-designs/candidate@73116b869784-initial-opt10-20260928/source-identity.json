@@ -1,0 +1,27 @@
+{
+  "schema": "scientific-skill-audit.source-identity.v1",
+  "skill_id": "bio-clinical-biostatistics-adaptive-designs",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clinical-biostatistics/adaptive-designs",
+    "subtree": "85188936f8fee497db8c92c095bcbd0a888e376e",
+    "license": "MIT"
+  },
+  "candidate": {
+    "identity_algorithm": "sha256-manifest-v1",
+    "identity": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+    "file_count": 8,
+    "manifest_bytes": 764,
+    "manifest_path": "evidence/candidate-manifest-current.tsv",
+    "worktree": "F:\\OpenScience\\wt\\opt10-adaptive-designs",
+    "branch": "optimize/ten-20260928-lane1-adaptive-designs",
+    "head": "0bc0b31fc52742dbec1034f698103434cc9460c3"
+  },
+  "audit": {
+    "phase": "initial",
+    "run_id": "initial-opt10-20260928",
+    "candidate_repaired": false,
+    "published": false
+  }
+}

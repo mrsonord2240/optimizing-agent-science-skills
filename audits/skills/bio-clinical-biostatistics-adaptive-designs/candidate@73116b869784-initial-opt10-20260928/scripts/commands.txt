@@ -1,0 +1,9 @@
+2026-09-28 independent audit commands
+
+Candidate surfaces:
+wsl.exe -d science -- bash -lc "/mnt/openscience/audit-envs/bio-clinical-biostatistics-adaptive-designs/tools/wsl_isolated_exec.sh bash /mnt/openscience/audit-envs/bio-clinical-biostatistics-adaptive-designs/tools/run_candidate_surfaces.sh"
+
+Valid current-interface and boundary controls:
+wsl.exe -d science -- bash -lc "/mnt/openscience/audit-envs/bio-clinical-biostatistics-adaptive-designs/tools/wsl_isolated_exec.sh bash /mnt/openscience/audit-envs/bio-clinical-biostatistics-adaptive-designs/tools/run_valid_smoke.sh"
+
+Both commands ran as unprivileged user sci inside the prepared interop-disabled WSL mount boundary. No packages were installed and candidate bytes were not changed.

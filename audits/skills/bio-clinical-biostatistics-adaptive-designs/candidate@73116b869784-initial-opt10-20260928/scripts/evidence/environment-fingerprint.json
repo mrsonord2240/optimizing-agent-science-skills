@@ -1,0 +1,164 @@
+{
+  "schema": "prepare-scientific-skill-tooling.environment-fingerprint.v1",
+  "captured_at_utc": "2026-09-28T21:02:31Z",
+  "normalized_identity": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+  "origin": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clinical-biostatistics/adaptive-designs",
+  "source_subtree_identity": "85188936f8fee497db8c92c095bcbd0a888e376e",
+  "worktree": "F:\\OpenScience\\wt\\opt10-adaptive-designs",
+  "branch": "optimize/ten-20260928-lane1-adaptive-designs",
+  "head": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+  "environment": {
+    "environment_yml_sha256": "ba3c8f7698e29e336ed56295d12385568dccba32f73b341e45dcf15277aaf73a",
+    "explicit_lock_sha256": "5f0bb3bca2660982c18770fd76ac9deffbd6157c5bd4db55f46c1c1d69aa230c",
+    "micromamba_list_sha256": "6b6e6885deaaec62c66f25d5aeab5ee7fbbbc73f90037b62ce00029083ccfa51",
+    "r_package_versions_sha256": "54a848c526e91ec7de06cb1182e1c423a92581fbb2da79ab1862f751fc4f86f5",
+    "r_session_info_sha256": "f9fd2dd8aac7d9e478fe79cd6fcd063bbddab31dfe8e1837bfd2528938dff596",
+    "execution_boundary_sha256": "3717fb3e3ede18f12dfdb64836b43c00374f123f5d20a0332a875400993f1f2e",
+    "rebuild_dry_run_sha256": "a5f1306bb7cb38181cc63acc6eee1f0bc983faee2cbfaa3b4a76b895b58d4751",
+    "r_packages": [
+      {
+        "package": "rpact",
+        "version": "4.4.0"
+      },
+      {
+        "package": "gsDesign",
+        "version": "3.11.0"
+      },
+      {
+        "package": "gsDesign2",
+        "version": "1.2.0"
+      },
+      {
+        "package": "simtrial",
+        "version": "1.1.0"
+      },
+      {
+        "package": "adaptr",
+        "version": "1.5.0"
+      },
+      {
+        "package": "BOIN",
+        "version": "2.7.2"
+      },
+      {
+        "package": "dfcrm",
+        "version": "0.2.2.1"
+      },
+      {
+        "package": "RBesT",
+        "version": "1.12.0"
+      },
+      {
+        "package": "rstan",
+        "version": "2.32.6"
+      },
+      {
+        "package": "RcppParallel",
+        "version": "5.1.9"
+      },
+      {
+        "package": "jsonlite",
+        "version": "1.8.9"
+      },
+      {
+        "package": "digest",
+        "version": "0.6.37"
+      }
+    ],
+    "retained_cran_sources": [
+      {
+        "file": "adaptr_1.5.0.tar.gz",
+        "sha256": "2899741383da5e584ce258122a0893342eabcac2ea8e8365c26dd9f51e36575e",
+        "bytes": 3676655
+      },
+      {
+        "file": "BOIN_2.7.2.tar.gz",
+        "sha256": "be643939639ccc70dd236712047056e051f7aa019a7230d09caf1f646dd0060e",
+        "bytes": 38829
+      },
+      {
+        "file": "dfcrm_0.2-2.1.tar.gz",
+        "sha256": "ef6a832e65ba11742ccad905cc77b02af668e164944d8a48af92f614f71f3607",
+        "bytes": 21938
+      },
+      {
+        "file": "escalation_0.2.3.tar.gz",
+        "sha256": "f5ca5558b45b7e7a99002d175033b8f2bd9d04d7eb9282afa7d4126ddc635a52",
+        "bytes": 5036421
+      },
+      {
+        "file": "gsDesign2_1.2.0.tar.gz",
+        "sha256": "76a678bb001050a6b63a2806e71e255eca1044d68d2da41c671599a3be70c4ad",
+        "bytes": 478792
+      },
+      {
+        "file": "lt_0.4.tar.gz",
+        "sha256": "a62bb0af7bd30c213b62f518249d64cee82fd789fba47ef836b892382e29d224",
+        "bytes": 53822
+      },
+      {
+        "file": "npsurvSS_1.1.0.tar.gz",
+        "sha256": "e7b511351c6cfd15e918fbe9c3d85747c82e20cc56e6de82ab7fdcf2dd7b1a1c",
+        "bytes": 289542
+      },
+      {
+        "file": "RBesT_1.12-0.tar.gz",
+        "sha256": "95dc0557c0a01115d8e97008b8e09281c3fe9d568afd878347d0e3cd2e761239",
+        "bytes": 774677
+      },
+      {
+        "file": "simtrial_1.1.0.tar.gz",
+        "sha256": "e35b770d343e849ebdbc93d3a00df7664f4e5d1515b5b013432c0f51674f2e77",
+        "bytes": 1126565
+      },
+      {
+        "file": "trialr_0.1.6.tar.gz",
+        "sha256": "678b99223047132498254d7617471ea6a9be6552f1d12e1afa0471c098bd23a9",
+        "bytes": 2721075
+      }
+    ]
+  },
+  "candidate_manifest": [
+    {
+      "path": "LICENSE",
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "bytes": 1065
+    },
+    {
+      "path": "references/group-sequential-ssr-enrichment.md",
+      "sha256": "186164898bbfb21fc6bea63c13c36f8e3e7ba401a72c94bdab7a61f7845c9c4d",
+      "bytes": 5806
+    },
+    {
+      "path": "references/platform-rar-dose-finding.md",
+      "sha256": "2e85931c628abb5cc71c840a5772cfff0d8e07bfc1981a5c4021db74f42a910f",
+      "bytes": 6318
+    },
+    {
+      "path": "references/provenance.md",
+      "sha256": "ebff33f500947901075b70634c9ac312e1c5ab0cd3170a925fe597fe6e0111bf",
+      "bytes": 616
+    },
+    {
+      "path": "references/regulatory-and-review.md",
+      "sha256": "467b8737c7ea79c1bf4e1a15ac27ae0b2094e7f9036c351208b791ab6ef2a5bb",
+      "bytes": 6753
+    },
+    {
+      "path": "scripts/adaptive_designs.R",
+      "sha256": "a312f05eeeb32218cf2dce78bb728060bea87ae34ad85a449919582f9fe027cb",
+      "bytes": 8356
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "eb0dd871da0ec3464b0b059071c361a787999cf650e04a0cbe4856199fdef4fe",
+      "bytes": 7953
+    },
+    {
+      "path": "usage-guide.md",
+      "sha256": "1ef480280ce3e41d6047fcdb773bfdbec55447d5e47fec0214a2fc85bb54fa7b",
+      "bytes": 4029
+    }
+  ],
+  "candidate_manifest_sha256": "1e4e537765d0318bd85e9d34a8a86579e1771b40a4ee7f0f0ececff8c4ca80ed"
+}

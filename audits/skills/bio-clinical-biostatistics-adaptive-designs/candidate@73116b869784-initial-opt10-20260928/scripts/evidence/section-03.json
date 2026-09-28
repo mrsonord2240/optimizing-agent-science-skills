@@ -1,0 +1,18 @@
+{
+  "section": 3,
+  "heading": "3. Blinded SSR for continuous endpoint (Friede-Kieser 2006)",
+  "classification": "candidate-executable",
+  "required_package": "rpact",
+  "package_version": "4.4.0",
+  "candidate_identity": {
+    "sha256": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+    "file_count": 8,
+    "manifest_bytes": 764
+  },
+  "status": "ERROR",
+  "elapsed_seconds": 0.108,
+  "warnings": [],
+  "messages": [],
+  "error": "Missing argument: parameter 'userAlphaSpending' must be specified in design",
+  "objects_created": []
+}

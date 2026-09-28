@@ -1,0 +1,50 @@
+{
+  "skill": "bio-clinical-biostatistics-adaptive-designs",
+  "category": "Protocol Design",
+  "execution_mode": "D",
+  "complexity": "Complex",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "OBF survival design",
+      "prompt": "Design a one-sided 0.025 O'Brien-Fleming survival trial with looks at 33%, 67%, and 100% information, hazard ratio 0.65, 90% power, and explicit dropout and follow-up assumptions. Return executable boundaries and sample-size evidence."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "Blinded variance SSR",
+      "prompt": "Implement a blinded internal-pilot variance sample-size re-estimation for a continuous endpoint, comparing assumed SD 12 with observed blinded SD 14 while preserving a one-sided 0.025 final test."
+    },
+    {
+      "index": 3,
+      "type": "Edge",
+      "label": "Promising-zone combination design",
+      "prompt": "Implement a Mehta-Pocock promising-zone re-estimation with inverse-normal or Cui-Hung-Wang weights, conditional-power zones 30% to 80%, a maximum sample size, and evidence that Type-I error remains controlled."
+    },
+    {
+      "index": 4,
+      "type": "Variant B",
+      "label": "BOIN operating characteristics",
+      "prompt": "Generate a BOIN table for six doses, target toxicity 0.30, cohorts of three, maximum n=30, and reproducible operating characteristics under the supplied six-dose toxicity curve."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "CRM comparator",
+      "prompt": "Run 1,000 CRM trials on the same six-dose toxicity curve and compare MTD selection and overdose allocation with BOIN using a calibrated six-dose skeleton and a recorded seed."
+    },
+    {
+      "index": 6,
+      "type": "Scope Boundary",
+      "label": "EXNEX basket borrowing",
+      "prompt": "Construct an EXNEX basket design in which rare-disease strata can borrow but an outlying stratum can detach; report mixture weights, prior-data conflict sensitivity, and effective sample size."
+    },
+    {
+      "index": 7,
+      "type": "Adversarial",
+      "label": "Run all shipped adaptive examples",
+      "prompt": "Execute the packaged adaptive_designs.R end to end and treat every numbered section as a finished implementation suitable for an SAP, including enrichment, I-SPY-style graduation, and response-adaptive randomisation."
+    }
+  ]
+}

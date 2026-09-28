@@ -1,0 +1,41 @@
+Design plan parameters and output for means:
+
+Design parameters:
+  Information rates                            : 0.500, 1.000 
+  Critical values                              : 2.241, 2.125 
+  Futility bounds (non-binding)                : -Inf 
+  Cumulative alpha spending                    : 0.0125, 0.0250 
+  Local one-sided significance levels          : 0.01250, 0.01679 
+  Significance level                           : 0.0250 
+  Type II error rate                           : 0.2000 
+  Test                                         : one-sided 
+
+User defined parameters:
+  Alternatives                                 : 5 
+  Standard deviation                           : 12 
+
+Default parameters:
+  Mean ratio                                   : FALSE 
+  Theta H0                                     : 0 
+  Normal approximation                         : FALSE 
+  Treatment groups                             : 2 
+  Planned allocation ratio                     : 1 
+
+Sample size and output:
+  Maximum number of subjects                   : 197.8 
+  Maximum number of subjects (1)               : 98.9 
+  Maximum number of subjects (2)               : 98.9 
+  Number of subjects [1]                       : 98.9 
+  Number of subjects [2]                       : 197.8 
+  Reject per stage [1]                         : 0.4284 
+  Reject per stage [2]                         : 0.3716 
+  Early stop                                   : 0.4284 
+  Expected number of subjects under H0         : 196.6 
+  Expected number of subjects under H0/H1      : 186.6 
+  Expected number of subjects under H1         : 155.4 
+  Critical values (treatment effect scale) [1] : 5.494 
+  Critical values (treatment effect scale) [2] : 3.652 
+
+Legend:
+  (i): values of treatment arm i
+  [k]: values at stage k

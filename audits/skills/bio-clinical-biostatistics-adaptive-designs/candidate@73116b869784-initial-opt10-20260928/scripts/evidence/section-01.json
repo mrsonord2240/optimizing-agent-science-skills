@@ -1,0 +1,18 @@
+{
+  "section": 1,
+  "heading": "1. O'Brien-Fleming group-sequential design for survival",
+  "classification": "candidate-executable",
+  "required_package": "gsDesign",
+  "package_version": "3.11.0",
+  "candidate_identity": {
+    "sha256": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+    "file_count": 8,
+    "manifest_bytes": 764
+  },
+  "status": "PASS",
+  "elapsed_seconds": 0.11,
+  "warnings": [],
+  "messages": [],
+  "error": null,
+  "objects_created": "design_obf"
+}

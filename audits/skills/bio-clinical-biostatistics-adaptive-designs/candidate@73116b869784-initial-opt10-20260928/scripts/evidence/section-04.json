@@ -1,0 +1,18 @@
+{
+  "section": 4,
+  "heading": "4. Mehta-Pocock promising zone SSR with CHW weights",
+  "classification": "candidate-executable",
+  "required_package": "rpact",
+  "package_version": "4.4.0",
+  "candidate_identity": {
+    "sha256": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+    "file_count": 8,
+    "manifest_bytes": 764
+  },
+  "status": "PASS",
+  "elapsed_seconds": 0.451,
+  "warnings": [],
+  "messages": [],
+  "error": null,
+  "objects_created": ["design_promising", "ss_promising"]
+}

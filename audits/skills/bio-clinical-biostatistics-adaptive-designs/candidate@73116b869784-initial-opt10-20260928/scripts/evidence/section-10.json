@@ -1,0 +1,18 @@
+{
+  "section": 10,
+  "heading": "10. RAR with time-trend adjustment (Robertson 2023 consensus)",
+  "classification": "conceptual-scaffold",
+  "required_package": null,
+  "package_version": null,
+  "candidate_identity": {
+    "sha256": "73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546",
+    "file_count": 8,
+    "manifest_bytes": 764
+  },
+  "status": "DOCUMENTED_ONLY",
+  "elapsed_seconds": 0,
+  "warnings": [],
+  "messages": [],
+  "error": null,
+  "objects_created": []
+}
