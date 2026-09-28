@@ -1,0 +1,38 @@
+{
+  "skill": "bio-batch-processing",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "complexity": "Moderate",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "Count, split, and index a bounded FASTA set",
+      "prompt": "Count three FASTA files without materializing the records, split one five-record file into chunks of at most two records, build a persistent multi-file index, and verify a random lookup after reopening the index. Report counts and output paths."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "Compressed FASTX reader selection and quality encoding",
+      "prompt": "Use pyfastx for indexed random access to a gzip FASTA and pysam for a gzip FASTQ. Verify one random-access sequence and compare quality values for a legacy Phred+64 record against an explicit Biopython parser. State which result is scientifically interpretable."
+    },
+    {
+      "index": 3,
+      "type": "Edge",
+      "label": "Empty discovery and invalid chunk size",
+      "prompt": "Generate the documented CSV summary when the input glob matches no FASTA files, and split a non-empty FASTA with records_per_file set to zero. Do not silently lose records; return actionable failures or valid empty output."
+    },
+    {
+      "index": 4,
+      "type": "Variant B",
+      "label": "High-cardinality and hostile prefix splitting",
+      "prompt": "Split a FASTA containing 2,048 distinct ID prefixes and also a record whose prefix contains ../. Keep resources bounded and guarantee every output stays inside the intended output directory without overwriting a sibling file."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "Deterministic traversal and spawn multiprocessing",
+      "prompt": "Merge logically identical directories created in different orders and require byte-stable record ordering. Then run the documented per-file multiprocessing recipe under a spawn start method, as used on Windows and macOS, and verify the totals."
+    }
+  ]
+}

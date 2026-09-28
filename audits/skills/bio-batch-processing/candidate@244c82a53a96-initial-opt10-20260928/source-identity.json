@@ -1,0 +1,51 @@
+{
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane3-batch-processing",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "244c82a53a96dce4586308b71ed678bae2bd3bed685a1db7aa44c6459b0c8990",
+    "identity_recipe": "case-insensitive relative POSIX-path sort; each row is path\\\\tbytes\\\\tsha256; rows joined by literal \\\\n; SHA-256 over UTF-8",
+    "path": "F:\\OpenScience\\wt\\opt10-batch-processing\\skills\\bio-batch-processing",
+    "status": "?? skills/bio-batch-processing/"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "files": [
+    {
+      "bytes": 5860,
+      "git_blob": "428baeb57bb8afeec5580ff6de18dc4fe055a550",
+      "path": "references/operations.md",
+      "sha256": "b45f07271f8f1dee1b980fe6d77b6457897df625dfd29d47a2bd00dfcf77c52e"
+    },
+    {
+      "bytes": 4138,
+      "git_blob": "82148614e6b5c4cdceef1bce21ed2302c66e5952",
+      "path": "references/readers-and-indexing.md",
+      "sha256": "1c74915f8cd96aeb1f1a82f062d2917b6729dda57cf7422168d90550d70e5c38"
+    },
+    {
+      "bytes": 2190,
+      "git_blob": "95a85454153fa711db03d28d8fe5aa9f466be839",
+      "path": "scripts/batch_process.py",
+      "sha256": "808e8a8e94ff11db161b6333b2c7558341ba941f8f77ddb5062013c2c5d28892"
+    },
+    {
+      "bytes": 4719,
+      "git_blob": "18118b4efd1db592c3393f2be0afe09f269e3f9c",
+      "path": "SKILL.md",
+      "sha256": "50678508714e0df4e66cffaf3cd7b900171e2f3bd8e62640d1629ad1bde64e92"
+    }
+  ],
+  "origin": {
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "sequence-io/batch-processing",
+    "repository": "GPTomics/bioSkills",
+    "status": "clean",
+    "subtree": "0dca3ff9c9d8e79f28b0747f41987f05dfd59b19"
+  },
+  "tooling": {
+    "environment_fingerprint_sha256": "5eb133e158c59a258243d162d0d8b5d8ad8f1476e75bf0014b9e17c140fdb702",
+    "environment_lock_sha256": "425284edfa0fae95ea2160958f526efeee3ceeffb58a71fce6a20ec3c310bc40",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "tools_md_sha256": "38ee571306947a57da3c2d627a6bb191ef8014d0136c09a3b433d43ec4a6ccc3"
+  }
+}

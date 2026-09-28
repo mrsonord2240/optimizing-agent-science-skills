@@ -1,0 +1,346 @@
+{
+  "meta": {
+    "skill_name": "bio-batch-processing",
+    "description": "Process many sequence files in batch (count, merge, split, convert, summarize) with memory-safe streaming and on-disk indexing using Biopython, pysam, or pyfastx. Use when iterating over a directory of FASTA/FASTQ files, merging or splitting datasets, building random access across many or huge files, or automating per-file operations without exhausting RAM.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No tested output fabricated identifiers, studies, sample sizes, p-values, efficacy data, sequence counts, or quality values."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill performs sequence-file engineering and makes no patient-specific diagnostic or treatment recommendation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The tested streaming, indexing, conversion-loss, and Phred+33 versus Phred+64 claims are methodologically sound; failures are implementation, safety, and reproducibility defects."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The public multiprocessing recipe omits the required main-module guard for spawn platforms. The exact recipe timed out after 15 seconds under Python spawn and returned no totals, so this advertised bioinformatics code path is not runnable on Windows/macOS-style process startup."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 58,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "Canonical count, split, index, conversion, pysam, and pyfastx behavior is scientifically correct, but empty summaries, invalid chunk sizes, spawn multiprocessing, high-cardinality prefixes, and deterministic traversal are not correctly covered."
+      },
+      "reliability": {
+        "score": 3,
+        "max": 12,
+        "note": "Several foreseeable inputs yield a raw IndexError or ValueError, silent zero-output data loss, descriptor exhaustion, partial output, or a multiprocessing hang; rollback and recovery guidance are absent."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Progressive disclosure and record streaming are efficient, but the prefix splitter scales open descriptors linearly with unique prefixes and fails far below the advertised many-file scope."
+      },
+      "agent_usability": {
+        "score": 10,
+        "max": 16,
+        "note": "Routing and normal-case recipes are clear, while output contracts, ordering guarantees, validation behavior, platform constraints, and failure confirmations are underspecified."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural trigger language and common-error guidance are strong, but routine boundary inputs can fail cryptically or silently and hostile identifiers are not rejected."
+      },
+      "security": {
+        "score": 5,
+        "max": 12,
+        "note": "No credentials, shell interpolation, or raw-code execution are present, but unvalidated record-ID prefixes become writable paths and can escape the output directory and truncate an existing sibling file."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "The compact Skill, two focused references, and standalone script are easy to navigate, but no regression suite covers documented edge behavior and the script preserves invalid chunk-size semantics."
+      },
+      "agent_specific": {
+        "score": 13,
+        "max": 20,
+        "note": "The trigger and progressive disclosure are precise, but side-effecting snippets lack structured I/O, collision policy, idempotent output handling, and reliable stop or handoff conditions."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 52.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 7,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Count, split, and index a bounded FASTA set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact standalone script and its public functions preserve 15 records, produce 2/2/1 chunks, and reopen a stable persistent index.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Streaming counts preserve all records.",
+            "result": "PASS",
+            "note": "The three files each report five records."
+          },
+          {
+            "text": "Split chunks are bounded and lossless.",
+            "result": "PASS",
+            "note": "Five source records parse back as chunk sizes 2, 2, and 1."
+          },
+          {
+            "text": "Persistent index reopening preserves count and lookup value.",
+            "result": "PASS",
+            "note": "The reopened index has 15 records and lookup s2_3 remains length 52."
+          },
+          {
+            "text": "The shipped standalone demonstration exits successfully.",
+            "result": "PASS",
+            "note": "The exact candidate script exits zero with the documented counts and no stderr."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Compressed FASTX reader selection and quality encoding",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The reader claims are correct: pyfastx indexed 94 gzip FASTA records, and pysam's Phred+33 assumption inflated a legacy Phred+64 score by 31; however, the pyfastx path has no shipped runnable example.",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "pyfastx indexes and randomly accesses gzip FASTA.",
+            "result": "PASS",
+            "note": "The auditor-authored probe indexes 94 records and the first sequence equals Biopython's parsed value."
+          },
+          {
+            "text": "pyfastx creates its persistent index.",
+            "result": "PASS",
+            "note": "A .fxi file is created for the gzip FASTA."
+          },
+          {
+            "text": "The documented pysam quality-encoding caveat is scientifically correct.",
+            "result": "PASS",
+            "note": "ASCII h becomes 71 under pysam's subtraction of 33 but 40 under Biopython fastq-illumina parsing."
+          },
+          {
+            "text": "The shipped Skill provides a runnable pyfastx recipe.",
+            "result": "FAIL",
+            "note": "pyfastx is advertised in the frontmatter, workflow, and reader matrix, but no code fence or shipped script demonstrates its API or index lifecycle."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Empty discovery and invalid chunk size",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The summary recipe leaves a zero-byte CSV and raises IndexError on an empty glob; a zero chunk size silently returns no files for a 94-record input and a negative size exposes raw ValueError.",
+        "basic": 14,
+        "specialized": 22,
+        "total": 36,
+        "assertions_passed": 0,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Empty discovery produces a valid header-only CSV or an actionable domain error.",
+            "result": "FAIL",
+            "note": "summaries[0] raises IndexError after creating an empty output file."
+          },
+          {
+            "text": "Zero records_per_file is rejected rather than silently producing no chunks.",
+            "result": "FAIL",
+            "note": "The public split function returns an empty list for a non-empty 94-record FASTA."
+          },
+          {
+            "text": "Negative records_per_file is rejected with an actionable skill-level error.",
+            "result": "FAIL",
+            "note": "The raw itertools ValueError is exposed without the parameter name or valid range."
+          },
+          {
+            "text": "No input records are silently lost in invalid split requests.",
+            "result": "FAIL",
+            "note": "All 94 input records are omitted when records_per_file is zero."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "High-cardinality and hostile prefix splitting",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The recipe reaches the 1,024-descriptor soft limit after opening 1,015 prefix files, then an ID prefix containing ../ escapes the intended directory and truncates a controlled sibling file.",
+        "basic": 8,
+        "specialized": 12,
+        "total": 20,
+        "assertions_passed": 0,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Open handles remain bounded independently of distinct prefix count.",
+            "result": "FAIL",
+            "note": "The descriptor delta is 1,015 for 1,015 opened prefixes and the next open raises OSError 24."
+          },
+          {
+            "text": "All derived output paths remain inside the intended output directory.",
+            "result": "FAIL",
+            "note": "The ../escaped prefix writes to the parent directory; no corresponding file exists in the intended directory."
+          },
+          {
+            "text": "An existing sibling file cannot be overwritten by a sequence ID.",
+            "result": "FAIL",
+            "note": "The controlled sentinel file is truncated and replaced by one FASTA record."
+          },
+          {
+            "text": "All 2,048 high-cardinality records are written.",
+            "result": "FAIL",
+            "note": "Execution stops after 1,015 prefixes with Too many open files."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Deterministic traversal and spawn multiprocessing",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "An ext4 probe returns opposite traversal orders for identical filename sets created in opposite orders, and the exact unguarded Pool recipe times out under spawn without returning totals.",
+        "basic": 14,
+        "specialized": 25,
+        "total": 39,
+        "assertions_passed": 0,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The documented traversal is explicitly sorted and byte-stable for identical filename sets.",
+            "result": "FAIL",
+            "note": "On WSL ext4, the same 200 filenames are returned in ascending versus descending order according to creation history."
+          },
+          {
+            "text": "The documented Pool recipe runs under spawn.",
+            "result": "FAIL",
+            "note": "The exact top-level Pool recipe does not complete within the bounded 15-second spawn probe."
+          },
+          {
+            "text": "Spawn multiprocessing returns the expected six-record total.",
+            "result": "FAIL",
+            "note": "No stdout or result rows are produced before timeout."
+          },
+          {
+            "text": "A platform-specific multiprocessing failure is prevented or explained.",
+            "result": "FAIL",
+            "note": "The recipe has no if __name__ == '__main__' guard and the instructions contain no Windows/macOS spawn warning."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 23.2,
+    "dynamic_weighted": 31.7,
+    "score": 55,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The canonical count, bounded split, persistent index, conversion, and standalone demonstration produce correct checked values on public Biopython fixtures.",
+    "The Skill accurately distinguishes one-pass streaming from persistent indexing and clearly warns that GenBank-to-FASTA conversion loses annotations.",
+    "The pysam Phred+33 caveat is scientifically precise and was reproduced against explicit Phred+64 parsing.",
+    "The compact primary instructions route detailed operations into two focused references and preserve the upstream MIT provenance."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "BATCH-001: ID prefix can escape output directory",
+      "observed_in": [4],
+      "problem": "The split-by-prefix recipe interpolates an untrusted record-ID prefix directly into a writable filename. A controlled ../ prefix escaped the intended directory and truncated an existing sibling file.",
+      "root_cause": "No basename normalization, containment check, collision policy, or safe output-directory API separates biological IDs from filesystem paths.",
+      "fix": "Map prefixes to validated filenames, reject separators and reserved names, resolve every target under an explicit output directory, verify containment before opening, and default to exclusive or atomic creation with a documented collision policy. Add traversal and overwrite regressions."
+    },
+    {
+      "priority": "P1",
+      "title": "BATCH-002: Prefix split exhausts file descriptors",
+      "observed_in": [4],
+      "problem": "One handle is retained per distinct prefix. Under the pinned environment's 1,024 soft limit, the 2,048-prefix case fails after 1,015 outputs with OSError 24 and leaves the operation incomplete.",
+      "root_cause": "The recipe bounds sequence-record memory but does not bound operating-system resources or protect cleanup with try/finally.",
+      "fix": "Use a bounded LRU handle cache or partition/sort strategy, always close handles in finally or ExitStack, emit a partial-run manifest on failure, and test above the descriptor limit. Narrow the memory-safe claim until fixed."
+    },
+    {
+      "priority": "P1",
+      "title": "BATCH-003: Empty summary crashes after creating output",
+      "observed_in": [3],
+      "problem": "When the glob matches no files, summaries[0] raises IndexError after summary.csv has been created as a zero-byte file.",
+      "root_cause": "CSV fieldnames are inferred from the first data row without an explicit schema or empty-input branch.",
+      "fix": "Define fieldnames statically and either write a valid header-only CSV with an explicit zero-match result or fail before opening the destination with a clear no-input-files error."
+    },
+    {
+      "priority": "P1",
+      "title": "BATCH-004: Invalid chunk sizes lose data silently",
+      "observed_in": [3],
+      "problem": "records_per_file=0 returns no output files for a non-empty 94-record input, while negative values expose a raw itertools exception.",
+      "root_cause": "The public split function and reference recipe do not validate that the chunk size is a positive integer before consuming the parser.",
+      "fix": "Validate records_per_file as an integer greater than zero before creating the parser or outputs, raise a stable actionable ValueError, and add zero, negative, non-integer, and one-record regression cases."
+    },
+    {
+      "priority": "P1",
+      "title": "BATCH-005: Pool recipe hangs under spawn",
+      "observed_in": [5],
+      "problem": "The documented multiprocessing example creates Pool at module import time. Under Python spawn it times out without results, making the advertised per-file parallel path unusable on Windows and macOS-style startup.",
+      "root_cause": "Pool construction is not inside a callable protected by if __name__ == '__main__', and no platform constraint is stated.",
+      "fix": "Move Pool creation into main(), protect invocation with the main-module guard, keep process_file importable at module scope, and test both fork and spawn contexts with checked totals."
+    },
+    {
+      "priority": "P1",
+      "title": "BATCH-006: Glob traversal makes outputs nondeterministic",
+      "observed_in": [5],
+      "problem": "Count rows, merged record order, source-tracked merges, conversion order, index file order, and Pool result order all inherit unsorted Path.glob traversal. Identical ext4 filename sets produced opposite orders from different creation histories.",
+      "root_cause": "Every multi-file recipe consumes Path.glob or rglob directly without a stable sort key.",
+      "fix": "Sort discovered paths with a documented cross-platform key before processing and add a creation-order regression that compares merged bytes and summary row order."
+    },
+    {
+      "priority": "P2",
+      "title": "BATCH-007: pyfastx path is advertised but not runnable",
+      "observed_in": [2],
+      "problem": "pyfastx is a named trigger and reader-matrix choice, yet the Skill ships no code showing gzip index construction, random access, cleanup, or identifier semantics. The tooling pass required an auditor-authored probe.",
+      "root_cause": "Normalization retained the recommendation but routed no executable pyfastx example into the Skill tree.",
+      "fix": "Add one bounded pyfastx FASTA or FASTQ recipe that builds/reuses the index, performs checked random access, closes resources where supported, and explains persistent sidecar behavior."
+    }
+  ]
+}

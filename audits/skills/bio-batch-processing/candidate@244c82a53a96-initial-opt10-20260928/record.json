@@ -1,0 +1,72 @@
+{
+  "skill_id": "bio-batch-processing",
+  "version": "candidate@244c82a53a96-initial-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "sequence-io/batch-processing",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/sequence-io/batch-processing",
+    "subtree": "0dca3ff9c9d8e79f28b0747f41987f05dfd59b19"
+  },
+  "candidate": {
+    "identity": "244c82a53a96dce4586308b71ed678bae2bd3bed685a1db7aa44c6459b0c8990",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane3-batch-processing",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "244c82a53a96dce4586308b71ed678bae2bd3bed685a1db7aa44c6459b0c8990",
+    "path": "F:\\OpenScience\\wt\\opt10-batch-processing\\skills\\bio-batch-processing",
+    "files": [
+      {
+        "bytes": 5860,
+        "git_blob": "428baeb57bb8afeec5580ff6de18dc4fe055a550",
+        "path": "references/operations.md",
+        "sha256": "b45f07271f8f1dee1b980fe6d77b6457897df625dfd29d47a2bd00dfcf77c52e"
+      },
+      {
+        "bytes": 4138,
+        "git_blob": "82148614e6b5c4cdceef1bce21ed2302c66e5952",
+        "path": "references/readers-and-indexing.md",
+        "sha256": "1c74915f8cd96aeb1f1a82f062d2917b6729dda57cf7422168d90550d70e5c38"
+      },
+      {
+        "bytes": 2190,
+        "git_blob": "95a85454153fa711db03d28d8fe5aa9f466be839",
+        "path": "scripts/batch_process.py",
+        "sha256": "808e8a8e94ff11db161b6333b2c7558341ba941f8f77ddb5062013c2c5d28892"
+      },
+      {
+        "bytes": 4719,
+        "git_blob": "18118b4efd1db592c3393f2be0afe09f269e3f9c",
+        "path": "SKILL.md",
+        "sha256": "50678508714e0df4e66cffaf3cd7b900171e2f3bd8e62640d1629ad1bde64e92"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 8
+  }
+}
