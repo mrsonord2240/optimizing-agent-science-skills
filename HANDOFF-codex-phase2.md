@@ -1,9 +1,9 @@
 # Handoff to Codex: final-pass Phase 2 audits (2026-09-22)
 
 > Historical handoff, superseded on 2026-09-28 by the modular suite under
-> `skill/`. Do not dispatch new work from this file or its references to the
-> former `process/` briefs. It is retained only as evidence of the 2026-09-22
-> recovery state.
+> `.claude/skills/`. Do not dispatch new work from this file or its references
+> to the former `process/` briefs. It is retained only as evidence of the
+> 2026-09-22 recovery state.
 
 You are the orchestrator. Sam will run you with **at most 4 sub-agents at a time**. Claude is out of weekly
 budget, so this is yours end to end. Delete this file when the work is done.

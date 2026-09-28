@@ -1,6 +1,6 @@
 ---
 name: optimize-scientific-skills
-description: Coordinate a five-lane relay that normalizes scientific agent Skills, prepares their tooling, audits and repairs them, independently certifies them, and runs local Marketplace intake. Use when Sam asks to process or resume the science-Skill backlog, run audit-fix-reaudit work, or close a refinement batch.
+description: Coordinate an up-to-five-lane relay that normalizes scientific agent Skills, prepares their tooling, audits and repairs them, independently certifies them, and runs local Marketplace intake. Use when Sam asks to process or resume the science-Skill backlog, run audit-fix-reaudit work, or close a refinement batch.
 ---
 
 # Optimize Scientific Skills
@@ -49,6 +49,9 @@ Inspect live agents and claims, relevant Git status, `audits/INDEX.md`,
 `audits/BACKLOG.md`, generated status, provider metadata, and active handoffs.
 Select only in-scope or canonically next-eligible Skills. Record exact source
 identity and the earliest incomplete phase. Claim no more than five Skills.
+Default to five eligible lanes, but honor any lower invocation-level lane,
+worker, or Skill limit as a hard run boundary. Do not refill beyond a stated
+batch-size limit.
 
 ### 2. Normalize every Skill
 

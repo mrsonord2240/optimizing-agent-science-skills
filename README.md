@@ -13,7 +13,8 @@ this repository holds the control plane and evidence.
 
 ## Active method
 
-The modular Skill suite under [`skill/`](skill/) is the active process:
+The modular Skill suite under [`.claude/skills/`](.claude/skills/) is the active
+process and the project-local Claude discovery surface:
 
 1. `normalize-scientific-skill` removes instruction redundancy and routes
    reusable code and conditional detail.
@@ -24,9 +25,9 @@ The modular Skill suite under [`skill/`](skill/) is the active process:
    tooling impact.
 5. `reaudit-scientific-skill` independently executes and inspects every
    accessible advertised surface.
-6. `optimize-scientific-skills` coordinates five lanes, lands one completed
-   batch, and requires the Marketplace's local intake validator to pass before
-   calling a Skill done.
+6. `optimize-scientific-skills` coordinates up to five lanes, honors lower
+   run-level caps, lands one completed batch, and requires the Marketplace's
+   local intake validator to pass before calling a Skill done.
 
 Each phase uses a fresh worker and one compact canonical handoff. The final
 auditor is never the fixer. Marketplace review, bundle building, submission,
@@ -50,7 +51,8 @@ consequence of removing a redundant local checkout.
 
 | Path | What |
 |---|---|
-| `skill/` | Modular orchestrator and independently distributable worker Skills |
+| `.claude/skills/` | Project-local modular orchestrator and independently distributable worker Skills |
+| `skill/` | Design notes retained outside the runtime discovery surface |
 | `audits/skills/<skill-id>/<owner>-<repo>@<sha7>/` | Reports, viewers, records, fix summaries, and saved audit scripts |
 | `fixes/<skill-id>.md` | Durable finding dispositions and verification summaries |
 | `tools/` | Audit publication, provider reconciliation, manifest support, and other deterministic control tooling |

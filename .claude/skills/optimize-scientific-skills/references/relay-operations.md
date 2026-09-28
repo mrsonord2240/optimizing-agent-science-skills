@@ -2,14 +2,17 @@
 
 ## Capacity and independence
 
-Run five worker lanes plus one orchestrator. A lane carries one Skill at a time.
-A worker carries one phase only. When a phase finishes, accept its handoff,
-retire it, and dispatch a fresh agent for the next phase. The fixer never
-certifies its own work, and an initial auditor never becomes the final auditor.
+Run up to five worker lanes plus one orchestrator. Five is the default when
+eligible work exists; an explicit invocation-level lane, worker, or Skill cap
+is a lower hard boundary. A lane carries one Skill at a time. A worker carries
+one phase only. When a phase finishes, accept its handoff, retire it, and
+dispatch a fresh agent for the next phase. The fixer never certifies its own
+work, and an initial auditor never becomes the final auditor.
 
 Keep a lane on its Skill until the Skill is done or durably parked for user
-action. Once parked, the lane may take another Skill; the parked handoff must
-retain its claim, candidate identity, blocker, and exact resume condition.
+action. Once parked, the lane may take another Skill only when doing so stays
+within the invocation's Skill cap; the parked handoff must retain its claim,
+candidate identity, blocker, and exact resume condition.
 
 ## Scheduling
 

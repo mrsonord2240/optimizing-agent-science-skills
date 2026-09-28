@@ -1,6 +1,8 @@
-# Scientific Skill Optimization Suite
+# Scientific Skill Optimization Design Notes
 
-This directory is a suite, not one monolithic Skill.
+The runtime suite lives in the project-local Claude discovery directory at
+[`../.claude/skills/`](../.claude/skills/). This directory retains its design
+record outside the runtime instruction surface.
 
 | Skill | Responsibility |
 |---|---|
@@ -11,10 +13,11 @@ This directory is a suite, not one monolithic Skill.
 | `fix-scientific-skill` | Resumable finding-led repair pass |
 | `reaudit-scientific-skill` | Fresh exhaustive executable certification |
 
-The orchestrator's `references/` directory contains its repository,
-environment, evidence, readiness, handoff, relay, and intake contracts. Each
-worker is independently distributable: its `SKILL.md` carries only the safety,
-evidence, completion, and handoff rules needed for that phase.
+The orchestrator's `.claude/skills/optimize-scientific-skills/references/`
+directory contains its repository, environment, evidence, readiness, handoff,
+relay, and intake contracts. Each worker is independently distributable: its
+`SKILL.md` carries only the safety, evidence, completion, and handoff rules
+needed for that phase.
 
 `_scratch.md` preserves the design discussion and decisions; it is not runtime
 instruction. The six former `process/` briefs were deleted after their active

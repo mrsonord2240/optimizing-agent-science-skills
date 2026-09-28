@@ -1,9 +1,9 @@
 # Optimizing Agent Science Skills
 
-Use the modular process suite under `skill/`. Start with
-`skill/optimize-scientific-skills/SKILL.md`; it routes fresh phase workers to
-the five focused worker Skills and shared contracts. The removed `process/`
-briefs are historical and are not active instructions.
+Use the project-local modular process suite under `.claude/skills/`. Start with
+`.claude/skills/optimize-scientific-skills/SKILL.md`; it routes fresh phase
+workers to the five focused worker Skills and shared contracts. The removed
+`process/` briefs are historical and are not active instructions.
 
 ## Repository contract
 
@@ -22,9 +22,10 @@ authorization.
 
 ## Relay
 
-Run at most five Skill lanes plus the orchestrator. A fresh worker owns one
-Skill and one phase, writes the canonical compact handoff, and retires. Use this
-order:
+Run at most five Skill lanes plus the orchestrator. An invocation may set a
+lower lane, worker, or Skill limit; treat that as a hard run boundary and do
+not refill beyond it. A fresh worker owns one Skill and one phase, writes the
+canonical compact handoff, and retires. Use this order:
 
 ```text
 normalize -> full tooling -> initial audit when needed -> fix
@@ -35,7 +36,7 @@ normalize -> full tooling -> initial audit when needed -> fix
 Use the `science` WSL distro first and preserve its `/mnt/openscience`-only,
 interop-disabled boundary. Docker and justified native-Windows execution are
 allowed under
-`skill/optimize-scientific-skills/references/environment-policy.md`.
+`.claude/skills/optimize-scientific-skills/references/environment-policy.md`.
 
 ## Records
 
