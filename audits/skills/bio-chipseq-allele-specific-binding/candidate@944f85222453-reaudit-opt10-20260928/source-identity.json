@@ -1,0 +1,93 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "chip-seq/allele-specific-binding",
+    "subtree": "3674e1603cbc7a17731f9f5ea652ae7aa9f6e1e5",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "read-only"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane5-chipseq-asb",
+    "head": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-chipseq-asb\\skills\\bio-chipseq-allele-specific-binding",
+    "identity_algorithm": "SHA-256 of eight UTF-8 lines path<TAB>sha256 joined by LF without a trailing LF, in the listed order",
+    "content_sha256": "944f852224538df92c581ab4a42889202ab10639f54974130f841782f5c90ead",
+    "status_before": "one expected fixer-owned untracked skill tree; no other isolated-worktree changes",
+    "status_after_execution": "same expected untracked skill tree; no candidate cache artifacts or auditor changes"
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "7b03d35c8844a11a86398a21bbe11293e482028939d0af8eba362199066e3c7b",
+      "git_blob": "09c70ca6124a8679cbeddce5246e55c8c6afe562",
+      "bytes": 11700
+    },
+    {
+      "path": "references/methods-and-commands.md",
+      "sha256": "15309e8f7e3309b47646919bf2e3d456b2c2564f3a32ef39adc1e26aec9a2f5c",
+      "git_blob": "baca7e7068e6413b76c26aaef33c36f08138b2d1",
+      "bytes": 12416
+    },
+    {
+      "path": "references/pitfalls-and-troubleshooting.md",
+      "sha256": "9725941aec0529c8c6a59552ed8b6a6bc87b62959ed2c195f886da44c413fe90",
+      "git_blob": "67f4116a6338d1706b46ae319ae3bfe075d4e9bd",
+      "bytes": 7724
+    },
+    {
+      "path": "scripts/baalchip_contracts.R",
+      "sha256": "2747a7b84dc6833aadb34b251d9de05efc84a01768ebb983a602654714ee5349",
+      "git_blob": "4c5ffbac29a9e022b896b739a34a9f3806c70f52",
+      "bytes": 8027
+    },
+    {
+      "path": "scripts/baalchip_workflow.R",
+      "sha256": "8dded9ad1dfc13dcf850ed749f01dc9964147c96fedc77a14a15506171096ef1",
+      "git_blob": "1348693674fba1c83810f063e4baeb33757edf1e",
+      "bytes": 9249
+    },
+    {
+      "path": "scripts/rasqual_cohort.py",
+      "sha256": "076d90a6396e7072c6b2c41f0760d0d981dec58eeb96d52c3d550172b537a59a",
+      "git_blob": "fbbce2f853e7fcdfdde9bf2fc20c5d689efbe16f",
+      "bytes": 13941
+    },
+    {
+      "path": "tests/test_baalchip_contracts.R",
+      "sha256": "148b393d823e220ab2810df4728c3d75839ac0d18395bd380e94b8b04f14656c",
+      "git_blob": "82259fed9ab26a245a79a4f4bdc1e8429ac9e41a",
+      "bytes": 2644
+    },
+    {
+      "path": "tests/test_rasqual_cohort.py",
+      "sha256": "84158118680dd5867f466b591a74c23afaca2764c25f95b3e689a1e679c6deae",
+      "git_blob": "56b77127eabff2016e886125d115cfe22bfefc36",
+      "bytes": 1813
+    }
+  ],
+  "independent_auditor": {
+    "phase": "reaudit-scientific-skill",
+    "performed_initial_audit": false,
+    "performed_fix": false,
+    "performed_tooling_delta": false,
+    "candidate_bytes_changed": false,
+    "full_execution_run_count": 1,
+    "secondary_execution_run_count": 1
+  },
+  "tooling": {
+    "tools_md_sha256": "2e78be8ac6a7c5bc6e777c78ef46f83ead28244c757da78ccc0fd275381fc767",
+    "delta2_fingerprint_file_sha256": "76aa74812b8f73deff029a01fc64407e03019f64e9aa328c7741ab7ee8ff421a",
+    "environment_lock_sha256": "5c1f84081967c537196e341afe8a3d5e0913258f0232b873af650dc2aebd9247",
+    "r_packages_sha256": "2facdaed4d0b50854506d79161341114dda38f9fea4000601ef6f3cf4282734b"
+  },
+  "execution_classifications": {
+    "wasp_paired": "PASS_LIVE",
+    "wasp_hdf5": "PASS_LIVE",
+    "rasqual_prepare_and_cohort": "PASS_LIVE",
+    "baalchip_preflight_and_contracts": "PASS_LIVE",
+    "baalchip_full_model": "RESOURCE_INFEASIBLE_BOUNDED_NOT_CREDITED",
+    "alleleseq_full_toolchain": "UNAVAILABLE_EXTERNAL_ONLY_NOT_CREDITED"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

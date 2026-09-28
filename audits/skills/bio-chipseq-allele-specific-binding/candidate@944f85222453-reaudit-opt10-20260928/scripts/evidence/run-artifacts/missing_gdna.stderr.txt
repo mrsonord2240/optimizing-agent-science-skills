@@ -1,0 +1,2 @@
+Error: [missing_gdna] gDNA correction requires --gdna-bam
+Execution halted

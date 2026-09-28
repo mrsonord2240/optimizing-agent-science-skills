@@ -1,0 +1,5 @@
+surface	candidate_claim	prepared_source	result
+BaalChIP	1.38.0 on Bioconductor 3.22	DESCRIPTION Version 1.38.0; git_branch RELEASE_3_23; Repository Bioconductor 3.23; prepared R library BiocVersion 3.22.0	MISMATCH
+AlleleSeq2	linked official repository https://github.com/gersteinlab/AlleleSeq at commit cfe8acf	prepared checkout origin https://github.com/trgaleev/AlleleSeq2.git at cfe8acf88989922da841e71238b360f8f57e813a	MISMATCH
+WASP	v0.3.4 commit f980683	prepared checkout f980683cff5638660a966ff0d7c69598bc056e98	MATCH
+RASQUAL	commit 5aa553c	prepared checkout 5aa553cf1b6501cf7ecd61a5efb34f7f20d354c6	MATCH

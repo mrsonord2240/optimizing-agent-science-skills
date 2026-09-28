@@ -1,0 +1,2 @@
+Error: [contig_mismatch] contig styles disagree: hets=chr, blacklist=bare, imprinted=chr, peaks_1=chr, bam_1=chr
+Execution halted

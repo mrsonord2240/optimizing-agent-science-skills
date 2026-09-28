@@ -1,0 +1,32 @@
+PASS	interval_filters	2/3 non-imprinted; 2/3 autosomal
+long alleles will be truncated to 100bp
+writing genotype probabilities to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/geno_probs.h5
+writing haplotypes to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/haps.h5
+writing SNP index to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/snp_index.h5
+writing SNP table to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/snp_tab.h5
+guessing chromosome name from filename /chr22.hg19.impute2.gz
+best matching chromosome: chr22
+guessing chromosome name from filename /chr22.hg19.impute2_haps.gz
+best matching chromosome: chr22
+     /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2.gz pairs with /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2_haps.gz
+guessing chromosome name from filename /chr22.hg19.impute2.gz
+best matching chromosome: chr22
+chromosome: chr22, length: 51304566bp
+reading from file /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2.gz
+counting lines in file
+  total lines: 247303
+  number of samples: 60
+initializing HDF5 matrix with dimension: (247303, 180)
+parsing file and writing to HDF5 files
+........................
+initializing HDF5 matrix with dimension: (247303, 120)
+reading from file /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2_haps.gz
+parsing file and writing to HDF5 files
+...................WARNING: snp2h5.c:923: SNP rs116119147 as position 41050149 is present in impute2_haps file but not in impute2 file
+....
+WARNING: snp2h5.c:944: 44451 SNPs were present in impute2_haps file but not in impute2 file
+WARNING: snp2h5.c:951: 54827 SNPs were present in impute file but not in impute2_haps file
+
+done
+PASS	wasp_hdf5	provider chr22 IMPUTE2/HAPS shapes verified
+PASS	alleleseq_boundary	dry-run recorded; missing prerequisites retained as external-only

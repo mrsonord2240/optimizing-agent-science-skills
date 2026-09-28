@@ -1,0 +1,2 @@
+Error: [empty_intervals] blacklist BED has no data rows
+Execution halted

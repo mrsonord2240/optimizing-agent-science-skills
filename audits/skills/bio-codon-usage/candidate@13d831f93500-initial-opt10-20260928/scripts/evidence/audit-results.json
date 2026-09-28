@@ -1,0 +1,557 @@
+{
+  "boundary": {
+    "ambiguous_counts": {
+      "ATG": 1,
+      "NNN": 1,
+      "TAA": 1
+    },
+    "empty_frequencies": {},
+    "empty_gc123": {
+      "message": "float division by zero",
+      "type": "ZeroDivisionError",
+      "value": null
+    },
+    "partial_counts": {
+      "ATG": 1
+    },
+    "rscu_ambiguous_equals_valid": true,
+    "rscu_partial_equals_prefix": true,
+    "rscu_stop_equals_valid": true,
+    "rscu_valid": {
+      "AAA": 0,
+      "AAC": 0,
+      "AAG": 0,
+      "AAT": 0,
+      "ACA": 0,
+      "ACC": 0,
+      "ACG": 0,
+      "ACT": 0,
+      "AGA": 0,
+      "AGC": 0,
+      "AGG": 0,
+      "AGT": 0,
+      "ATA": 0,
+      "ATC": 0,
+      "ATG": 0,
+      "ATT": 0,
+      "CAA": 0,
+      "CAC": 0,
+      "CAG": 0,
+      "CAT": 0,
+      "CCA": 0,
+      "CCC": 0,
+      "CCG": 0,
+      "CCT": 0,
+      "CGA": 0,
+      "CGC": 0,
+      "CGG": 0,
+      "CGT": 0,
+      "CTA": 0.0,
+      "CTC": 0.0,
+      "CTG": 3.0,
+      "CTT": 3.0,
+      "GAA": 0,
+      "GAC": 0,
+      "GAG": 0,
+      "GAT": 0,
+      "GCA": 0,
+      "GCC": 0,
+      "GCG": 0,
+      "GCT": 0,
+      "GGA": 0,
+      "GGC": 0,
+      "GGG": 0,
+      "GGT": 0,
+      "GTA": 0,
+      "GTC": 0,
+      "GTG": 0,
+      "GTT": 0,
+      "TAC": 0,
+      "TAT": 0,
+      "TCA": 0,
+      "TCC": 0,
+      "TCG": 0,
+      "TCT": 0,
+      "TGC": 0,
+      "TGG": 0,
+      "TGT": 0,
+      "TTA": 0.0,
+      "TTC": 0,
+      "TTG": 0.0,
+      "TTT": 0
+    },
+    "shifted_counts": {
+      "AAT": 1,
+      "ATT": 1,
+      "GAA": 1,
+      "TTA": 1
+    },
+    "valid_counts": {
+      "AAA": 1,
+      "ATG": 1,
+      "TAA": 1,
+      "TTT": 1
+    }
+  },
+  "cai": {
+    "biopython": "1.85",
+    "calculate_signature": "(self, sequence)",
+    "constructor_signature": "(sequences, table=NCBICodonTableDNA(id=1, names=['Standard', 'SGC0'], ...))",
+    "empty_query": {
+      "message": "division by zero",
+      "type": "ZeroDivisionError",
+      "value": null
+    },
+    "excluded_only_ATG_TGG": {
+      "message": "division by zero",
+      "type": "ZeroDivisionError",
+      "value": null
+    },
+    "nonstrict_output": "GCG",
+    "nonstrict_warnings": [],
+    "optimize_signature": "(self, sequence, seq_type='DNA', strict=True)",
+    "partial_query": {
+      "message": "illegal codon in sequence: AT",
+      "type": "TypeError",
+      "value": null
+    },
+    "python": "3.12.11 | packaged by conda-forge | (main, Jun  4 2025, 14:45:31) [GCC 13.3.0]",
+    "score_with_unobserved_TAG": 0.5,
+    "score_without_stop": 1.0,
+    "strict_tie": {
+      "message": "TTT and TTC are equally preferred.",
+      "type": "ValueError",
+      "value": null
+    },
+    "table2_TGG_only": {
+      "message": "division by zero",
+      "type": "ZeroDivisionError",
+      "value": null
+    },
+    "table2_input_translation": "W",
+    "table2_optimize_TGA": "TAA",
+    "table2_output_translation": "*",
+    "unobserved_GCC_weight_when_GCT_seen_10x": 0.05
+  },
+  "candidate": "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage",
+  "candidate_identity": "13d831f93500607c6f8cd7ce8b0ece7238af8400c80b750a3a6d95d2e5b4dc77",
+  "checks": [
+    {
+      "detail": 9,
+      "name": "candidate-file-count",
+      "passed": true
+    },
+    {
+      "detail": 862,
+      "name": "candidate-manifest-bytes",
+      "passed": true
+    },
+    {
+      "detail": "13d831f93500607c6f8cd7ce8b0ece7238af8400c80b750a3a6d95d2e5b4dc77",
+      "name": "candidate-identity",
+      "passed": true
+    },
+    {
+      "detail": 0,
+      "name": "basic_analysis.py-exit-zero",
+      "passed": true
+    },
+    {
+      "detail": [],
+      "name": "basic_analysis.py-stderr-empty",
+      "passed": true
+    },
+    {
+      "detail": [
+        "741aa1ba3435794b2b538e9a288469b4ef11aa511e6d9a1baa7cab709952b5dd",
+        "741aa1ba3435794b2b538e9a288469b4ef11aa511e6d9a1baa7cab709952b5dd"
+      ],
+      "name": "basic_analysis.py-byte-deterministic",
+      "passed": true
+    },
+    {
+      "detail": 0,
+      "name": "rscu_analysis.py-exit-zero",
+      "passed": true
+    },
+    {
+      "detail": [],
+      "name": "rscu_analysis.py-stderr-empty",
+      "passed": true
+    },
+    {
+      "detail": [
+        "c763ce158d424bcf39522ed5372caef7d5d963bd1a0b66ba801a5ab8240f45dd",
+        "c763ce158d424bcf39522ed5372caef7d5d963bd1a0b66ba801a5ab8240f45dd"
+      ],
+      "name": "rscu_analysis.py-byte-deterministic",
+      "passed": true
+    },
+    {
+      "detail": 0,
+      "name": "cai_optimization.py-exit-zero",
+      "passed": true
+    },
+    {
+      "detail": [],
+      "name": "cai_optimization.py-stderr-empty",
+      "passed": true
+    },
+    {
+      "detail": [
+        "4d1524f81cb5d8a98cecb760716d1a662862093cffaebb5ef5f3913fd48729e9",
+        "4d1524f81cb5d8a98cecb760716d1a662862093cffaebb5ef5f3913fd48729e9"
+      ],
+      "name": "cai_optimization.py-byte-deterministic",
+      "passed": true
+    },
+    {
+      "detail": {
+        "AAA": 1,
+        "ATG": 1,
+        "TAA": 1,
+        "TTT": 1
+      },
+      "name": "valid-codon-count",
+      "passed": true
+    },
+    {
+      "detail": {
+        "ATG": 1
+      },
+      "name": "partial-is-silently-truncated",
+      "passed": true
+    },
+    {
+      "detail": {
+        "AAT": 1,
+        "ATT": 1,
+        "GAA": 1,
+        "TTA": 1
+      },
+      "name": "shifted-frame-is-silently-accepted",
+      "passed": true
+    },
+    {
+      "detail": {
+        "ATG": 1,
+        "NNN": 1,
+        "TAA": 1
+      },
+      "name": "ambiguity-is-retained-in-basic-count",
+      "passed": true
+    },
+    {
+      "detail": {},
+      "name": "empty-frequency-helper-is-safe",
+      "passed": true
+    },
+    {
+      "detail": {
+        "message": "float division by zero",
+        "type": "ZeroDivisionError",
+        "value": null
+      },
+      "name": "empty-gc123-errors",
+      "passed": true
+    },
+    {
+      "detail": true,
+      "name": "rscu-partial-is-silently-truncated",
+      "passed": true
+    },
+    {
+      "detail": true,
+      "name": "rscu-ambiguity-is-silently-ignored",
+      "passed": true
+    },
+    {
+      "detail": true,
+      "name": "rscu-stop-is-silently-ignored",
+      "passed": true
+    },
+    {
+      "detail": "1.85",
+      "name": "biopython-is-1.85",
+      "passed": true
+    },
+    {
+      "detail": [
+        1.0,
+        0.5
+      ],
+      "name": "stop-codon-contributes-to-cai",
+      "passed": true
+    },
+    {
+      "detail": 0.05,
+      "name": "pseudocount-is-family-normalized",
+      "passed": true
+    },
+    {
+      "detail": {
+        "message": "division by zero",
+        "type": "ZeroDivisionError",
+        "value": null
+      },
+      "name": "empty-query-raises-zero-division",
+      "passed": true
+    },
+    {
+      "detail": {
+        "message": "division by zero",
+        "type": "ZeroDivisionError",
+        "value": null
+      },
+      "name": "atg-tgg-only-raises-zero-division",
+      "passed": true
+    },
+    {
+      "detail": {
+        "message": "illegal codon in sequence: AT",
+        "type": "TypeError",
+        "value": null
+      },
+      "name": "partial-query-raises-type-error",
+      "passed": true
+    },
+    {
+      "detail": {
+        "message": "TTT and TTC are equally preferred.",
+        "type": "ValueError",
+        "value": null
+      },
+      "name": "strict-tie-raises-value-error",
+      "passed": true
+    },
+    {
+      "detail": [],
+      "name": "nonstrict-tie-emits-no-warning",
+      "passed": true
+    },
+    {
+      "detail": {
+        "message": "division by zero",
+        "type": "ZeroDivisionError",
+        "value": null
+      },
+      "name": "table2-tgg-is-hard-excluded",
+      "passed": true
+    },
+    {
+      "detail": [
+        "W",
+        "*",
+        "TAA"
+      ],
+      "name": "table2-optimization-breaks-protein",
+      "passed": true
+    },
+    {
+      "detail": 0,
+      "name": "codonw-heterogeneous-exit-zero",
+      "passed": true
+    },
+    {
+      "detail": 0,
+      "name": "codonw-public-thra-exit-zero",
+      "passed": true
+    },
+    {
+      "detail": {
+        "codonw_command": [
+          "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw",
+          "nc-heterogeneous.fasta",
+          "nc-heterogeneous.out",
+          "nc-heterogeneous.blk",
+          "-nomenu",
+          "-silent",
+          "-nowarn",
+          "-machine",
+          "-enc",
+          "-noblk"
+        ],
+        "codonw_nc": 30.77,
+        "codonw_returncode": 0,
+        "codonw_stderr": "\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t nc-heterogeneous.fasta \n Output file was\t nc-heterogeneous.out  (codon usage indices, e.g. gc3s)\n Output file was\t nc-heterogeneous.blk  (bulk output e.g. raw codon usage)\n",
+        "codonw_stdout": "\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n",
+        "sequence_length": 18300,
+        "sequence_sha256": "09026fb93b9cc6beb837c80e893078c96d6cf821d76ea074b67e196dc3ee7abd",
+        "simplified_nc": 41.21212121212121
+      },
+      "name": "heterogeneous-nc-diverges-materially",
+      "passed": true
+    },
+    {
+      "detail": {
+        "codonw_command": [
+          "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw",
+          "nc-public_thra.fasta",
+          "nc-public_thra.out",
+          "nc-public_thra.blk",
+          "-nomenu",
+          "-silent",
+          "-nowarn",
+          "-machine",
+          "-enc",
+          "-noblk"
+        ],
+        "codonw_nc": 47.41,
+        "codonw_returncode": 0,
+        "codonw_stderr": "\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t nc-public_thra.fasta \n Output file was\t nc-public_thra.out  (codon usage indices, e.g. gc3s)\n Output file was\t nc-public_thra.blk  (bulk output e.g. raw codon usage)\n",
+        "codonw_stdout": "\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n",
+        "sequence_length": 2463,
+        "sequence_sha256": "ac909e561c7fddba46db1efed30c25217f9bd61229b0a9be3e46b58b754f359a",
+        "simplified_nc": 48.85410488805536
+      },
+      "name": "public-thra-nc-is-close-but-not-equal",
+      "passed": true
+    }
+  ],
+  "checks_passed": 35,
+  "checks_total": 35,
+  "environment_lock_sha256": "82d908a7a84f66a533a12a7b564cee57392b49312b2c1d503ffdafec88b24021",
+  "environment_prefix": "/mnt/openscience/audit-envs/bio-codon-usage/env",
+  "nc": {
+    "heterogeneous": {
+      "codonw_command": [
+        "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw",
+        "nc-heterogeneous.fasta",
+        "nc-heterogeneous.out",
+        "nc-heterogeneous.blk",
+        "-nomenu",
+        "-silent",
+        "-nowarn",
+        "-machine",
+        "-enc",
+        "-noblk"
+      ],
+      "codonw_nc": 30.77,
+      "codonw_returncode": 0,
+      "codonw_stderr": "\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t nc-heterogeneous.fasta \n Output file was\t nc-heterogeneous.out  (codon usage indices, e.g. gc3s)\n Output file was\t nc-heterogeneous.blk  (bulk output e.g. raw codon usage)\n",
+      "codonw_stdout": "\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n",
+      "sequence_length": 18300,
+      "sequence_sha256": "09026fb93b9cc6beb837c80e893078c96d6cf821d76ea074b67e196dc3ee7abd",
+      "simplified_nc": 41.21212121212121
+    },
+    "public_thra": {
+      "codonw_command": [
+        "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw",
+        "nc-public_thra.fasta",
+        "nc-public_thra.out",
+        "nc-public_thra.blk",
+        "-nomenu",
+        "-silent",
+        "-nowarn",
+        "-machine",
+        "-enc",
+        "-noblk"
+      ],
+      "codonw_nc": 47.41,
+      "codonw_returncode": 0,
+      "codonw_stderr": "\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t nc-public_thra.fasta \n Output file was\t nc-public_thra.out  (codon usage indices, e.g. gc3s)\n Output file was\t nc-public_thra.blk  (bulk output e.g. raw codon usage)\n",
+      "codonw_stdout": "\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n",
+      "sequence_length": 2463,
+      "sequence_sha256": "ac909e561c7fddba46db1efed30c25217f9bd61229b0a9be3e46b58b754f359a",
+      "simplified_nc": 48.85410488805536
+    }
+  },
+  "standalone": {
+    "basic_analysis.py": {
+      "command": [
+        "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+        "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/basic_analysis.py"
+      ],
+      "returncode": 0,
+      "stderr_lines": [],
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_lines": [
+        "Sequence: ATGCGATCGATCGATCGATCGATCGATCGATCGTAA",
+        "Length: 36 bp (12 codons)",
+        "",
+        "=== Codon Counts ===",
+        "ATC: 2",
+        "ATG: 1",
+        "CGA: 3",
+        "GAT: 2",
+        "TAA: 1",
+        "TCG: 3",
+        "",
+        "=== Codon Frequencies ===",
+        "CGA: 0.250 ############",
+        "TCG: 0.250 ############",
+        "ATC: 0.167 ########",
+        "GAT: 0.167 ########",
+        "ATG: 0.083 ####",
+        "TAA: 0.083 ####",
+        "",
+        "=== GC at Codon Positions ===",
+        "Total GC:        47.2%",
+        "1st position:    41.7%",
+        "2nd position:    50.0%",
+        "3rd position:    50.0% (wobble)",
+        "",
+        "=== Amino Acid Usage ===",
+        "R: 3",
+        "S: 3",
+        "I: 2",
+        "D: 2",
+        "M: 1",
+        "*: 1"
+      ],
+      "stdout_sha256": "741aa1ba3435794b2b538e9a288469b4ef11aa511e6d9a1baa7cab709952b5dd"
+    },
+    "cai_optimization.py": {
+      "command": [
+        "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+        "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/cai_optimization.py"
+      ],
+      "returncode": 0,
+      "stderr_lines": [],
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_lines": [
+        "Index built from 3 reference genes (64 codon weights)",
+        "Relative adaptiveness of GCT (Ala): 1.000",
+        "",
+        "Query: ATGGCAGCATTAGATGATAAAGGATAA (9 codons)",
+        "Query CAI: 0.098",
+        "",
+        "Optimized: ATGGCTGCTCTGGACGACAAAGGTTAA",
+        "Optimized CAI: 1.000",
+        "Protein preserved: MAALDDKG*",
+        "",
+        "Codons changed: 6",
+        "  codon 1: GCA -> GCT",
+        "  codon 2: GCA -> GCT",
+        "  codon 3: TTA -> CTG",
+        "  codon 4: GAT -> GAC",
+        "  codon 5: GAT -> GAC",
+        "  codon 7: GGA -> GGT"
+      ],
+      "stdout_sha256": "4d1524f81cb5d8a98cecb760716d1a662862093cffaebb5ef5f3913fd48729e9"
+    },
+    "rscu_analysis.py": {
+      "command": [
+        "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+        "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/rscu_analysis.py"
+      ],
+      "returncode": 0,
+      "stderr_lines": [],
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_lines": [
+        "Sequence: ATGCTTCTGCTACTGCTTCTACTGCTGCTACTGTAA",
+        "",
+        "=== RSCU Analysis ===",
+        "RSCU values (1.0 = no bias, >1 = preferred, <1 = avoided):",
+        "",
+        "L:",
+        "  CTG: 3.00 +++++++++++++++ (preferred)",
+        "  CTA: 1.80 +++++++++ (preferred)",
+        "  CTT: 1.20 ++++++ (neutral)",
+        "",
+        "=== Rare Codons (RSCU < 0.5) ==="
+      ],
+      "stdout_sha256": "c763ce158d424bcf39522ed5372caef7d5d963bd1a0b66ba801a5ab8240f45dd"
+    }
+  }
+}

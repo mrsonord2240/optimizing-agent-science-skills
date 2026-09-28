@@ -1,0 +1,27 @@
+{
+  "schema": "scientific-skill-audit.source-identity.v1",
+  "skill_id": "bio-codon-usage",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "sequence-manipulation/codon-usage",
+    "subtree": "3874a00444ef0856451fece587c051cfc34aaf80",
+    "license": "MIT"
+  },
+  "candidate": {
+    "identity_algorithm": "sha256-manifest-v1",
+    "identity": "13d831f93500607c6f8cd7ce8b0ece7238af8400c80b750a3a6d95d2e5b4dc77",
+    "file_count": 9,
+    "manifest_bytes": 862,
+    "manifest_path": "evidence/candidate-manifest-current.tsv",
+    "worktree": "F:\\OpenScience\\wt\\opt10-codon-usage",
+    "branch": "optimize/ten-20260928-lane2-codon-usage",
+    "head": "0bc0b31fc52742dbec1034f698103434cc9460c3"
+  },
+  "audit": {
+    "phase": "initial",
+    "run_id": "initial-opt10-20260928",
+    "candidate_repaired": false,
+    "published": false
+  }
+}

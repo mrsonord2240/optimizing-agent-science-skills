@@ -1,0 +1,21 @@
+{
+  "schema": "scientific-skill-audit.validation.v1",
+  "status": "PASS",
+  "candidate_identity": "13d831f93500607c6f8cd7ce8b0ece7238af8400c80b750a3a6d95d2e5b4dc77",
+  "candidate_file_count": 9,
+  "candidate_manifest_bytes": 862,
+  "execution_checks": {
+    "passed": 35,
+    "total": 35
+  },
+  "static_score": 68,
+  "execution_average": 50.8,
+  "assertions": {
+    "passed": 12,
+    "total": 25
+  },
+  "final_score": 58,
+  "grade": "Reject",
+  "recommendation_count": 4,
+  "required_files_checked": 18
+}

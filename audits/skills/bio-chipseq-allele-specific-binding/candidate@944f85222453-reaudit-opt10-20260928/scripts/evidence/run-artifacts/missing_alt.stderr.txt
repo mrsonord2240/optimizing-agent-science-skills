@@ -1,0 +1,2 @@
+Error: [schema_mismatch] heterozygous variant table is missing required columns: ALT
+Execution halted

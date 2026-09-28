@@ -1,0 +1,29 @@
+PASS	candidate_identity	944f852224538df92c581ab4a42889202ab10639f54974130f841782f5c90ead
+PASS	environment	pinned tool and lock identities captured
+baalchip contract tests: PASS
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+PASS	candidate_tests	R parse/helper suite and Python 3/3
+PASS	real_indexed_bam	quickcheck; contig=chr1; BAI present
+PASS	raf_preflight	measured RAF provenance and chr contract
+PASS	gdna_preflight	indexed gDNA provenance and chr contract
+PASS	af_not_raf	exit=1 expected=[missing_raf]
+PASS	missing_alt	exit=1 expected=[schema_mismatch]
+PASS	assembly_mismatch	exit=1 expected=[assembly_mismatch]
+PASS	contig_mismatch	exit=1 expected=[contig_mismatch]
+PASS	sample_mismatch	exit=1 expected=[sample_mismatch]
+PASS	empty_intervals	exit=1 expected=[empty_intervals]
+PASS	missing_bam	exit=1 expected=[missing_input]
+PASS	missing_bed	exit=1 expected=[missing_input]
+PASS	existing_output	exit=1 expected=[output_exists]
+PASS	missing_gdna	exit=1 expected=[missing_gdna]
+PASS	negative_baal_boundaries	ten expected structured failures
+PASS	missing_baalchip_atomic_cleanup	exit=1 no final; matching partials=0; unrelated sentinel preserved
+PASS	wasp_live	paired names/count invariants; final=4 input=4
+PASS	rasqual_live	public 2-feature cohort; exact binary sizes; 2 converged rows; finite phi/p/q; overwrite refused
+PASS	alleleseq_boundary	official legacy runtime remains unavailable; no execution credited
+PASS	baalchip_runtime_boundary	packages independently absent; retained bounded install evidence hashed; no model pass claimed
+ALL_FINAL_REAUDIT_CONTRACTS_PASS

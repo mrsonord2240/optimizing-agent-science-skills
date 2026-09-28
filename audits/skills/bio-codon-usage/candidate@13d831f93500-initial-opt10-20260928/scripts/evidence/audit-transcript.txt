@@ -1,0 +1,40 @@
+candidate=/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage
+identity=13d831f93500607c6f8cd7ce8b0ece7238af8400c80b750a3a6d95d2e5b4dc77
+python=3.12.11
+biopython=1.85
+checks=35/35
+PASS candidate-file-count: 9
+PASS candidate-manifest-bytes: 862
+PASS candidate-identity: 13d831f93500607c6f8cd7ce8b0ece7238af8400c80b750a3a6d95d2e5b4dc77
+PASS basic_analysis.py-exit-zero: 0
+PASS basic_analysis.py-stderr-empty: []
+PASS basic_analysis.py-byte-deterministic: ['741aa1ba3435794b2b538e9a288469b4ef11aa511e6d9a1baa7cab709952b5dd', '741aa1ba3435794b2b538e9a288469b4ef11aa511e6d9a1baa7cab709952b5dd']
+PASS rscu_analysis.py-exit-zero: 0
+PASS rscu_analysis.py-stderr-empty: []
+PASS rscu_analysis.py-byte-deterministic: ['c763ce158d424bcf39522ed5372caef7d5d963bd1a0b66ba801a5ab8240f45dd', 'c763ce158d424bcf39522ed5372caef7d5d963bd1a0b66ba801a5ab8240f45dd']
+PASS cai_optimization.py-exit-zero: 0
+PASS cai_optimization.py-stderr-empty: []
+PASS cai_optimization.py-byte-deterministic: ['4d1524f81cb5d8a98cecb760716d1a662862093cffaebb5ef5f3913fd48729e9', '4d1524f81cb5d8a98cecb760716d1a662862093cffaebb5ef5f3913fd48729e9']
+PASS valid-codon-count: {'ATG': 1, 'AAA': 1, 'TTT': 1, 'TAA': 1}
+PASS partial-is-silently-truncated: {'ATG': 1}
+PASS shifted-frame-is-silently-accepted: {'AAT': 1, 'GAA': 1, 'ATT': 1, 'TTA': 1}
+PASS ambiguity-is-retained-in-basic-count: {'ATG': 1, 'NNN': 1, 'TAA': 1}
+PASS empty-frequency-helper-is-safe: {}
+PASS empty-gc123-errors: {'type': 'ZeroDivisionError', 'message': 'float division by zero', 'value': None}
+PASS rscu-partial-is-silently-truncated: True
+PASS rscu-ambiguity-is-silently-ignored: True
+PASS rscu-stop-is-silently-ignored: True
+PASS biopython-is-1.85: 1.85
+PASS stop-codon-contributes-to-cai: [1.0, 0.5]
+PASS pseudocount-is-family-normalized: 0.05
+PASS empty-query-raises-zero-division: {'type': 'ZeroDivisionError', 'message': 'division by zero', 'value': None}
+PASS atg-tgg-only-raises-zero-division: {'type': 'ZeroDivisionError', 'message': 'division by zero', 'value': None}
+PASS partial-query-raises-type-error: {'type': 'TypeError', 'message': 'illegal codon in sequence: AT', 'value': None}
+PASS strict-tie-raises-value-error: {'type': 'ValueError', 'message': 'TTT and TTC are equally preferred.', 'value': None}
+PASS nonstrict-tie-emits-no-warning: []
+PASS table2-tgg-is-hard-excluded: {'type': 'ZeroDivisionError', 'message': 'division by zero', 'value': None}
+PASS table2-optimization-breaks-protein: ['W', '*', 'TAA']
+PASS codonw-heterogeneous-exit-zero: 0
+PASS codonw-public-thra-exit-zero: 0
+PASS heterogeneous-nc-diverges-materially: {'sequence_length': 18300, 'sequence_sha256': '09026fb93b9cc6beb837c80e893078c96d6cf821d76ea074b67e196dc3ee7abd', 'simplified_nc': 41.21212121212121, 'codonw_nc': 30.77, 'codonw_returncode': 0, 'codonw_stdout': '\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n', 'codonw_stderr': '\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t nc-heterogeneous.fasta \n Output file was\t nc-heterogeneous.out  (codon usage indices, e.g. gc3s)\n Output file was\t nc-heterogeneous.blk  (bulk output e.g. raw codon usage)\n', 'codonw_command': ['/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw', 'nc-heterogeneous.fasta', 'nc-heterogeneous.out', 'nc-heterogeneous.blk', '-nomenu', '-silent', '-nowarn', '-machine', '-enc', '-noblk']}
+PASS public-thra-nc-is-close-but-not-equal: {'sequence_length': 2463, 'sequence_sha256': 'ac909e561c7fddba46db1efed30c25217f9bd61229b0a9be3e46b58b754f359a', 'simplified_nc': 48.85410488805536, 'codonw_nc': 47.41, 'codonw_returncode': 0, 'codonw_stdout': '\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n', 'codonw_stderr': '\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t nc-public_thra.fasta \n Output file was\t nc-public_thra.out  (codon usage indices, e.g. gc3s)\n Output file was\t nc-public_thra.blk  (bulk output e.g. raw codon usage)\n', 'codonw_command': ['/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw', 'nc-public_thra.fasta', 'nc-public_thra.out', 'nc-public_thra.blk', '-nomenu', '-silent', '-nowarn', '-machine', '-enc', '-noblk']}

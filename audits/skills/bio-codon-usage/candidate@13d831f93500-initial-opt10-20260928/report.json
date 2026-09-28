@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "skill_name": "bio-codon-usage",
+    "description": "Analyze codon usage and calculate CAI (Codon Adaptation Index), RSCU, and Nc with Biopython, and produce naive max-CAI codon-optimized sequences. Use when scoring a gene's codon bias against a host, optimizing a CDS for heterologous expression, or studying synonymous codon selection.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The candidate does not fabricate measurements, references, or biological outcomes; retained numerical claims were reproduced from the exact scripts, Biopython 1.85, codonW 1.4.4, or identified primary sources."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill stays within sequence-analysis and construct-design support, explicitly rejects CAI as a guarantee of expression, and does not make patient-specific diagnostic or prescriptive claims."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The advertised alternate-code route can change a table-2 tryptophan into a stop codon, and several stated Biopython 1.85 CAI semantics are contradicted by exact execution; the supplied helpers also accept or discard invalid sequence structure without enforcing the declared validation contract."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "All three fixed demonstrations run, but documented valid alternate-code optimization produces a biologically wrong protein, empty or ATG/TGG-only CAI queries raise uncaught ZeroDivisionError, and the counting helpers silently process partial, shifted, or ambiguous input."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 68,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 6,
+        "max": 12,
+        "note": "The standard-code demonstrations cover counts, RSCU, GC123, CAI, and max-CAI output, but alternate-code optimization is unsafe, the CAI behavior table is inaccurate, and the advertised Nc capability is only a nonstandard approximation."
+      },
+      "reliability": {
+        "score": 5,
+        "max": 12,
+        "note": "Canonical scripts are deterministic, yet input validation is delegated to the caller and several foreseeable boundary cases are silently accepted, silently discarded, or allowed to reach raw exceptions."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The concise entrypoint uses progressive disclosure effectively, routes metric and compatibility detail into focused references, and avoids unnecessary runtime or context loading."
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Task routing, interpretation limits, and output context are clear, but an agent following the alternate-code and CAI compatibility instructions receives false assurances and no reusable validator."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural trigger language and examples are discoverable, but the fixed built-in scripts accept no input arguments and recovery from boundary failures requires editing code or independent Biopython expertise."
+      },
+      "security": {
+        "score": 9,
+        "max": 12,
+        "note": "There are no credentials, destructive commands, raw-string execution paths, or sensitive-data handling, but biological input validation is described rather than enforced before computation."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Files are cleanly separated and provenance is strong, but duplicated helper logic, import-time demonstration side effects, and the absence of shipped regression tests leave version-sensitive scientific behavior unprotected."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger precision, progressive disclosure, composability, and deterministic examples are good; executable interfaces and stop conditions do not fully realize the validation and genetic-code boundaries promised by the prose."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 50.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Run the three supplied standard-code examples",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three exact scripts exited 0 with empty stderr, reproduced byte-identically, and the standard-code CAI example preserved MAALDDKG* while raising optimized CAI to 1.000.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "All three supplied scripts execute successfully in the prepared environment.", "result": "PASS", "note": "basic_analysis.py, rscu_analysis.py, and cai_optimization.py each exited 0 with empty stderr."},
+          {"text": "Repeated canonical executions produce byte-identical stdout.", "result": "PASS", "note": "The independently retained first and second stdout SHA-256 values matched for every script."},
+          {"text": "The standard-code CAI example reports the reference set, query score, optimized score, and changes.", "result": "PASS", "note": "The output includes all four items and the optimized score is 1.000."},
+          {"text": "Standard-code optimization preserves the translated protein.", "result": "PASS", "note": "Both source and optimized sequences translate to MAALDDKG*."},
+          {"text": "No expression outcome is inferred solely from the optimized CAI.", "result": "PASS", "note": "The candidate explicitly labels the result a naive max-CAI draft and requires further design screening."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Alternate genetic code 2",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Construction accepts table 2, but calculate hard-excludes TGG and optimize translates DNA with the standard code: TGA (Trp in table 2) became TAA (stop in table 2).",
+        "basic": 8,
+        "specialized": 13,
+        "total": 21,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "CodonAdaptationIndex accepts the selected table-2 object during construction.", "result": "PASS", "note": "The exact Biopython 1.85 constructor completed with table=unambiguous_dna_by_id[2]."},
+          {"text": "A table-2 TGG-only query yields a defined CAI score.", "result": "FAIL", "note": "calculate() hard-excludes TGG and raises ZeroDivisionError when no other scored codon remains."},
+          {"text": "Optimizing table-2 DNA preserves translation under table 2.", "result": "FAIL", "note": "Input TGA translated to W under table 2; output TAA translated to *."},
+          {"text": "The candidate verifies preservation with the same genetic code used for analysis.", "result": "FAIL", "note": "The example assertion uses translate() without table= and the prose does not supply an alternate-code-safe route."},
+          {"text": "The documented alternate-code workflow respects table-specific sense and stop sets end to end.", "result": "FAIL", "note": "The observed TGA to TAA transformation proves the selected table is not respected by the DNA optimization path."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Empty partial shifted and ambiguous inputs",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The helpers do not implement the validation required by SKILL.md: trailing bases are dropped, shifted frames are accepted, ambiguous triplets are inconsistently retained or ignored, and empty GC123/CAI cases raise raw exceptions.",
+        "basic": 14,
+        "specialized": 20,
+        "total": 34,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The frequency helper returns an empty mapping for a sequence with no complete codon.", "result": "PASS", "note": "codon_frequencies('') returned {}."},
+          {"text": "Trailing one- or two-base partial codons are rejected or explicitly reported.", "result": "FAIL", "note": "count_codons('ATGAA') silently returned only ATG and RSCU treated a partial sequence as its complete prefix."},
+          {"text": "A shifted biological frame is rejected before producing plausible counts.", "result": "FAIL", "note": "The helper silently returned AAT, GAA, ATT, and TTA counts."},
+          {"text": "Ambiguous and stop triplets receive one consistent documented disposition.", "result": "FAIL", "note": "Basic counts retain NNN while RSCU silently ignores NNN and stop codons."},
+          {"text": "Empty and excluded-only metric inputs fail with actionable validation messages.", "result": "FAIL", "note": "GC123(''), CAI(''), and CAI('ATGTGG') surfaced raw ZeroDivisionError."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "CAI tie stop and pseudocount semantics",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Biopython 1.85 contradicts three compatibility claims: strict=False is silent, a stop present in the 64-entry index changes CAI, and an unobserved GCC pseudocount normalizes to weight 0.05 when GCT is observed ten times.",
+        "basic": 16,
+        "specialized": 23,
+        "total": 39,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "strict=True rejects a highest-weight synonymous-codon tie.", "result": "PASS", "note": "Biopython 1.85 raised ValueError for the four-way alanine tie."},
+          {"text": "strict=False emits the warning promised by the candidate.", "result": "FAIL", "note": "The warnings capture was empty."},
+          {"text": "Stop codons are categorically excluded from CAI calculation as documented.", "result": "FAIL", "note": "Adding unobserved TAG changed the test score from 1.0 to 0.5 because TAG was present in the index."},
+          {"text": "Every unobserved codon receives final relative-adaptiveness weight 0.5.", "result": "FAIL", "note": "Unobserved GCC had final weight 0.05 after family normalization against ten GCT observations."},
+          {"text": "The candidate guards empty or all-excluded score denominators.", "result": "FAIL", "note": "Both empty and ATG/TGG-only queries raised ZeroDivisionError."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Simplified Nc versus codonW",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The helper executes deterministically and the caveat is honest, but it is not Wright/codonW Nc: heterogeneous input scored 41.212 versus 30.77 and public thrA scored 48.854 versus 47.41.",
+        "basic": 28,
+        "specialized": 39,
+        "total": 67,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The exact documented simplified helper executes on both retained fixtures.", "result": "PASS", "note": "It returned finite deterministic values for the heterogeneous fixture and public thrA."},
+          {"text": "codonW 1.4.4 executes successfully on the same exact sequences.", "result": "PASS", "note": "Both independent comparator invocations exited 0 and wrote Nc outputs."},
+          {"text": "The candidate explicitly labels the helper a nonstandard approximation.", "result": "PASS", "note": "The reference says it does not implement Wright's standard class-averaged estimator and may not match codonW."},
+          {"text": "The public fixture is identifiable and bounded rather than used as an expression-biased CAI reference.", "result": "PASS", "note": "The retained 2,463-nt RefSeq thrA sequence is used only for metric comparison."},
+          {"text": "The helper can be reported as standard Nc for cross-study comparison.", "result": "FAIL", "note": "The heterogeneous result differed from codonW by 10.442 points; the candidate itself advises using a standard implementation for comparison."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 27.2,
+    "dynamic_weighted": 30.5,
+    "score": 58,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The normalized package preserves MIT provenance and exact upstream script identities while using a concise entrypoint with well-routed references.",
+    "All three standard-code demonstrations execute successfully, produce readable deterministic output, and the supplied canonical max-CAI example preserves its protein.",
+    "The scientific framing correctly treats CAI as host-reference-relative rather than as a guarantee of expression and requires downstream construct screening.",
+    "The RSCU definition, GC123 scale distinction, translation-ramp caution, and tAI description align with the cited primary literature.",
+    "The Nc reference is unusually candid that its helper is only a simplified approximation and should not be used for cross-study comparison."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "CODON-001: Make alternate-code optimization safe",
+      "observed_in": [2],
+      "problem": "The skill tells users to select the correct genetic code, but Biopython 1.85 optimize() translates DNA with the standard code. Under table 2, TGA encoding tryptophan was optimized to TAA encoding stop, and TGG-only scoring divided by zero.",
+      "root_cause": "The candidate assumes the constructor's table argument governs every internal calculate and optimize decision, but the live API hard-codes some exclusions and DNA translation behavior.",
+      "fix": "Reject nonstandard-code DNA optimization through the current direct path or translate explicitly with the selected table and optimize a protein sequence, then retranslate and assert equality under that same table. Add regression cases for table-2 TGA, TGG, AGA, AGG, and each selected stop set."
+    },
+    {
+      "priority": "P0",
+      "title": "CODON-002: Correct Biopython 1.85 CAI semantics",
+      "observed_in": [3, 4],
+      "problem": "The compatibility reference says all stops are excluded, unobserved codons receive weight 0.5, and strict=False warns. Exact 1.85 execution showed indexed stops affect CAI, the 0.5 count is normalized within its family, strict=False is silent, and empty or ATG/TGG-only queries divide by zero.",
+      "root_cause": "Documentation repeats API-doc wording and internal initialization details without testing the installed implementation's final numerical behavior and failure boundaries.",
+      "fix": "Replace the false claims with tested version-specific behavior, add a guarded scoring wrapper that validates at least one included codon and reports exclusions, and test indexed/unindexed stops, family-normalized pseudocounts, ties, partial codons, and zero-denominator inputs."
+    },
+    {
+      "priority": "P1",
+      "title": "CODON-003: Enforce the declared CDS validation contract",
+      "observed_in": [3],
+      "problem": "The skill requires frame, length, symbol, and genetic-code validation, but its reusable helpers silently truncate partial codons, accept shifted frames, retain ambiguity in counts, ignore ambiguity in RSCU, and let empty GC123 input crash.",
+      "root_cause": "Validation exists only as prose; the three scripts operate directly on raw sequence strings and do not share a preflight validator or structured result contract.",
+      "fix": "Add one reusable CDS validator with an explicit strict/permissive policy, table-aware start/stop checks, discarded-symbol accounting, and structured errors. Route all three scripts through it and add boundary regressions before any metric is computed."
+    },
+    {
+      "priority": "P1",
+      "title": "CODON-004: Do not advertise simplified score as Nc",
+      "observed_in": [5],
+      "problem": "The documented helper is transparent about being nonstandard, yet the trigger and metric summary still advertise Nc calculation. It diverged from codonW by 10.442 points on heterogeneous family bias and can exceed the conventional upper boundary.",
+      "root_cause": "A per-amino-acid reciprocal-homozygosity sum was retained as a convenient approximation while the top-level capability remained named after Wright's standard class-averaged statistic.",
+      "fix": "Either implement and regression-test a standard Wright/codonW-compatible estimator, or rename the helper and remove Nc calculation from the skill trigger. Keep the existing cross-study prohibition and report the exact estimator name with every value."
+    }
+  ]
+}

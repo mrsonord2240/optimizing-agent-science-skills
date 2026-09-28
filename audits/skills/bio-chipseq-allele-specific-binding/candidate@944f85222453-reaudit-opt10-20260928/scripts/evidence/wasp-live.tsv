@@ -1,0 +1,9 @@
+input_alignments	4
+direct_keep_alignments	0
+remap_fastq1_records	6
+remap_fastq2_records	6
+remap_keep_alignments	4
+final_alignments	4
+final_paired_alignments	4
+paired_output_names	input.remap.fq1.gz,input.remap.fq2.gz
+status	PASS

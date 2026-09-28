@@ -1,0 +1,6 @@
+BaalChIP_requireNamespace_exit	1
+rtracklayer_requireNamespace_exit	1
+prepared_install_log_sha256	2436c9f6ff6b886955e6b4f221c17faa82f304f286a3da3d55d0e1a8cc2fc9b9
+prepared_status_sha256	cf742017f1f0591d99e31d184f586cb36bb38f94d983e102d65a521481ec4dd9
+observed_compile_failure	Rhtslib hts.c missing lzma.h; bounded retry timed out per retained status
+classification	RESOURCE_INFEASIBLE_BOUNDED

@@ -1,0 +1,11 @@
+Sequence: ATGCTTCTGCTACTGCTTCTACTGCTGCTACTGTAA
+
+=== RSCU Analysis ===
+RSCU values (1.0 = no bias, >1 = preferred, <1 = avoided):
+
+L:
+  CTG: 3.00 +++++++++++++++ (preferred)
+  CTA: 1.80 +++++++++ (preferred)
+  CTT: 1.20 ++++++ (neutral)
+
+=== Rare Codons (RSCU < 0.5) ===

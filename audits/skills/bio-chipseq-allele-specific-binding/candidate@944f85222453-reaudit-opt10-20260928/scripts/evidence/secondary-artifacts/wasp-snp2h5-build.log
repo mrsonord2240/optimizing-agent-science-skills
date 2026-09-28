@@ -1,0 +1,33 @@
+make: Entering directory '/mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/wasp-snp2h5-build'
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g   -c -o snp2h5.o snp2h5.c
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g vcf.c -o vcf.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+vcf.c: In function 'vcf_read_line':
+vcf.c:516:10: warning: variable 'tok_num' set but not used [-Wunused-but-set-variable=]
+  516 |   size_t tok_num;
+      |          ^~~~~~~
+vcf.c:515:30: warning: variable 'alt_len' set but not used [-Wunused-but-set-variable=]
+  515 |   int n_fix_header, ref_len, alt_len;
+      |                              ^~~~~~~
+vcf.c:515:21: warning: variable 'ref_len' set but not used [-Wunused-but-set-variable=]
+  515 |   int n_fix_header, ref_len, alt_len;
+      |                     ^~~~~~~
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g impute.c -o impute.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+impute.c: In function 'impute_read_line':
+impute.c:154:10: warning: variable 'tok_num' set but not used [-Wunused-but-set-variable=]
+  154 |   size_t tok_num;
+      |          ^~~~~~~
+impute.c:153:7: warning: variable 'alt_len' set but not used [-Wunused-but-set-variable=]
+  153 |   int alt_len;
+      |       ^~~~~~~
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g util.c -o util.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g memutil.c -o memutil.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g err.c -o err.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g chrom.c -o chrom.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g snptab.c -o snptab.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g seq.c -o seq.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g nuc.c -o nuc.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -c -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g sampletab.c -o sampletab.o -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g -o snp2h5 vcf.o impute.o util.o memutil.o err.o chrom.o snptab.o seq.o nuc.o sampletab.o snp2h5.c -L/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/lib -lz -lm -lhdf5 -lhdf5_hl
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g   -c -o fasta2h5.o fasta2h5.c
+/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/bin/x86_64-conda-linux-gnu-cc -std=gnu89 -DH5_USE_16_API -I/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/include -Wall -g -o fasta2h5 vcf.o impute.o util.o memutil.o err.o chrom.o snptab.o seq.o nuc.o sampletab.o fasta2h5.c -L/mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/env/lib -lz -lm -lhdf5 -lhdf5_hl
+make: Leaving directory '/mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/wasp-snp2h5-build'

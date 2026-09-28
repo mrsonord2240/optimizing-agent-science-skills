@@ -1,0 +1,2 @@
+Error: [sample_mismatch] this single-group workflow requires every group_name to equal --group
+Execution halted

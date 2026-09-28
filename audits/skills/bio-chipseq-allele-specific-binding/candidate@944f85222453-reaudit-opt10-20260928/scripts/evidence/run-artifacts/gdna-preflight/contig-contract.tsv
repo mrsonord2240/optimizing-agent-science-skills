@@ -1,0 +1,7 @@
+input	contig_style
+hets	chr
+blacklist	chr
+imprinted	chr
+peaks_1	chr
+bam_1	chr
+gdna_bam	chr

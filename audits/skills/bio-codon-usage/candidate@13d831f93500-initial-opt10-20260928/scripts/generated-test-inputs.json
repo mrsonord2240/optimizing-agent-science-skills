@@ -1,0 +1,38 @@
+{
+  "skill": "bio-codon-usage",
+  "category": "Data Analysis",
+  "execution_mode": "B",
+  "complexity": "Moderate",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "Run the three supplied standard-code examples",
+      "prompt": "Run the supplied codon-count, RSCU, and CAI optimization examples on their built-in in-frame standard-code sequences and verify the optimized protein."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "Alternate genetic code 2",
+      "prompt": "Build and use a vertebrate-mitochondrial CAI index, score TGG, and optimize TGA while preserving its table-2 translation."
+    },
+    {
+      "index": 3,
+      "type": "Edge",
+      "label": "Empty partial shifted and ambiguous inputs",
+      "prompt": "Analyze empty, one- or two-base trailing partial, shifted-frame, ambiguous-codon, stop-containing, and ATG/TGG-only inputs and report every rejection or discard."
+    },
+    {
+      "index": 4,
+      "type": "Variant B",
+      "label": "CAI tie stop and pseudocount semantics",
+      "prompt": "Verify Biopython 1.85 strict and non-strict tie handling, stop-codon contribution to CAI, and the normalized weight assigned to an unobserved synonymous codon."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "Simplified Nc versus codonW",
+      "prompt": "Compare the documented simplified Nc helper with codonW on a heterogeneous synonymous-family fixture and public E. coli thrA CDS, and judge cross-study comparability."
+    }
+  ]
+}

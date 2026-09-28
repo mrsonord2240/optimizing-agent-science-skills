@@ -1,0 +1,78 @@
+PGENOME_DIR: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized
+READS_R1: 
+READS_R2: 
+PERFORM_FASTQC: on
+PREFIX: 
+ALIGNMENT_MODE: ASB
+RM_DUPLICATE_READS: on  
+FINAL_ALIGNMENT_FILENAME: _ASB-params.Aligned.sortedByCoord.out.bam
+HetSNV_UNIQALNS_FILENAME: _ASB-params_crdsorted_uniqreads_over_hetSNVs.bam
+HetSNV_MMAPALNS_FILENAME: _ASB-params_crdsorted_mmapreads_over_hetSNVs.bam
+
+
+
+
+fastqc --threads 1  
+~/bin/STAR/STAR-2.6.0c/bin/Linux_x86_64/STAR \
+--runThreadN 1 \
+--genomeDir /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/STAR_idx_diploid \
+--readFilesIn   \
+--readFilesCommand zcat  \
+--outFileNamePrefix _ASB-params. \
+--outSAMattributes All \
+--outFilterMismatchNoverReadLmax 0.03 \
+--outFilterMatchNminOverLread 0.95 \
+--outFilterMultimapNmax 999999 \
+--scoreGap -100 \
+--scoreGenomicLengthLog2scale 0.0 \
+--sjdbScore 0 \
+--limitSjdbInsertNsj 1500000  \
+--outSAMtype BAM SortedByCoordinate
+~/bin/samtools-1.3.1/samtools flagstat _ASB-params.Aligned.sortedByCoord.out.bam > _ASB-params.Aligned.sortedByCoord.out.bam.stat
+~/bin/samtools-1.3.1/samtools index _ASB-params.Aligned.sortedByCoord.out.bam	
+cat /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap1.bed /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap2.bed | \
+~/bin/samtools-1.3.1/samtools view -h -q 255 -L - _ASB-params.Aligned.sortedByCoord.out.bam | \
+~/bin/samtools-1.3.1/samtools view -b - > _ASB-params_crdsorted_uniqreads_over_hetSNVs.bam
+~/bin/samtools-1.3.1/samtools index _ASB-params_crdsorted_uniqreads_over_hetSNVs.bam
+~/bin/samtools-1.3.1/samtools flagstat _ASB-params_crdsorted_uniqreads_over_hetSNVs.bam > _ASB-params_crdsorted_uniqreads_over_hetSNVs.bam.stat
+~/bin/samtools-1.3.1/samtools mpileup -BQ0 --max-depth 999999 --ff UNMAP -f /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hap1.fa _ASB-params_crdsorted_uniqreads_over_hetSNVs.bam \
+--positions /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap1.bed --output _hap1_uniqreads.mpileup
+~/bin/samtools-1.3.1/samtools mpileup -BQ0 --max-depth 999999 --ff UNMAP -f /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hap2.fa _ASB-params_crdsorted_uniqreads_over_hetSNVs.bam \
+--positions /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap2.bed --output _hap2_uniqreads.mpileup
+python ~/bin/AlleleSeq2/pileup2counts.py 1 /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_ref.bed \
+/mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap1.bed /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap2.bed \
+_discarded_HetSNVs_from-pileups.log \
+_hap1_uniqreads.mpileup _hap2_uniqreads.mpileup > _raw_counts.tsv
+Rscript ~/bin/AlleleSeq2/plot_AllelicRatio_distribution.R _raw_counts.tsv  raw_counts
+cat /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap1.bed /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap2.bed | \
+~/bin/samtools-1.3.1/samtools view -h -L - _ASB-params.Aligned.sortedByCoord.out.bam | awk '$5!="255" {print $0}' | \
+~/bin/samtools-1.3.1/samtools view -b - > _ASB-params_crdsorted_mmapreads_over_hetSNVs.bam
+~/bin/samtools-1.3.1/samtools index _ASB-params_crdsorted_mmapreads_over_hetSNVs.bam
+~/bin/samtools-1.3.1/samtools flagstat _ASB-params_crdsorted_mmapreads_over_hetSNVs.bam > _ASB-params_crdsorted_mmapreads_over_hetSNVs.bam.stat
+~/bin/samtools-1.3.1/samtools mpileup -BQ0 --max-depth 999999 --ff UNMAP -f /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hap1.fa _ASB-params_crdsorted_mmapreads_over_hetSNVs.bam \
+--positions /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap1.bed --output _hap1_mmapreads.mpileup
+~/bin/samtools-1.3.1/samtools mpileup -BQ0 --max-depth 999999 --ff UNMAP -f /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hap2.fa _ASB-params_crdsorted_mmapreads_over_hetSNVs.bam \
+--positions /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_hap2.bed --output _hap2_mmapreads.mpileup
+cat _raw_counts.tsv | \
+python ~/bin/AlleleSeq2/filter_cnv_sites.py _discarded_HetSNVs_potential-CNV.log /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit-opt10-20260928/evidence/secondary-artifacts/personalized/NULL_hetSNVs_rd.tab | \
+python ~/bin/AlleleSeq2/filter_phase_warnings.py _discarded_HetSNVs_warn-haplotype.log | \
+#python ~/bin/AlleleSeq2/filter_sites_w_mmaps.py  _discarded_HetSNVs_warn-mmaps.log _mmap_reads_over_hetSNVs.log \
+python ~/bin/AlleleSeq2/filter_sites_w_mmaps.py adjust _discarded_HetSNVs_warn-mmaps.log _mmap_reads_over_hetSNVs.log \
+	_hap1_mmapreads.mpileup _hap2_mmapreads.mpileup > _filtered_counts.tsv
+Rscript ~/bin/AlleleSeq2/plot_AllelicRatio_distribution.R _filtered_counts.tsv  filtered_counts
+cat _filtered_counts.tsv | \
+python ~/bin/AlleleSeq2/filter_non-autosomal_chr.py  | \
+python ~/bin/AlleleSeq2/filter_by_counts.py 6 0 > _filtered_counts.chrs1-22.6-tot_0-min_cnt.tsv
+Rscript ~/bin/AlleleSeq2/plot_AllelicRatio_distribution.R _filtered_counts.chrs1-22.6-tot_0-min_cnt.tsv  filtered_counts.chrs1-22.6-tot_0-min
+python ~/bin/AlleleSeq2/FalsePos.py _filtered_counts.chrs1-22.6-tot_0-min_cnt.tsv 500 0.05 > _FDR-0.05.binom.chrs1-22.6-tot_0-min_cnt.txt
+cat _filtered_counts.chrs1-22.6-tot_0-min_cnt.tsv | python ~/bin/AlleleSeq2/filter_by_pval.py _FDR-0.05.binom.chrs1-22.6-tot_0-min_cnt.txt > _interestingHets.FDR-0.05.binom.chrs1-22.6-tot_0-min_cnt.tsv
+Rscript ~/bin/AlleleSeq2/alleledb_calcOverdispersion.R \
+	_filtered_counts.chrs1-22.6-tot_0-min_cnt.tsv \
+	_FDR-0.05.betabinomial.chrs1-22.6-tot_0-min
+Rscript ~/bin/AlleleSeq2/alleledb_alleleseqBetabinomial.R \
+	_filtered_counts.chrs1-22.6-tot_0-min_cnt.tsv \
+	_FDR-0.05.betabinomial.chrs1-22.6-tot_0-min \
+	_counts.FDR-0.05.betabinom.chrs1-22.6-tot_0-min_cnt.tsv \
+	_interestingHets.FDR-0.05.betabinom.chrs1-22.6-tot_0-min_cnt.tsv \
+	_FDR-0.05.betabinom.chrs1-22.6-tot_0-min_cnt.txt \
+	0.05

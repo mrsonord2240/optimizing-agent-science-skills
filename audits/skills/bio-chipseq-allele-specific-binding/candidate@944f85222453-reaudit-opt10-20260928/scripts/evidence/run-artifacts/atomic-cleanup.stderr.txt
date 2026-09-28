@@ -1,0 +1,3 @@
+Error in library(BaalChIP) : there is no package called ‘BaalChIP’
+Calls: run_staged ... suppressPackageStartupMessages -> withCallingHandlers -> library
+Execution halted

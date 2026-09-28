@@ -1,0 +1,32 @@
+Sequence: ATGCGATCGATCGATCGATCGATCGATCGATCGTAA
+Length: 36 bp (12 codons)
+
+=== Codon Counts ===
+ATC: 2
+ATG: 1
+CGA: 3
+GAT: 2
+TAA: 1
+TCG: 3
+
+=== Codon Frequencies ===
+CGA: 0.250 ############
+TCG: 0.250 ############
+ATC: 0.167 ########
+GAT: 0.167 ########
+ATG: 0.083 ####
+TAA: 0.083 ####
+
+=== GC at Codon Positions ===
+Total GC:        47.2%
+1st position:    41.7%
+2nd position:    50.0%
+3rd position:    50.0% (wobble)
+
+=== Amino Acid Usage ===
+R: 3
+S: 3
+I: 2
+D: 2
+M: 1
+*: 1

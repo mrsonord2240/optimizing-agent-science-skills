@@ -1,0 +1,2 @@
+wsl.exe -d science --exec /mnt/openscience/audit-envs/bio-codon-usage/env/bin/python /mnt/openscience/audits/bio-codon-usage/initial-opt10-20260928/audit_harness.py
+python F:\optimizing-agent-science-skills\tools\render_viewer.py --report F:\OpenScience\audits\bio-codon-usage\initial-opt10-20260928\report.json --output F:\OpenScience\audits\bio-codon-usage\initial-opt10-20260928\viewer.md

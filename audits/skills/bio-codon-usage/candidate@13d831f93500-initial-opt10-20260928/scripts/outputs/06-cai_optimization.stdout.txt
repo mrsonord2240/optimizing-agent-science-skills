@@ -1,0 +1,17 @@
+Index built from 3 reference genes (64 codon weights)
+Relative adaptiveness of GCT (Ala): 1.000
+
+Query: ATGGCAGCATTAGATGATAAAGGATAA (9 codons)
+Query CAI: 0.098
+
+Optimized: ATGGCTGCTCTGGACGACAAAGGTTAA
+Optimized CAI: 1.000
+Protein preserved: MAALDDKG*
+
+Codons changed: 6
+  codon 1: GCA -> GCT
+  codon 2: GCA -> GCT
+  codon 3: TTA -> CTG
+  codon 4: GAT -> GAC
+  codon 5: GAT -> GAC
+  codon 7: GGA -> GGT

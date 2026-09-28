@@ -1,0 +1,2 @@
+Error: [missing_input] ChIP BAM does not exist: /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/delta-20260928/missing.bam
+Execution halted

@@ -1,0 +1,95 @@
+{
+  "skill_id": "bio-chipseq-allele-specific-binding",
+  "version": "candidate@944f85222453-reaudit-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "chip-seq/allele-specific-binding",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chip-seq/allele-specific-binding",
+    "subtree": "3674e1603cbc7a17731f9f5ea652ae7aa9f6e1e5"
+  },
+  "candidate": {
+    "identity": "944f852224538df92c581ab4a42889202ab10639f54974130f841782f5c90ead",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane5-chipseq-asb",
+    "content_sha256": "944f852224538df92c581ab4a42889202ab10639f54974130f841782f5c90ead",
+    "path": "F:\\OpenScience\\wt\\opt10-chipseq-asb\\skills\\bio-chipseq-allele-specific-binding",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "7b03d35c8844a11a86398a21bbe11293e482028939d0af8eba362199066e3c7b",
+        "git_blob": "09c70ca6124a8679cbeddce5246e55c8c6afe562",
+        "bytes": 11700
+      },
+      {
+        "path": "references/methods-and-commands.md",
+        "sha256": "15309e8f7e3309b47646919bf2e3d456b2c2564f3a32ef39adc1e26aec9a2f5c",
+        "git_blob": "baca7e7068e6413b76c26aaef33c36f08138b2d1",
+        "bytes": 12416
+      },
+      {
+        "path": "references/pitfalls-and-troubleshooting.md",
+        "sha256": "9725941aec0529c8c6a59552ed8b6a6bc87b62959ed2c195f886da44c413fe90",
+        "git_blob": "67f4116a6338d1706b46ae319ae3bfe075d4e9bd",
+        "bytes": 7724
+      },
+      {
+        "path": "scripts/baalchip_contracts.R",
+        "sha256": "2747a7b84dc6833aadb34b251d9de05efc84a01768ebb983a602654714ee5349",
+        "git_blob": "4c5ffbac29a9e022b896b739a34a9f3806c70f52",
+        "bytes": 8027
+      },
+      {
+        "path": "scripts/baalchip_workflow.R",
+        "sha256": "8dded9ad1dfc13dcf850ed749f01dc9964147c96fedc77a14a15506171096ef1",
+        "git_blob": "1348693674fba1c83810f063e4baeb33757edf1e",
+        "bytes": 9249
+      },
+      {
+        "path": "scripts/rasqual_cohort.py",
+        "sha256": "076d90a6396e7072c6b2c41f0760d0d981dec58eeb96d52c3d550172b537a59a",
+        "git_blob": "fbbce2f853e7fcdfdde9bf2fc20c5d689efbe16f",
+        "bytes": 13941
+      },
+      {
+        "path": "tests/test_baalchip_contracts.R",
+        "sha256": "148b393d823e220ab2810df4728c3d75839ac0d18395bd380e94b8b04f14656c",
+        "git_blob": "82259fed9ab26a245a79a4f4bdc1e8429ac9e41a",
+        "bytes": 2644
+      },
+      {
+        "path": "tests/test_rasqual_cohort.py",
+        "sha256": "84158118680dd5867f466b591a74c23afaca2764c25f95b3e689a1e679c6deae",
+        "git_blob": "56b77127eabff2016e886125d115cfe22bfefc36",
+        "bytes": 1813
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@a058f8a1b36e-initial-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 46
+  }
+}
