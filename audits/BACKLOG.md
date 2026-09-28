@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (76)
+## P1 (70)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -49,54 +49,6 @@ None open.
 - Problem: rstatix pairwise_wilcox_test(paired = TRUE) and statannotations Wilcoxon / t-test_paired have no id argument; the same 28 rows shuffled give p 0.7148 instead of 0.00232 with no message, while ggpaired(id = ) draws the right subject lines, so the figure and the p disagree.
 - Root cause: Skill says 'Verify subjects are correctly matched' but ships no check.
 - Fix: Add arrange(subject_id) (and an assert that both levels have identical id vectors) before any paired test, in the R and Python recipes.
-
-### `bio-data-visualization-color-palettes` — Turbo offered as a perceptually uniform rainbow fix, but fails the Skill's own luminance test
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 4
-- Problem: SKILL.md (viridis list, Rainbow failure mode) and usage-guide (Tips, jet migration prompt) say turbo is 'jet-like but perceptually uniform' and offer it as the fix for rainbow banding. CIELab L* along turbo runs 12 to 90 to 24 (non-monotonic in R colorspace and Python colorspacious) and step CV is 0.359 against 0.012 for viridis.
-- Root cause: Turbo is a smoothed rainbow: better than jet but not uniform and not luminance-monotonic, so it fails criterion 3 that the Skill calls the most actionable.
-- Fix: Say turbo is a last resort for audiences who need a jet-like look, that it fails the grayscale test, and make viridis/batlow the default jet replacement in every place turbo appears.
-
-### `bio-data-visualization-color-palettes` — The mandatory CVD pre-flight does not run: cvd_emulator takes an image file
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: cvd_emulator(palette, type='deutan'\|'protan'\|'tritan') raises 'unused argument (type = ...)' (formals: file, overwrite, shiny.trace). The paired Python block imports cspace_converter and simulates nothing. The shipped example already uses the working deutan()/protan()/tritan().
-- Root cause: Function signature guessed from the name; the Python block stops at the import.
-- Fix: Replace with demoplot(deutan(palette), 'heatmap') / deutan(palette) in R, and cspace_convert(rgb, {'name':'sRGB1+CVD','cvd_type':'deuteranomaly','severity':100}, 'sRGB1') in Python; add one line reporting the minimum pairwise distance under each simulation.
-
-### `bio-data-visualization-color-palettes` — Pure-white midpoint rule contradicts the diverging palettes the Skill recommends
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2, 4
-- Problem: The Skill and usage-guide require white at the diverging midpoint and call #EEEEEE a failure mode, and the guide prompt asks vik with 'zero must map to pure white'. The recommended centres are vik #ECE5E0 (L* 91.3), roma #C0EAC3 (pale green), bam #F6F1F0, RdBu #F7F7F7 (also RdBu_r in matplotlib), all darker or tinted relative to white. The rule only holds for hand-built ramps (#0072B2/white/#D55E00 gives #FFFFFF).
-- Root cause: A rule for custom ramps was stated as a universal one, and the palette table never lists the true centre colours.
-- Fix: Add the measured centre colour to the Crameri and ColorBrewer tables, restrict the pure-white rule to custom ramps, and say that vik/roma/RdBu centres are near-neutral by design and zero is still anchored by midpoint=0 or symmetric limits.
-
-### `bio-data-visualization-color-palettes` — Unnamed Okabe-Ito vector silently recolours groups and has no grey for 'unassigned'
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1
-- Problem: scale_color_manual(values = okabe_ito) with an unnamed 8-vector maps by level order: dropping one level changed the colour of all 7 remaining cell types, and the 8th level gets black. The usage-guide prompt 'reserve grey for ambient/unassigned' has no code path, and Okabe-Ito 7 plus #999999 falls to dE 6.5 (Erythroid) and 9.8 (NK) under deutan simulation.
-- Root cause: Only the custom-palette example uses a named vector; the Okabe-Ito block does not, and the grey rule is never shown.
-- Fix: Show setNames(okabe_ito[1:7], levels) with a separate grey for the reserve class, state that named vectors keep colours stable across panels and subsets, and warn that #CC79A7 and #009E73 approach mid-grey under deutan (choose #BBBBBB/light grey or a marker shape).
-
-### `bio-data-visualization-color-palettes` — Grayscale test replaces the image with a generic grey ramp and is billed as the CVD check
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3
-- Problem: show_col(grey(seq(0,1,length=10))) is presented as the 'equivalent grayscale gradient' of viridis(10); it differs by up to 14.9 L* (0-100 ramp vs viridis 15-91). desaturate() differs by 0.2. The usage-guide tip calls the grayscale test 'the most actionable CVD check', but grayscale monotonicity is not colour-vision simulation.
-- Root cause: Two different tests conflated; the exact one (desaturate) is only in the example.
-- Fix: Use desaturate(pal) in SKILL.md, add an L* monotonicity one-liner (coords(as(hex2RGB(pal),'LAB'))[, 'L']), and separate the grayscale check from the CVD check.
-
-### `bio-data-visualization-color-palettes` — Shipped examples contradict the Skill and one does not run
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: palette_examples.R demonstrates Set1 and an NPG-style vector as the 'qualitative' example, a custom diverging with unmatched luminance ends (L* 70.8 vs 54.1) whose near-zero points are white on white, and ends with Python names (coolwarm, tab10). palettes_phd.R defines no df or de_df, so ggplot fails with 'data cannot be a function'.
-- Root cause: Two examples written independently of the SKILL.md guidance; the second is a template.
-- Fix: Rewrite palette_examples.R with Okabe-Ito (named), scico batlow/vik and a visible midpoint (grey panel or outlined points); add a small simulated df/de_df to palettes_phd.R so it runs, and drop non-R names from the closing cat().
 
 ### `bio-data-visualization-oncoprint-mutation-matrices` — comut block cannot run as written
 
@@ -618,7 +570,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (150)
+## P2 (149)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -635,30 +587,6 @@ None open.
 - Problem: The corrected family is the comparisons passed (two pairs x2, not x6) and this is unstated; summary(lmer) shows no p-value and no code draws the LMM/aggregated p on the figure; Dunn is named in the decision table and usage-guide prompt but the example uses pairwise Wilcoxon after Kruskal-Wallis (rstatix::dunn_test works and was verified); the ggsignif block sets two fill colours for a three-group plot and errors on the Skill's own three-group df; Shapiro pre-testing is offered without noting its weakness.
 - Root cause: Decision table and code snippets were written separately.
 - Fix: State the family-size rule; add a dunn_test/tukey_hsd + stat_pvalue_manual snippet and an emmeans-to-stat_pvalue_manual snippet for nested data; use lmerTest or emmeans for the p.
-
-### `bio-data-visualization-color-palettes` — 9-20 group palettes are recommended without a CVD caveat
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: tab20 (n=20), Paired (12), Set3 (12) and Polychrome 36 (first 15/20) drop to deutan min dE 2.0-4.5 with 6-16 pairs below 10, against 14.8 for Okabe-Ito.
-- Root cause: The palette-by-count table optimises normal-vision separation only.
-- Fix: Add that beyond 8 groups no listed palette is CVD-safe and pair colour with marker shape, direct labels or facets.
-
-### `bio-data-visualization-color-palettes` — Smaller factual errors in the palette descriptions
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 4
-- Problem: 'colorblind' matplotlib style does not exist (seaborn-v0_8-colorblind, 6 colours); viridis became the matplotlib default in 2.0 (classic.mplstyle still sets jet), not 3.0; bam runs magenta to white to green, not brown; roma is red/pale-green/blue, not 'slightly warmer than vik'; RdBu is called perceptually uniform in the usage-guide (step CV 0.22 vs vik 0.18); colorRampPalette(...)(100) of the custom ramp has no exact #FFFFFF entry (odd N does); the matplotlib RdBu_r block hard-codes +-2 and saturated 8.4% of an unscaled field.
-- Root cause: Palette facts written from memory and not checked against the installed packages.
-- Fix: Correct each statement; for RdBu_r use vmax = np.nanpercentile(np.abs(data), 99) as in the R example.
-
-### `bio-data-visualization-color-palettes` — usage-guide.md restates SKILL.md and lists tools no code uses
-
-- Skill: 71.8, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 2, 3
-- Problem: The guide repeats the Okabe-Ito hexes, symmetric-bounds, white-midpoint, grayscale, rainbow, brand-palette and custom-palette tips already in SKILL.md; khroma and colorcet are in the version line and install list but no code block or example uses them.
-- Root cause: Two documents maintained for the same content.
-- Fix: Keep prompts and prerequisites in the guide, reference SKILL.md for the tips, and either add a khroma/colorcet snippet or drop them from the install list.
 
 ### `bio-data-visualization-oncoprint-mutation-matrices` — usage-guide and SKILL.md disagree; smaller gaps
 
@@ -1539,6 +1467,22 @@ None open.
 - Problem: The shipped CAUSE demo intentionally uses 50,000 variants and emits a package warning that fewer than 100,000 nuisance variants may be unstable.
 - Root cause: The lightweight synthetic demonstration is smaller than CAUSE's nuisance-estimation recommendation.
 - Fix: Add one sentence beside the demo that its 50,000-variant size is pedagogic and real analyses should follow the package's larger-nuisance-variant guidance.
+
+### `bio-data-visualization-color-palettes` — Add a compact palette-audit response contract
+
+- Skill: 94, Production Ready · [mrsonord2240/optimized-scientific-skills@cd2cfef](https://github.com/mrsonord2240/optimized-scientific-skills/tree/cd2cfef126db14008baf614af792317daf6ff1e1/skills/bio-data-visualization-color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-optimized-scientific-skills@cd2cfef/viewer.md)
+- Observed in inputs: —
+- Problem: The Skill specifies the computations but not a single standard response shape for reporting the chosen type, limits, midpoint, grayscale result, CVD minima, redundant encoding, and visual-inspection outcome.
+- Root cause: Feedback expectations are distributed across several sections rather than summarized as an output checklist.
+- Fix: Add a short final-response checklist with palette name/type, normalization and bounds, CVD minima, luminance verdict, redundant encoding, and visual inspection status.
+
+### `bio-data-visualization-color-palettes` — Show arbitrary reference points and missing values
+
+- Skill: 94, Production Ready · [mrsonord2240/optimized-scientific-skills@cd2cfef](https://github.com/mrsonord2240/optimized-scientific-skills/tree/cd2cfef126db14008baf614af792317daf6ff1e1/skills/bio-data-visualization-color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-optimized-scientific-skills@cd2cfef/viewer.md)
+- Observed in inputs: 7
+- Problem: The nonzero-reference case succeeded, but the Skill only demonstrates midpoint zero and does not explicitly show how to mask missing values with a non-quantitative bad color.
+- Root cause: Examples center on signed LFC/z-score data and assume finite numeric matrices.
+- Fix: Add one compact Python or R note: set the diverging midpoint to the scientific reference value, mask non-finite cells, and assign missing values a separate neutral color such as #BBBBBB.
 
 ### `bio-differential-expression-deseq2-basics` — Add machine-checkable example expectations
 

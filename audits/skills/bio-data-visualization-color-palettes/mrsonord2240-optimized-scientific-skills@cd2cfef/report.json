@@ -1,0 +1,433 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-color-palettes",
+    "description": "Select colormaps and qualitative palettes for scientific figures using perceptual-uniformity, color-vision-deficiency safety, and luminance-monotonicity criteria. Covers Crameri, viridis-family, Okabe-Ito, ColorBrewer, and jet/rainbow migration.",
+    "evaluated_on": "2026-09-27",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/optimized-scientific-skills@cd2cfef126db14008baf614af792317daf6ff1e1:skills/bio-data-visualization-color-palettes",
+    "audit_type": "independent re-audit after fix",
+    "auditor_independent": true,
+    "executed": true,
+    "execution_note": "Executed all five archived inputs as regressions plus two genuinely new inputs. R and Python assertions reached PASS sentinels, Python exited 0, and all seven PNGs were manually opened plus pixel-checked. The shared R runtime currently exits 2816 during package teardown after successful output; a minimal ggplot2-only probe reproduces this outside the Skill, while a base-R probe exits 0. No Skill bytes or provider worktree files were modified."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No result was fabricated; all reported centers, bounds, distances, mappings, masks, and plot properties were computed from saved synthetic fixtures or installed palette implementations."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill selects scientific figure encodings and makes no diagnosis, prescription, treatment recommendation, or participant-level inference."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Palette type matches data semantics in all seven outputs; quantitative bounds, CVD simulation, grayscale testing, and redundant encodings are correctly separated."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "R and Python code parsed, executed all assertions, and emitted checked artifacts. Python and pixel checks exited 0. The post-success R exit 2816 is environment-wide and independently reproduces on loading ggplot2 alone, not a Skill code failure."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Completeness 4, correctness 4, appropriateness 4. Sequential, diverging, cyclic, categorical, CVD, grayscale, migration, and >8-group boundaries are consistent and executable."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 3, error reporting 3, recoverability 4. Version-introspection and design fallbacks are clear, although arbitrary non-finite data and custom reference points require agent judgment."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Token cost 4, efficiency 4. SKILL.md is 252 lines; the guide routes rather than duplicates, and executable depth lives in examples/tests."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability 4, consistency 4, feedback design 3, error prevention 4. The workflow is internally consistent and preventive; a compact result-report contract would further standardize responses."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 4, forgiveness 3. Natural prompts cover common requests; unusual nonzero midpoints and missing encodings are handled by generalization rather than explicit examples."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential safety 4, input validation 3, data safety 4. No secrets, shell interpolation, network calls, destructive operations, or data retention are present."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Modularity 4, modifiability 4, testability 4. Concise guide, two self-contained examples, and focused R/Python contract tests cleanly separate responsibilities."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger precision 4, progressive disclosure 4, composability 3, idempotency 4, escape hatches 3. The trigger is precise and >8/>20 group limits are explicit; response integration points remain informal."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 35,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Named Okabe-Ito mapping for seven cell types plus unassigned",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The fixed named mapping stayed byte-for-byte stable after T cells were removed. Unassigned used #BBBBBB plus a distinct cross marker; R CIELAB minima after deutan/protan/tritan transforms were 14.93/20.71/16.17.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions": [
+          {
+            "text": "Every category is assigned through a named mapping and Unassigned is light grey",
+            "result": "PASS",
+            "note": "Seven chromatic names plus Unassigned=#BBBBBB were present."
+          },
+          {
+            "text": "Removing T cells does not recolor any remaining category",
+            "result": "PASS",
+            "note": "The full and subset ggplot_build mappings were identical for all shared levels."
+          },
+          {
+            "text": "All three CVD simulations produce finite positive minimum pairwise distances",
+            "result": "PASS",
+            "note": "R minima were 14.93, 20.71, and 16.17; Python independently returned 14.17, 13.96, and 10.97 in CAM02-UCS."
+          },
+          {
+            "text": "A redundant non-color encoding distinguishes the reserve class",
+            "result": "PASS",
+            "note": "Unassigned uses marker 4 while chromatic categories use marker 16."
+          },
+          {
+            "text": "The full and subset plots render non-blank with readable legends",
+            "result": "PASS",
+            "note": "Manual visual inspection confirmed stable colors, the grey cross class, and complete legends."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed run/regressions.R on the 1,270-row synthetic UMAP; opened figs/i1_named_okabe_stability.png.",
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "vik log-fold-change heatmap with symmetric q99 bounds",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The fixed guidance correctly separates built-in near-neutral centres from an exact-white custom ramp. q99 was 4.814764, vik sampled #EBE5E0 at its centre, and the odd 101-color custom ramp sampled #FFFFFF exactly.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions": [
+          {
+            "text": "Bounds are symmetric at plus/minus the 99th percentile of absolute LFC",
+            "result": "PASS",
+            "note": "The computed limits were -4.814764 and +4.814764."
+          },
+          {
+            "text": "Zero is anchored at the built-in vik centre",
+            "result": "PASS",
+            "note": "midpoint=0 and symmetric limits place zero at the measured #EBE5E0 centre."
+          },
+          {
+            "text": "The output does not mislabel vik's centre as pure white",
+            "result": "PASS",
+            "note": "The output explicitly reports the near-neutral built-in centre."
+          },
+          {
+            "text": "A custom ramp can deliberately sample exact white at zero",
+            "result": "PASS",
+            "note": "The 101-color custom ramp's 51st color was #FFFFFF."
+          },
+          {
+            "text": "Both diverging arms and the neutral region are visually legible",
+            "result": "PASS",
+            "note": "Manual inspection found no blank panel or lost midpoint; the skewed positive block and negative block remain distinct."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed run/regressions.R on synthetic_skewed_lfc.csv; opened figs/i2_diverging_centres.png.",
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "CVD and grayscale audit of sequential and rainbow-like candidates",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The corrected workflow uses deutan/protan/tritan transforms and desaturates the actual palette. batlow remained luminance-monotonic; turbo was correctly identified as non-monotonic.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions": [
+          {
+            "text": "The grayscale check desaturates the actual palette",
+            "result": "PASS",
+            "note": "colorspace::desaturate(batlow) was rendered rather than a generic grey ramp."
+          },
+          {
+            "text": "batlow has monotonic CIELAB lightness",
+            "result": "PASS",
+            "note": "All successive L* differences had one direction."
+          },
+          {
+            "text": "turbo is not presented as luminance-monotonic",
+            "result": "PASS",
+            "note": "The regression asserted that turbo L* rises and then falls."
+          },
+          {
+            "text": "The CVD code performs deutan, protan, and tritan simulations and reports distances",
+            "result": "PASS",
+            "note": "Both R and Python produced finite minimum pairwise distances for all three simulations."
+          },
+          {
+            "text": "The simulated and grayscale panels are visually inspectable",
+            "result": "PASS",
+            "note": "Manual inspection confirmed six non-blank labeled swatches and visible turbo light-dark reversal."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed run/regressions.R and run/regressions.py; opened figs/i3_grayscale_cvd.png.",
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Migrate sequential, signed, and cyclic matplotlib panels away from jet",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The migration chose batlow for magnitude, vik with symmetric q99 bounds for signed data, and romaO for phase. Zero normalized to 0.5 and romaO/vikO/twilight seam distances were below 2.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions": [
+          {
+            "text": "The sequential panel no longer uses jet or rainbow",
+            "result": "PASS",
+            "note": "It uses cmcrameri batlow."
+          },
+          {
+            "text": "The signed panel uses a diverging palette and symmetric data-derived limits",
+            "result": "PASS",
+            "note": "vik uses plus/minus q99=5.956655 and maps zero to 0.5."
+          },
+          {
+            "text": "The phase panel uses a cyclic palette",
+            "result": "PASS",
+            "note": "romaO is used from 0 to 2*pi."
+          },
+          {
+            "text": "Cyclic palette endpoints close without an artificial seam",
+            "result": "PASS",
+            "note": "romaO, vikO, and twilight endpoint distances were each below 2 CAM02-UCS units."
+          },
+          {
+            "text": "All three migrated panels render with visible data and color bars",
+            "result": "PASS",
+            "note": "Manual inspection confirmed three non-blank, appropriately encoded panels."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed run/regressions.py on synthetic_spatial_expr.npy; opened figs/i4_jet_migration_fixed.png.",
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Run both shipped examples and assess 15-group and journal palettes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both shipped examples reached their PASS sentinels and emitted non-empty outputs. The four-panel example follows batlow/vik/named-Okabe-Ito guidance. Journal palettes had deutan minima below 10, and tab20/Paired/Set3 were correctly rejected as hue-only accessibility solutions.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions": [
+          {
+            "text": "Both shipped R examples execute on self-contained synthetic data",
+            "result": "PASS",
+            "note": "palette_examples.R and palettes_phd.R ran and emitted non-empty PDF output."
+          },
+          {
+            "text": "The four-panel example follows the Skill's current palette guidance",
+            "result": "PASS",
+            "note": "It uses batlow, symmetric vik, named Okabe-Ito, and stable subsetting."
+          },
+          {
+            "text": "Journal palettes are not claimed to be universal accessibility defaults",
+            "result": "PASS",
+            "note": "Measured deutan minima were npg 9.66, aaas 8.96, and lancet 7.51."
+          },
+          {
+            "text": "The 15-group request is not answered with a supposedly CVD-safe hue-only palette",
+            "result": "PASS",
+            "note": "tab20, Paired, and Set3 each had deutan minimum distance below 10 and the output routes to redundant encodings."
+          },
+          {
+            "text": "The representative shipped example is visually sound",
+            "result": "PASS",
+            "note": "Manual inspection confirmed four populated panels, outlined midpoint points, and stable categorical colors."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed copied fixed tests and examples from run/skill; opened figs/i5_palette_examples_fixed.png and verified all emitted PNGs with run/inspect_images.py.",
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Thirty clusters with a request for hue-only identity colors",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The output declines to imply that 30 unique hues can be CVD-safe, then uses direct facet labels and a single accessible accent. All 30 labels are present and only one identity color is used.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions": [
+          {
+            "text": "The output refuses the false promise of 30 CVD-safe identity hues",
+            "result": "PASS",
+            "note": "It explicitly treats hue-only encoding beyond eight groups as unsafe."
+          },
+          {
+            "text": "A practical redundant alternative is produced",
+            "result": "PASS",
+            "note": "The plot uses direct facet labels rather than color identity."
+          },
+          {
+            "text": "All 30 clusters remain represented",
+            "result": "PASS",
+            "note": "The factor has 30 levels and the plot contains 30 labeled facets."
+          },
+          {
+            "text": "The alternative does not smuggle identity back into hue",
+            "result": "PASS",
+            "note": "ggplot_build found exactly one point color across all facets."
+          },
+          {
+            "text": "The 30-panel output is visually inspectable",
+            "result": "PASS",
+            "note": "Manual inspection confirmed filled free-scale panels and readable C01-C30 labels."
+          }
+        ],
+        "executed": true,
+        "execution_note": "New input executed in run/regressions.R; opened figs/i6_thirty_groups_faceted.png.",
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Nonzero reference midpoint with missing matrix cells",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The output generalized the diverging principle to a scientifically meaningful reference of 0.5, masked 48 missing cells, and encoded them as #BBBBBB. The reference maps exactly to 0.5 in the norm.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions": [
+          {
+            "text": "The scientifically meaningful 0.5 reference maps to the diverging centre",
+            "result": "PASS",
+            "note": "TwoSlopeNorm(vcenter=0.5) returns 0.5 at the reference."
+          },
+          {
+            "text": "Missing values are not silently mapped to a quantitative color",
+            "result": "PASS",
+            "note": "The masked array uses cmap bad color #BBBBBB."
+          },
+          {
+            "text": "All missing cells are preserved as missing",
+            "result": "PASS",
+            "note": "The mask count is 48, matching the synthetic missing block."
+          },
+          {
+            "text": "The two arms use explicit symmetric conceptual bounds around the reference",
+            "result": "PASS",
+            "note": "The fraction limits are 0 and 1 around reference 0.5."
+          },
+          {
+            "text": "The reference and missing regions are visually distinct",
+            "result": "PASS",
+            "note": "Manual inspection shows a white reference block and a separate grey missing block."
+          }
+        ],
+        "executed": true,
+        "execution_note": "New input executed in run/regressions.py; opened figs/i7_nonzero_midpoint_missing.png.",
+        "assertions_passed": 5,
+        "assertions_total": 5
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 56.9,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false,
+    "grade_note": "All Production Ready floors pass: static 93>=80, execution 94.9>=85, Layer 1 average 38.3>=32, Layer 2 average 56.6>=48, assertions 35/35=100%, no veto, and no open P0."
+  },
+  "key_strengths": [
+    "The fixed guidance is internally consistent across sequential, diverging, cyclic, and categorical use cases, including measured built-in centres and data-derived symmetric limits.",
+    "CVD and grayscale checks now execute in both R and Python and report finite distances while explicitly avoiding a false universal accessibility cutoff.",
+    "Named categorical mappings remain stable across subsets, reserve grey is explicit, and redundant shape/facet strategies are used when hue cannot safely carry identity.",
+    "Both shipped examples are self-contained, match the prose, and are backed by focused cross-language contract tests."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Add a compact palette-audit response contract",
+      "observed_in": [],
+      "problem": "The Skill specifies the computations but not a single standard response shape for reporting the chosen type, limits, midpoint, grayscale result, CVD minima, redundant encoding, and visual-inspection outcome.",
+      "root_cause": "Feedback expectations are distributed across several sections rather than summarized as an output checklist.",
+      "fix": "Add a short final-response checklist with palette name/type, normalization and bounds, CVD minima, luminance verdict, redundant encoding, and visual inspection status."
+    },
+    {
+      "priority": "P2",
+      "title": "Show arbitrary reference points and missing values",
+      "observed_in": [
+        7
+      ],
+      "problem": "The nonzero-reference case succeeded, but the Skill only demonstrates midpoint zero and does not explicitly show how to mask missing values with a non-quantitative bad color.",
+      "root_cause": "Examples center on signed LFC/z-score data and assume finite numeric matrices.",
+      "fix": "Add one compact Python or R note: set the diverging midpoint to the scientific reference value, mask non-finite cells, and assign missing values a separate neutral color such as #BBBBBB."
+    }
+  ]
+}
