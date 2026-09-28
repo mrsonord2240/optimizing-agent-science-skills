@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (70)
+## P1 (67)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -49,38 +49,6 @@ None open.
 - Problem: rstatix pairwise_wilcox_test(paired = TRUE) and statannotations Wilcoxon / t-test_paired have no id argument; the same 28 rows shuffled give p 0.7148 instead of 0.00232 with no message, while ggpaired(id = ) draws the right subject lines, so the figure and the p disagree.
 - Root cause: Skill says 'Verify subjects are correctly matched' but ships no check.
 - Fix: Add arrange(subject_id) (and an assert that both levels have identical id vectors) before any paired test, in the R and Python recipes.
-
-### `bio-data-visualization-oncoprint-mutation-matrices` — comut block cannot run as written
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 4
-- Problem: import comut then comut.CoMut() raises AttributeError (class lives in comut.comut); later datasets must have samples inside the first dataset's set, so zero-mutation and unannotated samples raise ValueError; add_continuous_data raises TypeError on pandas 3; category_order draws the top gene at the bottom; no sample sorting; TMB range (0,30) saturates.
-- Root cause: Python equivalent was written from memory of the API and never executed.
-- Fix: Use from comut import comut, set toy_comut.samples to the full cohort first, reverse category_order, pre-sort samples by burden, note pandas<3, derive value_range from the data.
-
-### `bio-data-visualization-oncoprint-mutation-matrices` — Denominator claims contradict tool behaviour
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 7
-- Problem: The Skill says percentages differ with remove_empty_columns and that removeNonMutated = FALSE preserves cohort N. ComplexHeatmap % is always over the input matrix; maftools drops samples that are absent from the MAF (16 of 30) regardless of the flag and of clinicalData.
-- Root cause: Behaviour asserted without running it.
-- Fix: State the true denominators, and tell the agent to build the matrix from the explicit cohort sample list (or add zero-mutation samples to the MAF/clinical merge) before plotting.
-
-### `bio-data-visualization-oncoprint-mutation-matrices` — Matrix and annotation construction left as comments
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 5, 7
-- Problem: mat, clinical and the Variant_Classification-to-class map are undefined; clinical rows not ordered like colnames(mat) silently mislabel samples (391/600 wrong), non-matching IDs give an all-NA track with no warning, and the maftools example needs a Tumor_Sample_Barcode column.
-- Root cause: The hardest correctness step is the one the Skill does not show.
-- Fix: Ship a short verified MAF-to-matrix function with the class map, and require clinical <- clinical[match(colnames(mat), clinical$Tumor_Sample_Barcode), ] plus a stopifnot on NA matches.
-
-### `bio-data-visualization-oncoprint-mutation-matrices` — Row order is not sample frequency; somaticInteractions return misdescribed
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 6
-- Problem: oncoPrint ranks genes by alteration events, so a gene with fewer mutated samples can sit above one with more (DNMT3A 25% above FLT3 27%). somaticInteractions returns a data.table, not a signed -log10 matrix.
-- Root cause: Both descriptions were written from the plot appearance.
-- Fix: Say the default order counts alteration types and pass row_order = order(-rowSums(mat != '')) when sample frequency is wanted; document the data.table columns (pValue, oddsRatio, Event, pAdj).
 
 ### `bio-data-visualization-network-visualization` — examples/cytoscape_automation.py fails silently
 
@@ -362,6 +330,14 @@ None open.
 - Root cause: The helper uppercases and length-budgets the final oligo but never validates spacer alphabet or required 20-nt length.
 - Fix: Before constructing the oligo, require a 20-character A/C/G/T spacer and raise a concise ValueError otherwise; add a CLI test for hyphenated and wrong-length input.
 
+### `bio-data-visualization-oncoprint-mutation-matrices` — Make comut figures self-describing and dense-safe
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@5204d1a](https://github.com/mrsonord2240/optimized-scientific-skills/tree/5204d1a4bc6069eac905b4422d6591ccc400ff3f/skills/bio-data-visualization-oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-optimized-scientific-skills@5204d1a/viewer.md)
+- Observed in inputs: 4, 9
+- Problem: The shipped comut CLI saves plots without alteration or clinical legends, and a 200-sample cohort retains fully overlapping sample labels. Color meaning is therefore unavailable in the artifact and dense labels are unreadable.
+- Root cause: comut_plot.py calls plot_comut() and savefig() without adding a unified legend or applying a cohort-size label policy.
+- Fix: Call the comut legend API after plotting and add a documented option or automatic threshold that hides x tick labels for dense cohorts while retaining them for small cohorts. Add image-level regression assertions for legend text and label visibility.
+
 ### `bio-single-cell-cell-annotation` — Establish a clean-exit Linux smoke for R routes
 
 - Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-single-cell-cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
@@ -587,14 +563,6 @@ None open.
 - Problem: The corrected family is the comparisons passed (two pairs x2, not x6) and this is unstated; summary(lmer) shows no p-value and no code draws the LMM/aggregated p on the figure; Dunn is named in the decision table and usage-guide prompt but the example uses pairwise Wilcoxon after Kruskal-Wallis (rstatix::dunn_test works and was verified); the ggsignif block sets two fill colours for a three-group plot and errors on the Skill's own three-group df; Shapiro pre-testing is offered without noting its weakness.
 - Root cause: Decision table and code snippets were written separately.
 - Fix: State the family-size rule; add a dunn_test/tukey_hsd + stat_pvalue_manual snippet and an emmeans-to-stat_pvalue_manual snippet for nested data; use lmerTest or emmeans for the p.
-
-### `bio-data-visualization-oncoprint-mutation-matrices` — usage-guide and SKILL.md disagree; smaller gaps
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 5, 6
-- Problem: Usage-guide prompt gives green Missense and quarter-height Truncating versus SKILL.md; the 'sort by gene 1' failure mode contradicts its own fix; per-panel right bar and 'rasterize the cell layer' / 'side annotation' have no code and are not what oncoPrint does; Haldane-Anscombe OR flips to >1 for a 0-cell mutex pair; an all-empty matrix errors with 'subscript out of bounds'; maftools Multi_Hit black clashes with the Skill's black Truncating; partial annotationColor greys unlisted groups.
-- Root cause: Two documents maintained separately.
-- Fix: Align the two files, delete or implement the unsupported claims, and add one line per gotcha.
 
 ### `bio-data-visualization-network-visualization` — Hub-label rule and edge-width advice are not adaptive
 
@@ -1107,6 +1075,14 @@ None open.
 - Problem: Real CFD/MIT scoring is documented but cannot run in this environment without a multi-GB genome index, and the promised custom-library deliverable has no machine-readable column contract.
 - Root cause: The Skill names the external route and deliverables but lacks preflight/format checks for them.
 - Fix: Add a short preflight that names the required genome index and gives a clear blocked message, plus a minimal required-column schema for library table and oligo order.
+
+### `bio-data-visualization-oncoprint-mutation-matrices` — Reject empty cohort IDs and invalid TMB values
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@5204d1a](https://github.com/mrsonord2240/optimized-scientific-skills/tree/5204d1a4bc6069eac905b4422d6591ccc400ff3f/skills/bio-data-visualization-oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-optimized-scientific-skills@5204d1a/viewer.md)
+- Observed in inputs: 9
+- Problem: build_comut accepts an empty cohort sample ID and accepts negative TMB, despite describing cohort IDs as non-empty and treating TMB as a zero-based continuous burden.
+- Root cause: The cohort check tests only list emptiness/uniqueness, and pd.to_numeric is not followed by finite/non-negative range validation.
+- Fix: Normalize IDs to strings before validation, reject empty/NA IDs, and require all TMB values to be finite and >= 0. Add regression tests for empty, NA, infinite, and negative values.
 
 ### `bio-sam-bam-basics` — Validate BED rows before indexing fields
 
