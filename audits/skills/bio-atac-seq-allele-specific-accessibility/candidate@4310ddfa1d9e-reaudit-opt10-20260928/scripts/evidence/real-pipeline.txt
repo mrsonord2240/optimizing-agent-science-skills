@@ -1,0 +1,21 @@
+run_utc=2026-09-28T20:10:03Z
+candidate_sha256=4310ddfa1d9ed178f033ad42e77e0772ddadd3c4905dd1e9bcef8b6289a24103
+bounded_region=chr1:1-5000000
+phase_derivative=constant PS=1 only for bounded chromosome-wide-phased public VCF test
+ps_free_source_rejected_rc=255
+ps_free_staged_cleanup=PASS
+wasp_commit=d3b8447fd7719fffa00b856fd1f27c845554693e
+filtered_samples=NA12878
+filtered_variants=3542
+haplotype_map_rows=3542
+final_sort_order=coordinate
+final_rg_samples=NA12878
+final_reads=268176
+final_index_readable=PASS
+gatk_rows=953
+gatk_depth30_rows=28
+peak_rows=1
+peak_header=peak	phase_set	haplotype1_count	haplotype2_count	total_count	haplotype1_frac	snp_count	p_value	adj_p	status
+path_with_spaces=PASS
+output_reuse_refusal=PASS
+real_pipeline_reaudit=PASS

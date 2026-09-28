@@ -1,0 +1,42 @@
+run_utc=2026-09-28T20:04:18Z
+candidate_sha256=4310ddfa1d9ed178f033ad42e77e0772ddadd3c4905dd1e9bcef8b6289a24103
+pipeline_bash_syntax=PASS
+test_malformed_peak_schema_has_stable_actionable_error (test_aggregate_peak_ase.AggregatePeakAseTests.test_malformed_peak_schema_has_stable_actionable_error) ... ok
+test_malformed_schema_has_stable_actionable_error (test_aggregate_peak_ase.AggregatePeakAseTests.test_malformed_schema_has_stable_actionable_error) ... ok
+test_opposite_reference_labels_preserve_haplotype_direction (test_aggregate_peak_ase.AggregatePeakAseTests.test_opposite_reference_labels_preserve_haplotype_direction) ... ok
+test_separate_phase_sets_are_not_pooled (test_aggregate_peak_ase.AggregatePeakAseTests.test_separate_phase_sets_are_not_pooled) ... ok
+test_valid_empty_cases_write_schema_correct_empty_table (test_aggregate_peak_ase.AggregatePeakAseTests.test_valid_empty_cases_write_schema_correct_empty_table) ... ok
+test_feature_contract_rejects_inconsistent_counts (test_rasqual_driver.RasqualDriverTests.test_feature_contract_rejects_inconsistent_counts) ... ok
+test_feature_row_cannot_exceed_declared_matrix (test_rasqual_driver.RasqualDriverTests.test_feature_row_cannot_exceed_declared_matrix) ... ok
+test_feature_rows_advance_and_zero_fsnp_row_keeps_matrix_index (test_rasqual_driver.RasqualDriverTests.test_feature_rows_advance_and_zero_fsnp_row_keeps_matrix_index) ... ok
+test_bam_sample_is_resolved_before_target_vcf_filter (test_skill_contract.SkillContractTests.test_bam_sample_is_resolved_before_target_vcf_filter) ... ok
+test_final_bam_is_sorted_read_grouped_indexed_and_nonempty (test_skill_contract.SkillContractTests.test_final_bam_is_sorted_read_grouped_indexed_and_nonempty) ... ok
+test_matrixeqtl_and_quasar_are_explicit_routing_only (test_skill_contract.SkillContractTests.test_matrixeqtl_and_quasar_are_explicit_routing_only) ... ok
+test_provenance_uses_canonical_git_blob_ids (test_skill_contract.SkillContractTests.test_provenance_uses_canonical_git_blob_ids) ... ok
+test_run_is_staged_and_existing_output_is_refused (test_skill_contract.SkillContractTests.test_run_is_staged_and_existing_output_is_refused) ... ok
+test_scientific_claims_are_conditioned (test_skill_contract.SkillContractTests.test_scientific_claims_are_conditioned) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 24.369s
+
+OK
+Evaluated peak/phase sets: 2; significant imbalance: 1
+aggregate_orientation_phase_status=PASS
+aggregate_path_with_spaces=PASS
+Evaluated peak/phase sets: 0 (ASE input contains no rows)
+aggregate_empty_schema=PASS
+Evaluated peak/phase sets: 0 (no depth-eligible sites overlap peaks)
+aggregate_no_overlap_schema=PASS
+aggregate_schema_error=PASS
+Evaluated peak/phase sets: 1; significant imbalance: 1
+aggregate_duplicate_peak_identity=FAIL distinct coordinates pooled under duplicate BED4 name
+rasqual_two_feature_row_mapping=PASS
+rasqual_path_argument_safety=PASS
+rasqual_bh_contract=PASS
+rasqual_zero_feature_skip_plan=PASS
+rasqual_matrix_dimension_validation=PASS
+pipeline_target_only_genotype_filter=PASS
+pipeline_early_failure_cleanup=PASS
+pipeline_sample_identity_mismatch=PASS
+pipeline_output_reuse_refusal=PASS
+fixture_reaudit_complete=PASS

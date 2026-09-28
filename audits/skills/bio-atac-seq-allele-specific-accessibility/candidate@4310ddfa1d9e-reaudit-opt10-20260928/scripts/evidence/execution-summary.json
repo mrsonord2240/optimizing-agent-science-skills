@@ -1,0 +1,29 @@
+{
+  "candidate_sha256": "4310ddfa1d9ed178f033ad42e77e0772ddadd3c4905dd1e9bcef8b6289a24103",
+  "shipped_tests": {"passed": 14, "total": 14},
+  "public_pipeline": {
+    "sample": "NA12878",
+    "filtered_variants": 3542,
+    "final_reads": 268176,
+    "sort_order": "coordinate",
+    "read_group_samples": ["NA12878"],
+    "index_readable": true,
+    "gatk_rows": 953,
+    "gatk_depth_30_rows": 28,
+    "peak_rows": 1,
+    "ps_free_source_rejected": true,
+    "bounded_ps_derivative": "constant PS=1 over chr1:1-5 Mb only"
+  },
+  "rasqual": {
+    "features": {"C11orf21": 83, "TSPAN32": 83},
+    "association_rows": 166,
+    "finite_probabilities": true,
+    "complete_family_bh_recomputed": true,
+    "association_summary_sha256": "0363890d3049fd995391a7be9b7a0e73e8d82dab18c798ac38a4d9e190ac0aba"
+  },
+  "findings": {
+    "closed": ["ASA-001", "ASA-002", "ASA-003", "ASA-004", "ASA-005", "ASA-006", "ASA-007", "ASA-008"],
+    "open": ["ASA-009"]
+  },
+  "decision": "reject-return-to-fixer"
+}

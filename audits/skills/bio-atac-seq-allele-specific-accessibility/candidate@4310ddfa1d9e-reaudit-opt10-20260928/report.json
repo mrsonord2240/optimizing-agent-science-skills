@@ -1,0 +1,323 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-allele-specific-accessibility",
+    "description": "Detect allele-specific chromatin accessibility from ATAC-seq using WASP, GATK ASEReadCounter, or RASQUAL. Use when mapping cis-regulatory genetic variants from heterozygous SNPs, validating GWAS variant function with allelic imbalance, building a phased within-peak ASE analysis, or detecting reference-allele mapping bias before downstream analysis.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated study identifiers, sample sizes, p-values, effect sizes, or experimental claims; every numerical result was read from the bounded public runs or deterministic fixtures."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill remains a research analysis workflow and makes no patient-specific diagnosis, treatment recommendation, or clinical prescription."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "A valid BED4 input with two distinct genomic intervals sharing one display name is silently collapsed into one peak/phase-set test. The helper groups only by the display label and phase set, so unrelated coordinates can be pooled, the SNP-count threshold can be crossed incorrectly, and significance can be manufactured."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The 14-test shipped suite passed; the real bounded WASP-to-GATK workflow produced a sorted indexed one-sample BAM and 953 non-empty GATK rows; and the real two-feature RASQUAL workflow produced 166 validated association rows."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "All inherited core workflows are now implemented and correct on their tested paths, but peak identity is not coordinate-safe when BED4 labels repeat."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Sample, schema, empty, staging, and reuse failures are explicit; duplicate peak labels remain an accepted valid input that silently changes the statistical grouping."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Progressive references and bounded executable drivers are efficient; the full WASP path remains inherently expensive but is scientifically motivated and thread-configurable."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Method routing, outputs, stop conditions, and external-only branches are clear, while the undocumented uniqueness assumption on BED4 names can mislead an agent using ordinary peak labels."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger language, readable status outputs, and actionable errors support use and recovery; no warning tells users that repeated BED4 names are unsafe."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, raw-code execution, unquoted shell paths, unsafe overwrite, or broad destructive operation was found in the candidate."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Three scripts, focused references, and 14 deterministic tests are well separated; the regression suite omits coordinate identity for duplicate peak labels."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, composition, idempotency, and external-route escape hatches are strong, with one hidden input invariant blocking readiness."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 24,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Bounded public WASP-to-GATK and peak aggregation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact candidate ran end to end on ENCODE/1000 Genomes chr1:1-5 Mb data with an explicitly bounded PS=1 derivative, while the unmodified PS-free VCF was rejected and cleaned up.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The pipeline retains exactly the BAM target sample before heterozygous filtering.",
+            "result": "PASS",
+            "note": "The filtered VCF contained only NA12878 and 3,542 target heterozygous variants."
+          },
+          {
+            "text": "The final WASP BAM is coordinate sorted, sample-read-grouped, indexed, and non-empty.",
+            "result": "PASS",
+            "note": "The final BAM reported SO=coordinate, one NA12878 SM, a readable index, and 268,176 reads."
+          },
+          {
+            "text": "GATK ASEReadCounter emits non-empty scientifically inspectable rows.",
+            "result": "PASS",
+            "note": "GATK emitted 953 rows, including 28 rows at total depth at least 30."
+          },
+          {
+            "text": "The peak output has the declared phase-oriented schema and meaningful values.",
+            "result": "PASS",
+            "note": "One row was written with all ten declared columns after consuming a 3,542-row haplotype map."
+          },
+          {
+            "text": "The public PS-free input is not silently treated as one phase block.",
+            "result": "PASS",
+            "note": "The source VCF without PS failed before promotion and left neither a final output nor a temporary sibling."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Peak orientation, phase blocks, schemas, and duplicate labels",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Orientation, phase separation, statuses, empty outputs, malformed schemas, and paths with spaces passed, but two distinct intervals sharing BED4 label dup were collapsed into one significant two-SNP test.",
+        "basic": 28,
+        "specialized": 35,
+        "total": 63,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Opposite locus-specific REF labels are oriented to the same biological haplotype before pooling.",
+            "result": "PASS",
+            "note": "The shared phase block produced haplotype counts 180:20 and a significant-imbalance status."
+          },
+          {
+            "text": "Different phase sets remain separate and retain non-significant or underpowered statuses.",
+            "result": "PASS",
+            "note": "A second phase block remained a separate row with two SNPs and non-significant status."
+          },
+          {
+            "text": "Empty and no-overlap inputs return the exact stable ten-column schema.",
+            "result": "PASS",
+            "note": "Both cases returned header-only tables without raw tracebacks."
+          },
+          {
+            "text": "Malformed ASE input fails actionably without creating a misleading result.",
+            "result": "PASS",
+            "note": "The helper exited 2, named the missing ASE columns, and did not create the requested output."
+          },
+          {
+            "text": "Distinct genomic peak intervals cannot be pooled solely because their optional BED4 labels match.",
+            "result": "FAIL",
+            "note": "Two disjoint one-SNP intervals named dup became one row with snp_count 2 and significant_imbalance."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Target-only genotype, identity, staging, and reuse guards",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Synthetic valid BAM/VCF boundaries and the real run confirmed target-only selection, identity mismatch refusal, staged cleanup, quoted paths, and existing-output refusal.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "A target-homozygous site is excluded even when another VCF sample is heterozygous.",
+            "result": "PASS",
+            "note": "The two-sample fixture stopped with no target heterozygous SNPs rather than leaking donor2 heterozygosity."
+          },
+          {
+            "text": "BAM and VCF sample-identity mismatch stops before analysis.",
+            "result": "PASS",
+            "note": "A donor2-only VCF failed with the exact one-sample match error and exit 65."
+          },
+          {
+            "text": "Failures after staging remove temporary and final output paths.",
+            "result": "PASS",
+            "note": "Both the target-empty fixture and PS-free public run left no output or matching temporary sibling."
+          },
+          {
+            "text": "Existing output directories are refused rather than reused or overwritten.",
+            "result": "PASS",
+            "note": "The synthetic and public reruns both refused the existing path with the documented exit 73."
+          },
+          {
+            "text": "Paths containing spaces survive the complete public workflow.",
+            "result": "PASS",
+            "note": "The real input and output directories with spaces completed through WASP, GATK, and aggregation."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Two-feature public RASQUAL execution and BH family",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact driver executed both public matrix rows and returned 166 finite association rows; the global BH vector was independently recomputed and matched.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Two feature records map to distinct one-based binary-matrix rows.",
+            "result": "PASS",
+            "note": "C11orf21 used row 1 and TSPAN32 used row 2 in both the dry-run plan and real summary."
+          },
+          {
+            "text": "The real run produces results for every executable feature.",
+            "result": "PASS",
+            "note": "Each feature produced 83 rows, for 166 association rows total."
+          },
+          {
+            "text": "Raw and adjusted probabilities are finite and lie within zero and one.",
+            "result": "PASS",
+            "note": "All 332 probability values passed finite range checks."
+          },
+          {
+            "text": "BH adjustment covers the complete reported two-feature test family.",
+            "result": "PASS",
+            "note": "An independent BH recomputation across all 166 raw p-values matched every emitted adjusted p-value."
+          },
+          {
+            "text": "Dimension, zero-feature, path-array, and output-reuse boundaries are enforced.",
+            "result": "PASS",
+            "note": "Wrong matrix bytes failed, a zero-feature row was recorded as skipped, argument arrays preserved paths, and an existing output directory was refused."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "External-only routing, claims, provenance, and exact identity",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The candidate identity, pinned provider commit and blobs, external-only MatrixEQTL/QuASAR boundaries, and conditioned scientific claims all passed independent static checks.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The audited candidate exactly matches the declared deterministic content identity.",
+            "result": "PASS",
+            "note": "Eleven files and the 1,099-byte ordinal manifest hashed to 4310ddfa1d9ed178f033ad42e77e0772ddadd3c4905dd1e9bcef8b6289a24103."
+          },
+          {
+            "text": "Provider provenance is pinned to a clean commit with canonical Git blob identities.",
+            "result": "PASS",
+            "note": "The provider checkout was clean at d91ed3d and all three documented blob IDs resolved exactly."
+          },
+          {
+            "text": "Checkout-normalized hashes are distinguished from canonical source identity.",
+            "result": "PASS",
+            "note": "The provenance page explicitly labels newline-normalized checkout SHA-256 values and treats Git blobs as canonical."
+          },
+          {
+            "text": "MatrixEQTL and QuASAR are represented only as external routing options.",
+            "result": "PASS",
+            "note": "The skill and method reference explicitly state that no executable workflow or data/output contract is shipped for either route."
+          },
+          {
+            "text": "Phasing, cohort multiplicity, power, and concordance claims remain within tested evidence.",
+            "result": "PASS",
+            "note": "Phasing is scoped to pooling, study-specific FDR/permutation is required, and unsupported fixed p-value, power-fold, and concordance percentages are absent."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 52.3,
+    "score": 88,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The bounded public WASP-to-GATK workflow now enforces target identity, coordinate order, read groups, indexing, non-empty GATK output, staging, and safe reuse semantics.",
+    "Peak aggregation correctly orients opposite REF labels to a shared haplotype, keeps phase sets separate, and emits stable empty, error, and status schemas on the tested unique-name inputs.",
+    "The RASQUAL driver executed two public matrix rows, produced 166 finite association rows, and matched an independent complete-family BH recomputation.",
+    "MatrixEQTL and QuASAR claims are honestly bounded to external routing, while canonical provider blobs and checkout-normalization caveats preserve provenance."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ASA-009: key peak groups by coordinates, not BED label",
+      "observed_in": [2],
+      "problem": "Two distinct BED intervals with the same optional BED4 name are silently pooled into one peak/phase-set row. This can inflate SNP count and coverage and create a significant result that neither interval supports independently.",
+      "root_cause": "map_variants_to_peaks carries only the display label into evaluate_groups, which groups on peak and phaseSet and discards chromosome/start/end identity.",
+      "fix": "Carry chromosome, start, and end through the intersection and group on coordinate identity plus phaseSet; treat the BED4 name as display metadata only, or reject duplicate names explicitly. Add a regression with two disjoint one-SNP intervals sharing a label and require two underpowered rows."
+    }
+  ]
+}

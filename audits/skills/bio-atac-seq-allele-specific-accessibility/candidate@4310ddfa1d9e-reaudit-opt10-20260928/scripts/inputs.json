@@ -1,0 +1,32 @@
+{
+  "complexity": "Moderate",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "prompt": "Run the complete single-sample WASP, GATK ASEReadCounter, and phase-oriented peak workflow on bounded public NA12878 ATAC/genotype data; inspect sample identity, BAM invariants, allele-count rows, and the peak table."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "prompt": "Aggregate phased allele counts with opposite REF encodings, multiple phase blocks, empty and malformed inputs, paths with spaces, and two disjoint BED4 peaks that share a display name."
+    },
+    {
+      "index": 3,
+      "type": "Edge",
+      "prompt": "Challenge target-sample selection, BAM/VCF mismatch, missing phase-set data, staged-failure cleanup, quoted paths, and output-reuse refusal."
+    },
+    {
+      "index": 4,
+      "type": "Variant B",
+      "prompt": "Execute two public RASQUAL feature rows, validate matrix and VCF dimensions, inspect finite p-values, independently recompute BH across the complete family, and test zero-feature and reuse boundaries."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "prompt": "Audit exact candidate and provider identity, canonical provenance, external-only MatrixEQTL and QuASAR routing, and the scope of phasing, multiplicity, power, and concordance claims."
+    }
+  ]
+}
