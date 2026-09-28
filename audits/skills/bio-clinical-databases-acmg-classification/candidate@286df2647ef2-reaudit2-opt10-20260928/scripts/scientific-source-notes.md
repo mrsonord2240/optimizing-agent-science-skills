@@ -1,0 +1,11 @@
+# Scientific source notes
+
+- Pejaver et al. 2022 primary article, Table 2: <https://khoury.northeastern.edu/home/radivojac/papers/pejaver_amjhumgenet_2022.pdf>. It gives REVEL benign intervals `<=0.003`, `(0.003,0.016]`, `(0.016,0.183]`, `(0.183,0.290]` and pathogenic intervals `[0.644,0.773)`, `[0.773,0.932)`, `>=0.932`; candidate exact and adjacent observations match. It also gives the BayesDel intervals exercised here.
+- Brnich et al. 2020 primary open article, Table 3: <https://pmc.ncbi.nlm.nih.gov/articles/PMC6938631/>. The benign thresholds are `<0.053`, `<0.23`, and `<0.48`; `0.48-2.1` is indeterminate; pathogenic thresholds are `>2.1`, `>4.3`, `>18.7`, and `>350`. Fourteen exact or adjacent candidate observations and the explanatory prose match.
+- Bergquist et al. 2025, *Genetics in Medicine* 27:101402, DOI 10.1016/j.gim.2025.101402: <https://ccs.neu.edu/home/radivojac/papers/bergquist_genetmed_2025.pdf>. AlphaMissense intervals `<=0.070`, `0.071-0.099`, `0.100-0.169`, `0.170-0.791`, `0.792-0.905`, `0.906-0.971`, `0.972-0.989`, and `>=0.990`, including the explicit -3/+3 point bands, match the independent execution matrix.
+- ClinGen official variant-classification guidance: <https://www.clinicalgenome.org/tools/clingen-variant-classification-guidance/>. It retains the endorsed PP5/BP6, PP3/BP4, PVS1, splicing, and PS3/BS3 guidance routes; the candidate rejects PP5/BP6 under current-rule scoring.
+- ClinGen SVI splicing guidance: <https://pmc.ncbi.nlm.nih.gov/articles/PMC9980257/>. PVS1 application depends on transcript consequence and review of rescue mechanisms; incomplete review stops and contradictory NMD representations are now independently verified.
+- GeneBe official API documentation: <https://docs.genebe.net/docs/api/overview/>. The current coordinate request completed with one public example record on 2026-09-28.
+- ClinGen CSpec service: <https://cspec.genome.network/cspec/srvc>. The current GATM version route returned six public version records on 2026-09-28.
+
+The scientific sources were used to verify method semantics, not to classify any patient. Live inputs were a public documentation coordinate and a public gene symbol. No private, authenticated, proprietary, patient, or protected-health data was used.

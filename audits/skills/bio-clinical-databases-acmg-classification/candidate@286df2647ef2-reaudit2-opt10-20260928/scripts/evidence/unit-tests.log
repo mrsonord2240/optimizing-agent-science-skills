@@ -1,0 +1,29 @@
+test_bergquist_intervals (test_acmg_classify.AlphaMissenseTests.test_bergquist_intervals) ... ok
+test_probability_domain (test_acmg_classify.AlphaMissenseTests.test_probability_domain) ... ok
+test_cspec_uses_versioned_gene_route (test_acmg_classify.InterfaceTests.test_cspec_uses_versioned_gene_route) ... ok
+test_genebe_uses_coordinate_contract (test_acmg_classify.InterfaceTests.test_genebe_uses_coordinate_contract) ... ok
+test_interface_validation_precedes_request (test_acmg_classify.InterfaceTests.test_interface_validation_precedes_request) ... ok
+test_exact_brnich_boundaries (test_acmg_classify.OddsPathTests.test_exact_brnich_boundaries) ... ok
+test_framework_prose_matches_brnich_boundaries (test_acmg_classify.OddsPathTests.test_framework_prose_matches_brnich_boundaries) ... ok
+test_nonpositive_rejected (test_acmg_classify.OddsPathTests.test_nonpositive_rejected) ... ok
+test_initiation_and_deletion_paths_remain_bounded (test_acmg_classify.PVS1Tests.test_initiation_and_deletion_paths_remain_bounded) ... ok
+test_nmd_and_ten_percent_boundary (test_acmg_classify.PVS1Tests.test_nmd_and_ten_percent_boundary) ... ok
+test_prerequisites_gate_pvs1 (test_acmg_classify.PVS1Tests.test_prerequisites_gate_pvs1) ... ok
+test_splice_rejects_contradictory_nmd_representations (test_acmg_classify.PVS1Tests.test_splice_rejects_contradictory_nmd_representations) ... ok
+test_splice_requires_consequence_and_rescue_review (test_acmg_classify.PVS1Tests.test_splice_requires_consequence_and_rescue_review) ... ok
+test_bayesdel_exact_endpoints_are_inclusive_on_the_benign_side (test_acmg_classify.PejaverPredictorTests.test_bayesdel_exact_endpoints_are_inclusive_on_the_benign_side) ... ok
+test_generic_calibrator_retains_half_open_three_field_intervals (test_acmg_classify.PejaverPredictorTests.test_generic_calibrator_retains_half_open_three_field_intervals) ... ok
+test_revel_exact_endpoints_are_inclusive_on_the_benign_side (test_acmg_classify.PejaverPredictorTests.test_revel_exact_endpoints_are_inclusive_on_the_benign_side) ... ok
+test_all_tiers_and_tier_iii_iv_distinction (test_acmg_classify.SomaticTests.test_all_tiers_and_tier_iii_iv_distinction) ... ok
+test_invalid_or_unproven_somatic_input_stops (test_acmg_classify.SomaticTests.test_invalid_or_unproven_somatic_input_stops) ... ok
+test_current_rule_criteria_reject_retired_and_same_family_codes (test_acmg_classify.ValidationTests.test_current_rule_criteria_reject_retired_and_same_family_codes) ... ok
+test_numeric_domains (test_acmg_classify.ValidationTests.test_numeric_domains) ... ok
+test_opposing_computational_evidence_requires_conflict_review (test_acmg_classify.ValidationTests.test_opposing_computational_evidence_requires_conflict_review) ... ok
+test_standalone_demo_is_coherent_and_guarded (test_acmg_classify.ValidationTests.test_standalone_demo_is_coherent_and_guarded) ... ok
+test_subsumption_and_notice (test_acmg_classify.ValidationTests.test_subsumption_and_notice) ... ok
+test_unknown_duplicate_and_wrong_type_rejected (test_acmg_classify.ValidationTests.test_unknown_duplicate_and_wrong_type_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 2.154s
+
+OK

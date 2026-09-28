@@ -1,0 +1,12 @@
+{
+  "all_checks_pass": true,
+  "candidate_identity": "286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571",
+  "invalid_probes": 25,
+  "predictor_endpoint_cases": 26,
+  "pvs1_states": 9,
+  "pvs1_contradictions": 3,
+  "oddspath_cases": 14,
+  "somatic_tiers": 6,
+  "genebe_records": 1,
+  "cspec_versions": 6
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "index": 1,
+    "type": "Canonical",
+    "label": "Shipped regression and guarded demonstration",
+    "prompt": "Execute all 24 shipped regressions, compile every Python surface, and inspect the standalone training example for coherent evidence, unresolved context, and the non-diagnostic qualified-review boundary."
+  },
+  {
+    "index": 2,
+    "type": "Variant A",
+    "label": "PVS1 gates, review stops, and contradictory state",
+    "prompt": "Exercise LoF mechanism, transcript relevance, canonical-splice consequence, rescue review, NMD contradictions, initiation, deletion, and no-impact branches."
+  },
+  {
+    "index": 3,
+    "type": "Edge",
+    "label": "Brnich OddsPath boundaries and prose consistency",
+    "prompt": "Evaluate exact and adjacent pathogenic and benign OddsPath transitions, invalid numeric domains, and agreement between the implementation, table, and explanatory prose."
+  },
+  {
+    "index": 4,
+    "type": "Variant B",
+    "label": "Current evidence-family and predictor integrity",
+    "prompt": "Probe retired PP5/BP6, duplicates, evidence-family aliases, opposed PP3/BP4, and exact REVEL, BayesDel, and AlphaMissense interval endpoints."
+  },
+  {
+    "index": 5,
+    "type": "Stress",
+    "label": "Somatic tiers, semantic dates, and guarded result contracts",
+    "prompt": "Reach all six AMP tiers, distinguish Tier III from Tier IV, validate real and impossible ISO dates, and inspect every returned clinical-use guard."
+  },
+  {
+    "index": 6,
+    "type": "Scope Boundary",
+    "label": "Current public GeneBe and ClinGen CSpec interfaces",
+    "prompt": "Execute bounded public GeneBe coordinate and CSpec versioned-gene requests with documentation-only inputs, plus invalid local preflight controls and the no-PHI boundary."
+  },
+  {
+    "index": 7,
+    "type": "Adversarial",
+    "label": "Malformed, conflicting, and out-of-scope inputs",
+    "prompt": "Submit wrong types, non-finite values, unknown evidence, conflicting population and somatic state, missing provenance, and path-like interface inputs; verify deterministic stop behavior."
+  }
+]

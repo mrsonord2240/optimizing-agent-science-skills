@@ -33,7 +33,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-cfdna-preprocessing` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-cfdna-preprocessing/candidate@148b254a3107-reaudit-opt10-20260928/viewer.md) |
 | `bio-chipseq-allele-specific-binding` | Data Analysis | 92 | Production Ready | 0 / 1 / 1 | [viewer](skills/bio-chipseq-allele-specific-binding/candidate@944f85222453-reaudit-opt10-20260928/viewer.md) |
 | `bio-clinical-biostatistics-adaptive-designs` | Protocol Design | 59 | Reject | 3 / 3 / 2 | [viewer](skills/bio-clinical-biostatistics-adaptive-designs/candidate@73116b869784-initial-opt10-20260928/viewer.md) |
-| `bio-clinical-databases-acmg-classification` | Data Analysis | 76 | Reject | 1 / 1 / 1 | [viewer](skills/bio-clinical-databases-acmg-classification/candidate@926ce0436d0d-reaudit-opt10-20260928/viewer.md) |
+| `bio-clinical-databases-acmg-classification` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-databases-acmg-classification/candidate@286df2647ef2-reaudit2-opt10-20260928/viewer.md) |
 | `bio-codon-usage` | Data Analysis | 58 | Reject | 2 / 2 / 0 | [viewer](skills/bio-codon-usage/candidate@13d831f93500-initial-opt10-20260928/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |

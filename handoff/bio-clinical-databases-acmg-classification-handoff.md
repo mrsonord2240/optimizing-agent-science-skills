@@ -1,63 +1,56 @@
-# Handoff: bio-clinical-databases-acmg-classification / fix-scientific-skill
+# Handoff: bio-clinical-databases-acmg-classification / independent final re-audit
 
-- Updated: 2026-09-28T14:16:24-07:00
+- Updated: 2026-09-28
 - Lane: 3
-- Status: phase-failed
-- Owner leaving: /root/lane3_acmg_reaudit
-- Next role: fix-scientific-skill
+- Status: phase-complete / candidate-ready
+- Owner leaving: `/root/lane3_acmg_reaudit2`
+- Next role: orchestrator records publication, then exact-byte batch assembly
 
 ## Source identity
 
-- Origin: `GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clinical-databases/acmg-classification`; source subtree `b4c1f4dd04a6a53f3eba2aa56da5d830ba325e1a`.
-- Working tree: `F:\OpenScience\wt\opt10-acmg-classification\skills\bio-clinical-databases-acmg-classification`.
-- Branch/worktree: `optimize/ten-20260928-lane3-acmg-classification`; product HEAD `0bc0b31fc52742dbec1034f698103434cc9460c3`.
-- Candidate tree hash: `sha256-manifest-v1:926ce0436d0d9fd1fb73a5f2b83728adfb622cf6f8ec41c8c00ad8d8300e8c07` (seven files; 643-byte ordinal path/size/SHA-256 manifest).
-- Applicable audit: `F:\OpenScience\audits\bio-clinical-databases-acmg-classification\reaudit-opt10-20260928\report.json`, exact identity above, SHA-256 `6b514ffc803687eafabb483baa15710fb7ce5d30e6b5b04d9a47b77d8f140ddf`.
+- Origin: `GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clinical-databases/acmg-classification`; immutable source subtree `b4c1f4dd04a6a53f3eba2aa56da5d830ba325e1a`; read-only origin checkout is clean.
+- Candidate: `F:\OpenScience\wt\opt10-acmg-classification\skills\bio-clinical-databases-acmg-classification` on `optimize/ten-20260928-lane3-acmg-classification`; product HEAD remains `0bc0b31fc52742dbec1034f698103434cc9460c3`.
+- Exact audited identity: `sha256-manifest-v1:286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571`; seven files; 644-byte ordinal relative-POSIX-path/byte-count/SHA-256 manifest with TAB fields, LF records, and no trailing LF.
+- Strict identity record: `F:\OpenScience\audits\bio-clinical-databases-acmg-classification\reaudit2-opt10-20260928\source-identity.json`, SHA-256 `ab5a82c4ff81fa1cfc13d933e112e937da72d368db2646b72b5ac3f08a0c369c`.
 
 ## Completed this phase
 
-- Independently read the complete re-audit and auditor contracts, reinspected all seven candidate files, verified origin/candidate/tool records, and reproduced the exact identity before and after execution.
-- Executed all three Python files, 16/16 shipped regressions, standalone demo, bounded live smoke, and independent cases across all 15 callables in the pinned isolated runtime; GeneBe returned one public record and CSpec returned six GATM version records.
-- Accepted ACMG-003, ACMG-004, ACMG-005, ACMG-007, ACMG-008, and ACMG-009; AlphaMissense passed 17/17, OddsPath passed 14/14, practice boundaries passed, and Tier III/IV remain distinct.
-- Reopened ACMG-001, ACMG-002, and ACMG-006 with durable reproductions. PP5 and same-family duplicate evidence demonstrably changed classifications, firing the Methodological Ground veto.
-- Produced a strict schema-valid record: static 76, execution 75.9, final diagnostic score 76/100 Reject, Layer 1 average 31.4/40, Layer 2 average 44.4/60, assertions 26/35 (74.3%), research veto FAIL.
+- Read and followed the complete audit-scientific-skill contract and the freshly extracted `skill-auditor.zip` rubric, veto, classification, and report-schema references. Candidate bytes were not changed.
+- Independently recomputed the exact candidate identity and statically reviewed the complete seven-file tree, trigger/authority/practice boundaries, provenance/license, instructions, reference, implementation, and tests.
+- Executed all accessible surfaces in isolated WSL `science`: 24/24 shipped tests; compilation; guarded standalone demo; 25 invalid probes; 26 predictor endpoints; nine PVS1 states; three contradictory NMD rejections; 14 OddsPath cases; two valid and four invalid ISO-date cases; six somatic tiers; GeneBe one-record response; CSpec six-version response.
+- Closed ACMG-001, ACMG-002, and ACMG-006; independently preserved closure of ACMG-003/004/005/007/008/009. No new finding was opened.
+- Final verdict: **Production Ready**, score **96/100**, static **95**, dynamic **97.3**, assertions **28/28**, Skill Veto **PASS**, Research Veto **PASS**, no open P0/P1/P2.
+- Strict report, viewer, inputs, source identity, surface classifications, finding ledger, source notes, repeatable harness, candidate manifest, and artifact hashes were written and validated.
 
 ## Required next actions
 
-1. Fix ACMG-006: remove current-rule PP5/BP6 acceptance; define evidence families and reject multiple strengths/aliases/opposed codes; repair inclusive REVEL/BayesDel benign endpoints; parse real ISO calendar dates.
-2. Fix ACMG-002: reject contradictory `is_nmd_predicted` and `splice_consequence` representations before PVS1 assignment; add contradiction and deletion/initiation review-state regressions.
-3. Fix ACMG-001: replace the residual `>4.3 for Strong` prose with `>4.3 Moderate; >18.7 Strong` and add a documentation consistency assertion.
-4. Classify tooling impact after the fix. Any code/test change requires a fresh tooling-delta pass before another independent re-audit.
+1. Publish this exact raw run through the modular records publisher using explicit artifacts only; regenerate and validate the records indexes. Do not alter strict `report.json` or candidate bytes.
+2. Bind publication to exact identity `286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571` and record the publication identifier in this handoff if the relay requires it.
+3. Park this exact worktree as candidate-ready until the orchestrator assembles all ten audited candidates in the single authorized shelf batch commit. Do not push, open a PR, release, or submit remotely.
 
 ## Open findings and blockers
 
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| ACMG-006 | P0 | open | `reaudit-opt10-20260928\evidence\execution.json` (`workflows.tavtigian`, `other_predictor_boundaries`, `somatic.invalid_date`) | Enforce current evidence-family, endpoint, conflict, and semantic-date validation. |
-| ACMG-002 | P1 | open | same file, `workflows.pvs1.conflict` | Reject contradictory NMD inputs before strength assignment. |
-| ACMG-001 | P2 | open | same file, `static_checks` | Remove the residual Brnich prose contradiction. |
-
-- No candidate execution surface is blocked. InterVar/ANNOVAR remains restricted/documented-only; AutoPVS1 is unpinned/documented-only; VarSome, Franklin, and parts of manual curation remain restricted as already inventoried.
-- This is a scientific rejection, not a tooling blocker; no Sam action is required.
+- Open findings: none. ACMG-001 through ACMG-009 are closed for the exact audited identity.
+- No executable blocker. InterVar/ANNOVAR remains restricted/documented-only; AutoPVS1 remains unpinned/documented-only; VarSome, Franklin/Genoox, and ClinGen VCI remain restricted/manual; other named evidence sources have no shipped wrapper. The candidate states these boundaries accurately.
+- No user action or credential is required for local records publication or later exact-byte shelf assembly.
 
 ## Environment and evidence
 
-- Tool inventory: `F:\OpenScience\audit-envs\bio-clinical-databases-acmg-classification\TOOLS.md`, SHA-256 `96651ce26387bcd9e04369b381b6dc5cafac6fa64f0ba5d8d1c43ac25ec85161`; fingerprint `be04749b5d2581594940a228004479fe7c8511f371fc30b5c7dad5cf38a07cd7`.
-- Runtime: WSL `science` / `sci`; Python 3.12.14; requests 2.32.5; private mount namespace with `/mnt/openscience` only and `WSL_INTEROP` unset.
-- Run evidence: `F:\OpenScience\audits\bio-clinical-databases-acmg-classification\reaudit-opt10-20260928`; `viewer.md` SHA-256 `4ff00b618478541bb48a5cd3c6efe069a8eb15f3e9ae525509da5224155cba28`; execution SHA-256 `63049c50400193c8b5a920bfa93d1db37d9a0eb57954b73c9caffab55389c9fd`.
-- Evidence map: sibling `finding-ledger.md`, `scientific-source-notes.md`, `execution-classifications.json`, `source-identity.json`, `artifact-hashes.json`, saved scripts/inputs, and command logs. `scripts/validate_report.py` passes.
-- Restricted-access items: InterVar/ANNOVAR, AutoPVS1, VarSome, Franklin/Genoox, and manual ClinGen VCI actions as classified above.
-- Tooling impact: none (re-audit changed no candidate byte; a subsequent fix will likely be `changed`).
+- Tool root: `F:\OpenScience\audit-envs\bio-clinical-databases-acmg-classification`; `TOOLS.md` SHA-256 `86a8fec1672e6a80907925ccd216f9f3d9e5e99ea7b40b70fdffbebd7185b893`.
+- Runtime: WSL `science` / `sci`; Python 3.12.14; requests 2.32.5; exact 40-artifact lock SHA-256 `800ca0e5bf3c0dc2849f0e4797f1b2928ce9cf72ed1c4b5e2e605b5784b8b4e5`; fingerprint SHA-256 `f97acb4215b1958eb67f8ffb51b958780b09305575964e598c898633ed6f5881`.
+- Isolation: private mount namespace, `/mnt/f` unmounted, `/mnt/openscience` only, `WSL_INTEROP` unset. Only a public GeneBe documentation coordinate and public GATM symbol were used; no patient/private data, PHI, proprietary database, or credential was used.
+- Raw audit root: `F:\OpenScience\audits\bio-clinical-databases-acmg-classification\reaudit2-opt10-20260928`.
+- Report: `report.json`, SHA-256 `a71432c78089958e8eb36ad9ef789d0e51e0d1de1d03b95e4d48e9f96ffb42c6`; viewer SHA-256 `58dd4726779f14a792f783c5cb3cb2de7810bb0af29457d831fa96ac7aa62c91`.
+- Artifact manifest: `artifact-hashes.json`, SHA-256 `3dad02e9705556394d14695c85b3ef8ef9db966db9197997c396de4165bd9dd2`; 18 named artifacts; strict validator result: score 96, Production Ready, 28/28 assertions, all hashes valid.
 
 ## Worktree safety
 
-- Run-owned changes: raw re-audit root above and this canonical handoff only.
-- Pre-existing/user-owned changes: none inside the lane candidate; the candidate subtree remains the lane's only untracked product path.
-- A first-run `py_compile` cache was immediately moved to `evidence\quarantined-pycache`; the candidate was restored and independently revalidated at the exact incoming identity with no remaining cache files.
-- Records state: the exact re-audit was published locally as `candidate@926ce0436d0d-reaudit-opt10-20260928` with 13 explicit scripts/inputs; generated views were refreshed. The matching record/view/handoff changes await the run-owned control commit.
-- Product commits/pushes: none; no PR, release, Marketplace, credential, PHI, patient/private data, or remote mutation.
+- Candidate worktree remains only `?? skills/bio-clinical-databases-acmg-classification/`; no tracked or unrelated product path changed. Candidate subtree has zero `__pycache__`, `.pyc`, or `.pyo` artifacts.
+- Origin checkout remains clean at the pinned commit. The only phase-owned control-repository mutation is this canonical handoff; concurrent worker and user changes were not staged or altered.
+- The exact final audit was published locally as `candidate@286df2647ef2-reaudit2-opt10-20260928` with 15 explicit scripts/inputs; generated views were refreshed. The matching record/view/handoff changes await the run-owned control commit. No repair, product commit, push, PR, release, Marketplace action, credential action, or remote mutation occurred.
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes for `fix-scientific-skill`; no for candidate-ready.
-- If no: candidate readiness requires ACMG-001, ACMG-002, and ACMG-006 fixed, tooling impact disposition completed, and a fresh independent re-audit meeting every readiness floor with no veto.
+- Candidate-ready: **yes**, for exact identity `286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571` only.
+- Publication route: orchestrator may publish the exact raw run, regenerate/check indexes, then leave these bytes parked for the single ten-skill shelf batch commit.
+- Any candidate-byte change invalidates this audit and must restart from deterministic identity plus fresh tooling delta and independent re-audit.
