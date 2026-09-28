@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (62)
+## P1 (61)
 
 ### `bio-data-visualization-network-visualization` — examples/cytoscape_automation.py fails silently
 
@@ -290,14 +290,6 @@ None open.
 - Root cause: The helper uppercases and length-budgets the final oligo but never validates spacer alphabet or required 20-nt length.
 - Fix: Before constructing the oligo, require a 20-character A/C/G/T spacer and raise a concise ValueError otherwise; add a CLI test for hyphenated and wrong-length input.
 
-### `bio-data-visualization-oncoprint-mutation-matrices` — Make comut figures self-describing and dense-safe
-
-- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@5204d1a](https://github.com/mrsonord2240/optimized-scientific-skills/tree/5204d1a4bc6069eac905b4422d6591ccc400ff3f/skills/bio-data-visualization-oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-optimized-scientific-skills@5204d1a/viewer.md)
-- Observed in inputs: 4, 9
-- Problem: The shipped comut CLI saves plots without alteration or clinical legends, and a 200-sample cohort retains fully overlapping sample labels. Color meaning is therefore unavailable in the artifact and dense labels are unreadable.
-- Root cause: comut_plot.py calls plot_comut() and savefig() without adding a unified legend or applying a cohort-size label policy.
-- Fix: Call the comut legend API after plotting and add a documented option or automatic threshold that hides x tick labels for dense cohorts while retaining them for small cohorts. Add image-level regression assertions for legend text and label visibility.
-
 ### `bio-single-cell-cell-annotation` — Establish a clean-exit Linux smoke for R routes
 
 - Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-single-cell-cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
@@ -506,7 +498,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (149)
+## P2 (144)
 
 ### `bio-data-visualization-network-visualization` — Hub-label rule and edge-width advice are not adaptive
 
@@ -1020,14 +1012,6 @@ None open.
 - Root cause: The Skill names the external route and deliverables but lacks preflight/format checks for them.
 - Fix: Add a short preflight that names the required genome index and gives a clear blocked message, plus a minimal required-column schema for library table and oligo order.
 
-### `bio-data-visualization-oncoprint-mutation-matrices` — Reject empty cohort IDs and invalid TMB values
-
-- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@5204d1a](https://github.com/mrsonord2240/optimized-scientific-skills/tree/5204d1a4bc6069eac905b4422d6591ccc400ff3f/skills/bio-data-visualization-oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-optimized-scientific-skills@5204d1a/viewer.md)
-- Observed in inputs: 9
-- Problem: build_comut accepts an empty cohort sample ID and accepts negative TMB, despite describing cohort IDs as non-empty and treating TMB as a zero-based continuous burden.
-- Root cause: The cohort check tests only list emptiness/uniqueness, and pd.to_numeric is not followed by finite/non-negative range validation.
-- Fix: Normalize IDs to strings before validation, reject empty/NA IDs, and require all TMB values to be finite and >= 0. Add regression tests for empty, NA, infinite, and negative values.
-
 ### `bio-sam-bam-basics` — Validate BED rows before indexing fields
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@cb48eb1](https://github.com/mrsonord2240/bioSkills/tree/cb48eb16bf63f75098c865da4e8f7bf3191af733/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@cb48eb1/viewer.md)
@@ -1308,22 +1292,6 @@ None open.
 - Root cause: The Skill assumes the documented error route is a reliable process-status contract without testing this image version.
 - Fix: Require checking the error text and absence of CRISPResso_quantification_of_editing_frequency.txt; do not promise a nonzero exit code.
 
-### `bio-data-visualization-statistical-annotation` — Add configurable spacing for dense bracket families
-
-- Skill: 93, Production Ready · [mrsonord2240/optimized-scientific-skills@d156f04](https://github.com/mrsonord2240/optimized-scientific-skills/tree/d156f04779dcde24d9e20270907be0557c28f654/skills/bio-data-visualization-statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-optimized-scientific-skills@d156f04/viewer.md)
-- Observed in inputs: 4
-- Problem: Six-comparison figures are correct but several ns/star labels sit close together at the top of the bracket pyramid, reducing scanability.
-- Root cause: annotate_pairwise.R uses one fixed step.increase value for every family size and data range.
-- Fix: Expose bracket spacing or derive it from family size, expand the y scale accordingly, and offer an alternate compact-letter or faceted presentation when all pairwise brackets become visually dense.
-
-### `bio-data-visualization-statistical-annotation` — Persist effect size in default pairwise result tables
-
-- Skill: 93, Production Ready · [mrsonord2240/optimized-scientific-skills@d156f04](https://github.com/mrsonord2240/optimized-scientific-skills/tree/d156f04779dcde24d9e20270907be0557c28f654/skills/bio-data-visualization-statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-optimized-scientific-skills@d156f04/viewer.md)
-- Observed in inputs: 1, 3, 4
-- Problem: The documentation asks users to preserve test, effect size, raw p, adjusted p, adjustment method, and family, but the generic pairwise scripts save p fields without an effect-size column.
-- Root cause: Effect size is demonstrated in the shipped example rather than implemented in the reusable pairwise result contract.
-- Fix: Add an explicit effect-size mode and write effect_type plus effect_size columns to both R and Python result tables, or narrow the documentation promise to workflows that actually compute the magnitude.
-
 ### `bio-experimental-design-randomization-blocking` — Revalidate optional Latin-square and auxiliary simulation routes
 
 - Skill: 93, Production Ready · [mrsonord2240/bioSkills@c19ca21](https://github.com/mrsonord2240/bioSkills/tree/c19ca21cc60b9007bd955ebe4b31ead3ccf687e4/experimental-design/randomization-blocking) · [viewer](skills/bio-experimental-design-randomization-blocking/mrsonord2240-bioSkills@c19ca21/viewer.md)
@@ -1403,22 +1371,6 @@ None open.
 - Problem: The shipped CAUSE demo intentionally uses 50,000 variants and emits a package warning that fewer than 100,000 nuisance variants may be unstable.
 - Root cause: The lightweight synthetic demonstration is smaller than CAUSE's nuisance-estimation recommendation.
 - Fix: Add one sentence beside the demo that its 50,000-variant size is pedagogic and real analyses should follow the package's larger-nuisance-variant guidance.
-
-### `bio-data-visualization-color-palettes` — Add a compact palette-audit response contract
-
-- Skill: 94, Production Ready · [mrsonord2240/optimized-scientific-skills@cd2cfef](https://github.com/mrsonord2240/optimized-scientific-skills/tree/cd2cfef126db14008baf614af792317daf6ff1e1/skills/bio-data-visualization-color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-optimized-scientific-skills@cd2cfef/viewer.md)
-- Observed in inputs: —
-- Problem: The Skill specifies the computations but not a single standard response shape for reporting the chosen type, limits, midpoint, grayscale result, CVD minima, redundant encoding, and visual-inspection outcome.
-- Root cause: Feedback expectations are distributed across several sections rather than summarized as an output checklist.
-- Fix: Add a short final-response checklist with palette name/type, normalization and bounds, CVD minima, luminance verdict, redundant encoding, and visual inspection status.
-
-### `bio-data-visualization-color-palettes` — Show arbitrary reference points and missing values
-
-- Skill: 94, Production Ready · [mrsonord2240/optimized-scientific-skills@cd2cfef](https://github.com/mrsonord2240/optimized-scientific-skills/tree/cd2cfef126db14008baf614af792317daf6ff1e1/skills/bio-data-visualization-color-palettes) · [viewer](skills/bio-data-visualization-color-palettes/mrsonord2240-optimized-scientific-skills@cd2cfef/viewer.md)
-- Observed in inputs: 7
-- Problem: The nonzero-reference case succeeded, but the Skill only demonstrates midpoint zero and does not explicitly show how to mask missing values with a non-quantitative bad color.
-- Root cause: Examples center on signed LFC/z-score data and assume finite numeric matrices.
-- Fix: Add one compact Python or R note: set the diverging midpoint to the scientific reference value, mask non-finite cells, and assign missing values a separate neutral color such as #BBBBBB.
 
 ### `bio-differential-expression-deseq2-basics` — Add machine-checkable example expectations
 

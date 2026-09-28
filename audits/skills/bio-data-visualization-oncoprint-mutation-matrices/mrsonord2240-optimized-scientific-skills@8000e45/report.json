@@ -1,0 +1,571 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-oncoprint-mutation-matrices",
+    "description": "Build cohort-aware OncoPrint and co-mutation plots from somatic-variant cohorts with ComplexHeatmap, maftools, and comut.py, preserving alteration classes, burden ordering, interaction results, and clinical annotations.",
+    "evaluated_on": "2026-09-27",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/optimized-scientific-skills@8000e4567f1b47a812706874f7091fdc21816df2:skills/bio-data-visualization-oncoprint-mutation-matrices",
+    "auditor_independent": true,
+    "audit_type": "independent re-audit",
+    "executed": true,
+    "execution_note": "Executed 11/11 inputs: all nine archived round-one scenarios plus two genuinely new round-two scenarios. R 4.4.3 with ComplexHeatmap 2.22.0, maftools 2.22.0, circlize 0.4.18; Python 3.12 with pandas 2.3.3, comut 0.0.3, matplotlib 3.11.2. Sixteen scored PNGs were opened via a contact sheet, the four round-two-critical artifacts were also opened at native resolution, and automated parse/dimension/nonwhite checks passed. Provider worktree remained at the dispatched commit and source hashes matched the audit copy."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated references, sample counts, p-values, or efficacy claims. All reported counts and the checked Fisher p-value derive from executed data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Outputs remain cohort-level research visualizations and statistical associations; no individual diagnosis, prescription, or treatment advice."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The skill distinguishes MAF-only and explicit-cohort denominators, orders by mutated samples when claimed, preserves multi-class events, and warns against sparse pairwise inference."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped R/Python scripts parsed; the full R example, all three shipped regression tests, all archived cases, and both new boundary/adversarial cases executed. Valid inputs rendered and invalid identifiers/burdens failed before output."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 100,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All promised workflows are present and core scientific claims matched execution, including full-cohort denominators, row order, interaction return schema, CNV/fusion merging, and tool-specific caveats."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Major ID, class, duplicate, all-empty, label-threshold, and burden-value failures are explicit; valid reruns and invalid-input rejection are deterministic."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "SKILL.md is concise, routes complex logic to two scripts and one example, and avoids duplicated workflow prose in the usage guide."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Selection guidance, contracts, output expectations, legend policy, label threshold, caveats, and error-prevention notes are precise and executable."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger language is strong; defaults produce self-describing dense-safe artifacts, and the documented override preserves intentional control."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, network calls, code injection, or destructive actions; identifiers, categorical values, and numeric burden data are validated before rendering."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Matrix construction, rendering, CLI logic, and regression tests are cleanly separated; all shipped paths parsed and all three shipped tests ran."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, composability, idempotency, strict stop conditions, and explicit CLI overrides are all well calibrated."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 53,
+      "total": 53
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Cohort-complete TCGA-LAML ComplexHeatmap OncoPrint",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The helper retained all 200 clinical cohort members (including seven absent from the MAF), aligned a reversed clinical table exactly, and rendered the correct frequency order.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The matrix retains every explicit cohort sample, including samples absent from the MAF",
+            "result": "PASS",
+            "note": "200 matrix columns equal 200 clinical rows; maftools sees only 193 MAF-represented samples."
+          },
+          {
+            "text": "Rows are ordered by descending number of mutated samples",
+            "result": "PASS",
+            "note": "rowSums(mat != '') is monotone; FLT3 leads with 52 samples."
+          },
+          {
+            "text": "Clinical values align by exact sample ID rather than row position",
+            "result": "PASS",
+            "note": "A fully reversed clinical table realigned identically to matrix column names."
+          },
+          {
+            "text": "MAF consequences are mapped and excluded classifications are disclosed",
+            "result": "PASS",
+            "note": "Missense/Truncating/Splice rendered; 5'Flank, IGR, Intron, RNA, and Silent recorded as ignored."
+          },
+          {
+            "text": "The rendered figure is nonblank and visually interpretable",
+            "result": "PASS",
+            "note": "1800x1000 PNG, 35,094 bytes, 45.2% nonwhite; visual inspection confirmed labels, legends, bars, and tracks."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_regressions.R; run/out/r_regressions.log; run/out/i1_laml_complexheatmap.png"
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "maftools rapid MAF view with complete clinical colors",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The documented quick path ran with a complete discrete palette and sequential numeric palette; it correctly retained 193 of 200 cohort samples and did not claim full-cohort coverage.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The oncoplot executes with valid discrete and numeric annotation palettes",
+            "result": "PASS",
+            "note": "Complete FAB mapping plus Blues sequential palette ran without the prior numeric-color error."
+          },
+          {
+            "text": "The MAF-only denominator is reported rather than confused with the cohort denominator",
+            "result": "PASS",
+            "note": "getClinicalData returned 193 rows versus 200 in clinical input."
+          },
+          {
+            "text": "Top-gene and alteration-class panels render",
+            "result": "PASS",
+            "note": "The plot shows the 20-gene landscape, TMB bars, class legend, frequency bars, and two annotation tracks."
+          },
+          {
+            "text": "The figure is nonblank and visually interpretable",
+            "result": "PASS",
+            "note": "1800x900 PNG, 42,233 bytes, 43.5% nonwhite; opened and inspected."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_regressions.R; run/out/i2_laml_maftools.png"
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Thirty-sample planted edge cohort",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The helper collapsed duplicate classes, retained 14 zero-mutation samples, used N=30 percentages, rejected all-empty input with context, and the shipped maftools test confirmed its 16/30 limitation.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Duplicate same-class calls collapse and multi-class cells remain representable",
+            "result": "PASS",
+            "note": "TP53/S02 collapsed to Missense; shipped helper test passed the complete class contract."
+          },
+          {
+            "text": "Zero-mutation samples remain in the cohort-complete matrix",
+            "result": "PASS",
+            "note": "30 columns retained, including 14 zero-mutation columns."
+          },
+          {
+            "text": "Percentages use the explicit cohort denominator",
+            "result": "PASS",
+            "note": "TP53 displays 27%, matching 8/30."
+          },
+          {
+            "text": "An all-empty mapped selection fails with an actionable error",
+            "result": "PASS",
+            "note": "The helper returned its documented all-empty/No mapped error instead of ComplexHeatmap's former subscript error."
+          },
+          {
+            "text": "The maftools caveat is demonstrated rather than hidden",
+            "result": "PASS",
+            "note": "Shipped test printed that maftools retained 16 of 30 samples."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_regressions.R; run/out/r_test_helper.log; run/out/r_test_maftools.log; run/out/i3_edge_cohort.png; run/out/i3_maftools.png"
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Burden-sorted cohort-complete TCGA-LAML comut plot",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The shipped script and CLI retained all 200 samples in deterministic TMB order, rendered complete alteration and FAB legends, and automatically hid the unreadable dense sample labels.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The shipped Python CLI runs in its documented pandas 2 environment",
+            "result": "PASS",
+            "note": "Both direct API and CLI execution completed under pandas 2.3.3/comut 0.0.3."
+          },
+          {
+            "text": "All cohort samples are retained and ordered by descending TMB",
+            "result": "PASS",
+            "note": "200 samples exactly matched independently computed (-TMB, sample ID) order."
+          },
+          {
+            "text": "The top gene is drawn at the top and the TMB scale uses the observed maximum",
+            "result": "PASS",
+            "note": "FLT3 is the top y tick; returned TMB maximum is the observed 42."
+          },
+          {
+            "text": "The saved plot includes legends for alteration and clinical colors",
+            "result": "PASS",
+            "note": "Rendered legend text contains Mutations, Clinical, every observed alteration class, and all eight FAB values."
+          },
+          {
+            "text": "Dense sample labels are hidden or remain readable",
+            "result": "PASS",
+            "note": "Rendered-text inspection found no visible x-axis sample labels for the 200-sample cohort."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_comut.py; run/out/py_comut_regressions.log; run/out/i4_laml_comut_direct.png; run/out/i4_laml_comut_cli.png"
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Six-hundred-sample split OncoPrint and shipped full example",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The full example and split adaptation ran; exact-ID alignment repaired a full shuffle, subtype split counts were correct, and log TMB limited the maximum-to-median ratio to 2.59.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The shipped three-argument example runs end to end",
+            "result": "PASS",
+            "note": "It wrote a 124,325-byte PNG and a 9,030-byte interaction PDF."
+          },
+          {
+            "text": "Shuffled clinical rows realign exactly to matrix columns",
+            "result": "PASS",
+            "note": "All 600 aligned IDs equal colnames(mat)."
+          },
+          {
+            "text": "Subtype splits contain the correct samples",
+            "result": "PASS",
+            "note": "Basal 180, HER2 120, Luminal 300."
+          },
+          {
+            "text": "The hypermutator track is log-transformed as documented",
+            "result": "PASS",
+            "note": "max(log10(TMB+1))/median = 2.59, below 3."
+          },
+          {
+            "text": "The stress figures remain nonblank and interpretable",
+            "result": "PASS",
+            "note": "Both native images opened; tracks, gene percentages, split bands, legends, and mutation tiles are visible."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_regressions.R; run/out/r_full_example.log; run/out/i5_full_example.png; run/out/i5_stress_split.png"
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pairwise interaction table and plot",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All required return columns were present across 190 rows; an independent Fisher recomputation differed by only 5.96e-19, and the plot was visually inspected.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The returned object exposes documented pair labels, counts, p-values, adjusted p-values, odds ratios, and event direction",
+            "result": "PASS",
+            "note": "All ten required fields were present."
+          },
+          {
+            "text": "At least one returned p-value agrees with an independently computed two-sided Fisher test",
+            "result": "PASS",
+            "note": "Absolute delta 5.96e-19."
+          },
+          {
+            "text": "The result is not misdescribed as the plotted signed matrix",
+            "result": "PASS",
+            "note": "CSV contains the data.table rows; signed -log10 values remain a plot representation."
+          },
+          {
+            "text": "The output avoids causal or clinical claims",
+            "result": "PASS",
+            "note": "Viewer and Skill treat pairs as descriptive statistical associations."
+          },
+          {
+            "text": "The interaction figure is nonblank and visually interpretable",
+            "result": "PASS",
+            "note": "1400x1200 PNG opened; triangular heat map, significance marks, and signed scale are readable."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_regressions.R; run/out/i6_interactions.csv; run/out/i6_interactions.png"
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Mismatched IDs, unmapped classes, and denominator inflation request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The fixed helper rejects missing clinical matches and all-unmapped selections, records ignored classes, and retains the explicit cohort rather than silently inflating percentages.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Clinical sample-ID mismatch is rejected before plotting",
+            "result": "PASS",
+            "note": "align_oncoprint_clinical returned an explicit missing-matrix-samples error."
+          },
+          {
+            "text": "Unmapped-only selections are rejected rather than passed to the renderer",
+            "result": "PASS",
+            "note": "Silent-only input failed before ComplexHeatmap."
+          },
+          {
+            "text": "Ignored MAF classes are observable",
+            "result": "PASS",
+            "note": "The matrix attribute records the five excluded LAML classifications."
+          },
+          {
+            "text": "The workflow preserves the intended cohort denominator",
+            "result": "PASS",
+            "note": "TP53 is 27% of 30; an altered-only denominator would misleadingly report 50%."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_regressions.R; run/out/r_regressions.log"
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "New all-six-class additional-call seam",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The canonical R seam represented all six classes, built Amp;Missense in one cell, retained six zero-mutation samples, and rejected duplicate cohort IDs and unsupported classes.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All six documented alteration classes are represented",
+            "result": "PASS",
+            "note": "Amp, HomDel, Missense, Truncating, Splice, and Fusion all appear in exact planted cells."
+          },
+          {
+            "text": "A CNV plus SNV in one cell is preserved",
+            "result": "PASS",
+            "note": "TP53/C01 equals Amp;Missense."
+          },
+          {
+            "text": "Duplicate normalized calls collapse deterministically",
+            "result": "PASS",
+            "note": "Repeated MYC Amp call produces one Amp class."
+          },
+          {
+            "text": "Zero-mutation samples and shuffled clinical metadata are handled correctly",
+            "result": "PASS",
+            "note": "Six empty columns retained; clinical IDs realigned exactly."
+          },
+          {
+            "text": "Invalid cohort and alteration-class inputs are rejected",
+            "result": "PASS",
+            "note": "Duplicate cohort ID and unsupported Gain class both raised errors."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_regressions.R; run/out/i8_new_all_classes.png"
+      },
+      {
+        "index": 9,
+        "type": "Adversarial",
+        "label": "New minimal comut path and numeric validation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The minimal path, ordering, zero-mutation retention, and all validation checks passed; empty cohort IDs and negative TMB were rejected with explicit ValueError messages.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The minimal mutation-plus-cohort path renders and retains zero-mutation samples",
+            "result": "PASS",
+            "note": "All eight samples retained; Z7 and Z8 remain as empty trailing columns."
+          },
+          {
+            "text": "Burden order and top-gene placement are deterministic",
+            "result": "PASS",
+            "note": "Sample order equals independent burden sorting; the most frequent gene is the top y tick."
+          },
+          {
+            "text": "Unknown samples/classes and duplicate cohort IDs are rejected",
+            "result": "PASS",
+            "note": "All three probes raised clear ValueError messages."
+          },
+          {
+            "text": "Every cohort sample ID is validated as non-empty",
+            "result": "PASS",
+            "note": "An empty cohort ID was rejected with 'must not be empty or NA'."
+          },
+          {
+            "text": "TMB values are validated as finite and non-negative",
+            "result": "PASS",
+            "note": "A -1 TMB value was rejected with 'finite and non-negative'."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_comut.py; run/out/py_comut_regressions.log; run/out/i9_new_minimal_comut.png"
+      },
+      {
+        "index": 10,
+        "type": "Edge",
+        "label": "Exact sample-label threshold and unified-legend boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "At exactly 50 samples every ordered label rendered; at 51 the labels were absent by default; threshold 51 restored all 51; threshold zero hid all 50. Mutation and clinical legend groups and every observed value rendered with nonzero text bounds.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The default policy renders all sample labels at the documented 50-sample boundary",
+            "result": "PASS",
+            "note": "The 50 rendered labels exactly equal plot.samples in deterministic order."
+          },
+          {
+            "text": "The default policy hides sample labels immediately above the boundary",
+            "result": "PASS",
+            "note": "The 51-sample figure has zero visible x-label text artists."
+          },
+          {
+            "text": "The documented threshold override can force or suppress labels",
+            "result": "PASS",
+            "note": "Threshold 51 rendered all 51 labels; threshold 0 hid all labels in the 50-sample plot."
+          },
+          {
+            "text": "The unified legend names both track groups and all observed values",
+            "result": "PASS",
+            "note": "Rendered text includes Clinical, Mutations, Alpha/Beta/Gamma/Delta, and Missense/Truncating/Splice."
+          },
+          {
+            "text": "Every boundary figure is nonblank and visually coherent",
+            "result": "PASS",
+            "note": "Three PNGs are 1220 pixels wide, 20-43 KB, and 40.4-41.3% nonwhite; all were opened."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_comut.py; run/out/py_comut_regressions.log; run/out/i10_boundary_50_labels.png; run/out/i10_boundary_51_hidden.png; run/out/i10_boundary_51_forced.png"
+      },
+      {
+        "index": 11,
+        "type": "Adversarial",
+        "label": "Normalized-ID collisions and file-level invalid TMB",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Valid surrounding whitespace normalized to N01/N02/N03 and rendered through both API and CLI. Duplicate-after-strip, whitespace-only, NaN, both infinities, and negative TMB were all rejected; CLI transcripts retained the documented error messages.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Surrounding ID whitespace is normalized consistently across mutation, clinical, TMB, and cohort inputs",
+            "result": "PASS",
+            "note": "The direct and CLI paths produced ordered samples N01, N02, N03 and nonblank figures."
+          },
+          {
+            "text": "Cohort IDs that collide after normalization are rejected",
+            "result": "PASS",
+            "note": "Both direct and CLI probes reported that IDs must be unique after normalization."
+          },
+          {
+            "text": "A file-level whitespace-only cohort ID is rejected",
+            "result": "PASS",
+            "note": "The quoted TSV value reached validation and produced 'must not be empty or NA'."
+          },
+          {
+            "text": "Non-finite and negative TMB values are rejected",
+            "result": "PASS",
+            "note": "NaN, +Inf, -Inf, and -0.01 failed directly; CLI infinite TMB failed with the documented message."
+          },
+          {
+            "text": "Validation failures do not create output figures",
+            "result": "PASS",
+            "note": "All three invalid CLI calls returned nonzero and the should-not-exist targets were absent."
+          }
+        ],
+        "executed": true,
+        "execution_note": "run/audit_comut.py; run/out/py_comut_regressions.log; run/out/i11_validation_cli.log; run/out/i11_normalized_ids.png; run/out/i11_normalized_ids_cli.png"
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 40.0,
+    "dynamic_weighted": 56.6,
+    "score": 97,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The canonical R helper makes cohort membership and clinical alignment explicit, preventing the original silent denominator and annotation failures.",
+    "All shipped workflows execute on real and planted cohorts, with deterministic row/sample order and correct multi-class handling.",
+    "Documentation accurately separates ComplexHeatmap's full matrix denominator from maftools' MAF-only sample set.",
+    "The example and regression tests provide strong, reproducible evidence for the main scientific contracts."
+  ],
+  "recommendations": []
+}

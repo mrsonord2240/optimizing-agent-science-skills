@@ -1,0 +1,579 @@
+{
+  "source": "mrsonord2240/optimized-scientific-skills@a74fdbc6b6001691903e5051ce36f3fba93bb966:skills/bio-data-visualization-statistical-annotation",
+  "meta": {
+    "skill_name": "bio-data-visualization-statistical-annotation",
+    "description": "Add p-value brackets, significance asterisks, and effect-size annotations to distribution plots using ggpubr, ggsignif, and statannotations with correct test selection (parametric vs non-parametric vs paired), multiple-testing adjustment, and rendering of negative results. Use when a boxplot/violin/raincloud needs in-figure statistical comparisons between groups.",
+    "evaluated_on": "2026-09-27",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "auditor_independent": true
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every reported p-value and adjustment was reproduced from the synthetic fixtures with independent base-R or SciPy/statsmodels calculations; no literature identifiers, clinical results, or unsupported statistics were invented."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Outputs remained statistical-graphics workflows over synthetic data and made no individual diagnostic, prescriptive, or treatment claims."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The outputs used design-matched tests, corrected the declared comparison family, preserved null results, validated subject identity for paired and nested data, and avoided cell-level pseudoreplication."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All eleven inputs produced the expected parseable tables, validated errors, or nonblank figures. The shared Windows R runtime returned status 139 during process teardown after printing explicit success markers, but every R assertion completed and all expected outputs parsed and passed independent verification."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "The promised adjusted pairwise, paired, nested, parametric, and non-parametric routes are correct and runnable. Default R and Python pairwise tables persist test, adjustment, family size, effect type, and signed effect magnitude."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Major integrity failures are rejected clearly and reruns are deterministic. Errors are plain messages rather than structured codes, and singular-model or degenerate-distribution recovery is not explicitly covered."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The 153-line SKILL.md keeps executable detail in focused scripts and avoids redundant procedural prose."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Test choice, correction-family semantics, known library traps, output files, stop conditions, automatic and explicit bracket spacing, and dense-family alternate displays are explicit."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger phrases and a short chooser guide make the skill easy to discover; strict scientific input contracts are clearly stated, though some low-level package errors remain possible for unsupported data types."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network calls, raw-code evaluation, destructive operations, or sensitive-data logging are present. File paths are passed to normal readers/writers without an explicit output-scope policy."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Separate pairwise, paired, and nested modules plus R and Python regression tests make behavior isolated, modifiable, and directly verifiable."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, deterministic reruns, and method escape hatches are strong. R and Python result objects are not normalized to one composable schema, and explicit human handoff guidance is minimal."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 55,
+      "total": 55
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Three skewed groups with Holm-adjusted Wilcoxon brackets",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "R exact and Python asymptotic routes each matched their independent calculations; the shipped example completed and placed the omnibus label above the bracket stack.",
+        "executed": true,
+        "execution_note": "Executed fixed R and Python pairwise scripts plus the shipped example on synthetic three_group.csv; inspected r_three_group_holm.png, py_three_group_holm.png, and example/pairwise-adjusted.png.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The R Holm-adjusted values equal stats::p.adjust applied to the same Wilcoxon family.",
+            "result": "PASS",
+            "note": "R values were 0.2276500, 0.2276500, and 0.0162722 in both calculations."
+          },
+          {
+            "text": "The Python adjusted values equal statsmodels multipletests applied to independent SciPy Mann-Whitney values.",
+            "result": "PASS",
+            "note": "All three values matched to absolute tolerance 1e-12."
+          },
+          {
+            "text": "All three pre-specified brackets connect the intended groups and show adjusted significance.",
+            "result": "PASS",
+            "note": "Visual inspection showed Control-Treatment ns, Control-Vehicle ns, and Treatment-Vehicle star with correct endpoints."
+          },
+          {
+            "text": "The omnibus label remains visually separate from the pairwise bracket stack.",
+            "result": "PASS",
+            "note": "The example figure places p = 0.019 above the highest bracket without overlap."
+          },
+          {
+            "text": "No unsupported or clinical claim is added to the statistical output.",
+            "result": "PASS",
+            "note": "Output is limited to tested synthetic data, method labels, adjusted values, and rank-biserial magnitude."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Subject-ID-safe paired pre/post Wilcoxon",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "R and Python both returned p = 0.0023193359 before and after row shuffling; incomplete pairs were rejected.",
+        "executed": true,
+        "execution_note": "Executed both paired scripts on synthetic paired.csv, a deterministic shuffled copy, and an incomplete copy; visually inspected paired plots and trajectories.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Row shuffling does not change the paired p-value.",
+            "result": "PASS",
+            "note": "Ordered and shuffled inputs both returned 0.0023193359375 in R and Python."
+          },
+          {
+            "text": "Incomplete subject pairs are rejected before testing.",
+            "result": "PASS",
+            "note": "Python raised 'time levels do not contain identical complete subject IDs'; the R workflow has the corresponding identical-ID guard."
+          },
+          {
+            "text": "The plotted trajectories use subject identity rather than row order.",
+            "result": "PASS",
+            "note": "Original and shuffled Python and R plots were pixel-identical within each language."
+          },
+          {
+            "text": "The bracket displays the independently checked paired Wilcoxon result.",
+            "result": "PASS",
+            "note": "The displayed label is 0.00232 and the results table stores the same value."
+          },
+          {
+            "text": "The output remains within research-analysis boundaries.",
+            "result": "PASS",
+            "note": "No individual inference or prescription is made."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Borderline raw p-values under Holm correction",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Only the G1-G3 comparison survived Holm; both language routes supplied adjusted values explicitly and visual labels were ns, three stars, ns.",
+        "executed": true,
+        "execution_note": "Executed R and Python pairwise scripts on synthetic border.csv; checked result tables independently and opened both figures.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All three raw p-values are below 0.05 but exactly one Holm-adjusted value remains below 0.05.",
+            "result": "PASS",
+            "note": "R raw values were 0.04216, 0.0003199, 0.04455; adjusted values were 0.08432, 0.0009598, 0.08432."
+          },
+          {
+            "text": "R labels are based on adjusted rather than raw values.",
+            "result": "PASS",
+            "note": "The figure and rstatix results show ns, ***, ns."
+          },
+          {
+            "text": "Python labels are based on explicitly supplied adjusted values.",
+            "result": "PASS",
+            "note": "The figure shows ns, ***, ns and its p_adj column matches statsmodels to 1e-12."
+          },
+          {
+            "text": "The plots retain negative comparisons rather than selectively hiding them.",
+            "result": "PASS",
+            "note": "Both null brackets remain visible."
+          },
+          {
+            "text": "No p-value or significance label is fabricated.",
+            "result": "PASS",
+            "note": "All displayed labels trace to saved raw and adjusted result tables."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Four groups with six Wilcoxon, Dunn, and Tukey comparisons",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Holm, Bonferroni, BH, Dunn-Holm, and Tukey HSD all produced six checked comparisons; family-size-derived spacing and expanded y limits kept the full bracket pyramid readable.",
+        "executed": true,
+        "execution_note": "Executed five R routes and the Python BH route on synthetic four_group.csv; compared corrections to p.adjust/multipletests and Tukey values to TukeyHSD; inspected all figures at original resolution.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The declared family contains all six pairwise comparisons.",
+            "result": "PASS",
+            "note": "Every R route and the Python BH route emitted six rows."
+          },
+          {
+            "text": "Holm, Bonferroni, and BH values equal independent family corrections.",
+            "result": "PASS",
+            "note": "R matched p.adjust to 1e-10; Python BH matched statsmodels to 1e-12."
+          },
+          {
+            "text": "The Tukey HSD route equals an independent TukeyHSD calculation.",
+            "result": "PASS",
+            "note": "All six sorted adjusted p-values matched within 1e-8."
+          },
+          {
+            "text": "The Dunn route writes finite adjusted values for all six comparisons.",
+            "result": "PASS",
+            "note": "The two expected contrasts were significant at 0.0021702 and 0.0024519; the remaining four were null."
+          },
+          {
+            "text": "The full comparison family remains visible, including negative results.",
+            "result": "PASS",
+            "note": "All six brackets are present with distinct vertical rows, expanded limits, and attributable endpoints."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Patient-nested cells without pseudoreplication",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The random-intercept LMM plus emmeans contrast returned adjusted p = 0.396429 and displayed it rather than the spurious cell-level result.",
+        "executed": true,
+        "execution_note": "Executed annotate_nested.R on synthetic nested.csv, parsed its result table, and visually inspected both direct and shipped-example figures.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The analysis models biological-subject clustering.",
+            "result": "PASS",
+            "note": "The fitted model is value ~ group + (1 | subject_id)."
+          },
+          {
+            "text": "The figure shows the model-based emmeans contrast rather than a cell-level rank test.",
+            "result": "PASS",
+            "note": "The bracket displays 0.396 and the caption names the random-intercept LMM."
+          },
+          {
+            "text": "Each subject is validated as belonging to one group before fitting.",
+            "result": "PASS",
+            "note": "The script performs a distinct subject/group membership count and stops on any count other than one."
+          },
+          {
+            "text": "The plot is nonblank and the bracket joins the intended groups.",
+            "result": "PASS",
+            "note": "Visual inspection confirmed a readable Ctl-Trt bracket and nonwhite fraction 0.118."
+          },
+          {
+            "text": "The output avoids subject-level diagnostic interpretation.",
+            "result": "PASS",
+            "note": "Only a group-level synthetic model contrast is reported."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Large sample, tiny effect, exact p-value and magnitude",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The plot shows p = 9.615e-07 with four stars while the caption reports Cohen's d = 0.097, preventing significance from being mistaken for a large effect.",
+        "executed": true,
+        "execution_note": "Generated and ran the documented Wilcoxon-plus-effect-size route on synthetic bigN.csv, saved the exact table, and inspected r_bigN_exact_effect.png.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The displayed p-value equals the saved Wilcoxon result.",
+            "result": "PASS",
+            "note": "Both are 9.615462389e-07."
+          },
+          {
+            "text": "The significance symbol uses the documented inclusive four-star threshold.",
+            "result": "PASS",
+            "note": "The plot displays **** for p below 1e-4."
+          },
+          {
+            "text": "An interpretable effect magnitude is reported alongside significance.",
+            "result": "PASS",
+            "note": "The caption and result table report Cohen's d = 0.09731."
+          },
+          {
+            "text": "The presentation does not overstate the tiny effect.",
+            "result": "PASS",
+            "note": "Exact p and magnitude are both visible; the output makes no claim that statistical significance implies a large effect."
+          },
+          {
+            "text": "The dense figure remains parseable and nonblank.",
+            "result": "PASS",
+            "note": "The 1040x880 plot has nonwhite fraction 0.169 and a readable bracket/caption despite 10,000 points."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Incorrect request about ggpubr defaults and Python t-tests",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The skill correctly rejects the premise: installed ggpubr defaults are Wilcoxon and Kruskal-Wallis, while Welch requires statannotations test name t-test_welch.",
+        "executed": true,
+        "execution_note": "Rendered installed ggpubr defaults for two and three groups, extracted plot labels, and validated the Python Welch test name in the new independent route.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The two-group ggpubr default is identified as Wilcoxon.",
+            "result": "PASS",
+            "note": "The rendered installed-version label is 'Wilcoxon, p = 0.11'."
+          },
+          {
+            "text": "The three-group ggpubr default is identified as Kruskal-Wallis.",
+            "result": "PASS",
+            "note": "The rendered installed-version label is 'Kruskal-Wallis, p = 0.019'."
+          },
+          {
+            "text": "The Python Welch test uses t-test_welch rather than t-test_ind.",
+            "result": "PASS",
+            "note": "The statannotations object returned the same p-value as scipy ttest_ind(equal_var=False)."
+          },
+          {
+            "text": "The agent does not accept the user's false methodological premise.",
+            "result": "PASS",
+            "note": "The SKILL.md explicitly corrects both default-test and Student-versus-Welch naming errors."
+          },
+          {
+            "text": "No unsupported statistical conclusion is introduced.",
+            "result": "PASS",
+            "note": "Claims are limited to observed installed-version behavior and verified test results."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "New: unequal-variance normal groups with Welch annotation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The statannotations Welch bracket returned p = 0.00836319, different from Student p = 0.0190646, and the caption reported Hedges' g = 0.665.",
+        "executed": true,
+        "execution_note": "Generated deterministic synthetic unequal-variance data, ran the documented t-test_welch route, saved a result table, and visually inspected the figure.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The displayed statannotations p-value equals an independent Welch test.",
+            "result": "PASS",
+            "note": "Both are 0.008363188800053285 to 1e-12."
+          },
+          {
+            "text": "The workflow does not silently use Student's independent t-test.",
+            "result": "PASS",
+            "note": "Student's p was 0.019064584660832905, demonstrably different from the displayed result."
+          },
+          {
+            "text": "The figure identifies the Welch route and provides an exact numeric p-value.",
+            "result": "PASS",
+            "note": "The bracket says t-test_welch and the caption gives exact p = 0.00836319."
+          },
+          {
+            "text": "The output reports effect magnitude alongside significance.",
+            "result": "PASS",
+            "note": "Hedges' g = 0.665 appears in the caption and CSV."
+          },
+          {
+            "text": "The synthetic nature and research scope are respected.",
+            "result": "PASS",
+            "note": "The fixture is deterministically generated and no diagnostic or treatment claim is made."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Adversarial",
+        "label": "New: one biological subject assigned to two nested groups",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The nested workflow rejected the malformed design before model fitting or figure creation with a precise subject-membership error.",
+        "executed": true,
+        "execution_note": "Generated a deterministic cross-group-subject fixture and executed annotate_nested.R; asserted the exact failure message and absence of a plot.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The invalid cross-group subject assignment is rejected before modeling.",
+            "result": "PASS",
+            "note": "The workflow stopped with 'each subject_id must belong to exactly one group'."
+          },
+          {
+            "text": "No misleading plot is written after the validation failure.",
+            "result": "PASS",
+            "note": "must_not_exist_nested.png was absent."
+          },
+          {
+            "text": "The error identifies the violated scientific input contract.",
+            "result": "PASS",
+            "note": "The message names subject_id and the one-group membership requirement."
+          },
+          {
+            "text": "The failure is recoverable by correcting the input and rerunning.",
+            "result": "PASS",
+            "note": "The validator writes no partial state; valid nested.csv reran successfully in the same audit."
+          },
+          {
+            "text": "No statistic is fabricated from invalid data.",
+            "result": "PASS",
+            "note": "The workflow stops before lmer, emmeans, or annotation."
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Edge",
+        "label": "New: dense six-comparison family with automatic and explicit spacing",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The four-group family derived spacing 0.18 versus 0.12 for three comparisons, honored an explicit 0.20 override, reserved plot space above the omnibus label, and documented when to replace brackets with a compact alternate display.",
+        "executed": true,
+        "execution_note": "Executed automatic and 0.20-spacing R routes on synthetic four_group.csv, parsed all six persisted rows, checked returned layout coordinates, read the alternate-display contract, and inspected both figures at original resolution.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Automatic bracket spacing increases for a six-comparison family.",
+            "result": "PASS",
+            "note": "The six-comparison route returned 0.18 versus 0.12 for the three-comparison route."
+          },
+          {
+            "text": "A positive explicit spacing override is honored exactly.",
+            "result": "PASS",
+            "note": "The 0.20 request returned bracket_spacing = 0.20 and produced a nonblank 1040x880 plot."
+          },
+          {
+            "text": "The y range reserves space above both brackets and the omnibus label.",
+            "result": "PASS",
+            "note": "overall_y exceeded every bracket y position and plot_upper exceeded overall_y."
+          },
+          {
+            "text": "An alternate dense-family display does not discard the complete numerical family.",
+            "result": "PASS",
+            "note": "The Skill requires retaining the complete table and warns that a compact-letter view omits exact per-pair p-values and effects."
+          },
+          {
+            "text": "Visual spacing is readable at the shipped figure size.",
+            "result": "PASS",
+            "note": "Original-resolution inspection showed six distinct bracket rows and no clipping in both automatic and custom layouts."
+          }
+        ]
+      },
+      {
+        "index": 11,
+        "type": "Variant B",
+        "label": "New: persisted cross-language effect-size contract",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "R and Python each persisted all six pairwise signed rank-biserial values with explicit effect_type fields; pair order and values agreed within 1e-12, while the R Tukey route correctly used Hedges' g.",
+        "executed": true,
+        "execution_note": "Ran dedicated R and Python Holm families on synthetic four_group.csv, parsed both CSVs, reconstructed Python effects independently from SciPy U, compared R and Python direction/value, and checked Dunn and Tukey effect types.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both persisted result tables contain effect_type and effect_size.",
+            "result": "PASS",
+            "note": "The R and Python CSV schemas each contained both columns for all six rows."
+          },
+          {
+            "text": "Rank-based routes declare rank_biserial_r and Tukey declares hedges_g.",
+            "result": "PASS",
+            "note": "Wilcoxon, Dunn, and Python Mann-Whitney rows used rank_biserial_r; R Tukey rows used hedges_g."
+          },
+          {
+            "text": "Persisted effects are finite and within the valid rank-biserial range.",
+            "result": "PASS",
+            "note": "All six Python and R rank-biserial values were finite and had absolute value at most one."
+          },
+          {
+            "text": "Python effect values equal an independent reconstruction from Mann-Whitney U.",
+            "result": "PASS",
+            "note": "All six values matched 2U/(n1*n2)-1 to absolute tolerance 1e-15."
+          },
+          {
+            "text": "R and Python use the same first-group-positive direction convention.",
+            "result": "PASS",
+            "note": "Pair order was identical and all six signed values agreed within 1e-12."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 57.4,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Adjusted pairwise labels are computed independently of plotting helpers and verified against canonical correction routines.",
+    "Paired and nested workflows enforce biological identity contracts before testing, preventing row-order pairing and pseudoreplication.",
+    "R and Python routes preserve their documented exact-versus-asymptotic differences without pretending cross-language identity.",
+    "The shipped example completes all four workflows and produces visually legible pairwise, ggsignif, paired, and mixed-model figures.",
+    "Dense families have reproducible automatic and explicit spacing, and R/Python pairwise tables preserve aligned effect types and signed magnitudes."
+  ],
+  "recommendations": []
+}
