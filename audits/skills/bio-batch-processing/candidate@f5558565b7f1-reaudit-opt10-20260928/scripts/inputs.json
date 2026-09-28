@@ -1,0 +1,39 @@
+{
+  "skill": "bio-batch-processing",
+  "candidate_content_sha256": "f5558565b7f1068f76afdfaecee4a560c24917c037658c45b54f554d7ab23afd",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "complexity": "Moderate",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "Count, merge, split, index, convert, and standalone demo",
+      "prompt": "Process two bounded FASTA files in stable order: stream counts, merge all records, split two fresh record sets into bounded chunks, build and reopen a persistent multi-file index, convert a public GenBank fixture to FASTA without sequence loss, and run the shipped standalone demonstration. Report checked record counts and lookup values."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "pyfastx gzip reuse and pysam quality semantics",
+      "prompt": "Build and reuse a pyfastx index over a public gzip FASTA through both the importable function and CLI, verify two random-access lengths and persistent sidecar reuse, then parse a public gzip FASTQ with pysam and Biopython. Demonstrate the documented Phred+33 versus legacy Phred+64 interpretation boundary."
+    },
+    {
+      "index": 3,
+      "type": "Edge",
+      "label": "Empty summaries and invalid chunk/worker bounds",
+      "prompt": "Summarize no inputs and one empty FASTA with an explicit readable schema. Reject Boolean, zero, negative, floating-point, and string chunk sizes before opening a deliberately missing input or creating outputs; also reject invalid worker counts. Confirm a valid five-record split remains lossless."
+    },
+    {
+      "index": 4,
+      "type": "Variant B",
+      "label": "Contained prefix splitting under hostile and high-cardinality inputs",
+      "prompt": "Exercise real prefix-derived output safety: reject traversal, reserved filenames, a manifest escape, an existing target, and a case-insensitive collision without changing a sibling sentinel. Under RLIMIT_NOFILE=32, split 2,048 prefixes with max_open_files=8 and verify every manifest/file/parsed total plus an evicted interleaved group."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "Creation-order determinism and fork/spawn parity",
+      "prompt": "Create identical nested FASTA trees in opposite creation orders, require the stable relative order a.fasta, z/a.fasta, z/B.fasta, byte-identical summaries and merges, then run two-worker processing under fork, spawn, and a second spawn run with identical ordered rows and totals."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+Independent auditor command transcript — 2026-09-28
+
+1. Exact identity capture (Windows host; read-only candidate/origin inspection)
+   python -B F:\OpenScience\audits\bio-batch-processing\reaudit-opt10-20260928\scripts\capture_identity.py
+   exit: 0
+   output: {"candidate_content_sha256": "f5558565b7f1068f76afdfaecee4a560c24917c037658c45b54f554d7ab23afd", "files": 7, "cache": []}
+
+2. Isolated scientific execution
+   wsl.exe -d science -u root -- /mnt/openscience/audit-envs/bio-batch-processing/tools/wsl_isolated_exec.sh /mnt/openscience/audit-envs/bio-batch-processing/conda-env/bin/python -B /mnt/openscience/audits/bio-batch-processing/reaudit-opt10-20260928/scripts/reaudit_cases.py
+   exit: 0
+   output: {"all_cases_completed": true, "all_surfaces_passed": true, "case_statuses": ["COMPLETED", "COMPLETED", "COMPLETED", "COMPLETED", "COMPLETED"], "shipped_suite_returncode": 0}
+
+The wrapper confirmed user sci, WSL_INTEROP unset, /mnt/f not mounted, and /mnt/openscience as the retained Windows-backed mount. PYTHONDONTWRITEBYTECODE=1 was active. The shipped suite promoted ResourceWarning to an error and passed 11/11.

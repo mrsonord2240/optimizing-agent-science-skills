@@ -1,0 +1,157 @@
+{
+  "candidate_content_sha256": "f5558565b7f1068f76afdfaecee4a560c24917c037658c45b54f554d7ab23afd",
+  "inputs": [
+    {
+      "assertions": [
+        {
+          "note": "Counts were three and four; the merged output contained seven records in a.fasta then b.fasta order.",
+          "result": "PASS",
+          "text": "Streaming counts and stable merge preserve all records in deterministic order."
+        },
+        {
+          "note": "Four records split as 3/1 and five records split as 2/2/1 with every chunk parsed back.",
+          "result": "PASS",
+          "text": "Two fresh record-count splits are bounded and lossless."
+        },
+        {
+          "note": "The reopened SQLite index contained seven records and preserved the checked a2 and b3 sequence lengths.",
+          "result": "PASS",
+          "text": "Persistent multi-file indexing survives close and reopen with exact lookup values."
+        },
+        {
+          "note": "All 94 public orchid records converted; the checked first identifier and sequence matched the GenBank source.",
+          "result": "PASS",
+          "text": "GenBank-to-FASTA conversion preserves record count and sequence while the documentation warns about annotation loss."
+        },
+        {
+          "note": "It exited zero and reported 5/5/5 records, three chunks, 15 indexed records, and lookup length 52.",
+          "result": "PASS",
+          "text": "The standalone demonstration is runnable and emits readable checked values."
+        }
+      ],
+      "index": 1
+    },
+    {
+      "assertions": [
+        {
+          "note": "It indexed 94 records and returned checked first/last selected lengths of 740 and 592.",
+          "result": "PASS",
+          "text": "The importable pyfastx function builds a persistent gzip FASTA index and returns meaningful record metadata."
+        },
+        {
+          "note": "The .fxi hash and inode were unchanged across the second function call and CLI invocation.",
+          "result": "PASS",
+          "text": "Function reuse and CLI reuse preserve the same persistent index."
+        },
+        {
+          "note": "The CLI reported 94 records and selected length 740 for the checked identifier.",
+          "result": "PASS",
+          "text": "The CLI output is valid JSON and agrees with function-level random access."
+        },
+        {
+          "note": "Three public reads, the first sequence, and its quality array matched; the first range was 18 to 26.",
+          "result": "PASS",
+          "text": "pysam thin FASTQ parsing agrees with explicit Biopython parsing for Phred+33 data."
+        },
+        {
+          "note": "ASCII h was 71 under pysam's fixed subtraction of 33 and 40 under Biopython fastq-illumina parsing.",
+          "result": "PASS",
+          "text": "The documented legacy Phred+64 caveat is scientifically observable rather than merely stated."
+        }
+      ],
+      "index": 2
+    },
+    {
+      "assertions": [
+        {
+          "note": "The result was [] and the exact columns were file,sequences,total_bp,min_len,max_len,avg_len.",
+          "result": "PASS",
+          "text": "No-match summary output is a valid header-only CSV with the complete public schema."
+        },
+        {
+          "note": "The row identified empty.fasta and returned zero for all five numerical measures.",
+          "result": "PASS",
+          "text": "An empty FASTA produces explicit, readable zero metrics rather than a crash or blank file."
+        },
+        {
+          "note": "False, True, 0, -1, 1.5, and '2' all raised the stable positive-integer ValueError against a deliberately missing input without filesystem changes.",
+          "result": "PASS",
+          "text": "Invalid chunk sizes fail before input access or output creation with an actionable parameter message."
+        },
+        {
+          "note": "Five records parsed back as chunks 2, 2, and 1.",
+          "result": "PASS",
+          "text": "A valid boundary split remains lossless after validation was added."
+        },
+        {
+          "note": "Zero, negative, Boolean, and floating-point worker counts all raised the stable positive-integer error.",
+          "result": "PASS",
+          "text": "Invalid multiprocessing worker counts are rejected before pool construction."
+        }
+      ],
+      "index": 3
+    },
+    {
+      "assertions": [
+        {
+          "note": "The ../ prefix was rejected, the sibling sentinel was byte-preserved, and the partial manifest recorded zero writes.",
+          "result": "PASS",
+          "text": "Record-derived paths cannot escape the output directory or alter an existing sibling."
+        },
+        {
+          "note": "CON was rejected and ../escaped.json could not leave the output directory.",
+          "result": "PASS",
+          "text": "Reserved filenames and manifest path traversal are rejected before unsafe output is created."
+        },
+        {
+          "note": "The existing target sentinel remained unchanged; Sample/sample stopped with a one-record partial manifest.",
+          "result": "PASS",
+          "text": "Existing targets are never overwritten and case-insensitive collisions are explicitly accounted."
+        },
+        {
+          "note": "Under RLIMIT_NOFILE=32 and max_open_files=8, manifest rows, count sum, output-file count, and parsed records all equaled 2,048; descriptors were 4 before and after.",
+          "result": "PASS",
+          "text": "Open handles remain bounded while all 2,048 distinct prefixes are written and parseable."
+        },
+        {
+          "note": "The interleaved a group parsed back as a_1 then a_2 with four total records across the manifest.",
+          "result": "PASS",
+          "text": "Reopening an evicted prefix appends without truncating earlier records."
+        }
+      ],
+      "index": 4
+    },
+    {
+      "assertions": [
+        {
+          "note": "Both trees resolved to a.fasta, z/a.fasta, z/B.fasta using the casefolded/exact stable key.",
+          "result": "PASS",
+          "text": "Opposite filesystem creation histories produce the same documented relative-path order."
+        },
+        {
+          "note": "Rows matched and both CSV files had SHA-256 baf79636270cad3d4a4f4442eb03eee6cfe3fb06188ad3f7f460d6ddcdafcb79.",
+          "result": "PASS",
+          "text": "Summary output is row-stable and byte-identical across creation histories."
+        },
+        {
+          "note": "Both six-record merges had SHA-256 fa38059609575f34feb44e5e3ddc886f976ae7549b7993a5c394e393a4f9dd3f.",
+          "result": "PASS",
+          "text": "Streaming merge output is record-stable and byte-identical across creation histories."
+        },
+        {
+          "note": "Fork, spawn, and a second spawn run returned the same three ordered rows.",
+          "result": "PASS",
+          "text": "Real two-worker fork and spawn execution return identical stable results."
+        },
+        {
+          "note": "Every run reported six records and 15 total base pairs; duplicate nested basenames did not alter values or order.",
+          "result": "PASS",
+          "text": "Parallel results preserve complete checked totals across start methods."
+        }
+      ],
+      "index": 5
+    }
+  ],
+  "passed": 25,
+  "total": 25
+}

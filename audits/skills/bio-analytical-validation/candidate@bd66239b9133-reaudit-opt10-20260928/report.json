@@ -1,0 +1,324 @@
+{
+  "meta": {
+    "skill_name": "bio-analytical-validation",
+    "description": "Treats ctDNA analytical sensitivity as a molecule-counting and measurement-science problem, with sampling-only calculators, replicated probit LoD95 estimation with uncertainty, explicit validation boundaries, and precise reference-material guidance.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No executed output fabricated study identifiers, results, sample sizes, p-values, efficacy claims, or assay-performance evidence. Public aggregate and simulated fixtures are explicitly bounded as computational teaching or smoke data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Outputs remain analytical-method calculations and validation guidance, make no patient-specific diagnostic or treatment recommendation, and repeatedly distinguish analytical calculations from clinical evidence."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The former panel-LoD95 fallacy is removed. Every multi-locus result is an explicitly assumption-bound theoretical sampling threshold, while empirical LoD95 requires replicated full-workflow detections, diagnostics, and uncertainty."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All four runnable Python surfaces executed with warnings promoted to errors. Twenty-five of twenty-five scientific assertions passed, including eighteen invalid-input probes and two fresh cases for every material workflow."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Sampling, LoB, empirical LoD95, panel-boundary, reference-material, and reporting workflows are covered accurately; one minor fragment-size provenance statement is more precise than the cited method supports."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Public numerical paths reject invalid finite, range, shape, replication, binary-outcome, fit-identification, k-of-N, and grid conditions with stable actionable errors; reruns are deterministic."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The 129-line primary document and four bounded Python surfaces are compact, linear, and free of redundant external-service or large-data dependencies."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tables, interpretation boundaries, output diagnostics, and common-error guidance are unusually clear; the public functions rely on ordinary ValueError text rather than structured error codes."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger phrases, a concise usage guide, explicit units, and strict scientific input rejection make the skill discoverable and safely usable."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "The skill has no credentials, network calls, shell interpolation, destructive operations, retained user data, or raw-code execution; numeric inputs are constrained before dependency calls."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Responsibilities are cleanly split and outputs are deterministic and independently testable. Small validation helpers are duplicated across modules and no regression suite is shipped inside the candidate tree."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, idempotency, composable functions, and stop conditions are strong; formal integration contracts and machine-coded errors could be deeper."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Sampling-only molecule-count calculation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Canonical and two fresh Poisson cases matched independent formulas; the CLI carried the sampling-only boundary.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The default genome-equivalent conversion exactly follows 1,000 pg divided by 3.3 pg and remains explicitly overridable.",
+            "result": "PASS",
+            "note": "Twenty-five ng produced 7,575.75757576 GE and the explicit alternate convention produced 330 GE for one ng."
+          },
+          {
+            "text": "Canonical and fresh k=2 sampling probabilities agree with independent SciPy Poisson tails.",
+            "result": "PASS",
+            "note": "Probabilities were 0.977356417213 and 0.176045779693 with agreement at numerical precision."
+          },
+          {
+            "text": "The 95% one-template inversion equals negative log of 0.05 divided by VAF rather than a rounded lambda=3 shortcut.",
+            "result": "PASS",
+            "note": "Observed and analytical requirements both equaled 29,957.3227355 GE at VAF 1e-4."
+          },
+          {
+            "text": "A fresh k=2, 80% inversion agrees with an independent continuous root.",
+            "result": "PASS",
+            "note": "Observed and independently solved requirements both equaled 3,992.41112934 GE."
+          },
+          {
+            "text": "The command-line surface labels results as sampling-only and excludes recovery, background errors, and false positives.",
+            "result": "PASS",
+            "note": "The warning-failing command exited zero with empty stderr and all required interpretation terms."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Replicated LoB and LoD95 fits",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The inherited aggregate smoke case and two fresh replicated series returned identified fits with CI and diagnostics; separated and non-bracketing series were refused.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Gaussian-shortcut LoB equals mean plus 1.645 sample standard deviations on a fresh blank fixture.",
+            "result": "PASS",
+            "note": "Observed and independently calculated LoB both equaled 0.000242202728163."
+          },
+          {
+            "text": "The inherited public aggregate smoke case returns an identified result with ordered confidence interval and no warning.",
+            "result": "PASS",
+            "note": "LoD95 was 0.00396833096549 with ordered interval 0.00313605615849 to 0.00502148235102 and zero warnings."
+          },
+          {
+            "text": "Both fresh replicated fits converge with positive slope, ordered inverse-prediction confidence interval, correct 95% inversion, and no warning.",
+            "result": "PASS",
+            "note": "Fresh LoD95 values were 0.00334601956925 and 0.00459714452988; reconstructed target probabilities were 0.95."
+          },
+          {
+            "text": "Separated and non-bracketing dilution series are refused with stable domain errors.",
+            "result": "PASS",
+            "note": "The paths raised the documented separated-or-unidentified and must-bracket-0.95 ValueErrors with no dependency warning."
+          },
+          {
+            "text": "The command-line probit demo is warning-free and reports a confidence interval, convergence, slope, sample size, levels, and target bracketing.",
+            "result": "PASS",
+            "note": "The warning-failing command exited zero with empty stderr and all diagnostics present."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Physical, shape, and fit-domain validation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All eighteen invalid probes terminated through stable candidate-level ValueErrors without warnings or misleading numerical output.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All finite, range, and type invalid probes stop with the documented stable ValueError and no warning.",
+            "result": "PASS",
+            "note": "Zero VAF, negative and nonfinite mass, Boolean mass, invalid molecule count, and target probability one were all rejected."
+          },
+          {
+            "text": "All blank-count and blank-shape invalid probes stop with the documented stable ValueError and no warning.",
+            "result": "PASS",
+            "note": "A single blank and a two-dimensional blank array were both rejected before NumPy produced invalid statistics."
+          },
+          {
+            "text": "All probit-contract invalid probes stop with the documented stable ValueError and no warning.",
+            "result": "PASS",
+            "note": "Length mismatch, nonbinary outcome, insufficient replication, and invalid confidence level were all rejected."
+          },
+          {
+            "text": "All panel-rule and grid invalid probes stop with the documented stable ValueError and no warning.",
+            "result": "PASS",
+            "note": "Impossible k-of-N, wrong-dimensional grid, descending grid, and insufficient upper bound were all rejected."
+          },
+          {
+            "text": "All simulation invalid probes stop with the documented stable ValueError and no warning.",
+            "result": "PASS",
+            "note": "Too few VAF levels and too few replicates were rejected with actionable messages."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Theoretical multi-locus sampling bounds",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Inherited and fresh k-of-N thresholds matched independent roots, behaved monotonically, and carried complete non-assay interpretation boundaries.",
+        "basic": 40,
+        "specialized": 59,
+        "total": 99,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The inherited 48-locus threshold is lower than the 16-locus threshold and its fixed-VAF probability is higher.",
+            "result": "PASS",
+            "note": "Thresholds were 3.41849214618e-5 and 1.10307874488e-5; fixed-VAF probabilities were 0.999988089896 and effectively one."
+          },
+          {
+            "text": "Inherited default-grid thresholds agree with independent roots within one log-grid step.",
+            "result": "PASS",
+            "note": "Relative grid overestimates were 1.4046% and 0.3952%, both below the approximately 2.34% grid step."
+          },
+          {
+            "text": "Both fresh k-of-N scenarios agree with independent roots within their finer grid step.",
+            "result": "PASS",
+            "note": "Relative grid overestimates were 0.3752% and 0.0177% for fresh k=1 and k=3 cases."
+          },
+          {
+            "text": "Every structured result carries all four assumptions and explicitly denies achieved-assay-LoD95 interpretation; misleading legacy APIs are absent.",
+            "result": "PASS",
+            "note": "All four structured cases had the exact assumption set, and both retired assay-looking names were absent."
+          },
+          {
+            "text": "The panel command-line surface is warning-free and states sampling-only status plus equal-VAF, independence, recovery, background, and non-assay-LoD boundaries.",
+            "result": "PASS",
+            "note": "The warning-failing command exited zero with empty stderr and all required boundary terms."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Simulation determinism, calibration, and sensitivity",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The complete example and fresh simulation probes were deterministic, calibrated, parameter-sensitive, and explicitly teaching-only.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Two full worked-example runs are byte-for-byte deterministic and warning-free.",
+            "result": "PASS",
+            "note": "Both commands exited zero with identical stdout and empty stderr."
+          },
+          {
+            "text": "An identical seed and identical inputs reproduce the exact VAF and detection arrays.",
+            "result": "PASS",
+            "note": "The complete arrays were equal on an independent replay."
+          },
+          {
+            "text": "Fresh changes to true_lod_vaf and probit_slope materially change outcomes in the documented direction and model.",
+            "result": "PASS",
+            "note": "Changing true LoD changed 833 of 2,400 outcomes and reduced positives from 2,135 to 1,514; changing slope changed 181 outcomes."
+          },
+          {
+            "text": "The named true_lod_vaf is empirically calibrated near 95% in a fresh 4,000-replicate sample.",
+            "result": "PASS",
+            "note": "The observed rate at the named true LoD was 0.9485."
+          },
+          {
+            "text": "The full example explicitly labels all sampling and simulation outputs as theoretical or contrived teaching results, not validation evidence.",
+            "result": "PASS",
+            "note": "All sampling-only, non-assay-LoD, and teaching-only labels were present in warning-free output."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 58.6,
+    "score": 96,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Sampling-only calculations are now named, structured, and bounded so they cannot masquerade as achieved assay LoD.",
+    "The replicated probit surface returns uncertainty and diagnostics and refuses separated, non-bracketing, nonconverged, nonpositive-slope, and physically invalid fits.",
+    "All four public Python surfaces are deterministic, warning-free, dependency-complete, and backed by exact candidate identity.",
+    "Reference-material guidance now separates HCC1395 and HCC1395BL truth sets from Sample A and Sample B liquid-biopsy materials with stable identifiers.",
+    "The documentation consistently conditions sensitivity claims on molecule input, recovery, consensus depth, background, calling rules, and replicate evidence."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "ADV-006: Tighten SEQC2 fragment-size wording",
+      "observed_in": [],
+      "problem": "The static documentation says Df and Ef were fragmented to 130–170 bp, while the cited primary ctDNA methods describe Pippin size selection from 110 to 190 bp with an average fragment length of about 165 bp.",
+      "root_cause": "A concise characteristic range was written as an exact preparation range without a directly matching citation.",
+      "fix": "Replace 130–170 bp with the cited preparation wording, such as size-selected from 110–190 bp to an average of about 165 bp, or add a primary source that directly supports the narrower range."
+    }
+  ]
+}

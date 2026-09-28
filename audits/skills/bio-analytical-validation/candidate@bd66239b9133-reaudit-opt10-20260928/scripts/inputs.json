@@ -1,0 +1,32 @@
+[
+  {
+    "index": 1,
+    "type": "Canonical",
+    "label": "Sampling-only molecule-count calculation",
+    "prompt": "For 25 ng cfDNA and a 0.05% VAF single-locus variant, compute haploid genome equivalents under the documented 3.3 pg convention, expected mutant molecules, sampling-only presence probability, and the input required for 95% template presence. Cross-check at least two fresh probability/inversion cases and state what these calculations do not establish."
+  },
+  {
+    "index": 2,
+    "type": "Variant A",
+    "label": "Replicated LoB and LoD95 fits",
+    "prompt": "Re-run the bounded public aggregate pseudo-replicate smoke case, then fit at least two fresh replicated binary dilution series. Inspect LoD95, confidence intervals, slope, convergence, target bracketing, separation rejection, and a non-bracketing failure. Treat all fixtures as computational tests rather than clinical validation."
+  },
+  {
+    "index": 3,
+    "type": "Edge",
+    "label": "Physical, shape, and fit-domain validation",
+    "prompt": "Probe every public calculator with invalid finite/range/type/shape/replicate/binary/k-of-N/grid/target inputs. Each case must stop with a stable actionable ValueError rather than NaN, infinity, a raw dependency exception, or a misleading scientific result."
+  },
+  {
+    "index": 4,
+    "type": "Variant B",
+    "label": "Theoretical multi-locus sampling bounds",
+    "prompt": "For the inherited 30 ng two-of-N comparison and two fresh k-of-N scenarios, compare the grid threshold with an independent continuous root, check expected monotonic relationships, and verify every result and command-line output carries the equal-VAF, independence, recovery, background, and non-assay-LoD interpretation boundaries."
+  },
+  {
+    "index": 5,
+    "type": "Stress",
+    "label": "Simulation determinism, calibration, and sensitivity",
+    "prompt": "Run the complete worked example twice, then independently test the teaching simulator with fresh seeds, two true-LoD values, and two slopes. Verify deterministic replay, material parameter sensitivity, approximate 95% calibration at the named true LoD, input rejection, and explicit non-validation labeling."
+  }
+]

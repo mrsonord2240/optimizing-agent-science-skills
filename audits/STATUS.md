@@ -27,9 +27,9 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
-| `bio-analytical-validation` | Protocol Design | 59 | Reject | 1 / 3 / 1 | [viewer](skills/bio-analytical-validation/candidate@b5a701c41d3a-initial-opt10-20260928/viewer.md) |
+| `bio-analytical-validation` | Protocol Design | 96 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-analytical-validation/candidate@bd66239b9133-reaudit-opt10-20260928/viewer.md) |
 | `bio-atac-seq-allele-specific-accessibility` | Data Analysis | 42 | Reject | 3 / 4 / 1 | [viewer](skills/bio-atac-seq-allele-specific-accessibility/candidate@1e03ae9e3815-initial-opt10-20260928/viewer.md) |
-| `bio-batch-processing` | Data Analysis | 55 | Reject | 1 / 5 / 1 | [viewer](skills/bio-batch-processing/candidate@244c82a53a96-initial-opt10-20260928/viewer.md) |
+| `bio-batch-processing` | Data Analysis | 97 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-batch-processing/candidate@f5558565b7f1-reaudit-opt10-20260928/viewer.md) |
 | `bio-cfdna-preprocessing` | Data Analysis | 38 | Reject | 4 / 2 / 0 | [viewer](skills/bio-cfdna-preprocessing/candidate@9852987be210-initial-opt10-20260928/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |

@@ -1,0 +1,11 @@
+{
+  "assertions": {
+    "passed": 25,
+    "total": 25
+  },
+  "execution_avg": 97.0,
+  "final_score": 97,
+  "schema": "skill-auditor report_json_schema.md v4.0",
+  "static_total": 97,
+  "valid": true
+}

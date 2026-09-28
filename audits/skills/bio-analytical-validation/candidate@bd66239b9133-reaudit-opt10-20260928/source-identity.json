@@ -1,0 +1,87 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "liquid-biopsy/analytical-validation",
+    "subtree": "798bd55e904f3ab813a2a37ac5989febb4d1d2a7",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "read-only"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane1-analytical",
+    "head": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "baseline_subtree": "b5a701c41d3afe697766a02a11b2954e12ff9d42",
+    "path": "F:\\OpenScience\\wt\\opt10-analytical-validation\\skills\\bio-analytical-validation",
+    "identity_algorithm": "SHA-256 of UTF-8 lines path<TAB>sha256<TAB>git_blob<TAB>bytes<LF>, in the listed order",
+    "content_sha256": "bd66239b9133b70a7522d0d99e3bc4ebbed1b8c1291c74fad26367dfa339b2ab",
+    "status_before": "six expected fixer-owned modified files; no other candidate-tree changes",
+    "status_after_execution": "same six expected fixer-owned modified files; no cache artifacts or auditor changes"
+  },
+  "files": [
+    {
+      "path": "examples/detection_limits.py",
+      "sha256": "65f593e6f815df63de9cc69f1847cf813a9a26cc839d870b4c3246ce2ab3425d",
+      "git_blob": "f1856a4bfd61f4b4e9c03e79fb4c3b7265713564",
+      "bytes": 5158
+    },
+    {
+      "path": "scripts/ge_and_poisson.py",
+      "sha256": "97e595319630dbdb9bd9272e6c439b297032fb1315367c7d852026b1c9e33d4e",
+      "git_blob": "b7493ee073aa000b4297d6acc04910d7402bf247",
+      "bytes": 4337
+    },
+    {
+      "path": "scripts/lod95_probit.py",
+      "sha256": "32dfd49aef0040d2eab636e86adb96e0771416b4077335b7b23a7ad2ff50c307",
+      "git_blob": "fe128c01f356c0dd15fc7dee53ffa970a475e9b9",
+      "bytes": 7816
+    },
+    {
+      "path": "scripts/panel_integrated_lod.py",
+      "sha256": "7f2233e25c9ab2f1f6a40a88ad3fe6320117ba7bcfc8ba821bb2d1565ea4bc90",
+      "git_blob": "144b635f6b872e6670c807ddafa560fc5287886c",
+      "bytes": 6006
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "c7717b94521745a0dbd1d778ae13310795c16bd2fe1dff1783e4733cad39f6d3",
+      "git_blob": "6aec52fd44d44db7ee36d3621028db2e3a5300e9",
+      "bytes": 17053
+    },
+    {
+      "path": "usage-guide.md",
+      "sha256": "e6483a7db26c7ed73c65a81b2b13365fc00ebd14deaf4b992a021109da29d5ff",
+      "git_blob": "13a756ef6e231151c78aed32bf82e12b96ee2df7",
+      "bytes": 2724
+    }
+  ],
+  "independent_auditor": {
+    "phase": "reaudit-scientific-skill",
+    "performed_initial_audit": false,
+    "performed_fix": false,
+    "performed_tooling_delta": false,
+    "candidate_bytes_changed": false,
+    "execution_run_count": 2,
+    "execution_summary_sha256_both_runs": "fb4fa08d468b33caca8c8dd49dfdf34e6c913487fff0cbf0d5ef8a37a8077618"
+  },
+  "tooling": {
+    "tools_md_sha256": "d2478cf2c054a848eb7ca08677beba0fb6946c845ead9da72f98658c6b8506a4",
+    "environment_fingerprint_sha256": "3b189eb6dc20e42bdd60cca6885d3d83287b1c4fd3578d1ba62269c501305e4d",
+    "environment_lock_sha256": "fecdb107ca7c0cd211bf4fe7f9ad0f2a48eff8a11d8068c5cf4e5b2d2d2d6d73",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "audit_artifacts": {
+    "data/etamseq_table2_lab1.tsv": "787d7b6c665e7a817e753b0bf5a31f1d85de7f5a9daad9b03745b071bd1b58c9",
+    "evidence/execution-summary.json": "fb4fa08d468b33caca8c8dd49dfdf34e6c913487fff0cbf0d5ef8a37a8077618",
+    "evidence/schema-validation.json": "37de34adb87748f30ed7882066a5e3307d7318199c214b68e630e6d18a247b79",
+    "evidence/structural-precheck.json": "15f1d4102f494fe799bcb763ccfaceecbfe2d6aaa78864bb1b61d23673c142ec",
+    "finding-ledger.md": "e42b1c7add44c6842d8bc9af95196accb1966baadd94f4c17122e47419a51efd",
+    "inputs.json": "4ae849995673683834e08d4c0c3114dff8e4706fe257321b29dde8128e4b37cf",
+    "report.json": "f50d78dec3d58cc087ffbf19e811c9d9beb0f9613060152f022b8ef303f7af10",
+    "run_cases.py": "d50823eb5369388f33cf60b76e9c0881afa015e12a40ae36d3209cdad5382f2b",
+    "scientific-source-notes.md": "88ee4f212b9a67c75feaf2f348d1c2d43d1adb53fc51f3de9cd1f5e2c3cb2728",
+    "validate_report.py": "cf1a9e1b44a7e755d6ce426dad352d45f43a834d822140097366e8b2b19379eb",
+    "viewer.md": "e6cdfc6bb2bb0f88fb09f830df8f548e438ce89aa9c8cb696a08908696de6c36"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

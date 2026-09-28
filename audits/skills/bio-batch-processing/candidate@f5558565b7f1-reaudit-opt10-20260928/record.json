@@ -1,0 +1,90 @@
+{
+  "skill_id": "bio-batch-processing",
+  "version": "candidate@f5558565b7f1-reaudit-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "sequence-io/batch-processing",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/sequence-io/batch-processing",
+    "subtree": "0dca3ff9c9d8e79f28b0747f41987f05dfd59b19"
+  },
+  "candidate": {
+    "identity": "f5558565b7f1068f76afdfaecee4a560c24917c037658c45b54f554d7ab23afd",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane3-batch-processing",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "f5558565b7f1068f76afdfaecee4a560c24917c037658c45b54f554d7ab23afd",
+    "path": "F:\\OpenScience\\wt\\opt10-batch-processing\\skills\\bio-batch-processing",
+    "files": [
+      {
+        "bytes": 1283,
+        "git_blob": "2bbcd04d17aa4e091c1446f6d1fe0776379ac0aa",
+        "path": "FIXES.md",
+        "sha256": "66c5db1aa0b526094c8edc22122e4d177fdc0fbcbebb605387d24f4509e57c55"
+      },
+      {
+        "bytes": 5683,
+        "git_blob": "db916c9958d59d8388fe41654629ebd352ba6770",
+        "path": "references/operations.md",
+        "sha256": "01be9393009792ca74ddbc426053486a7c555ff0fa94ad1d478d615cb53bae36"
+      },
+      {
+        "bytes": 4937,
+        "git_blob": "f2c45ed39555d7c298c0d81d056d828a5f442728",
+        "path": "references/readers-and-indexing.md",
+        "sha256": "b172e927856385727258b2a097437721d0ca720d3787e1c6a94590a118de3a14"
+      },
+      {
+        "bytes": 9787,
+        "git_blob": "401546826a19415071fc3567d27cc64c21d9b8f0",
+        "path": "scripts/batch_process.py",
+        "sha256": "26bac9d04be269bb9e6758dd6ecc37923e70f7c1bd31ccb952f109eb65619d77"
+      },
+      {
+        "bytes": 1460,
+        "git_blob": "f3d324da4bb4cc09a405897efa203627e75a496a",
+        "path": "scripts/pyfastx_index.py",
+        "sha256": "e488e91995fa0c34d68870c1f6a7f0ddf3d0d716ae18858550de00d265276d90"
+      },
+      {
+        "bytes": 5845,
+        "git_blob": "6ce1474c951976ab4e87151279e0ae97bcc0afe6",
+        "path": "SKILL.md",
+        "sha256": "55690eaa5081c9e7c468cdcc27517d3cf840f48a15a5bc7283f0d86b260cb2b7"
+      },
+      {
+        "bytes": 10920,
+        "git_blob": "8fef4ed380d608d61ef00999c28363f2795a2ad3",
+        "path": "tests/test_batch_process.py",
+        "sha256": "53ec4400edaf08e8402af5cbde93a6e80f43a9c478a710e95b1d1befcd6521cc"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@244c82a53a96-initial-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 13
+  }
+}

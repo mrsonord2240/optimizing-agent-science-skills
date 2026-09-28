@@ -1,0 +1,206 @@
+{
+  "all_cases_completed": true,
+  "all_surfaces_passed": true,
+  "candidate_identity": "f5558565b7f1068f76afdfaecee4a560c24917c037658c45b54f554d7ab23afd",
+  "cases": [
+    {
+      "checks": {
+        "chunk_sizes": [
+          3,
+          1
+        ],
+        "converted_records": 94,
+        "counts": {
+          "a.fasta": 3,
+          "b.fasta": 4
+        },
+        "fresh_chunk_sizes": [
+          2,
+          2,
+          1
+        ],
+        "indexed_records": 7,
+        "merged_records": 7,
+        "standalone_stdout": [
+          "sample0.fasta: 5 sequences",
+          "sample1.fasta: 5 sequences",
+          "sample2.fasta: 5 sequences",
+          "Split sample0.fasta into 3 chunks of <=2 records",
+          "Indexed 15 records across 3 files",
+          "Random lookup s2_3 length: 52"
+        ]
+      },
+      "index": 1,
+      "label": "Count, merge, split, index, convert, and standalone demo",
+      "status": "COMPLETED",
+      "type": "Canonical"
+    },
+    {
+      "checks": {
+        "cli_selected_length": 740,
+        "fastq_records": 3,
+        "function_selected_lengths": [
+          740,
+          592
+        ],
+        "index_reused_function_and_cli": true,
+        "legacy_pysam_vs_illumina": [
+          71,
+          40
+        ],
+        "phred33_first_range": [
+          18,
+          26
+        ],
+        "pyfastx_records": 94
+      },
+      "index": 2,
+      "label": "pyfastx gzip reuse and pysam quality semantics",
+      "status": "COMPLETED",
+      "type": "Variant A"
+    },
+    {
+      "checks": {
+        "empty_file_row": {
+          "avg_len": 0,
+          "file": "empty.fasta",
+          "max_len": 0,
+          "min_len": 0,
+          "sequences": 0,
+          "total_bp": 0
+        },
+        "header": [
+          "file",
+          "sequences",
+          "total_bp",
+          "min_len",
+          "max_len",
+          "avg_len"
+        ],
+        "invalid_chunk_errors": {
+          "'2'": "records_per_file must be a positive integer; got '2'",
+          "-1": "records_per_file must be a positive integer; got -1",
+          "0": "records_per_file must be a positive integer; got 0",
+          "1.5": "records_per_file must be a positive integer; got 1.5",
+          "False": "records_per_file must be a positive integer; got False",
+          "True": "records_per_file must be a positive integer; got True"
+        },
+        "invalid_workers_rejected": 4,
+        "valid_chunk_sizes": [
+          2,
+          2,
+          1
+        ]
+      },
+      "index": 3,
+      "label": "Empty summaries and invalid chunk/worker bounds",
+      "status": "COMPLETED",
+      "type": "Edge"
+    },
+    {
+      "checks": {
+        "case_collision_partial_records": 1,
+        "fd_before_after": [
+          4,
+          4
+        ],
+        "interleaved_a_ids": [
+          "a_1",
+          "a_2"
+        ],
+        "many_prefixes": 2048,
+        "max_open_files": 8,
+        "parsed_records": 2048,
+        "rlimit_nofile": 32,
+        "safety": {
+          "exclusive_target_preserved": true,
+          "manifest_escape_rejected": true,
+          "traversal_rejected_sibling_preserved": true
+        }
+      },
+      "index": 4,
+      "label": "Contained prefix splitting under hostile and high-cardinality inputs",
+      "status": "COMPLETED",
+      "type": "Variant B"
+    },
+    {
+      "checks": {
+        "fork_spawn_rerun_equal": true,
+        "merge_sha256": "fa38059609575f34feb44e5e3ddc886f976ae7549b7993a5c394e393a4f9dd3f",
+        "parallel_rows": [
+          {
+            "count": 2,
+            "file": "a.fasta",
+            "total_bp": 5
+          },
+          {
+            "count": 2,
+            "file": "a.fasta",
+            "total_bp": 5
+          },
+          {
+            "count": 2,
+            "file": "B.fasta",
+            "total_bp": 5
+          }
+        ],
+        "records": 6,
+        "stable_relative_paths": [
+          "a.fasta",
+          "z/a.fasta",
+          "z/B.fasta"
+        ],
+        "summary_sha256": "baf79636270cad3d4a4f4442eb03eee6cfe3fb06188ad3f7f460d6ddcdafcb79",
+        "total_bp": 15
+      },
+      "index": 5,
+      "label": "Creation-order determinism and fork/spawn parity",
+      "status": "COMPLETED",
+      "type": "Stress"
+    }
+  ],
+  "surface_checks": {
+    "ast_files": [
+      "scripts/batch_process.py",
+      "scripts/pyfastx_index.py",
+      "tests/test_batch_process.py"
+    ],
+    "candidate_cache_after": [],
+    "candidate_cache_before": [],
+    "isolation": {
+      "candidate_writable_attempted": false,
+      "mount_f_present": false,
+      "user": "sci",
+      "wsl_interop": null
+    },
+    "shipped_regression_suite": {
+      "resource_warnings_fatal": true,
+      "returncode": 0,
+      "stderr": [
+        "test_empty_summary_is_header_only_with_explicit_schema (__main__.BatchProcessRegressions.test_empty_summary_is_header_only_with_explicit_schema) ... ok",
+        "test_invalid_chunk_sizes_fail_before_output (__main__.BatchProcessRegressions.test_invalid_chunk_sizes_fail_before_output) ... ok",
+        "test_parallel_recipe_runs_under_spawn (__main__.BatchProcessRegressions.test_parallel_recipe_runs_under_spawn) ... ok",
+        "test_prefix_split_bounds_handles_and_writes_every_record (__main__.BatchProcessRegressions.test_prefix_split_bounds_handles_and_writes_every_record) ... ok",
+        "test_prefix_split_never_overwrites_existing_target (__main__.BatchProcessRegressions.test_prefix_split_never_overwrites_existing_target) ... ok",
+        "test_prefix_split_rejects_case_insensitive_collision (__main__.BatchProcessRegressions.test_prefix_split_rejects_case_insensitive_collision) ... ok",
+        "test_prefix_split_rejects_escape_and_preserves_sibling (__main__.BatchProcessRegressions.test_prefix_split_rejects_escape_and_preserves_sibling) ... ok",
+        "test_prefix_split_reopens_evicted_group_without_truncating (__main__.BatchProcessRegressions.test_prefix_split_reopens_evicted_group_without_truncating) ... ok",
+        "test_pyfastx_example_builds_and_reuses_gzip_index (__main__.BatchProcessRegressions.test_pyfastx_example_builds_and_reuses_gzip_index) ... ok",
+        "test_stable_discovery_and_summary_ignore_creation_order (__main__.BatchProcessRegressions.test_stable_discovery_and_summary_ignore_creation_order) ... ok",
+        "test_standalone_demo_runs (__main__.BatchProcessRegressions.test_standalone_demo_runs) ... ok",
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 11 tests in 9.800s",
+        "",
+        "OK"
+      ],
+      "stdout": []
+    },
+    "versions": {
+      "biopython": "1.88",
+      "pyfastx": "2.3.1",
+      "pysam": "0.24.1",
+      "python": "3.12.14"
+    }
+  }
+}
