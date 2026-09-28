@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-acmg-classification",
+    "description": "Builds a non-diagnostic ACMG/AMP or AMP/ASCO/CAP evidence ledger using current ClinGen SVI methods, calibrated PP3/BP4 and PS3/BS3 thresholds, PVS1 prerequisite gates, and explicit somatic tiers. Use for training or qualified-review support, never stand-alone patient diagnosis or treatment decisions.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated patient results, studies, identifiers, sample sizes, p-values, or treatment effects; all observations trace to candidate execution, public documentation examples, or identified primary guidance."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill, germline result, somatic result, and demonstration prohibit diagnostic or treatment use, require qualified review, and prohibit PHI in public interfaces."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The scorer accepts ClinGen-retired PP5/BP6, double-counts multiple strengths or aliases from one criterion family, silently cancels opposing computational evidence, and mis-bins exact documented REVEL/BayesDel endpoints; PP5 and same-family duplication demonstrably changed classifications."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three Python files compiled; 16 shipped tests, the standalone demo, the bounded live smoke, and direct current GeneBe/CSpec calls executed successfully in the pinned environment."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 76,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "The major workflows are present and ACMG-001 through ACMG-005, ACMG-007 through ACMG-009 are materially improved, but current-rule scoring can still be changed by retired or duplicate evidence."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Typed/domain guards and runnable regressions are strong; evidence-family uniqueness, conflicting PVS1 state, semantic dates, and exact inclusive boundaries remain unsafe."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The concise main skill routes detail into one method reference and one reusable implementation with little redundant execution."
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Authority order, stop states, and result guards are clear, but the executable does not enforce all current-rule exclusions or emit the complete ledger promised by the workflow."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural triggers, readable tables, explicit uncertainty, and medical-use boundaries are present; one Brnich sentence conflicts with the corrected table."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, PHI, raw-code execution, or destructive behavior exists; bounded public calls validate key request fields and explicitly prohibit patient data."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "The module and 16-test suite are readable and deterministic, but regressions omit retired criteria, criterion-family duplication, exact benign endpoints, semantic dates, and contradictory PVS1 state."
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, deterministic helpers, and escape hatches are good; incomplete conflict/alias validation prevents safe composition into a current evidence ledger."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Guarded synthetic germline evidence ledger",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The demo exited zero, used one predictor, mapped OddsPath 8 to PS3 Moderate, printed unresolved context and the qualified-review boundary; it remains a compact sketch rather than a complete versioned evidence ledger.",
+        "basic": 34,
+        "specialized": 50,
+        "assertions": [
+          {
+            "text": "The shipped standalone demonstration executes successfully.",
+            "result": "PASS",
+            "note": "Exit status was zero and output was retained in standalone-demo.log."
+          },
+          {
+            "text": "The demonstration uses one computational predictor and does not stack discordant BP4 evidence.",
+            "result": "PASS",
+            "note": "Output retained REVEL only and contained no BP4 criterion."
+          },
+          {
+            "text": "OddsPath 8 is represented as PS3 Moderate.",
+            "result": "PASS",
+            "note": "The retained criteria list contains PS3_Moderate."
+          },
+          {
+            "text": "The output states unresolved disease, transcript, VCEP, and assay-validity context plus a non-diagnostic qualified-review boundary.",
+            "result": "PASS",
+            "note": "All four unresolved fields and the medical-use guard were printed."
+          },
+          {
+            "text": "The demonstration emits a complete versioned evidence ledger with sources, overrides, exclusions, and access dates.",
+            "result": "FAIL",
+            "note": "The compact demo warns that context is unresolved but does not emit the complete ledger promised by the main workflow."
+          }
+        ],
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "PVS1 prerequisites and splice stop states",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The prerequisite gates, NMD and 10 percent branches, and splice review stop states passed, but contradictory NMD inputs silently produced PVS1 Very Strong.",
+        "basic": 30,
+        "specialized": 43,
+        "assertions": [
+          {
+            "text": "PVS1 is withheld when the LoF disease mechanism is not established.",
+            "result": "PASS",
+            "note": "The function returned no evidence."
+          },
+          {
+            "text": "PVS1 is withheld for a disease-irrelevant transcript.",
+            "result": "PASS",
+            "note": "The function returned no evidence."
+          },
+          {
+            "text": "Canonical splice calls stop for missing consequence or rescue-transcript review.",
+            "result": "PASS",
+            "note": "Both incomplete cases returned PVS1_REVIEW_REQUIRED."
+          },
+          {
+            "text": "NMD and exact/above 10 percent branches produce the documented strengths.",
+            "result": "PASS",
+            "note": "Very Strong, Moderate, and Strong observations matched the documented branches."
+          },
+          {
+            "text": "Contradictory splice NMD signals are rejected before strength assignment.",
+            "result": "FAIL",
+            "note": "is_nmd_predicted=False with splice_consequence=nmd returned PVS1_VeryStrong."
+          }
+        ],
+        "total": 73,
+        "assertions_passed": 4,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Brnich OddsPath exact boundaries and mirrors",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 14 exact/adjacent OddsPath cases and invalid-domain guards passed; one failure-mode sentence still calls greater than 4.3 Strong, contradicting the corrected table and code.",
+        "basic": 36,
+        "specialized": 53,
+        "assertions": [
+          {
+            "text": "Pathogenic OddsPath bands implement Supporting, Moderate, Strong, and Very Strong at the documented boundaries.",
+            "result": "PASS",
+            "note": "All pathogenic exact and adjacent cases matched Brnich Table 3."
+          },
+          {
+            "text": "Benign mirror bands implement Supporting, Moderate, and Strong at the documented boundaries.",
+            "result": "PASS",
+            "note": "All benign exact and adjacent cases matched."
+          },
+          {
+            "text": "Nonpositive, non-finite, boolean, and string OddsPath inputs are rejected.",
+            "result": "PASS",
+            "note": "All six invalid probes raised actionable type or value errors."
+          },
+          {
+            "text": "The reference threshold table agrees with the executable mapping.",
+            "result": "PASS",
+            "note": "The table uses greater than 2.1, 4.3, 18.7, and 350 and the reciprocal benign mirrors."
+          },
+          {
+            "text": "All Brnich explanatory prose is internally consistent with the corrected table.",
+            "result": "FAIL",
+            "note": "Failure mode 6 still states that greater than 4.3 is required for Strong before its next sentence correctly calls that band Moderate."
+          }
+        ],
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Tavtigian scoring and evidence-family integrity",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Numeric endpoints, exact duplicate rejection, and basic subsumption passed; retired PP5/BP6, same-family multiple strengths, aliases, and opposed computational evidence remain accepted and can change a category.",
+        "basic": 23,
+        "specialized": 24,
+        "assertions": [
+          {
+            "text": "The 10, 9, 6, 5, -1, -6, and -7 Tavtigian classification endpoints are correct.",
+            "result": "PASS",
+            "note": "All seven endpoint fixtures matched."
+          },
+          {
+            "text": "Unknown criteria, exact duplicates, and a string in place of a criterion sequence are rejected.",
+            "result": "PASS",
+            "note": "All three basic validation probes raised."
+          },
+          {
+            "text": "Only one strength or alias from each ACMG evidence family can be counted.",
+            "result": "FAIL",
+            "note": "PVS1 Very Strong plus PVS1 Strong scored 12; PM2 plus PM2 Supporting was also double-counted."
+          },
+          {
+            "text": "ClinGen-retired PP5 and BP6 are rejected by the current-rule scorer.",
+            "result": "FAIL",
+            "note": "Both remain in STRENGTH_POINTS; PP5 changed a five-point VUS fixture to six-point Likely Pathogenic."
+          },
+          {
+            "text": "Opposing computational evidence is surfaced as a conflict instead of arithmetically cancelled.",
+            "result": "FAIL",
+            "note": "PP3 Strong plus BP4 Strong was accepted and returned a zero-point VUS without a conflict field."
+          }
+        ],
+        "total": 47,
+        "assertions_passed": 2,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Bergquist and Pejaver calibrated predictor endpoints",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "All 17 AlphaMissense cases and all SpliceAI cases passed, including explicit +/-3 point labels; four REVEL and two BayesDel exact benign endpoints were assigned to the next weaker band or to no evidence.",
+        "basic": 27,
+        "specialized": 35,
+        "assertions": [
+          {
+            "text": "All Bergquist AlphaMissense intervals, including the indeterminate interval, match the cited table.",
+            "result": "PASS",
+            "note": "All 17 exact and fresh values matched."
+          },
+          {
+            "text": "The Bergquist -3 and +3 point intervals remain explicit point codes.",
+            "result": "PASS",
+            "note": "BP4_3pt and PP3_3pt were returned and carry -3/+3 points."
+          },
+          {
+            "text": "Out-of-domain AlphaMissense inputs and exact SpliceAI endpoints are handled correctly.",
+            "result": "PASS",
+            "note": "All invalid AlphaMissense probes rejected; SpliceAI 0.10, 0.15, and 0.20 matched."
+          },
+          {
+            "text": "REVEL exact benign-side endpoints use the inclusive boundaries documented by the candidate.",
+            "result": "FAIL",
+            "note": "0.003, 0.016, 0.183, and 0.290 were placed in the next interval or made indeterminate."
+          },
+          {
+            "text": "BayesDel exact benign-side endpoints use the inclusive boundaries documented by the candidate.",
+            "result": "FAIL",
+            "note": "-0.36 became Supporting and -0.18 became indeterminate rather than Moderate and Supporting."
+          }
+        ],
+        "total": 62,
+        "assertions_passed": 3,
+        "assertions_total": 5
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Population and somatic evidence validation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Population helpers, numeric guards, all six somatic tiers, and the qualified-review boundary passed; the YYYY-MM-DD regex accepted the impossible date 2026-99-99.",
+        "basic": 33,
+        "specialized": 49,
+        "assertions": [
+          {
+            "text": "Whiffin, PM2 Supporting, BS1, and BA1 bounded cases produce the documented outcomes.",
+            "result": "PASS",
+            "note": "All four population cases matched and invalid numeric domains rejected."
+          },
+          {
+            "text": "Germline and somatic classification vocabularies remain separate.",
+            "result": "PASS",
+            "note": "Germline returned P/LP/VUS/LB/B vocabulary while somatic returned Tier labels."
+          },
+          {
+            "text": "Tier I-A, I-B, II-C, II-D, III, and IV are independently reachable.",
+            "result": "PASS",
+            "note": "All six tier cases matched and III/IV had distinct rationales."
+          },
+          {
+            "text": "Somatic enum conflicts, empty provenance, and unsupported oncogenic evidence are rejected.",
+            "result": "PASS",
+            "note": "All four invalid somatic probes raised actionable errors."
+          },
+          {
+            "text": "The access date is a real calendar date, not only a digit pattern.",
+            "result": "FAIL",
+            "note": "2026-99-99 was accepted and preserved in a Tier III result."
+          }
+        ],
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 5
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Current public GeneBe and ClinGen CSpec interfaces",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The shipped live smoke and independent direct calls passed: GeneBe returned one public documentation-example record and CSpec returned six GATM version records; preflight guards ran before requests.",
+        "basic": 37,
+        "specialized": 57,
+        "assertions": [
+          {
+            "text": "The current GeneBe coordinate helper succeeds and returns a parsed variant list.",
+            "result": "PASS",
+            "note": "One record was returned for the public documentation coordinate."
+          },
+          {
+            "text": "The current ClinGen CSpec versioned-gene helper succeeds and returns version identifiers.",
+            "result": "PASS",
+            "note": "Six GATM version records were returned."
+          },
+          {
+            "text": "Invalid chromosome, position, symbol, and timeout inputs fail before a network request.",
+            "result": "PASS",
+            "note": "All four preflight cases rejected."
+          },
+          {
+            "text": "The former CSpec UI route is marked stale and the current REST workflow is documented.",
+            "result": "PASS",
+            "note": "Both statements are present in the reference."
+          },
+          {
+            "text": "The public-interface workflow explicitly prohibits PHI and uses only public examples.",
+            "result": "PASS",
+            "note": "The skill and live-smoke docstring prohibit patient/private data; retained inputs are public documentation examples."
+          }
+        ],
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.4,
+    "dynamic_weighted": 45.5,
+    "score": 76,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The corrected Brnich code and table passed all 14 exact and adjacent pathogenic/benign boundary cases, including Very Strong above 350.",
+    "The Bergquist AlphaMissense implementation passed all 17 cases and preserves the published -3/+3 point bands without rounding them to legacy strengths.",
+    "LoF mechanism, transcript relevance, and incomplete canonical-splice review now stop PVS1, while all germline and somatic results retain a non-diagnostic qualified-review boundary.",
+    "Current GeneBe coordinate and ClinGen CSpec versioned-gene interfaces passed bounded public live execution, and Tier III and Tier IV are distinct."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ACMG-006: Enforce current evidence-family integrity",
+      "observed_in": [
+        4,
+        5,
+        6
+      ],
+      "problem": "The scorer accepts retired PP5/BP6, multiple strengths or aliases from the same criterion family, and opposed PP3/BP4 evidence; exact documented REVEL/BayesDel benign endpoints and semantic access dates are also validated incorrectly. PP5 and same-family duplication changed returned classifications.",
+      "root_cause": "Validation is keyed to exact strings and regex shapes rather than current ClinGen criterion families, mutual-exclusion rules, inclusive threshold semantics, and typed calendar dates.",
+      "fix": "Remove PP5/BP6 from accepted current criteria; define criterion families and reject multiple strengths, aliases, or opposed codes before summation; fix inclusive REVEL/BayesDel benign endpoints; parse access_date as an ISO calendar date. Add exact regressions for every observation in evidence/execution.json."
+    },
+    {
+      "priority": "P1",
+      "title": "ACMG-002: Reject contradictory PVS1 state",
+      "observed_in": [
+        2
+      ],
+      "problem": "A canonical splice fixture with is_nmd_predicted false and splice_consequence nmd silently returned PVS1 Very Strong.",
+      "root_cause": "The splice branch ignores is_nmd_predicted once the consequence string is supplied and does not reconcile duplicate representations of the NMD conclusion.",
+      "fix": "Use one canonical NMD field or reject contradictory fields before any strength assignment; add contradictory true/false and consequence cases plus deletion/initiation review-state regressions."
+    },
+    {
+      "priority": "P2",
+      "title": "ACMG-001: Remove residual Brnich contradiction",
+      "observed_in": [
+        3
+      ],
+      "problem": "The corrected table and code call greater than 4.3 Moderate, but failure mode 6 still says greater than 4.3 is required for Strong.",
+      "root_cause": "One explanatory sentence was not updated with the repaired threshold table.",
+      "fix": "Change the sentence to state that greater than 4.3 is Moderate and greater than 18.7 is Strong, then add a documentation consistency assertion."
+    }
+  ]
+}

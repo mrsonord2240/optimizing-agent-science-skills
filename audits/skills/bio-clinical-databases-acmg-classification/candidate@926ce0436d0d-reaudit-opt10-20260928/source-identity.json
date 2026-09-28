@@ -1,0 +1,71 @@
+{
+  "schema": "sha256-manifest-v1",
+  "skill": "bio-clinical-databases-acmg-classification",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clinical-databases/acmg-classification",
+    "subtree": "b4c1f4dd04a6a53f3eba2aa56da5d830ba325e1a"
+  },
+  "candidate": {
+    "path": "F:\\OpenScience\\wt\\opt10-acmg-classification\\skills\\bio-clinical-databases-acmg-classification",
+    "branch": "optimize/ten-20260928-lane3-acmg-classification",
+    "product_head": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "identity": "926ce0436d0d9fd1fb73a5f2b83728adfb622cf6f8ec41c8c00ad8d8300e8c07",
+    "identity_label": "sha256-manifest-v1:926ce0436d0d9fd1fb73a5f2b83728adfb622cf6f8ec41c8c00ad8d8300e8c07",
+    "manifest_bytes": 643,
+    "file_count": 7
+  },
+  "independence": {
+    "auditor": "/root/lane3_acmg_reaudit",
+    "performed_initial_audit": false,
+    "performed_fix": false,
+    "audit_phase": "reaudit-scientific-skill"
+  },
+  "environment": {
+    "tool_record": "F:\\OpenScience\\audit-envs\\bio-clinical-databases-acmg-classification\\TOOLS.md",
+    "tool_record_sha256": "96651ce26387bcd9e04369b381b6dc5cafac6fa64f0ba5d8d1c43ac25ec85161",
+    "fingerprint_sha256": "be04749b5d2581594940a228004479fe7c8511f371fc30b5c7dad5cf38a07cd7",
+    "python": "3.12.14",
+    "requests": "2.32.5",
+    "isolation": "private mount namespace; lazy-unmounted /mnt/f; /mnt/openscience only; WSL_INTEROP unset"
+  },
+  "audited_on": "2026-09-28",
+  "files": [
+    {
+      "bytes": 1065,
+      "path": "LICENSE",
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "bytes": 5805,
+      "path": "SKILL.md",
+      "sha256": "f85fa9a82650660f7ba17452904126625083f7d853fa8079681cb478b041470b"
+    },
+    {
+      "bytes": 23680,
+      "path": "references/acmg-framework.md",
+      "sha256": "d14bc53e15f42867f4638be2e50efdc67bec83d5ad49c923418977ca4ae0ed50"
+    },
+    {
+      "bytes": 623,
+      "path": "references/provenance.md",
+      "sha256": "7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce"
+    },
+    {
+      "bytes": 15176,
+      "path": "scripts/acmg_classify.py",
+      "sha256": "e9c7217fc289dab1e0374801bd381a9c716480b88fb543956df3efe20eb5616e"
+    },
+    {
+      "bytes": 948,
+      "path": "tests/live_interface_smoke.py",
+      "sha256": "33e77fb6a9456f4bde3beae2814909436b1cfbdd3898af7ffc520c4be47f0cbe"
+    },
+    {
+      "bytes": 8090,
+      "path": "tests/test_acmg_classify.py",
+      "sha256": "d5bbade7d070eaf43cf7203972085f81b24ca9c4f64cd590db5eb4741853ffbe"
+    }
+  ]
+}

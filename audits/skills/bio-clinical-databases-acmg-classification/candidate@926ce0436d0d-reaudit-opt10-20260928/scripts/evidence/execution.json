@@ -1,0 +1,1098 @@
+{
+  "candidate_identity_after": {
+    "digest": "926ce0436d0d9fd1fb73a5f2b83728adfb622cf6f8ec41c8c00ad8d8300e8c07",
+    "file_count": 7,
+    "files": [
+      {
+        "bytes": 1065,
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "bytes": 5805,
+        "path": "SKILL.md",
+        "sha256": "f85fa9a82650660f7ba17452904126625083f7d853fa8079681cb478b041470b"
+      },
+      {
+        "bytes": 23680,
+        "path": "references/acmg-framework.md",
+        "sha256": "d14bc53e15f42867f4638be2e50efdc67bec83d5ad49c923418977ca4ae0ed50"
+      },
+      {
+        "bytes": 623,
+        "path": "references/provenance.md",
+        "sha256": "7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce"
+      },
+      {
+        "bytes": 15176,
+        "path": "scripts/acmg_classify.py",
+        "sha256": "e9c7217fc289dab1e0374801bd381a9c716480b88fb543956df3efe20eb5616e"
+      },
+      {
+        "bytes": 948,
+        "path": "tests/live_interface_smoke.py",
+        "sha256": "33e77fb6a9456f4bde3beae2814909436b1cfbdd3898af7ffc520c4be47f0cbe"
+      },
+      {
+        "bytes": 8090,
+        "path": "tests/test_acmg_classify.py",
+        "sha256": "d5bbade7d070eaf43cf7203972085f81b24ca9c4f64cd590db5eb4741853ffbe"
+      }
+    ],
+    "manifest_bytes": 643,
+    "rows": [
+      "LICENSE\t1065\tb6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "SKILL.md\t5805\tf85fa9a82650660f7ba17452904126625083f7d853fa8079681cb478b041470b",
+      "references/acmg-framework.md\t23680\td14bc53e15f42867f4638be2e50efdc67bec83d5ad49c923418977ca4ae0ed50",
+      "references/provenance.md\t623\t7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce",
+      "scripts/acmg_classify.py\t15176\te9c7217fc289dab1e0374801bd381a9c716480b88fb543956df3efe20eb5616e",
+      "tests/live_interface_smoke.py\t948\t33e77fb6a9456f4bde3beae2814909436b1cfbdd3898af7ffc520c4be47f0cbe",
+      "tests/test_acmg_classify.py\t8090\td5bbade7d070eaf43cf7203972085f81b24ca9c4f64cd590db5eb4741853ffbe"
+    ],
+    "schema": "sha256-manifest-v1"
+  },
+  "candidate_identity_before": {
+    "digest": "926ce0436d0d9fd1fb73a5f2b83728adfb622cf6f8ec41c8c00ad8d8300e8c07",
+    "file_count": 7,
+    "files": [
+      {
+        "bytes": 1065,
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "bytes": 5805,
+        "path": "SKILL.md",
+        "sha256": "f85fa9a82650660f7ba17452904126625083f7d853fa8079681cb478b041470b"
+      },
+      {
+        "bytes": 23680,
+        "path": "references/acmg-framework.md",
+        "sha256": "d14bc53e15f42867f4638be2e50efdc67bec83d5ad49c923418977ca4ae0ed50"
+      },
+      {
+        "bytes": 623,
+        "path": "references/provenance.md",
+        "sha256": "7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce"
+      },
+      {
+        "bytes": 15176,
+        "path": "scripts/acmg_classify.py",
+        "sha256": "e9c7217fc289dab1e0374801bd381a9c716480b88fb543956df3efe20eb5616e"
+      },
+      {
+        "bytes": 948,
+        "path": "tests/live_interface_smoke.py",
+        "sha256": "33e77fb6a9456f4bde3beae2814909436b1cfbdd3898af7ffc520c4be47f0cbe"
+      },
+      {
+        "bytes": 8090,
+        "path": "tests/test_acmg_classify.py",
+        "sha256": "d5bbade7d070eaf43cf7203972085f81b24ca9c4f64cd590db5eb4741853ffbe"
+      }
+    ],
+    "manifest_bytes": 643,
+    "rows": [
+      "LICENSE\t1065\tb6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "SKILL.md\t5805\tf85fa9a82650660f7ba17452904126625083f7d853fa8079681cb478b041470b",
+      "references/acmg-framework.md\t23680\td14bc53e15f42867f4638be2e50efdc67bec83d5ad49c923418977ca4ae0ed50",
+      "references/provenance.md\t623\t7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce",
+      "scripts/acmg_classify.py\t15176\te9c7217fc289dab1e0374801bd381a9c716480b88fb543956df3efe20eb5616e",
+      "tests/live_interface_smoke.py\t948\t33e77fb6a9456f4bde3beae2814909436b1cfbdd3898af7ffc520c4be47f0cbe",
+      "tests/test_acmg_classify.py\t8090\td5bbade7d070eaf43cf7203972085f81b24ca9c4f64cd590db5eb4741853ffbe"
+    ],
+    "schema": "sha256-manifest-v1"
+  },
+  "completed_at": "2026-09-28T21:11:19.719333+00:00",
+  "phase": "independent-reaudit",
+  "runtime": {
+    "python": "3.12.14 (main, Sep  2 2026, 23:27:36) [GCC 15.3.0]",
+    "requests": "2.32.5"
+  },
+  "started_at": "2026-09-28T21:11:05.650893+00:00",
+  "static_checks": {
+    "brnich_table_corrected": true,
+    "contradictory_brnich_sentence_present": true,
+    "pp5_bp6_retirement_documented": false,
+    "practice_boundary_in_skill": true,
+    "stale_cspec_route_marked": true
+  },
+  "surface_runs": {
+    "compile": [
+      {
+        "command": [
+          "/mnt/openscience/audit-envs/bio-clinical-databases-acmg-classification/conda-env-delta/bin/python",
+          "-B",
+          "-X",
+          "pycache_prefix=/tmp/acmg-reaudit-pycache",
+          "-m",
+          "py_compile",
+          "/mnt/openscience/wt/opt10-acmg-classification/skills/bio-clinical-databases-acmg-classification/scripts/acmg_classify.py"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ""
+      },
+      {
+        "command": [
+          "/mnt/openscience/audit-envs/bio-clinical-databases-acmg-classification/conda-env-delta/bin/python",
+          "-B",
+          "-X",
+          "pycache_prefix=/tmp/acmg-reaudit-pycache",
+          "-m",
+          "py_compile",
+          "/mnt/openscience/wt/opt10-acmg-classification/skills/bio-clinical-databases-acmg-classification/tests/test_acmg_classify.py"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ""
+      },
+      {
+        "command": [
+          "/mnt/openscience/audit-envs/bio-clinical-databases-acmg-classification/conda-env-delta/bin/python",
+          "-B",
+          "-X",
+          "pycache_prefix=/tmp/acmg-reaudit-pycache",
+          "-m",
+          "py_compile",
+          "/mnt/openscience/wt/opt10-acmg-classification/skills/bio-clinical-databases-acmg-classification/tests/live_interface_smoke.py"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ""
+      }
+    ],
+    "live_interface_smoke": {
+      "command": [
+        "/mnt/openscience/audit-envs/bio-clinical-databases-acmg-classification/conda-env-delta/bin/python",
+        "-B",
+        "tests/live_interface_smoke.py"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "GeneBe coordinate contract: PASS (1 variant record(s))\nCSpec versioned-gene contract: PASS (6 version record(s))\n"
+    },
+    "standalone_demo": {
+      "command": [
+        "/mnt/openscience/audit-envs/bio-clinical-databases-acmg-classification/conda-env-delta/bin/python",
+        "-B",
+        "scripts/acmg_classify.py"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "NON-DIAGNOSTIC TRAINING EXAMPLE\nEducational evidence sketch only; not for patient diagnosis, treatment, or stand-alone clinical reporting. A qualified variant scientist or clinical geneticist must review disease, transcript, VCEP rules, provenance, conflicts, and uncertainty.\nContext: disease=unresolved; transcript=unresolved; VCEP=not checked; assay validity=unreviewed\nCriteria: ['PP3_Strong', 'PS3_Moderate', 'PM2_Supporting']\nIllustrative points/category: 7 / Likely Pathogenic\nUncertainty: do not use until context and conflicts receive qualified review.\n"
+    },
+    "unit_tests": {
+      "command": [
+        "/mnt/openscience/audit-envs/bio-clinical-databases-acmg-classification/conda-env-delta/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "stderr": "test_bergquist_intervals (test_acmg_classify.AlphaMissenseTests.test_bergquist_intervals) ... ok\ntest_probability_domain (test_acmg_classify.AlphaMissenseTests.test_probability_domain) ... ok\ntest_cspec_uses_versioned_gene_route (test_acmg_classify.InterfaceTests.test_cspec_uses_versioned_gene_route) ... ok\ntest_genebe_uses_coordinate_contract (test_acmg_classify.InterfaceTests.test_genebe_uses_coordinate_contract) ... ok\ntest_interface_validation_precedes_request (test_acmg_classify.InterfaceTests.test_interface_validation_precedes_request) ... ok\ntest_exact_brnich_boundaries (test_acmg_classify.OddsPathTests.test_exact_brnich_boundaries) ... ok\ntest_nonpositive_rejected (test_acmg_classify.OddsPathTests.test_nonpositive_rejected) ... ok\ntest_nmd_and_ten_percent_boundary (test_acmg_classify.PVS1Tests.test_nmd_and_ten_percent_boundary) ... ok\ntest_prerequisites_gate_pvs1 (test_acmg_classify.PVS1Tests.test_prerequisites_gate_pvs1) ... ok\ntest_splice_requires_consequence_and_rescue_review (test_acmg_classify.PVS1Tests.test_splice_requires_consequence_and_rescue_review) ... ok\ntest_all_tiers_and_tier_iii_iv_distinction (test_acmg_classify.SomaticTests.test_all_tiers_and_tier_iii_iv_distinction) ... ok\ntest_invalid_or_unproven_somatic_input_stops (test_acmg_classify.SomaticTests.test_invalid_or_unproven_somatic_input_stops) ... ok\ntest_numeric_domains (test_acmg_classify.ValidationTests.test_numeric_domains) ... ok\ntest_standalone_demo_is_coherent_and_guarded (test_acmg_classify.ValidationTests.test_standalone_demo_is_coherent_and_guarded) ... ok\ntest_subsumption_and_notice (test_acmg_classify.ValidationTests.test_subsumption_and_notice) ... ok\ntest_unknown_duplicate_and_wrong_type_rejected (test_acmg_classify.ValidationTests.test_unknown_duplicate_and_wrong_type_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 16 tests in 1.830s\n\nOK\n",
+      "stdout": ""
+    }
+  },
+  "workflows": {
+    "alphamissense": {
+      "cases": [
+        {
+          "actual": "BP4_3pt",
+          "expected": "BP4_3pt",
+          "label": "AlphaMissense 0.0",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BP4_3pt",
+          "expected": "BP4_3pt",
+          "label": "AlphaMissense 0.07",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BP4_Moderate",
+          "expected": "BP4_Moderate",
+          "label": "AlphaMissense 0.071",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BP4_Moderate",
+          "expected": "BP4_Moderate",
+          "label": "AlphaMissense 0.099",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BP4_Supporting",
+          "expected": "BP4_Supporting",
+          "label": "AlphaMissense 0.1",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BP4_Supporting",
+          "expected": "BP4_Supporting",
+          "label": "AlphaMissense 0.169",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "AlphaMissense 0.17",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "AlphaMissense 0.564",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "AlphaMissense 0.791",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Supporting",
+          "expected": "PP3_Supporting",
+          "label": "AlphaMissense 0.792",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Supporting",
+          "expected": "PP3_Supporting",
+          "label": "AlphaMissense 0.905",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Moderate",
+          "expected": "PP3_Moderate",
+          "label": "AlphaMissense 0.906",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Moderate",
+          "expected": "PP3_Moderate",
+          "label": "AlphaMissense 0.971",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_3pt",
+          "expected": "PP3_3pt",
+          "label": "AlphaMissense 0.972",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_3pt",
+          "expected": "PP3_3pt",
+          "label": "AlphaMissense 0.989",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Strong",
+          "expected": "PP3_Strong",
+          "label": "AlphaMissense 0.99",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Strong",
+          "expected": "PP3_Strong",
+          "label": "AlphaMissense 1.0",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "invalid": [
+        {
+          "error": "ValueError: am_score must be between 0 and 1 inclusive",
+          "label": "AlphaMissense rejects -0.001",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: am_score must be between 0 and 1 inclusive",
+          "label": "AlphaMissense rejects 1.001",
+          "rejected": true
+        },
+        {
+          "error": "TypeError: am_score must be a finite real number",
+          "label": "AlphaMissense rejects True",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: am_score must be finite",
+          "label": "AlphaMissense rejects nan",
+          "rejected": true
+        },
+        {
+          "error": "TypeError: am_score must be a finite real number",
+          "label": "AlphaMissense rejects '0.9'",
+          "rejected": true
+        }
+      ]
+    },
+    "interfaces": {
+      "live": {
+        "cspec": {
+          "record_count": 6,
+          "status": "PASS",
+          "version_ids": [
+            "https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/2.0.1",
+            "https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/2.0.0",
+            "https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/1.1.1",
+            "https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/1.1.0",
+            "https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/1.0.1",
+            "https://cspec.genome.network/cspec/SequenceVariantInterpretation/id/GN025/version/1.0.0"
+          ]
+        },
+        "genebe": {
+          "first_record_keys": [
+            "acmg_by_gene",
+            "acmg_classification",
+            "acmg_criteria",
+            "acmg_score",
+            "allele_count_reference_population",
+            "alphamissense_prediction",
+            "alphamissense_score",
+            "alt",
+            "apogee2_prediction",
+            "apogee2_score",
+            "bayesdelnoaf_prediction",
+            "bayesdelnoaf_score",
+            "chr",
+            "clinvar_classification",
+            "clinvar_disease",
+            "clinvar_review_status",
+            "clinvar_submissions_summary",
+            "computational_prediction_selected",
+            "computational_score_selected",
+            "computational_source_selected",
+            "consequences",
+            "custom_annotations",
+            "dbscsnv_ada_prediction",
+            "dbscsnv_ada_score",
+            "dbsnp",
+            "effect",
+            "frequency_reference_population",
+            "gene_hgnc_id",
+            "gene_symbol",
+            "gnomad_exomes_ac",
+            "gnomad_exomes_af",
+            "gnomad_exomes_homalt",
+            "gnomad_genomes_ac",
+            "gnomad_genomes_af",
+            "gnomad_genomes_homalt",
+            "gnomad_mito_heteroplasmic",
+            "gnomad_mito_homoplasmic",
+            "hom_count_reference_population",
+            "mitotip_prediction",
+            "mitotip_score",
+            "pathogenicity_classification_combined",
+            "phenotype_combined",
+            "phylop100way_prediction",
+            "phylop100way_score",
+            "pos",
+            "ref",
+            "revel_prediction",
+            "revel_score",
+            "splice_prediction_selected",
+            "splice_score_selected",
+            "splice_source_selected",
+            "spliceai_max_prediction",
+            "spliceai_max_score",
+            "transcript",
+            "warning"
+          ],
+          "record_count": 1,
+          "status": "PASS"
+        }
+      },
+      "preflight": [
+        {
+          "error": "ValueError: chrom must be a canonical chromosome name",
+          "label": "invalid chromosome",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: pos must be a positive integer",
+          "label": "negative position",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: gene_symbol must be a nonempty HGNC-style symbol",
+          "label": "invalid CSpec symbol",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: timeout must be greater than zero",
+          "label": "invalid timeout",
+          "rejected": true
+        }
+      ]
+    },
+    "oddspath": {
+      "cases": [
+        {
+          "actual": "PS3_VeryStrong",
+          "expected": "PS3_VeryStrong",
+          "label": "OddsPath 351.0",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PS3",
+          "expected": "PS3",
+          "label": "OddsPath 350.0",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PS3",
+          "expected": "PS3",
+          "label": "OddsPath 19.0",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PS3_Moderate",
+          "expected": "PS3_Moderate",
+          "label": "OddsPath 18.7",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PS3_Moderate",
+          "expected": "PS3_Moderate",
+          "label": "OddsPath 5.0",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PS3_Supporting",
+          "expected": "PS3_Supporting",
+          "label": "OddsPath 4.3",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PS3_Supporting",
+          "expected": "PS3_Supporting",
+          "label": "OddsPath 2.2",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "OddsPath 2.1",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "OddsPath 0.48",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BS3_Supporting",
+          "expected": "BS3_Supporting",
+          "label": "OddsPath 0.47",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BS3_Supporting",
+          "expected": "BS3_Supporting",
+          "label": "OddsPath 0.23",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BS3_Moderate",
+          "expected": "BS3_Moderate",
+          "label": "OddsPath 0.22",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BS3_Moderate",
+          "expected": "BS3_Moderate",
+          "label": "OddsPath 0.053",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BS3",
+          "expected": "BS3",
+          "label": "OddsPath 0.052",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "invalid": [
+        {
+          "error": "ValueError: odds_path must be greater than zero",
+          "label": "OddsPath rejects 0",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: odds_path must be greater than zero",
+          "label": "OddsPath rejects -0.1",
+          "rejected": true
+        },
+        {
+          "error": "TypeError: odds_path must be a finite real number",
+          "label": "OddsPath rejects True",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: odds_path must be finite",
+          "label": "OddsPath rejects nan",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: odds_path must be finite",
+          "label": "OddsPath rejects inf",
+          "rejected": true
+        },
+        {
+          "error": "TypeError: odds_path must be a finite real number",
+          "label": "OddsPath rejects '8'",
+          "rejected": true
+        }
+      ]
+    },
+    "other_predictor_boundaries": {
+      "bayesdel": [
+        {
+          "actual": "BP4_Supporting",
+          "expected": "BP4_Moderate",
+          "label": "BayesDel exact -0.36",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": "BP4_Supporting",
+          "label": "BayesDel exact -0.18",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Supporting",
+          "expected": "PP3_Supporting",
+          "label": "BayesDel exact 0.13",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Strong",
+          "expected": "PP3_Strong",
+          "label": "BayesDel exact 0.50",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "revel": [
+        {
+          "actual": "BP4_Strong",
+          "expected": "BP4_VeryStrong",
+          "label": "REVEL exact 0.003",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BP4_Moderate",
+          "expected": "BP4_Strong",
+          "label": "REVEL exact 0.016",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BP4_Supporting",
+          "expected": "BP4_Moderate",
+          "label": "REVEL exact 0.183",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": "BP4_Supporting",
+          "label": "REVEL exact 0.290",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Supporting",
+          "expected": "PP3_Supporting",
+          "label": "REVEL exact 0.644",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Strong",
+          "expected": "PP3_Strong",
+          "label": "REVEL exact 0.932",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "spliceai": [
+        {
+          "actual": "BP4_Supporting",
+          "expected": "BP4_Supporting",
+          "label": "SpliceAI exact 0.10",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "SpliceAI 0.15",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PP3_Supporting",
+          "expected": "PP3_Supporting",
+          "label": "SpliceAI exact 0.20",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ]
+    },
+    "population": {
+      "cases": [
+        {
+          "actual": 0.0005,
+          "expected": 0.0005,
+          "label": "Whiffin default",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PM2_Supporting",
+          "expected": "PM2_Supporting",
+          "label": "zero observed PM2",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BS1",
+          "expected": "BS1",
+          "label": "above BS1 threshold",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "BA1",
+          "expected": "BA1",
+          "label": "above BA1 threshold",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "invalid": [
+        {
+          "error": "ValueError: penetrance must be greater than zero",
+          "label": "zero penetrance",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: prevalence must be between 0 and 1 inclusive",
+          "label": "negative prevalence",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: grpmax_faf95 must be finite",
+          "label": "nonfinite frequency",
+          "rejected": true
+        },
+        {
+          "error": "TypeError: revel_score must be a finite real number",
+          "label": "bool score",
+          "rejected": true
+        }
+      ]
+    },
+    "pvs1": {
+      "cases": [
+        {
+          "actual": null,
+          "expected": null,
+          "label": "LoF mechanism absent",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "disease transcript absent",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PVS1_VeryStrong",
+          "expected": "PVS1_VeryStrong",
+          "label": "nonsense NMD",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PVS1_Moderate",
+          "expected": "PVS1_Moderate",
+          "label": "escape exactly 10 percent",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PVS1_Strong",
+          "expected": "PVS1_Strong",
+          "label": "escape above 10 percent",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PVS1_REVIEW_REQUIRED",
+          "expected": "PVS1_REVIEW_REQUIRED",
+          "label": "splice consequence missing",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PVS1_REVIEW_REQUIRED",
+          "expected": "PVS1_REVIEW_REQUIRED",
+          "label": "splice rescue review missing",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PVS1_VeryStrong",
+          "expected": "PVS1_VeryStrong",
+          "label": "splice NMD reviewed",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": null,
+          "expected": null,
+          "label": "splice no impact",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "conflict": {
+        "actual": "PVS1_VeryStrong",
+        "expected": "REJECT_CONTRADICTORY_INPUT",
+        "label": "contradictory splice NMD signals",
+        "match": false,
+        "status": "RETURNED"
+      },
+      "fresh_variant_cases": [
+        {
+          "actual": "PVS1_Moderate",
+          "expected": "PVS1_Moderate",
+          "label": "initiation returns bounded moderate",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "PVS1_Strong",
+          "expected": "PVS1_Strong",
+          "label": "multi-exon noncritical deletion",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ]
+    },
+    "somatic": {
+      "cases": [
+        {
+          "actual": "Tier I-A",
+          "expected": "Tier I-A",
+          "label": "Tier I-A",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Tier I-B",
+          "expected": "Tier I-B",
+          "label": "Tier I-B",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Tier II-C",
+          "expected": "Tier II-C",
+          "label": "Tier II-C",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Tier II-D",
+          "expected": "Tier II-D",
+          "label": "Tier II-D",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Tier III",
+          "expected": "Tier III",
+          "label": "Tier III",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Tier IV",
+          "expected": "Tier IV",
+          "label": "Tier IV",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": true,
+          "expected": true,
+          "label": "somatic result carries guard",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "invalid": [
+        {
+          "error": "ValueError: evidence_level must be one of ['clinical_trial', 'none', 'preclinical', 'professional_guideline', 'regulatory_approved']",
+          "label": "invalid evidence enum",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: oncogenic significance without evidence requires review, not a tier",
+          "label": "oncogenic without evidence",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: actionable evidence conflicts with benign significance; review required",
+          "label": "benign with actionable evidence",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: knowledgebase and its evidence record are required",
+          "label": "empty knowledgebase",
+          "rejected": true
+        }
+      ],
+      "invalid_date": {
+        "actual": {
+          "access_date": "2026-99-99",
+          "clinical_use": "Educational evidence sketch only; not for patient diagnosis, treatment, or stand-alone clinical reporting. A qualified variant scientist or clinical geneticist must review disease, transcript, VCEP rules, provenance, conflicts, and uncertainty.",
+          "knowledgebase": "CIViC evidence record CIViC-1",
+          "rationale": "uncertain clinical significance",
+          "review_required": true,
+          "tier": "Tier III"
+        },
+        "expected": "REJECT_INVALID_DATE",
+        "label": "semantically impossible access date",
+        "match": false,
+        "status": "RETURNED"
+      }
+    },
+    "tavtigian": {
+      "basic_rejections": [
+        {
+          "error": "ValueError: unknown evidence code(s): NOT_A_CRITERION",
+          "label": "unknown criterion",
+          "rejected": true
+        },
+        {
+          "error": "ValueError: duplicate evidence code(s): PS3",
+          "label": "exact duplicate criterion",
+          "rejected": true
+        },
+        {
+          "error": "TypeError: criteria_assigned must be a sequence of evidence-code strings",
+          "label": "string instead of sequence",
+          "rejected": true
+        }
+      ],
+      "boundaries": [
+        {
+          "actual": "Pathogenic",
+          "expected": "Pathogenic",
+          "label": "10 points",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Likely Pathogenic",
+          "expected": "Likely Pathogenic",
+          "label": "9 points",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Likely Pathogenic",
+          "expected": "Likely Pathogenic",
+          "label": "6 points",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "VUS",
+          "expected": "VUS",
+          "label": "5 points",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Likely Benign",
+          "expected": "Likely Benign",
+          "label": "minus 1",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Likely Benign",
+          "expected": "Likely Benign",
+          "label": "minus 6",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": "Benign",
+          "expected": "Benign",
+          "label": "minus 7",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ],
+      "retired_criteria": [
+        {
+          "actual": {
+            "classification": "Likely Pathogenic",
+            "clinical_use": "Educational evidence sketch only; not for patient diagnosis, treatment, or stand-alone clinical reporting. A qualified variant scientist or clinical geneticist must review disease, transcript, VCEP rules, provenance, conflicts, and uncertainty.",
+            "criteria": [
+              "PS3",
+              "PM2_Supporting",
+              "PP5"
+            ],
+            "points": 6,
+            "review_required": true
+          },
+          "expected": "REJECT_RETIRED_PP5",
+          "label": "PP5 can cross VUS to LP",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": {
+            "classification": "Likely Benign",
+            "clinical_use": "Educational evidence sketch only; not for patient diagnosis, treatment, or stand-alone clinical reporting. A qualified variant scientist or clinical geneticist must review disease, transcript, VCEP rules, provenance, conflicts, and uncertainty.",
+            "criteria": [
+              "BS1",
+              "BP6"
+            ],
+            "points": -5,
+            "review_required": true
+          },
+          "expected": "REJECT_RETIRED_BP6",
+          "label": "BP6 accepted",
+          "match": false,
+          "status": "RETURNED"
+        }
+      ],
+      "semantic_duplicates": [
+        {
+          "actual": {
+            "classification": "Pathogenic",
+            "clinical_use": "Educational evidence sketch only; not for patient diagnosis, treatment, or stand-alone clinical reporting. A qualified variant scientist or clinical geneticist must review disease, transcript, VCEP rules, provenance, conflicts, and uncertainty.",
+            "criteria": [
+              "PVS1_VeryStrong",
+              "PVS1_Strong"
+            ],
+            "points": 12,
+            "review_required": true
+          },
+          "expected": "REJECT_SEMANTIC_DUPLICATE",
+          "label": "two PVS1 strengths",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": {
+            "classification": "Likely Pathogenic",
+            "clinical_use": "Educational evidence sketch only; not for patient diagnosis, treatment, or stand-alone clinical reporting. A qualified variant scientist or clinical geneticist must review disease, transcript, VCEP rules, provenance, conflicts, and uncertainty.",
+            "criteria": [
+              "PS3",
+              "PM2",
+              "PM2_Supporting"
+            ],
+            "points": 6,
+            "review_required": true
+          },
+          "expected": "REJECT_SEMANTIC_DUPLICATE",
+          "label": "PM2 alias plus PM2 Supporting",
+          "match": false,
+          "status": "RETURNED"
+        },
+        {
+          "actual": {
+            "classification": "VUS",
+            "clinical_use": "Educational evidence sketch only; not for patient diagnosis, treatment, or stand-alone clinical reporting. A qualified variant scientist or clinical geneticist must review disease, transcript, VCEP rules, provenance, conflicts, and uncertainty.",
+            "criteria": [
+              "PP3_Strong",
+              "BP4_Strong"
+            ],
+            "points": 0,
+            "review_required": true
+          },
+          "expected": "REJECT_CONFLICT",
+          "label": "opposed PP3 and BP4",
+          "match": false,
+          "status": "RETURNED"
+        }
+      ],
+      "subsumption": [
+        {
+          "actual": [
+            "PVS1_VeryStrong",
+            "PM2_Supporting"
+          ],
+          "expected": [
+            "PVS1_VeryStrong",
+            "PM2_Supporting"
+          ],
+          "label": "PVS1 subsumes PP3 and PM4",
+          "match": true,
+          "status": "RETURNED"
+        },
+        {
+          "actual": true,
+          "expected": true,
+          "label": "result carries guard",
+          "match": true,
+          "status": "RETURNED"
+        }
+      ]
+    }
+  }
+}

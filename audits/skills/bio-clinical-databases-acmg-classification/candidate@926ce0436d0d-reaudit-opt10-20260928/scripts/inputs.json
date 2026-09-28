@@ -1,0 +1,44 @@
+[
+  {
+    "index": 1,
+    "type": "Canonical",
+    "label": "Guarded synthetic germline evidence ledger",
+    "prompt": "Run the shipped training example for a synthetic germline variant and inspect predictor selection, PS3 calibration, unresolved context, classification output, and the non-diagnostic qualified-review boundary."
+  },
+  {
+    "index": 2,
+    "type": "Variant A",
+    "label": "PVS1 prerequisites and splice stop states",
+    "prompt": "Exercise LoF-mechanism and transcript-relevance gates, NMD and 10 percent branches, canonical-splice consequence and rescue review, plus contradictory NMD inputs."
+  },
+  {
+    "index": 3,
+    "type": "Edge",
+    "label": "Brnich OddsPath exact boundaries and mirrors",
+    "prompt": "Evaluate exact and adjacent pathogenic and benign Brnich Table 3 OddsPath boundaries, nonpositive and non-finite inputs, and agreement between code and reference prose."
+  },
+  {
+    "index": 4,
+    "type": "Variant B",
+    "label": "Tavtigian scoring and evidence-family integrity",
+    "prompt": "Exercise all classification endpoints, unknown and duplicate criteria, PVS1 subsumption, multiple strengths from one criterion family, opposing predictor codes, and criteria retired by current ClinGen guidance."
+  },
+  {
+    "index": 5,
+    "type": "Stress",
+    "label": "Bergquist and Pejaver calibrated predictor endpoints",
+    "prompt": "Re-run the full AlphaMissense interval table including the -3/+3 point bands and fresh exact REVEL, BayesDel, and SpliceAI endpoint cases with invalid-domain controls."
+  },
+  {
+    "index": 6,
+    "type": "Scope Boundary",
+    "label": "Population and somatic evidence validation",
+    "prompt": "Exercise Whiffin, BS1/BA1, all six distinct AMP tiers, germline/somatic vocabulary separation, strict numeric/enumerated validation, provenance, and access-date validation."
+  },
+  {
+    "index": 7,
+    "type": "Adversarial",
+    "label": "Current public GeneBe and ClinGen CSpec interfaces",
+    "prompt": "Run the shipped bounded live smoke and direct candidate helpers against current public GeneBe coordinate and CSpec versioned-gene routes, including invalid preflight inputs and the no-PHI boundary."
+  }
+]

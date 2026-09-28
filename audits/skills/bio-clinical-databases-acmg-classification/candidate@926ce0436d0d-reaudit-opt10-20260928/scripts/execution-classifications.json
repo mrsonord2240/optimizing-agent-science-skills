@@ -1,0 +1,72 @@
+{
+  "skill": "bio-clinical-databases-acmg-classification",
+  "candidate_identity": "926ce0436d0d9fd1fb73a5f2b83728adfb622cf6f8ec41c8c00ad8d8300e8c07",
+  "surfaces": [
+    {
+      "surface": "scripts/acmg_classify.py compile/import",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/execution.json#surface_runs.compile"
+    },
+    {
+      "surface": "tests/test_acmg_classify.py",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/unit-tests.log"
+    },
+    {
+      "surface": "scripts/acmg_classify.py standalone demo",
+      "classification": "EXECUTED",
+      "status": "PASS_WITH_FINDINGS",
+      "evidence": "evidence/standalone-demo.log"
+    },
+    {
+      "surface": "tests/live_interface_smoke.py",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/live-interface-smoke.log"
+    },
+    {
+      "surface": "all 15 candidate callables through independent fixtures",
+      "classification": "EXECUTED",
+      "status": "FAIL_WITH_REPRODUCED_FINDINGS",
+      "evidence": "evidence/execution.json#workflows"
+    },
+    {
+      "surface": "GeneBe public coordinate endpoint",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/execution.json#workflows.interfaces.live.genebe"
+    },
+    {
+      "surface": "ClinGen CSpec versioned-gene endpoint",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/execution.json#workflows.interfaces.live.cspec"
+    },
+    {
+      "surface": "InterVar 2.2+ with ANNOVAR data",
+      "classification": "DOCUMENTED_ONLY",
+      "status": "BLOCKED_RESTRICTED_DATA",
+      "evidence": "TOOLS.md inventory; ANNOVAR registration and annotation data required"
+    },
+    {
+      "surface": "AutoPVS1 external implementation",
+      "classification": "DOCUMENTED_ONLY",
+      "status": "UNPINNED_NO_SHIPPED_CALLABLE",
+      "evidence": "TOOLS.md inventory"
+    },
+    {
+      "surface": "VarSome, Franklin/Genoox, ClinGen VCI manual curation",
+      "classification": "RESTRICTED_MANUAL",
+      "status": "NOT_EXECUTED",
+      "evidence": "TOOLS.md inventory"
+    },
+    {
+      "surface": "other named evidence sources and knowledgebases",
+      "classification": "DOCUMENTED_ONLY",
+      "status": "NO_SHIPPED_WRAPPER",
+      "evidence": "TOOLS.md inventory"
+    }
+  ]
+}

@@ -32,7 +32,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-batch-processing` | Data Analysis | 97 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-batch-processing/candidate@f5558565b7f1-reaudit-opt10-20260928/viewer.md) |
 | `bio-cfdna-preprocessing` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-cfdna-preprocessing/candidate@148b254a3107-reaudit-opt10-20260928/viewer.md) |
 | `bio-chipseq-allele-specific-binding` | Data Analysis | 51 | Reject | 3 / 3 / 1 | [viewer](skills/bio-chipseq-allele-specific-binding/candidate@a058f8a1b36e-initial-opt10-20260928/viewer.md) |
-| `bio-clinical-databases-acmg-classification` | Data Analysis | 46 | Reject | 3 / 5 / 1 | [viewer](skills/bio-clinical-databases-acmg-classification/candidate@719fd2d6eb6f-initial-opt10-20260928/viewer.md) |
+| `bio-clinical-databases-acmg-classification` | Data Analysis | 76 | Reject | 1 / 1 / 1 | [viewer](skills/bio-clinical-databases-acmg-classification/candidate@926ce0436d0d-reaudit-opt10-20260928/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |
