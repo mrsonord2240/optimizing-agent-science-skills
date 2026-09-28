@@ -1,0 +1,12 @@
+{
+  "conclusion": "Pinned targeted CWL prose says 9 nt, executable defaults to 10 nt, CWL does not override, and the live default extracts 10 nt.",
+  "cwl_prose_says_9nt": true,
+  "cwl_sha256": "b5472f5e5282a548f2e0b6695742cbdfd0fefdae2623c762121614895ef80ba7",
+  "cwl_supplies_umi_length": false,
+  "live_header": "@read1_AACCGGTTAA description",
+  "live_prefix_length": 10,
+  "live_returncode": 0,
+  "script_default_umi_length_10": true,
+  "script_sha256": "af887ae426084af9fa8ef403da8e46cb9b1c29732affaccf570e46bc0de6833f",
+  "source_commit": "75fe74e90e6e4ca670a5af76836d80db09bdbcb1"
+}

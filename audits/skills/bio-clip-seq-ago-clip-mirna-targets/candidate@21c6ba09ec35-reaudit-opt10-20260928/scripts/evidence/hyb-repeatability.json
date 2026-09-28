@@ -1,0 +1,49 @@
+{
+  "cross_pair": {
+    "accepted_only_in_a": [
+      "14538_1",
+      "16192_1",
+      "23368_1",
+      "25396_1",
+      "43802_1",
+      "7938_1",
+      "8145_1"
+    ],
+    "accepted_only_in_b": [
+      "19372_1",
+      "31168_1",
+      "48489_1",
+      "55648_1",
+      "61840_1",
+      "73394_1",
+      "9420_1"
+    ],
+    "changed_assignments_among_shared": [
+      "24330_1",
+      "25530_1",
+      "29870_1",
+      "73092_1"
+    ],
+    "exclusion_reason_changed": [],
+    "identical_sites_bytes": false,
+    "identical_targets_bytes": false
+  },
+  "pair_a": {
+    "accepted": 94,
+    "excluded": 17,
+    "reasons": {
+      "unstable_assignment": 17
+    },
+    "sites_sha256": "953725d682c8b9d3e1cdfc103e44b0bc4607b9f2973f652e43373daafa7c5121",
+    "targets_sha256": "3601ed6dfcf272ec954b43cbc57bb610ae691fd2519ba6ac8a975992cc99b5df"
+  },
+  "pair_b": {
+    "accepted": 94,
+    "excluded": 17,
+    "reasons": {
+      "unstable_assignment": 17
+    },
+    "sites_sha256": "86ebbdac9aa76553d837f5619524b2f3dddb8d9ab866275c86d7ef3cdee4a3e7",
+    "targets_sha256": "71d7274e6ad318f52e913b6fce30679aa9b3ec1e1baa21cb946c0e79f185bcf2"
+  }
+}

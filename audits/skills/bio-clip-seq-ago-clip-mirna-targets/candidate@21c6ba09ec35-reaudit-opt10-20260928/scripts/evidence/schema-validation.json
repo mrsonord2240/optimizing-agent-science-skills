@@ -1,0 +1,24 @@
+{
+  "schema": "skill-auditor report schema v4.0",
+  "valid": true,
+  "errors": [],
+  "candidate_identity": "21c6ba09ec3580896c35adbe5175ac2e7bf161870e912e46d2bbca42190cfebc",
+  "static_subtotal": 88,
+  "dynamic_average": 86.0,
+  "assertions": {
+    "passed": 23,
+    "total": 25
+  },
+  "weighted": {
+    "static": 35.2,
+    "dynamic": 51.6,
+    "rounded_final": 87
+  },
+  "skill_veto": "FAIL",
+  "research_veto": "FAIL",
+  "readiness": "rejected",
+  "open_findings": [
+    "AGO-004",
+    "AGO-005"
+  ]
+}

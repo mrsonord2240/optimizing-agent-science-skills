@@ -1,70 +1,66 @@
-# Handoff: bio-clip-seq-ago-clip-mirna-targets / fix
+# Handoff: bio-clip-seq-ago-clip-mirna-targets / independent final re-audit
 
-- Updated: 2026-09-28T14:55:00-07:00
+- Updated: 2026-09-28T16:02:00-07:00
 - Lane: 4
-- Status: ready-for-phase
-- Owner leaving: audit-scientific-skill
+- Status: rejected; repair required
+- Owner leaving: reaudit-scientific-skill (fresh independent worker)
 - Next role: fix-scientific-skill
 
 ## Source identity
 
 - Origin: `GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clip-seq/ago-clip-mirna-targets`; origin subtree `6326a423789826240d0840be6897ddd69b21d940`.
-- Candidate: `F:\OpenScience\wt\opt10-ago-clip\skills\bio-clip-seq-ago-clip-mirna-targets` on `optimize/ten-20260928-lane4-ago-clip`; base commit `0bc0b31fc52742dbec1034f698103434cc9460c3`.
-- Exact audited content SHA-256: `9eb490f452b4c0e4a27a95986816e7d84d689e6077a537e057368b9e471cf7e7` (six files; 591-byte manifest).
-- Strict source identity: `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\initial-opt10-20260928\source-identity.json` (SHA-256 `54c6c034ca29ca0ee8b508af032639ff5497b2aa100cb9e98868d10fcfeb45f1`).
+- Worktree/branch: `F:\OpenScience\wt\opt10-ago-clip` / `optimize/ten-20260928-lane4-ago-clip`; unchanged product HEAD `0bc0b31fc52742dbec1034f698103434cc9460c3`.
+- Exact re-audited identity: `21c6ba09ec3580896c35adbe5175ac2e7bf161870e912e46d2bbca42190cfebc` (nine files; 886-byte ordinal manifest).
+- Identity was independently regenerated before and during report validation; candidate bytes were not changed.
+- Applicable initial audit: `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\initial-opt10-20260928\report.json`, SHA-256 `ebe0e70aeb3d781470e8a2ae69fdc4a242235e0afdc2a1f4b7b5bc44a3ac23e2`.
 
 ## Completed this phase
 
-- Independent initial audit completed against the exact unchanged candidate. Final diagnostic score: **37/100, Reject**; static 46/100, execution average 31.4/100, assertions 10/25.
-- Skill veto **FAIL**: Stability, Determinism, and Security. Research veto **FAIL**: Methodological Ground and Code Usability. Contract, Scientific Integrity, and Practice Boundaries pass.
-- Rebuilt the pinned Hyb runtime from Git blobs, ran official data twice, and obtained 111 valid 16-field rows per run. The same read ids received 18 different RNA-pair assignments in each run.
-- Ran the exact wrapper against real Hyb: invalid generated-FASTA database contract, wrapper exit 0, and three empty derived tables.
-- Reproduced the wrapper matrix: Hyb exit 42 swallowed, spaces fail with exit 0, literal glob includes a sibling FASTA, actual output naming is missed, and current 16-column rows are discarded by field-3/5 assumptions.
-- Re-executed UMI-tools, cutadapt, soft-clip diagnostic, unstranded/stranded bedtools controls, and TargetScanHuman 8 schema parsing.
-- Classified public Yeo chim-eCLIP, HEAP/CLIPanalyze, Hyb, TargetScan, miRDB, DIANA, pyHyb, and hybkit interfaces without substitution or access bypass.
-- No audit-local repair was eligible: every correction changes a scientific interface, parser, safety boundary, determinism policy, or interpretation rule. Audit publication was intentionally left to the orchestrator.
+- Read the full current audit protocol/rubric and independently audited only the exact fixed candidate.
+- Re-ran the shipped suite: 5/5 pass.
+- Ran an independent nine-assertion parser/wrapper adversarial matrix: 9/9 pass across both 16-column orientations, expression provenance, reason codes, malformed schemas, path quoting, overwrite refusal, status 42, failed-replacement preservation, and stage cleanup.
+- Executed two fresh complete wrapper batches on pinned Hyb `028ab63` official input, two clean single-thread replicates per batch. Every underlying run produced 111 non-empty 16-column rows; each batch retained 94 and excluded 17.
+- Compared the two complete batches at read-id and normalized-assignment level: seven accepted-only ids on each side plus four changed assignments among shared ids; `sites.tsv` and `targets.tsv` differ.
+- Executed the pinned targeted-Yeo script on bounded paired FASTQ: default output appended ten R2 bases; source script default is 10, CWL prose says 9, and CWL supplies no override.
+- Re-executed TargetScan plus/minus exon-spanning conversion, `bedtools intersect -split -s`, wrong-release rejection, and out-of-range rejection; all passed.
+- Produced a strict final report: static 88, dynamic 86.0, weighted 87, assertions 23/25, final **Reject** because skill determinism and research methodological-ground vetoes fail.
 
 ## Required next actions
 
-1. Implement the current Hyb named-database, goal/id, and generated-output contract; require non-empty validated output before parsing (`AGO-001`).
-2. Replace awk field assumptions with an orientation-aware 16-column parser using fields 4/10; preserve site, coordinates, scores, and expression provenance (`AGO-002`).
-3. Fail closed: strict shell mode, validated/quoted arguments, guarded staging, subprocess propagation, schema/count postconditions, and atomic final outputs (`AGO-003`).
-4. Investigate the 18/111 pair-assignment variance and define a deterministic seed/single-thread, ambiguity exclusion, or consensus rule with repeat-run tests (`AGO-004`).
-5. Route preprocessing by declared library layout and ship a versioned strand-safe TargetScan transcript-to-genome integration (`AGO-005`).
-6. Correct current tool identities/access states and narrow affinity/negative-evidence conclusions with claim-level sources (`AGO-006`, `AGO-007`).
-7. Add structured site/target outputs and focused schema/path/failure/repeatability regressions (`AGO-008`), then run delta tooling and a fresh independent re-audit.
+1. Fix AGO-004 with a prospectively fixed workflow-level ambiguity policy across more independent runs or a deterministic upstream tie-selection rule; record per-read cross-run support and prove exact repeated-workflow equality.
+2. Fix AGO-005 by removing the unsupported exact 9-nt operational statement or by requiring and explicitly passing a protocol-declared UMI length through a pinned targeted route, with 9-nt and 10-nt fixtures tied to provenance.
+3. Prepare delta tooling only for the changed executable/claim surfaces.
+4. Route the next exact candidate to a new independent re-auditor; do not publish this rejected audit as candidate-ready.
 
 ## Open findings and blockers
 
-| ID | Severity | State | Required disposition |
-|---|---|---|---|
-| AGO-001 | P0 | open | Current Hyb database/output contract and fail-closed postconditions. |
-| AGO-002 | P0 | open | Orientation-aware 16-column schema parser and valid aggregation. |
-| AGO-003 | P0 | open | Quoted/validated shell boundary, propagated failures, atomic outputs. |
-| AGO-004 | P0 | open | Deterministic or explicitly ambiguity-aware pair-assignment policy. |
-| AGO-005 | P1 | open | Library-specific preprocessing and strand/coordinate-safe TargetScan route. |
-| AGO-006 | P1 | open | Current Hyb/Yeo/HEAP/pyHyb/hybkit identities and classifications. |
-| AGO-007 | P1 | open | Remove affinity proxy and biological-false-positive overclaims; source heuristics. |
-| AGO-008 | P2 | open | Structured reports, provenance, safe reruns, field-aware filters, regressions. |
-- Full human Yeo chim-eCLIP is resource-infeasible in the bounded environment; HEAP wet-lab and reporter validation require biological material; DIANA's documented example returned HTTP 500. These do not block repair or bounded re-audit.
+| Finding | Priority | Disposition |
+|---|---:|---|
+| AGO-004 | P0 | **Open.** Two-run agreement is not workflow-level deterministic: pair A and B both report 94 retained/17 excluded but accept different read ids and assignments. This fails the determinism and methodological-ground vetoes. |
+| AGO-005 | P1 | **Open.** Candidate says targeted Yeo uses a 9-nt R2 UMI; live pinned executable defaults to 10, CWL does not override, and the bounded run extracts 10. |
+| AGO-001, AGO-002, AGO-003 | closed | Current Hyb contract, orientation-aware schema, and strict atomic/failure boundaries pass independent execution. |
+| AGO-006, AGO-007, AGO-008 | closed | Tool identity, evidence interpretation, structured reporting, and regression surfaces are corrected. |
+- Full Yeo remains resource-infeasible without a real library and matched indices; HEAP and reporter validation require biological material; DIANA remote execution is unavailable. None blocks fixing or re-auditing the shipped candidate.
 
 ## Environment and evidence
 
-- Raw report: `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\initial-opt10-20260928\report.json` (SHA-256 `ebe0e70aeb3d781470e8a2ae69fdc4a242235e0afdc2a1f4b7b5bc44a3ac23e2`).
-- Viewer: `...\viewer.md` (SHA-256 `684ab43c02e1f4a8eddb33cd5074f2c38df2d1ca8931e9bfaa8565dfbb35b79f`). Finding ledger: `...\finding-ledger.md`.
-- Schema validation: `...\evidence\schema-validation.json` — valid, exact candidate identity confirmed, score arithmetic and 25 assertions confirmed.
-- Primary evidence: `wrapper-contract-results.json`, `real-wrapper-summary.txt`, both `official_test_comp_hOH7_hybrids_ua*.hyb` runs, `hyb-repeatability.txt`, `adjacent-surface-results.json`, and `access-classifications.md` under the raw run's `evidence/`.
-- Tooling record: `F:\OpenScience\audit-envs\bio-clip-seq-ago-clip-mirna-targets\TOOLS.md` (SHA-256 `3cfec99140011ae7f8130fb2501cffbf37c1f74d1d1ed0e8098bb19f623fdc0f`).
-- Environment fingerprint SHA-256: `dc64dc57f17e3f0de31a8d348a0c7045f7bc3b4e92c5191051a8249e8ac0bae3`; explicit lock SHA-256 `ba5f355bb2d907197f723c7424742517b0e4fb4839a4273382d2293c5b2f3340`.
-- Rubric archive SHA-256: `e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de`.
+- Raw final run root: `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\reaudit-opt10-20260928`.
+- Strict report SHA-256 `00f55371ad11cdac36c64fca764cff9fa991baa449074fb0a031efbe45426bde`; viewer `edbb658a068c00234db0639e682f6d2e04fdec6eb645dea9397af8abbcc33c2b`; source identity `e89c7b9e0f571fbc1f510819874368afd85fbb5e65851aba2785fd33054878fa`.
+- Schema validation is valid with zero errors; SHA-256 `7a3572356d659243fa5d64e19727ca036586baa4b3be94bc42245e8c69c17a04`.
+- Cross-batch Hyb evidence: `evidence/hyb-repeatability.json`, SHA-256 `409c04b2648e334d16086bcf171a28145a4f75bbe8c647b3474ea257510a4026`.
+- Targeted-Yeo evidence: `evidence/yeo-targeted-contract.json`, SHA-256 `86a478d6797fc2b59e89327bcd005dfaad7b1685b7d9e6698a69d1cf2f4bf4b2`.
+- TargetScan evidence: `evidence/targetscan-contract.json`, SHA-256 `97d9477d56fdcef0a561da1732e17cf8232115c4efccbcd0d32576aeb88c6bb8`.
+- Tooling root: `F:\OpenScience\audit-envs\bio-clip-seq-ago-clip-mirna-targets`; `TOOLS.md` SHA-256 `939c5ce0a3c765711c4ba4a38e1895308c5457470c3836789a5b9172860cb810`; environment fingerprint `fcd7556256ce1a32f3473718ad2f0fa3d1821039dc4994ecf4aa626fe97d7e5c`.
 
 ## Worktree safety
 
-- Product status remains only `?? skills/bio-clip-seq-ago-clip-mirna-targets/`; candidate bytes revalidated to the exact audited identity after execution.
-- Audit artifacts are confined to `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\initial-opt10-20260928`; tooling caches remain under the dedicated audit environment.
-- The exact audit was published locally as `candidate@9eb490f452b4-initial-opt10-20260928` with 17 explicit scripts/inputs; generated views were refreshed. The matching record/view/handoff changes await the run-owned control commit. No product commit, candidate repair, push, pull request, release, submission, or Marketplace action occurred.
+- Product status remains only `?? skills/bio-clip-seq-ago-clip-mirna-targets/`; the nine candidate files were read but never edited.
+- Audit outputs are confined to the raw final run root; heavy Hyb intermediates remain under its `work/` subtree.
+- This canonical handoff replacement is the only control-repository write in this phase; unrelated orchestrator, relay, Mercury, and other lane files were not staged or changed.
+- The exact rejected re-audit was published locally as `candidate@21c6ba09ec35-reaudit-opt10-20260928` with 24 explicit scripts/inputs; generated views were refreshed. The matching record/view/handoff changes await the run-owned control commit. No product commit, push, pull request, release, submission, or Marketplace action occurred.
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes — exact rejected candidate, eight ordered findings, reproducible evidence, strict schema-valid report, and deterministic next actions are present.
-- Next owner must begin at `AGO-001` through `AGO-004`, preserve exact origin/provenance, and not claim readiness until delta tooling plus a fresh independent re-audit pass both veto gates.
+- Independent final re-audit complete: yes — exact identity reproduced, all accessible changed surfaces executed, restricted surfaces classified, strict report and evidence hashes validated.
+- Candidate-ready: **no**. Numerical score 87 is overridden by failed determinism and methodological-ground vetoes.
+- Next owner must be a fresh `fix-scientific-skill` worker addressing only AGO-004 and AGO-005 before delta tooling and another independent re-audit.

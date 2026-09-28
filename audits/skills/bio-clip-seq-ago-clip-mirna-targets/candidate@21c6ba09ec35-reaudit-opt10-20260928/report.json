@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "skill_name": "bio-clip-seq-ago-clip-mirna-targets",
+    "description": "Identify direct miRNA-target interactions from AGO HITS-CLIP, AGO-CLEAR-CLIP, HEAP, chimeric eCLIP / miR-eCLIP, or CLASH, and reconcile direct chimeras with computational predictions.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricates a DOI, PMID, study size, p-value, biological result, or execution state; public, executed, resource-infeasible, wet-lab, and unavailable surfaces remain separated."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill remains a research-analysis workflow and makes no patient-specific diagnosis, prescription, or clinical-treatment recommendation."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The core direct-interaction workflow calls assignments stable after only two coincident runs, but repeating that entire two-run policy on identical pinned input changes accepted ids and assignments. The targeted-Yeo route also states an unresolved 9-nt UMI contract while the executable default actually extracts 10 nt."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three shipped scripts are runnable in the prepared environment; 5/5 shipped tests and 9/9 independent contract assertions passed, including fail-closed and atomic-publication cases."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "The main Hyb and TargetScan routes are implemented and useful, but direct-target repeatability and one targeted-library contract remain unresolved."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Failure, overwrite, staging, parsing, and release gates are strong; workflow-level output repeatability remains defective."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Progressive routing, bounded fixtures, and explicit execution classifications avoid unnecessary work."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "The workflow and report contract are clear, but the targeted UMI statement gives an agent an incorrect exact length."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural triggers and explicit failure guidance are strong; one external protocol detail requires independent resolution."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "Inputs are validated, paths are quoted, no credentials are used, and final outputs are atomically protected."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Responsibilities are separated across references and small scripts with focused regression coverage."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Triggering, disclosure, composition, and escape hatches are strong; repeated complete runs are not idempotent at the scientific-result layer."
+      }
+    }
+  },
+  "dynamic_score": {
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Current Hyb official-data route and workflow-level repeatability",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The repaired wrapper executes current pinned Hyb and publishes complete structured outputs, but two independent two-run batches retained nonidentical direct-target sets despite equal 94/17 aggregate counts.",
+        "basic": 26,
+        "specialized": 42,
+        "total": 68,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The wrapper executes pinned Hyb 028ab63 on its official public input through the current named-database interface",
+            "result": "PASS",
+            "note": "Four fresh single-thread Hyb runs across two wrapper batches each emitted 111 non-empty 16-column rows."
+          },
+          {
+            "text": "The wrapper publishes complete structured outputs and reason-coded exclusions",
+            "result": "PASS",
+            "note": "Each batch atomically published sites, targets, exclusions, manifest, raw outputs, and logs; counts reconciled to 111."
+          },
+          {
+            "text": "The orientation-aware parser retains only assignments identical within each configured batch",
+            "result": "PASS",
+            "note": "Each two-run batch retained 94 assignments and excluded 17 as unstable_assignment."
+          },
+          {
+            "text": "Repeating the complete two-run workflow on identical pinned inputs produces the same direct-target list",
+            "result": "FAIL",
+            "note": "Pair A and Pair B had seven accepted-only ids on each side and four changed assignments among shared ids; sites and target hashes differed."
+          },
+          {
+            "text": "Raw Hyb and output identities are recorded for independent review",
+            "result": "PASS",
+            "note": "Both manifests retain commit, database, input hash, per-run hashes, output hashes, counts, and policy."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Strict failure, path, overwrite, and atomic-publication boundaries",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Quoted space and literal-glob paths, exit-status propagation, overwrite refusal, failed-replacement preservation, and staging cleanup all passed independent controls.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Paths containing spaces and literal glob characters remain literal",
+            "result": "PASS",
+            "note": "The wrapper completed with a spaced/literal-star FASTQ and spaced tool/output paths."
+          },
+          {
+            "text": "An existing final output is not overwritten without explicit replacement",
+            "result": "PASS",
+            "note": "The rerun returned exit 73 and preserved the completed manifest."
+          },
+          {
+            "text": "A Hyb subprocess status of 42 is propagated",
+            "result": "PASS",
+            "note": "The replacement attempt returned 42 and surfaced the controlled error."
+          },
+          {
+            "text": "A failed replacement preserves the prior output",
+            "result": "PASS",
+            "note": "The sentinel in the prior final directory remained intact."
+          },
+          {
+            "text": "A failed run leaves neither a partial final result nor staging residue",
+            "result": "PASS",
+            "note": "No matching stage directory remained after failure."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "16-column orientation, expression provenance, schema, and ambiguity controls",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Independent fixtures verified fields 4/10 in either orientation, exact expression provenance, structured aggregation, reason codes, and fail-closed schema behavior.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The parser recognizes one microRNA and one mRNA in either fields-4/10 orientation",
+            "result": "PASS",
+            "note": "Both mirna-first and target-first fixture rows were retained with the correct orientation."
+          },
+          {
+            "text": "Expression values, units, and source provenance are preserved",
+            "result": "PASS",
+            "note": "The accepted rows retained 150 TPM and matched-small-rna source."
+          },
+          {
+            "text": "Missing and differing cross-run assignments receive distinct reason codes",
+            "result": "PASS",
+            "note": "missing_from_replicate and unstable_assignment were emitted as expected."
+          },
+          {
+            "text": "Malformed Hyb field counts fail closed",
+            "result": "PASS",
+            "note": "A three-field row returned nonzero with an expected-16 diagnostic."
+          },
+          {
+            "text": "Malformed expression schemas fail closed",
+            "result": "PASS",
+            "note": "The parser rejected a reduced header before producing results."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "TargetScan spliced-coordinate projection and strand-safe overlap",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Plus- and minus-strand exon-spanning sites projected to versioned BED12, -split -s excluded the opposite strand, and release/range errors failed closed.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "TargetScan UTR-relative input is not treated as genomic BED",
+            "result": "PASS",
+            "note": "The converter requires a version-matched spliced UTR map and emits the coordinate contract in its manifest."
+          },
+          {
+            "text": "Plus- and minus-strand exon-spanning sites project correctly",
+            "result": "PASS",
+            "note": "Both fixtures produced two-block BED12 rows with the expected strands."
+          },
+          {
+            "text": "The overlap command is block- and strand-aware",
+            "result": "PASS",
+            "note": "bedtools intersect -split -s retained the two matching-strand peaks and excluded the opposite-strand peak."
+          },
+          {
+            "text": "Release mismatch is rejected",
+            "result": "PASS",
+            "note": "A 7.2 command against an 8.0 map returned nonzero with a release diagnostic."
+          },
+          {
+            "text": "Sites outside the mapped UTR fail closed",
+            "result": "PASS",
+            "note": "The out-of-range fixture returned nonzero instead of truncating the site."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Library-layout and external-surface claim boundaries",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "Tool and evidence boundaries are substantially corrected, but the candidate still states that the pinned targeted-Yeo route takes a 9-nt R2 UMI while the live executable defaults to 10 and its CWL does not override it.",
+        "basic": 30,
+        "specialized": 39,
+        "total": 69,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Total and targeted Yeo library layouts are kept distinct",
+            "result": "PASS",
+            "note": "The candidate routes them separately and warns against transferring a generic paired pattern."
+          },
+          {
+            "text": "The targeted-Yeo UMI length stated by the candidate matches the pinned executable contract",
+            "result": "FAIL",
+            "note": "Pinned CWL prose says 9 nt, targeted_miR_umi.py defaults to 10, the CWL supplies no umi_length, and the live default appended ten R2 bases."
+          },
+          {
+            "text": "Hyb, Yeo CWL, HEAP, hybkit, and prediction services are not represented as interchangeable tools",
+            "result": "PASS",
+            "note": "The skill now distinguishes each interface and access state."
+          },
+          {
+            "text": "Counts and absent overlaps are interpreted within assay context",
+            "result": "PASS",
+            "note": "Counts are recovery support rather than affinity, and absent AGO overlap is not represented as biological disproof."
+          },
+          {
+            "text": "Unavailable full Yeo, HEAP wet lab, and DIANA execution are not credited as completed",
+            "result": "PASS",
+            "note": "They remain respectively resource-infeasible, biological-route unavailable, and remote unavailable."
+          }
+        ]
+      }
+    ],
+    "execution_avg": 86.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 23,
+      "total": 25
+    }
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 51.6,
+    "score": 87,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The repaired wrapper now uses the current pinned Hyb named-database and generated-output contract and publishes structured provenance atomically.",
+    "Orientation-aware 16-column parsing, expression provenance, reason-coded exclusions, path safety, error propagation, and overwrite behavior passed independent controls.",
+    "TargetScan 8 sites are projected through a versioned spliced UTR map and intersected with explicit block and strand semantics.",
+    "Tool identity, direct-versus-indirect evidence, recovery-versus-affinity, species, access, and negative-evidence boundaries are materially improved."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "AGO-004 — Make direct-target consensus workflow-level deterministic",
+      "observed_in": [
+        1
+      ],
+      "problem": "Two separate two-run batches on identical pinned input each retained 94 and excluded 17, yet seven accepted ids changed on each side and four shared ids changed assignment.",
+      "root_cause": "Agreement inside one pair does not establish stability when Hyb tie or multi-hit selection can coincidentally agree twice on different assignments across batches.",
+      "fix": "Adopt and validate a workflow-level ambiguity policy across a prospectively fixed larger replicate panel or deterministic upstream selection rule; emit per-read cross-run support and require exact end-to-end repeatability before labeling direct targets stable."
+    },
+    {
+      "priority": "P1",
+      "title": "AGO-005 — Resolve the targeted-Yeo UMI-length contract",
+      "observed_in": [
+        5
+      ],
+      "problem": "The candidate says the pinned targeted route takes a 9-nt R2 UMI, but targeted_miR_umi.py defaults to 10, the CWL does not pass umi_length, and the live default extracts ten bases.",
+      "root_cause": "The candidate treats a stale CWL comment as the executable contract without reconciling it with the bound command or the experimental library specification.",
+      "fix": "Do not state an exact targeted UMI length until the protocol is resolved. Require a declared library UMI length and a pinned route that passes it explicitly, then add 9-nt and 10-nt regression fixtures tied to protocol provenance."
+    }
+  ]
+}

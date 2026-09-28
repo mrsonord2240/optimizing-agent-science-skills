@@ -1,0 +1,138 @@
+{
+  "audit_artifacts": {
+    "evidence/contract-results.json": "228aa8a65da49151859aaa2a8a3a28d1002eb453c7d598b61f4bbe169250096d",
+    "evidence/contract-tests.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/contract-tests.stdout": "228aa8a65da49151859aaa2a8a3a28d1002eb453c7d598b61f4bbe169250096d",
+    "evidence/hyb-pair-a.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/hyb-pair-a.stdout": "827eb288edbb479f80057ff2202ed855b7d410546fcb3d944a295b92ec51ea4a",
+    "evidence/hyb-pair-b.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/hyb-pair-b.stdout": "46e2666011c9f1a6653df7baaa147c5657d5899dcc204fa1c5f492e54c664c4a",
+    "evidence/hyb-repeatability.json": "409c04b2648e334d16086bcf171a28145a4f75bbe8c647b3474ea257510a4026",
+    "evidence/schema-validation.json": "7a3572356d659243fa5d64e19727ca036586baa4b3be94bc42245e8c69c17a04",
+    "evidence/shipped-tests.stderr": "60ef67e024e4d79f7495cb9d57efbc070298cc0db39639b4c1dd2a3945da16e2",
+    "evidence/shipped-tests.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/targetscan-contract.json": "97d9477d56fdcef0a561da1732e17cf8232115c4efccbcd0d32576aeb88c6bb8",
+    "evidence/yeo-targeted-contract.json": "86a478d6797fc2b59e89327bcd005dfaad7b1685b7d9e6698a69d1cf2f4bf4b2",
+    "execution-classifications.md": "4238f1e4ed745168a58948a47e8478ee8210412dfcefc55cca08c6501d1cade7",
+    "finding-ledger.md": "5d2e10515d35e49e888dbc45d4bfc7fdcf07c0bf92b2a3f9bd93fb7475bc8c83",
+    "inputs/test-inputs.md": "cf62ff9768182f73d1a67408c44ed2f4017cc3df47e5bca477952c52e06d7a5d",
+    "report.json": "00f55371ad11cdac36c64fca764cff9fa991baa449074fb0a031efbe45426bde",
+    "scientific-source-notes.md": "0a46427c41f6ca6b9aa02dd85f980cd729b2fbd7028e285d9decc242a23595e7",
+    "scripts/build_report.py": "09140f4b6b0fa816d480a58aa789880c5e6f46aefc4741c8923a6324b94bb751",
+    "scripts/compare_hyb_pairs.py": "2d4d92b99c96460c0bf3ac8ddb66a9454087c8b966434977da021a99043e6b06",
+    "scripts/reaudit_contracts.py": "5d261d89e1ff547e3015857c828ed1d199e6368807758049a261e605de1a3bdf",
+    "scripts/run_reaudit.sh": "e72c0871bdfc6b3e3417ff75a5f0f6c9a0a31a21a03cfdf765f90ccafb0f6493",
+    "scripts/targetscan_overlap_check.py": "f24cbcf95278a5960d3e5fa72a5aa26632ae4bd90637b4aceee71645dfdf4182",
+    "scripts/yeo_targeted_check.py": "c4906996f645246975c686708ba993bfe20511715582094cc4c9ccccbc1dbe5b",
+    "validate_report.py": "41305c969b9ffae6dfe81e939f7c47a92a0a84982646bf8835be65f4d71044f8",
+    "viewer.md": "edbb658a068c00234db0639e682f6d2e04fdec6eb645dea9397af8abbcc33c2b"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane4-ago-clip",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_manifest": {
+      "bytes": 886,
+      "file_count": 9,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; paths sorted with ordinal bytewise ordering; LF joins; no trailing LF"
+    },
+    "content_sha256": "21c6ba09ec3580896c35adbe5175ac2e7bf161870e912e46d2bbca42190cfebc",
+    "files": [
+      {
+        "bytes": 8423,
+        "git_blob": "2631e97a0792cd22947b4292303773b162b17c5a",
+        "path": "SKILL.md",
+        "sha256": "314094d9e9d7c2c88fb474a732b67d0d9a322f546613e1982ad9af53a816f958"
+      },
+      {
+        "bytes": 4830,
+        "git_blob": "87b30cca786e39c7d706282558eb251137a1d89f",
+        "path": "references/failure-modes.md",
+        "sha256": "a76227c394036af71cf30b108857d858f8d36e8e7160dadacab1e7402f4362f4"
+      },
+      {
+        "bytes": 6094,
+        "git_blob": "1398fd39cd65343b3e5f8f568ebd5cceca3076f2",
+        "path": "references/method-selection-and-pairing.md",
+        "sha256": "2540d012f97b4fd56b9d96e15ae4e0df71b70db2525dc144ed16bc56dbe7dd92"
+      },
+      {
+        "bytes": 2271,
+        "git_blob": "d4456d1bec25b4230c81504b11dd29d867797917",
+        "path": "references/provenance.md",
+        "sha256": "08f737e58ddd1e59a2d6150905c4d2cbff241f86b6cc3936a61dc187c5b34926"
+      },
+      {
+        "bytes": 6194,
+        "git_blob": "d92f6a492578b8c985d62ef81f03c110ab170bc0",
+        "path": "references/workflows-and-commands.md",
+        "sha256": "89db42294ded71ffc23d03f45f5e4dc685bdf0ad25b977dbd4af1d7ef118b821"
+      },
+      {
+        "bytes": 10672,
+        "git_blob": "32a51e41957a94915256a5609fce801c0aa00109",
+        "path": "scripts/consensus_hyb.py",
+        "sha256": "0a703f2161b9fb555dd0d882da596e1e31bbda54c998efa9325fcb991f490b99"
+      },
+      {
+        "bytes": 6227,
+        "git_blob": "44902e3fe997195de40746ad81f178b04ead9f83",
+        "path": "scripts/run_chimeric_eclip.sh",
+        "sha256": "341e5fa7432799616950151faf84624bf76742d7ed852d158631f05cb7451b30"
+      },
+      {
+        "bytes": 6245,
+        "git_blob": "e6da7a7d003f2b539902b471b6cd828bd7217caf",
+        "path": "scripts/targetscan_sites_to_bed12.py",
+        "sha256": "4c64f7158915cef30a538b9fd4ef3abfb843b29b80900d7dbca0c03850f9b034"
+      },
+      {
+        "bytes": 7811,
+        "git_blob": "73c79dd37784802d8e0bb267825429bc91f44aec",
+        "path": "tests/test_scripts.py",
+        "sha256": "0879fa468c52f16dc793d5114ae98385619936d3d2b77270c4b6a1a03855a710"
+      }
+    ],
+    "path": "F:\\OpenScience\\wt\\opt10-ago-clip\\skills\\bio-clip-seq-ago-clip-mirna-targets",
+    "status_after_execution": "untracked fixed subtree only; no candidate bytes changed",
+    "status_before": "untracked fixed subtree only"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "execution_classification": {
+    "accessible_and_rerun": [
+      "exact candidate shipped suite",
+      "independent parser and wrapper adversarial matrix",
+      "two fresh complete two-run current-Hyb batches on official input",
+      "targeted-Yeo default extraction smoke",
+      "TargetScan conversion and bedtools block/strand controls"
+    ],
+    "remote_unavailable": [
+      "DIANA microT-CDS example endpoint"
+    ],
+    "resource_infeasible_bounded": [
+      "complete human Yeo chimeric-eCLIP CWL workflow"
+    ],
+    "static_or_interface_only": [
+      "standard AGO peak-calling route",
+      "miRDB 6",
+      "hybkit identity"
+    ],
+    "wet_lab_unavailable": [
+      "HEAP Halo-Ago2 library preparation",
+      "orthogonal reporter validation"
+    ]
+  },
+  "origin": {
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clip-seq/ago-clip-mirna-targets",
+    "repository": "GPTomics/bioSkills",
+    "status": "read-only source identity",
+    "subtree": "6326a423789826240d0840be6897ddd69b21d940"
+  },
+  "tooling": {
+    "environment_fingerprint_sha256": "fcd7556256ce1a32f3473718ad2f0fa3d1821039dc4994ecf4aa626fe97d7e5c",
+    "environment_lock_sha256": "ba5f355bb2d907197f723c7424742517b0e4fb4839a4273382d2293c5b2f3340",
+    "rubric_skill_sha256": "d8b7ac3f0c5100251aba33c92d3d1cbba70bb4f8d07cd5c97cb72dd7af87807f",
+    "tools_md_sha256": "939c5ce0a3c765711c4ba4a38e1895308c5457470c3836789a5b9172860cb810"
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "assertions_passed": 9,
+  "assertions_total": 9,
+  "checks": [
+    {
+      "detail": [
+        {
+          "expression_source": "matched-small-rna",
+          "expression_unit": "TPM",
+          "expression_value": "150.0",
+          "folding_energy": ".",
+          "mirna_alignment_score": "1e-4",
+          "mirna_id": "MIMAT1_MirBase_miR-1_microRNA",
+          "mirna_read_end": "22",
+          "mirna_read_start": "1",
+          "mirna_reference_end": "22",
+          "mirna_reference_start": "1",
+          "read_id": "stable_mirna_first",
+          "sequence": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT",
+          "source_orientation": "mirna-first",
+          "supporting_runs": "2",
+          "target_alignment_score": "2e-4",
+          "target_id": "ENST1_gene_mRNA",
+          "target_read_end": "40",
+          "target_read_start": "23",
+          "target_reference_end": "118",
+          "target_reference_start": "101"
+        },
+        {
+          "expression_source": "matched-small-rna",
+          "expression_unit": "TPM",
+          "expression_value": "150.0",
+          "folding_energy": ".",
+          "mirna_alignment_score": "2e-4",
+          "mirna_id": "MIMAT1_MirBase_miR-1_microRNA",
+          "mirna_read_end": "40",
+          "mirna_read_start": "23",
+          "mirna_reference_end": "118",
+          "mirna_reference_start": "101",
+          "read_id": "stable_target_first",
+          "sequence": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT",
+          "source_orientation": "target-first",
+          "supporting_runs": "2",
+          "target_alignment_score": "1e-4",
+          "target_id": "ENST1_gene_mRNA",
+          "target_read_end": "22",
+          "target_read_start": "1",
+          "target_reference_end": "22",
+          "target_reference_start": "1"
+        }
+      ],
+      "name": "orientation-aware 16-column parsing",
+      "passed": true
+    },
+    {
+      "detail": [
+        {
+          "expression_source": "matched-small-rna",
+          "expression_unit": "TPM",
+          "expression_value": "150.0",
+          "folding_energy": ".",
+          "mirna_alignment_score": "1e-4",
+          "mirna_id": "MIMAT1_MirBase_miR-1_microRNA",
+          "mirna_read_end": "22",
+          "mirna_read_start": "1",
+          "mirna_reference_end": "22",
+          "mirna_reference_start": "1",
+          "read_id": "stable_mirna_first",
+          "sequence": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT",
+          "source_orientation": "mirna-first",
+          "supporting_runs": "2",
+          "target_alignment_score": "2e-4",
+          "target_id": "ENST1_gene_mRNA",
+          "target_read_end": "40",
+          "target_read_start": "23",
+          "target_reference_end": "118",
+          "target_reference_start": "101"
+        },
+        {
+          "expression_source": "matched-small-rna",
+          "expression_unit": "TPM",
+          "expression_value": "150.0",
+          "folding_energy": ".",
+          "mirna_alignment_score": "2e-4",
+          "mirna_id": "MIMAT1_MirBase_miR-1_microRNA",
+          "mirna_read_end": "40",
+          "mirna_read_start": "23",
+          "mirna_reference_end": "118",
+          "mirna_reference_start": "101",
+          "read_id": "stable_target_first",
+          "sequence": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT",
+          "source_orientation": "target-first",
+          "supporting_runs": "2",
+          "target_alignment_score": "1e-4",
+          "target_id": "ENST1_gene_mRNA",
+          "target_read_end": "22",
+          "target_read_start": "1",
+          "target_reference_end": "22",
+          "target_reference_start": "1"
+        }
+      ],
+      "name": "expression provenance retained",
+      "passed": true
+    },
+    {
+      "detail": {
+        "missing": "missing_from_replicate",
+        "unstable": "unstable_assignment"
+      },
+      "name": "ambiguity reason codes",
+      "passed": true
+    },
+    {
+      "detail": {
+        "accepted_rows": 2,
+        "excluded_rows": 2,
+        "exclusion_reasons": {
+          "missing_from_replicate": 1,
+          "unstable_assignment": 1
+        },
+        "expression": {
+          "name": "expression.tsv",
+          "sha256": "d7dc3154d59d699424c6d2cc2d728d608f0a9aa86245195b59160b1c0b0c9fe0",
+          "threshold": 100.0
+        },
+        "hyb": {
+          "commit": "028ab6371ce793ca5e86f475fce1f2cc6ad3c677",
+          "database": "fixture",
+          "goal": "detect",
+          "threads": 1,
+          "type": "mim"
+        },
+        "inputs": [
+          {
+            "path": "raw/replicate-1/r1.hyb",
+            "rows": 4,
+            "sha256": "714ba8298a07773e1114270a5f148419c4e84e521658e4143a78d3d52ed22e90"
+          },
+          {
+            "path": "raw/replicate-2/r2.hyb",
+            "rows": 3,
+            "sha256": "52fa0be80adcb107d0cec2513f2c49e0f418b8fbe4343b54d93ea5d51ae0a53f"
+          }
+        ],
+        "outputs": {
+          "excluded.tsv": {
+            "rows": 2,
+            "sha256": "d582cd26e9d6dc1f46e4e0a83b5eace704700d759d6be6c969ecf1dd51c4c8a3"
+          },
+          "sites.tsv": {
+            "rows": 2,
+            "sha256": "af6ea4a614a0c168756990873d8d3f0aabde04e4a5de4c6ab33672a1457787e3"
+          },
+          "targets.tsv": {
+            "rows": 1,
+            "sha256": "973727c0831ddefae33b23753d60e17496eb76a8e4eea3d49774f2eb37e37672"
+          }
+        },
+        "policy": "retain only identical normalized miRNA-mRNA assignments present in every clean Hyb run",
+        "replicates": 2,
+        "run_id": "reaudit",
+        "schema_version": "ago-clip-consensus-1",
+        "source_reads": {
+          "name": "r1.hyb",
+          "sha256": "714ba8298a07773e1114270a5f148419c4e84e521658e4143a78d3d52ed22e90"
+        },
+        "status": "complete",
+        "target_rows": 1
+      },
+      "name": "structured counts reconcile",
+      "passed": true
+    },
+    {
+      "detail": {
+        "returncode": 1,
+        "stderr_tail": "o-clip-seq-ago-clip-mirna-targets/scripts/consensus_hyb.py\", line 70, in parse_site\n    raise ValueError(f\"{path}:{line_no}: expected 16 tab fields, found {len(row)}\")\nValueError: /tmp/tmpte_dbdaw/bad.hyb:1: expected 16 tab fields, found 3\n"
+      },
+      "name": "wrong schema fails closed",
+      "passed": true
+    },
+    {
+      "detail": {
+        "returncode": 1,
+        "stderr_tail": "  raise ValueError(f\"{path}: expression header must be exactly {sorted(required)}\")\nValueError: /tmp/tmpte_dbdaw/bad-expression.tsv: expression header must be exactly ['expression_source', 'expression_unit', 'expression_value', 'mirna_id']\n"
+      },
+      "name": "expression schema fails closed",
+      "passed": true
+    },
+    {
+      "detail": "Completed consensus Hyb analysis: /tmp/tmpte_dbdaw/output with spaces\n",
+      "name": "wrapper quotes paths and publishes complete output",
+      "passed": true
+    },
+    {
+      "detail": {
+        "returncode": 73,
+        "stderr": "Output exists; use --replace to replace it atomically: /tmp/tmpte_dbdaw/output with spaces\n"
+      },
+      "name": "existing output refused",
+      "passed": true
+    },
+    {
+      "detail": {
+        "residue": [],
+        "returncode": 42
+      },
+      "name": "failed replace propagates status and preserves prior output",
+      "passed": true
+    }
+  ]
+}

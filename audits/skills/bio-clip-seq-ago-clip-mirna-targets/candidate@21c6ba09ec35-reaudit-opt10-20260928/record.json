@@ -1,0 +1,46 @@
+{
+  "skill_id": "bio-clip-seq-ago-clip-mirna-targets",
+  "version": "candidate@21c6ba09ec35-reaudit-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clip-seq/ago-clip-mirna-targets",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/clip-seq/ago-clip-mirna-targets",
+    "subtree": "6326a423789826240d0840be6897ddd69b21d940"
+  },
+  "candidate": {
+    "identity": "21c6ba09ec3580896c35adbe5175ac2e7bf161870e912e46d2bbca42190cfebc",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane4-ago-clip",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "21c6ba09ec3580896c35adbe5175ac2e7bf161870e912e46d2bbca42190cfebc",
+    "path": "F:\\OpenScience\\wt\\opt10-ago-clip\\skills\\bio-clip-seq-ago-clip-mirna-targets"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@9eb490f452b4-initial-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 24
+  }
+}
