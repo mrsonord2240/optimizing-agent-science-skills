@@ -28,7 +28,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
 | `bio-analytical-validation` | Protocol Design | 96 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-analytical-validation/candidate@bd66239b9133-reaudit-opt10-20260928/viewer.md) |
-| `bio-atac-seq-allele-specific-accessibility` | Data Analysis | 88 | Reject | 1 / 0 / 0 | [viewer](skills/bio-atac-seq-allele-specific-accessibility/candidate@4310ddfa1d9e-reaudit-opt10-20260928/viewer.md) |
+| `bio-atac-seq-allele-specific-accessibility` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-atac-seq-allele-specific-accessibility/candidate@275ff0a1b8d9-reaudit2-opt10-20260928/viewer.md) |
 | `bio-batch-processing` | Data Analysis | 97 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-batch-processing/candidate@f5558565b7f1-reaudit-opt10-20260928/viewer.md) |
 | `bio-cfdna-preprocessing` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-cfdna-preprocessing/candidate@148b254a3107-reaudit-opt10-20260928/viewer.md) |
 | `bio-chipseq-allele-specific-binding` | Data Analysis | 51 | Reject | 3 / 3 / 1 | [viewer](skills/bio-chipseq-allele-specific-binding/candidate@a058f8a1b36e-initial-opt10-20260928/viewer.md) |

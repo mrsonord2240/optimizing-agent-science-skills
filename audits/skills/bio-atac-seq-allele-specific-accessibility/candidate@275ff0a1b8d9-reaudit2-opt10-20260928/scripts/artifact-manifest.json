@@ -1,0 +1,112 @@
+﻿{
+    "skill":  "bio-atac-seq-allele-specific-accessibility",
+    "phase":  "second-independent-reaudit",
+    "candidate_sha256":  "275ff0a1b8d9bed7a80e8316f97fe421296cb081c837ed01aaa53a0f96e48ae2",
+    "artifacts":  [
+                      {
+                          "path":  "report.json",
+                          "bytes":  15817,
+                          "sha256":  "587eb0ca31024f4f9d7e4789d2e1b9f223e45cb7f7374369bd65abbad0ae9a42"
+                      },
+                      {
+                          "path":  "viewer.md",
+                          "bytes":  8130,
+                          "sha256":  "9143a5466ef1b8ca636a3046095f09bf581aceb5449cb9caed844016a9240ca7"
+                      },
+                      {
+                          "path":  "source-identity.json",
+                          "bytes":  3134,
+                          "sha256":  "ca4927205b4180264133f5fa95727677d12ceae2a63ef5c7f43369322cd8c102"
+                      },
+                      {
+                          "path":  "candidate-manifest.json",
+                          "bytes":  3157,
+                          "sha256":  "679f1d2889a13903cbafb411add27f31ba4d0e5f4aa0a4ac9c337ec909006a7a"
+                      },
+                      {
+                          "path":  "finding-ledger.md",
+                          "bytes":  2180,
+                          "sha256":  "9031b85b2025b84dccf708a51b7bdf6a7c851a7ae1833b9ef74577fa337edefe"
+                      },
+                      {
+                          "path":  "scientific-source-notes.md",
+                          "bytes":  1354,
+                          "sha256":  "bb365cebc196c71145b8372f8393a14623e74b6a2d4b7e725157b26ec8b6db23"
+                      },
+                      {
+                          "path":  "inputs.json",
+                          "bytes":  2003,
+                          "sha256":  "d4b55c5ed50ddc5787d1a9acbe0bceb59ac55adc4d17427898bc499797d80909"
+                      },
+                      {
+                          "path":  "inputs/rasqual-two-features.tsv",
+                          "bytes":  69,
+                          "sha256":  "1734d7644451bf2195d15a517aa62990118e66b7042c4f310435ce160378e0a9"
+                      },
+                      {
+                          "path":  "inputs/rasqual-zero-feature.tsv",
+                          "bytes":  72,
+                          "sha256":  "e18f43e8b3642526c87ee32a1a65ef030e015ececc70a83ab1e6bb591c7db938"
+                      },
+                      {
+                          "path":  "scripts/run_static_reaudit2.ps1",
+                          "bytes":  4693,
+                          "sha256":  "22b37b8090a20142c2ec369e4a98045b28b1c6c8bc3c7dddb5592e497cfd3dd5"
+                      },
+                      {
+                          "path":  "scripts/run_fixture_reaudit2.sh",
+                          "bytes":  11746,
+                          "sha256":  "9dbc0956731470c8d45286e656de3d366b27a93a67be989b45382641c8b9a556"
+                      },
+                      {
+                          "path":  "scripts/run_real_pipeline_reaudit2.sh",
+                          "bytes":  4339,
+                          "sha256":  "937658a54ef3d5a049168ccc66d0e14ce41532193b5225b02d5036aae70ee091"
+                      },
+                      {
+                          "path":  "scripts/run_real_rasqual_reaudit2.sh",
+                          "bytes":  2767,
+                          "sha256":  "6e332c50cbad29d634bc45862b39001c084b416ba5843ea403853bb63e6ea579"
+                      },
+                      {
+                          "path":  "scripts/build_artifact_manifest.ps1",
+                          "bytes":  1627,
+                          "sha256":  "ce33df301df8fb620d2392f59537049419847f5be740a3c61c48e824c9b0646a"
+                      },
+                      {
+                          "path":  "validate_report.py",
+                          "bytes":  5402,
+                          "sha256":  "4bc8ea636350eaaf58d785502749bc4420b1800988322cd948344042ddab1c4f"
+                      },
+                      {
+                          "path":  "evidence/schema-validation.json",
+                          "bytes":  425,
+                          "sha256":  "7e02abe3ccc1f998395fbe400427961d687a71e42e3ca56bf7b565d3edff70e2"
+                      },
+                      {
+                          "path":  "evidence/static.txt",
+                          "bytes":  946,
+                          "sha256":  "19f85e0469a1f4c11308c6d863a31e61d69446dfc3fe1fcfcb42ed95d0096f3d"
+                      },
+                      {
+                          "path":  "evidence/fixtures.txt",
+                          "bytes":  3503,
+                          "sha256":  "d700734b398aca734dee357eb78b8b4c121f4429ac514ae3c9230a508a746da4"
+                      },
+                      {
+                          "path":  "evidence/real-pipeline.txt",
+                          "bytes":  879,
+                          "sha256":  "6b06d0b521f1444a641e6265bfb51a7a34d273d82dfc31f322248c048128b204"
+                      },
+                      {
+                          "path":  "evidence/real-rasqual.txt",
+                          "bytes":  483,
+                          "sha256":  "7a553623688c8d1d1374925db517c19e3eb984b945f294ec450b4a4e3dae1755"
+                      },
+                      {
+                          "path":  "evidence/structural-precheck.json",
+                          "bytes":  1821,
+                          "sha256":  "bd3f7f193be428b1424eb262fe354cd30a912fe77d41d9024b15c98644b2f12e"
+                      }
+                  ]
+}

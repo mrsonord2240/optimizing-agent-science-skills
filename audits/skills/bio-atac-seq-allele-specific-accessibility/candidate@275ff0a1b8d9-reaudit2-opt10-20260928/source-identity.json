@@ -1,0 +1,46 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/allele-specific-accessibility",
+    "subtree": "1d84e31c0fdc0b2636e5a553d71796b996be6a23",
+    "license": "MIT"
+  },
+  "candidate": {
+    "path": "F:\\OpenScience\\wt\\opt10-atac-asa\\skills\\bio-atac-seq-allele-specific-accessibility",
+    "branch": "optimize/ten-20260928-lane2-atac-asa",
+    "starting_head": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "275ff0a1b8d9bed7a80e8316f97fe421296cb081c837ed01aaa53a0f96e48ae2",
+    "manifest_recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted with StringComparer.Ordinal and separated by LF; no trailing LF",
+    "manifest_bytes": 1099,
+    "file_count": 11,
+    "manifest_path": "F:\\OpenScience\\audits\\bio-atac-seq-allele-specific-accessibility\\reaudit2-opt10-20260928\\candidate-manifest.json",
+    "manifest_sha256": "679f1d2889a13903cbafb411add27f31ba4d0e5f4aa0a4ac9c337ec909006a7a"
+  },
+  "audit": {
+    "phase": "second-independent-reaudit",
+    "auditor_performed_initial_audit": false,
+    "auditor_performed_prior_reaudit": false,
+    "auditor_performed_fix": false,
+    "auditor_performed_tooling": false,
+    "initial_report_sha256": "381149f327d4673102dbd8a1d2142adb14b506a02be006b1a7f73f306d9fd366",
+    "rejected_reaudit_report_sha256": "8fed6b54118d4166c4c4b7b6f01f79153b0a0f9ef4b2ccca8a74109dd2890f40",
+    "first_fix_log_sha256": "6b97750b11fcc8bca8c8530537a6e09ff2774d8474edab28db9ca86ea3540fba",
+    "second_fix_log_sha256": "3af4e19a5474d72db22ebd06954edf62f9527f03c81739661448941d869482a1",
+    "tooling_record_sha256": "73a94e76eb45e9f7d11a13e254ff0decd81e4a51ce22f71d444e8db1409676b0",
+    "environment_fingerprint": "b71c6a315b43e28a9188b32e0b3314f1b3de01ae6868c47588b9db6acc78f5b5",
+    "tooling_evidence_fingerprint": "e3417734e8069dd52657e4a06c1f7a93df9e86b61ad0be3141167aa36137804c",
+    "raw_root": "F:\\OpenScience\\audits\\bio-atac-seq-allele-specific-accessibility\\reaudit2-opt10-20260928"
+  },
+  "durable_evidence": {
+    "evidence/static.txt": "19f85e0469a1f4c11308c6d863a31e61d69446dfc3fe1fcfcb42ed95d0096f3d",
+    "evidence/fixtures.txt": "d700734b398aca734dee357eb78b8b4c121f4429ac514ae3c9230a508a746da4",
+    "evidence/real-pipeline.txt": "6b06d0b521f1444a641e6265bfb51a7a34d273d82dfc31f322248c048128b204",
+    "evidence/real-rasqual.txt": "7a553623688c8d1d1374925db517c19e3eb984b945f294ec450b4a4e3dae1755",
+    "evidence/structural-precheck.json": "bd3f7f193be428b1424eb262fe354cd30a912fe77d41d9024b15c98644b2f12e",
+    "runs/fixtures/duplicate-labels.tsv": "812217a982f91c1009d2da1418ac7f6a54f8ff192f872b26fd4ccfdee6737dc7",
+    "runs/real-pipeline/output with spaces/ase/NA12878.ase_counts.tsv": "2ed6920dea99ce81f127df9f38beba00e50c0271d2e454a751c1337c253ee3d4",
+    "runs/real-pipeline/output with spaces/peak_aggregation/NA12878.peak_ase.tsv": "ffbfe3c72956a2e37413b32f539720c33f5daecbc121c3933bd1d04b4a9c1ac3",
+    "runs/real-rasqual/association_summary.tsv": "0363890d3049fd995391a7be9b7a0e73e8d82dab18c798ac38a4d9e190ac0aba"
+  }
+}

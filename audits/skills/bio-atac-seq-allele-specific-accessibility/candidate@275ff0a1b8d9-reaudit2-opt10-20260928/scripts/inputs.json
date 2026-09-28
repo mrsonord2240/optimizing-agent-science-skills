@@ -1,0 +1,32 @@
+[
+  {
+    "index": 1,
+    "type": "Canonical",
+    "label": "Bounded public WASP-to-GATK and coordinate-safe peak aggregation",
+    "prompt": "Run the complete single-sample allele-specific accessibility workflow on bounded public GM12878/NA12878 data, verify mapping-bias correction, sample identity, final BAM postconditions, non-empty allele counts, phase-aware aggregation, and staged failure cleanup."
+  },
+  {
+    "index": 2,
+    "type": "Variant A",
+    "label": "Coordinate identity, phase orientation, schemas, and labels",
+    "prompt": "Aggregate phased ASE counts across ATAC peaks while proving opposite REF labels orient to the same haplotype, different phase sets remain separate, duplicate display labels cannot pool disjoint intervals, BED3/BED4 labels are display-only, exact duplicate coordinates fail closed, and empty or malformed inputs behave contractually."
+  },
+  {
+    "index": 3,
+    "type": "Edge",
+    "label": "Target genotype, identity, staging, and reuse guards",
+    "prompt": "Exercise target-only heterozygous selection, BAM/VCF sample mismatch, output staging, cleanup after failure, paths containing spaces, and refusal to reuse an existing output directory."
+  },
+  {
+    "index": 4,
+    "type": "Variant B",
+    "label": "Two-feature public RASQUAL execution and global BH correction",
+    "prompt": "Run the bounded RASQUAL driver on two public feature rows, verify binary matrix row ownership, finite probabilities, complete-family BH correction, zero-feature handling, matrix dimensions, quoted paths, and output reuse refusal."
+  },
+  {
+    "index": 5,
+    "type": "Stress",
+    "label": "Inherited suite, provenance, route boundaries, and exact bytes",
+    "prompt": "Reinspect and execute every shipped runnable surface, rerun all inherited tests, verify exact candidate bytes and provider blobs, confirm MatrixEQTL and QuASAR are external-only routes, and check that phasing, multiplicity, power, and validation claims remain scientifically bounded."
+  }
+]
