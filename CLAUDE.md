@@ -5,18 +5,17 @@ The records repo for refining agent science Skills. The method, and every rule a
 
 | repo | role |
 | --- | --- |
-| `F:\OpenScience\external\mrsonord2240__bioSkills` (`bioSkills-Improved`) | staging: every fix lands here on `main`. **Being retired**, see below |
+| `F:\optimizing-agent-science-skills\external\GPTomics__bioSkills` | read-only upstream at `d91ed3d`; provenance comparison only |
 | `F:\optimizing-agent-science-skills` (this repo) | records: `process/`, `audits/`, `fixes/`, `tools/` |
-| `F:\optimized-scientific-skills` | published shelf: refined Skills only, with `REMAINING.md` |
+| `F:\optimized-scientific-skills` | provider and published shelf; `main` is shipped Skill bytes |
 | `F:\OpenScience\audits\`, `audit-envs\`, `wt\` | live working area, not a repo; raw runs stay here |
 
-## Consolidation (Sam, 2026-09-22)
+## Consolidation (Sam, completed 2026-09-27)
 
-Target: two repos and one read-only folder. The shelf becomes the only place Skill bytes are edited
-(`main` = shipped, Skills imported from upstream onto a branch when work starts, fix worktrees branch from
-the shelf). This repo keeps records and the one set of instructions. `F:\OpenScience\external` holds only
-read-only upstream clones. **Order (option A):** finish the final pass Phase 2 on staging, promote, then
-retire staging (archive `bioSkills-Improved` on GitHub, prune `wt\`). Until then the paths below stand.
+The two-repo contract is active. The provider is the only place Skill bytes are edited (`main` = shipped;
+import from upstream onto a provider branch, then fix and independently re-audit there). This repo keeps
+records and process instructions. The original upstream clone is read-only. The former
+`bioSkills-Improved` staging fork is archived and must not be used by promotion tooling.
 
 ## The goal and its order (Sam, 2026-09-17)
 
@@ -55,18 +54,21 @@ Commit the record, the regenerated index and any fix log together. An audit only
 
 ## Fixing, landing, promoting
 
-- One worktree and branch per fix from staging `main`: `F:\OpenScience\wt\<short>`, `fix/<short>`. Archive
+- One worktree and branch per fix from provider `main`: `F:\OpenScience\wt\<short>`, `fix/<short>`. Archive
   the pre-fix report to `F:\OpenScience\audits\_pre-fix-<yyyymmdd>\<skill-id>\` before the re-audit.
 - A fix lands when its re-audit passes: core ≥ 85, deployable, no open P0, no veto. Merge `--no-ff` into
-  staging `main`, push, delete the branch and worktree.
+  provider `main`, push when authorized, then delete the branch and worktree.
 - **Promote every audited Skill that did not fail, whatever its score** (Sam, 2026-09-17): deployable, no
   open P0. Promotion is part of landing; do not wait to be asked. Failed Skills stay in `REMAINING.md`
   under `excluded` until a fix passes re-audit.
-- `promote_skills.py` flags each promoted Skill in `PROVENANCE.json` and at the top of `REMAINING.md`:
-  `fix_pass: needed` (first audit only) and `reaudit: needed` (bytes changed since its latest audit).
-- To promote: advance `FORK_COMMIT` in `tools/promote_skills.py` to the staging commit, run it dry, then
-  `--apply`. Update the Status table in the shelf `README.md` from the new `PROVENANCE.json`, commit and
-  push the shelf.
+- `promote_skills.py` is an append-only metadata reconciler. It preserves published provenance rows and
+  adds a provider Skill only when the latest published audit is deployable, has no open P0/veto, names an
+  ancestor of provider `main`, and the current Skill tree exactly matches the audited commit. It updates
+  only `PROVENANCE.json`, `REMAINING.json`, and `REMAINING.md`; it never rebuilds `skills/`.
+- To promote: land the independently re-audited provider commit, publish its audit record, run
+  `python tools/promote_skills.py` as a dry run, inspect the proposed additions and marketplace-readiness
+  holds, then run `--apply`. Update the provider README status table, commit the metadata, and push only
+  when authorized.
 - **The goal is the Open Science skill marketplace** (`aipoch/openscience-skill-marketplace`,
   `authoring/README.md`): one `release.config.json` per Skill pinned to a shelf commit, every version
   immutable and reviewed. `promote_skills.py` sets `marketplace_ready`. After pushing the shelf, run

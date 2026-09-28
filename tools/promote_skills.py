@@ -1,38 +1,41 @@
-"""Assemble the optimized-scientific-skills repository.
+"""Reconcile published-shelf metadata without rewriting published Skill bytes.
 
-Contents, per Sam 2026-09-24:
-  - the fixed 157-Skill published shelf, refreshed in place as its Skills finish their final passes
-  - a list of what remains, limited for now to the rest of GPTomics/bioSkills
+Consolidated contract (Sam, 2026-09-27):
 
-Layout is flat, `skills/<skill-id>/`, so the directory name equals the frontmatter `name` and equals
-the marketplace submission `id`. The upstream path is not encoded in the tree; it is recorded per
-Skill in PROVENANCE.json, which is the only place provenance should be read from.
+* ``GPTomics/bioSkills@d91ed3d`` is a read-only upstream used only for provenance.
+* ``optimized-scientific-skills`` is the provider and the sole source of shipped bytes.
+* Existing provenance rows are carried forward. A provider Skill without a provenance row is
+  appended only when its latest *published records-repo audit* is deployable, has no open P0 or
+  veto, names a provider commit on the ancestry of provider ``main``, and the Skill tree at
+  ``main`` exactly matches the audited commit.
+* ``--apply`` writes only PROVENANCE.json, REMAINING.json, and REMAINING.md. It never copies,
+  deletes, or rebuilds ``skills/``.
 
-Source of Skill bytes is the fork at the pinned commit, not the working tree.
+The marketplace gate remains metadata-only. This tool never writes release manifests, submission
+state, marketplace intake trees, or provider ``authoring/`` content.
 """
+
+import argparse
 import atexit
+import copy
+import difflib
 import json
 import os
 import re
 import shutil
 import subprocess
-import sys
+import tempfile
 import time
+from pathlib import Path
 
-REC = "F:/optimizing-agent-science-skills"
-FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
+REC = Path("F:/optimizing-agent-science-skills")
+UPSTREAM = REC / "external" / "GPTomics__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "7963580251c856f48511aa64c438dd798decb0ae"
-AUDITS = "F:/OpenScience/audits"
-OUT = "F:/optimized-scientific-skills"
-SHELF_SIZE = 157
-MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
-    os.path.dirname(__file__), "..", "config", "marketplace_submission_holds.json"))
+OUT = Path("F:/optimized-scientific-skills")
+PROVIDER_REF = "main"
+PROVIDER_REPOSITORY = "mrsonord2240/optimized-scientific-skills"
+MARKETPLACE_HOLDS = REC / "config" / "marketplace_submission_holds.json"
 
-# Metadata declarations added corpus-wide after the scientific audits. They do not change the
-# instructions or executable payload the audit evaluated. Category is accepted only from the five
-# values defined by AIPOCH MedSkillAudit, and is separately required to match the audit report.
-DECLARATIONS = {"+license: MIT", "+author: GPTomics"}
 VALID_CATEGORIES = {
     "Evidence Insight",
     "Protocol Design",
@@ -40,12 +43,20 @@ VALID_CATEGORIES = {
     "Academic Writing",
     "Other",
 }
+DECLARATION_LINES = {
+    "license: MIT",
+    "author: GPTomics",
+    *(f"category: {category}" for category in VALID_CATEGORIES),
+}
 
 
-def is_declaration_change(line):
-    if line in DECLARATIONS:
-        return True
-    return line.startswith("+category: ") and line[len("+category: "):] in VALID_CATEGORIES
+class PromotionResult:
+    def __init__(self, provenance, remaining, remaining_md, messages, added):
+        self.provenance = provenance
+        self.remaining = remaining
+        self.remaining_md = remaining_md
+        self.messages = messages
+        self.added = added
 
 
 def grade_for_score(score):
@@ -58,44 +69,14 @@ def grade_for_score(score):
         return "Beta Only"
     return "Reject"
 
-# Present in the source tree but not candidates for refinement. Recorded in REMAINING.json with the
-# reason rather than silently filtered, so the remaining count always reconciles with the tree.
-OUT_OF_SCOPE = {
-    "clawhub-installer": "upstream's own corpus installer, not a science Skill; declares "
-                         "os: darwin/linux only and exists to install the other Skills",
-}
-
-
-def load_shelf_rows(out_dir=OUT):
-    """The published shelf is an update-in-place scope, not an expanding audit queue.
-
-    Sam fixed this pass at the 157 Skills already published on 2026-09-24.  Audit records for
-    other Skills remain useful backlog evidence, but they must not silently expand this repository.
-    Read the current published provenance before rebuilding and fail closed if its membership is
-    missing or no longer exactly the agreed scope.
-    """
-    path = os.path.join(out_dir, "PROVENANCE.json")
-    try:
-        with open(path, encoding="utf-8") as fh:
-            rows = json.load(fh)["skills"]
-        ids = {row["id"] for row in rows}
-    except (OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
-        raise SystemExit(f"cannot load fixed shelf scope from {path}: {exc}") from exc
-    if len(ids) != SHELF_SIZE or len(rows) != SHELF_SIZE:
-        raise SystemExit(
-            f"{path}: expected exactly {SHELF_SIZE} unique published Skills, "
-            f"found {len(ids)} unique ids across {len(rows)} rows")
-    return rows
-
-
-def load_shelf_scope(out_dir=OUT):
-    return {row["id"] for row in load_shelf_rows(out_dir)}
-
 
 def load_marketplace_holds(path=MARKETPLACE_HOLDS):
-    """Read deliberate marketplace submission holds, failing closed on a malformed config."""
-    with open(path, encoding="utf-8") as fh:
-        document = json.load(fh)
+    """Read deliberate marketplace submission holds, failing closed when malformed."""
+    path = Path(path)
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"cannot load marketplace holds from {path}: {exc}") from exc
     if document.get("schema_version") != 1 or not isinstance(document.get("holds"), list):
         raise SystemExit(f"{path}: expected schema_version 1 and a holds array")
     holds = {}
@@ -113,427 +94,586 @@ def load_marketplace_holds(path=MARKETPLACE_HOLDS):
     return holds
 
 
-def set_marketplace_status(row, hold):
-    """Apply the marketplace gate without changing the Skill's audit or shelf eligibility."""
-    row["marketplace_ready"] = (row["grade"] == "Production Ready" and row["fix_pass"] == "done"
-                                and row["reaudit"] == "not needed" and hold is None)
-    if hold:
-        # A submission hold does not question audit deployability or shelf promotion. It only
-        # prevents this record from becoming a marketplace candidate or entering intake:skill.
-        row["marketplace_hold"] = hold
-
-
-def git(args, cwd=FORK):
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True,
-                          text=True, encoding="utf-8", errors="replace")
-
-
-def staging_tree():
-    """Every path in the staging repo at the pinned commit. Never the working tree.
-
-    Reading a working tree here is how the export/source mix-up happens: the tree on disk can be
-    ahead of, behind, or unrelated to the commit this promotion claims to be from.
-    """
-    out = git(["ls-tree", "-r", "--name-only", FORK_COMMIT]).stdout or ""
-    return [p for p in out.splitlines() if p]
-
-
-def skill_index():
-    """frontmatter name -> path in the staging repo, read at the pinned commit."""
-    idx = {}
-    for path in staging_tree():
-        if not path.endswith("/SKILL.md"):
-            continue
-        head = (git(["show", f"{FORK_COMMIT}:{path}"]).stdout or "")[:2000]
-        m = re.search(r"^name:\s*(.+)$", head, re.M)
-        if m:
-            idx[m.group(1).strip().strip("\"'")] = path[: -len("/SKILL.md")]
-    return idx
-
-
-def audits():
-    out = {}
-    for d in sorted(os.listdir(AUDITS)):
-        if d.startswith("_"):
-            continue
-        p = os.path.join(AUDITS, d, f"eval_report_{d}_result.json")
-        if not os.path.exists(p):
-            # A re-audit in flight has cleared the live report: the Skill keeps the status of its last
-            # completed audit, which is the newest archive under _pre-fix-*/. Without this the Skill
-            # drops off the promoted shelf until the re-audit lands.
-            for a in sorted((x for x in os.listdir(AUDITS) if x.startswith("_pre-fix-")), reverse=True):
-                q = os.path.join(AUDITS, a, d, f"eval_report_{d}_result.json")
-                if os.path.exists(q):
-                    p = q
-                    break
-        if os.path.exists(p):
-            out[d] = json.load(open(p, encoding="utf-8"))
-    return out
-
-
-def classify(path):
-    """How this Skill differs from the archived upstream, at the pinned fork commit."""
-    if git(["diff", "--quiet", UPSTREAM_COMMIT, FORK_COMMIT, "--", path]).returncode == 0:
-        return "unmodified", []
-    out = git(["diff", "-U0", UPSTREAM_COMMIT, FORK_COMMIT, "--", path]).stdout or ""
-    changed = [l for l in out.splitlines()
-               if l[:1] in "+-" and not l.startswith(("+++", "---"))]
-    files = sorted({l.split("/")[-1] for l in out.splitlines() if l.startswith("+++ b/")})
-    if all(is_declaration_change(l) for l in changed):
-        return "declarations-only", files
-    return "modified", files
-
-
-def audited_bytes_differ(source, path):
-    """True when the bytes at FORK_COMMIT are not the bytes the audit ran on.
-
-    A Skill fixed after its audit but not yet re-audited must not be promoted on the old score. The
-    declaration lines accepted by `is_declaration_change`, added corpus-wide, are the only
-    tolerated difference.
-    """
-    m = re.match(r"^[\w.-]+/[\w.-]+@([0-9a-f]{7,40}):", source or "")
-    if not m:
-        return True
-    out = git(["diff", "-U0", m.group(1), FORK_COMMIT, "--", path]).stdout or ""
-    changed = [l for l in out.splitlines() if l[:1] in "+-" and not l.startswith(("+++", "---"))]
-    return any(not is_declaration_change(l) for l in changed)
-
-
-def source_category(path):
-    """Read the canonical category declaration from a Skill at the pinned source commit."""
-    head = git(["show", f"{FORK_COMMIT}:{path}/SKILL.md"]).stdout or ""
-    matches = re.findall(r"^category:\s*(.+)$", head, re.M)
-    if len(matches) != 1:
-        raise SystemExit(f"{path}/SKILL.md: expected exactly one category frontmatter field")
-    category = matches[0].strip().strip("\"'")
-    if category not in VALID_CATEGORIES:
-        raise SystemExit(f"{path}/SKILL.md: invalid category {category!r}")
-    return category
-
-
-def audit_source_commit(source):
-    """The fork commit an audit record was run against, or None for an upstream-sourced record."""
-    m = re.match(r"^mrsonord2240/bioSkills(?:-Improved)?@([0-9a-f]{7,40}):", source or "")
-    return m.group(1) if m else None
-
-
-def unmerged_records(rep, idx):
-    """Records audited on a fork commit that never landed on the path to FORK_COMMIT.
-
-    Distinct from ordinary staleness (`audited_bytes_differ`, where the fork simply moved on since a
-    passing audit — safe to promote with `reaudit: needed`). Here the record's own commit is not an
-    ancestor of FORK_COMMIT at all: a re-audit that scored a fix worktree, then declined to land it
-    (still failing, or landed by a run that hasn't pushed yet), leaves that better score sitting in
-    the canonical report while the Skill's actual bytes at FORK_COMMIT are whatever they were before
-    — often not deployable. Promoting on that record's `deployable` flag would ship the old, rejected
-    content under the new score. Caught by hand once (bio-geo-data, 2026-09-19); this closes it.
-    """
-    bad = []
-    for sid, r in rep.items():
-        if sid not in idx:
-            continue
-        commit = audit_source_commit(r.get("source") or r.get("meta", {}).get("source"))
-        if commit is None:
-            continue
-        if git(["merge-base", "--is-ancestor", commit, FORK_COMMIT]).returncode != 0:
-            bad.append((sid, commit))
-    return bad
-
-
-def shelf_bytes_match_pinned_source(row, out_dir=OUT):
-    """Prove a carried shelf entry already contains the bytes at FORK_COMMIT.
-
-    An unmerged audit record must not replace the last published score, but a fixed-size shelf also
-    must not drop that Skill. Carrying the existing row is safe only when its current files are
-    byte-identical to the path at the pinned staging commit.
-    """
-    prefix = row["upstream_path"] + "/"
-    source_paths = sorted(path for path in staging_tree() if path.startswith(prefix))
-    skill_dir = os.path.join(out_dir, "skills", row["id"])
-    if not source_paths or not os.path.isdir(skill_dir):
-        return False
-    shelf_paths = sorted(
-        os.path.relpath(os.path.join(root, name), skill_dir).replace(os.sep, "/")
-        for root, _, files in os.walk(skill_dir)
-        for name in files
+def set_marketplace_status(row, hold, source_category_ready=True):
+    """Apply the existing marketplace gate without touching submission or release state."""
+    row["marketplace_ready"] = (
+        row.get("grade") == "Production Ready"
+        and row.get("fix_pass") == "done"
+        and row.get("reaudit") == "not needed"
+        and source_category_ready
+        and hold is None
     )
-    relative_source_paths = [path[len(prefix):] for path in source_paths]
-    if shelf_paths != relative_source_paths:
+    if hold:
+        row["marketplace_hold"] = copy.deepcopy(hold)
+    else:
+        row.pop("marketplace_hold", None)
+
+
+def _git(repo, *args, check=True, binary=False):
+    result = subprocess.run(
+        ["git", *args], cwd=repo, capture_output=True,
+        text=not binary, encoding=None if binary else "utf-8",
+        errors=None if binary else "replace",
+        check=False,
+    )
+    if check and result.returncode:
+        stderr = result.stderr.decode("utf-8", "replace") if binary else result.stderr
+        raise SystemExit(
+            f"git -C {repo} {' '.join(args)} failed ({result.returncode}): {stderr.strip()}"
+        )
+    return result
+
+
+def _resolve(repo, ref):
+    return _git(repo, "rev-parse", "--verify", ref).stdout.strip()
+
+
+def tree_fingerprint(repo, ref, path):
+    """Return the exact Git tree/blob object id at ``ref:path``."""
+    result = _git(repo, "rev-parse", f"{ref}:{path}", check=False)
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
+def _tree_bytes(repo, ref, prefix):
+    """Return relative path -> blob bytes for a committed subtree."""
+    listed = _git(repo, "ls-tree", "-r", "--name-only", "-z", ref, "--", prefix,
+                  binary=True).stdout
+    paths = [part.decode("utf-8") for part in listed.split(b"\0") if part]
+    normalized_prefix = prefix.rstrip("/") + "/"
+    blobs = {}
+    for path in paths:
+        if not path.startswith(normalized_prefix):
+            continue
+        relative = path[len(normalized_prefix):]
+        blobs[relative] = _git(repo, "show", f"{ref}:{path}", binary=True).stdout
+    return blobs
+
+
+def _declarations_only(upstream, provider):
+    try:
+        before = upstream.decode("utf-8").splitlines()
+        after = provider.decode("utf-8").splitlines()
+    except UnicodeDecodeError:
         return False
-    for source_path, relative in zip(source_paths, relative_source_paths):
-        expected = subprocess.run(
-            ["git", "show", f"{FORK_COMMIT}:{source_path}"], cwd=FORK, capture_output=True
-        ).stdout
-        with open(os.path.join(skill_dir, *relative.split("/")), "rb") as fh:
-            if fh.read() != expected:
-                return False
+    for line in difflib.ndiff(before, after):
+        if line.startswith("- "):
+            return False
+        if line.startswith("+ ") and line[2:].strip() not in DECLARATION_LINES:
+            return False
     return True
 
 
-def acquire_promote_lock(out_dir=OUT, timeout=600, poll=2):
-    """Atomic mkdir lock so two concurrent `--apply` runs never race the same rmtree/rebuild of
-    `skills/`. Several agents hit this collision by hand on 2026-09-19 (crash mid-rmtree, or one
-    run's output silently clobbered by another's) before recovering manually each time. Blocks up
-    to `timeout` seconds, then fails loudly rather than racing anyway. Released via atexit so a
-    raised SystemExit (e.g. a blob-hash mismatch) still frees it for the next run.
-    """
-    os.makedirs(out_dir, exist_ok=True)
-    lock_dir = os.path.join(out_dir, ".promote.lock")
+def classify_across_repositories(provider_repo, provider_ref, provider_path,
+                                 upstream_repo, upstream_commit, upstream_path):
+    """Classify committed provider bytes relative to pinned upstream across repositories."""
+    provider = _tree_bytes(provider_repo, provider_ref, provider_path)
+    upstream = _tree_bytes(upstream_repo, upstream_commit, upstream_path)
+    if not provider:
+        raise SystemExit(f"{provider_repo}:{provider_ref}:{provider_path}: empty Skill tree")
+    if not upstream:
+        raise SystemExit(f"{upstream_repo}:{upstream_commit}:{upstream_path}: empty upstream tree")
+    changed = sorted(path for path in set(provider) | set(upstream)
+                     if provider.get(path) != upstream.get(path))
+    if not changed:
+        return "unmodified", []
+    if changed == ["SKILL.md"] and _declarations_only(
+            upstream["SKILL.md"], provider["SKILL.md"]):
+        return "declarations-only", changed
+    return "modified", changed
+
+
+def _read_json(path, label):
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"cannot load {label} from {path}: {exc}") from exc
+
+
+def load_latest_audits(records_repo=REC):
+    """Load the one unsuperseded audit per Skill from canonical records-repo evidence."""
+    root = Path(records_repo) / "audits" / "skills"
+    latest = {}
+    if not root.is_dir():
+        return latest
+    for skill_dir in sorted(path for path in root.iterdir() if path.is_dir()):
+        versions = {}
+        for version_dir in sorted(path for path in skill_dir.iterdir() if path.is_dir()):
+            record_path = version_dir / "record.json"
+            report_path = version_dir / "report.json"
+            if not record_path.is_file() or not report_path.is_file():
+                continue
+            record = _read_json(record_path, "audit record")
+            report = _read_json(report_path, "audit report")
+            version = record.get("version")
+            if record.get("skill_id") != skill_dir.name or version != version_dir.name:
+                raise SystemExit(
+                    f"{version_dir}: record identifies {record.get('skill_id')}/{version}"
+                )
+            versions[version] = {
+                "skill_id": skill_dir.name,
+                "version": version,
+                "record": record,
+                "report": report,
+            }
+        if not versions:
+            continue
+        superseded = set()
+        for version, entry in versions.items():
+            predecessor = entry["record"].get("supersedes")
+            if predecessor:
+                if predecessor not in versions:
+                    raise SystemExit(
+                        f"{skill_dir}/{version}: supersedes missing version {predecessor}"
+                    )
+                superseded.add(predecessor)
+        candidates = [entry for version, entry in versions.items() if version not in superseded]
+        if len(candidates) != 1:
+            raise SystemExit(
+                f"{skill_dir}: expected one latest audit, found {len(candidates)}"
+            )
+        latest[skill_dir.name] = candidates[0]
+    return latest
+
+
+def _skill_index(repo, ref):
+    """Map frontmatter Skill ids to committed Skill paths."""
+    result = _git(repo, "ls-tree", "-r", "--name-only", ref).stdout
+    index = {}
+    for path in result.splitlines():
+        if not path.endswith("/SKILL.md"):
+            continue
+        head = _git(repo, "show", f"{ref}:{path}").stdout[:4000]
+        match = re.search(r"^name:\s*(.+)$", head, re.MULTILINE)
+        if not match:
+            continue
+        skill_id = match.group(1).strip().strip("\"'")
+        skill_path = path[:-len("/SKILL.md")]
+        if skill_id in index and index[skill_id] != skill_path:
+            raise SystemExit(f"{repo}:{ref}: duplicate Skill id {skill_id}")
+        index[skill_id] = skill_path
+    return index
+
+
+def _source_category(repo, ref, path, required=True):
+    head = _git(repo, "show", f"{ref}:{path}/SKILL.md").stdout
+    matches = re.findall(r"^category:\s*(.+)$", head, re.MULTILINE)
+    if not matches and not required:
+        return None
+    if len(matches) != 1:
+        raise SystemExit(f"{repo}:{ref}:{path}/SKILL.md: expected one category field")
+    category = matches[0].strip().strip("\"'")
+    if category not in VALID_CATEGORIES:
+        raise SystemExit(f"{repo}:{ref}:{path}/SKILL.md: invalid category {category!r}")
+    return category
+
+
+def _open_p0(report):
+    return sum(
+        1 for recommendation in report.get("recommendations", [])
+        if str(recommendation.get("priority", "")).upper() == "P0"
+    )
+
+
+def _veto_reason(report):
+    gates = report.get("veto_gates")
+    if not isinstance(gates, dict):
+        return "missing veto gates"
+    skill_gate = gates.get("skill_veto", {}).get("gate")
+    research_gate = gates.get("research_veto", {}).get("gate")
+    if skill_gate != "PASS":
+        return f"skill veto gate is {skill_gate!r}"
+    if research_gate not in {"PASS", "N/A", "NOT_APPLICABLE"}:
+        return f"research veto gate is {research_gate!r}"
+    return None
+
+
+def _candidate_eligibility(skill_id, entry, provider_repo, provider_ref):
+    record, report = entry["record"], entry["report"]
+    source = record.get("source", {})
+    final = report.get("final", {})
+    if source.get("repository") != PROVIDER_REPOSITORY:
+        return False, f"latest audit is not a provider audit ({source.get('repository')!r})"
+    commit = source.get("commit", "")
+    if not re.fullmatch(r"[0-9a-f]{40}", commit):
+        return False, "latest provider audit has no full commit"
+    expected_path = f"skills/{skill_id}"
+    if source.get("path") != expected_path:
+        return False, f"audit path is {source.get('path')!r}, expected {expected_path!r}"
+    if final.get("deployable") is not True:
+        return False, "latest audit is not deployable"
+    if final.get("grade") != grade_for_score(final.get("score", -1)):
+        return False, "latest audit grade does not match its score"
+    p0 = _open_p0(report)
+    if p0:
+        return False, f"latest audit has {p0} open P0 recommendation(s)"
+    veto = _veto_reason(report)
+    if veto:
+        return False, f"latest audit has a veto: {veto}"
+    if _git(provider_repo, "cat-file", "-e", f"{commit}^{{commit}}", check=False).returncode:
+        return False, f"audited provider commit {commit[:12]} is unavailable"
+    if _git(provider_repo, "merge-base", "--is-ancestor", commit, provider_ref,
+            check=False).returncode:
+        return False, f"audited provider commit {commit[:12]} is not an ancestor of {provider_ref}"
+    audited_tree = tree_fingerprint(provider_repo, commit, expected_path)
+    current_tree = tree_fingerprint(provider_repo, provider_ref, expected_path)
+    if not audited_tree or audited_tree != current_tree:
+        return False, "current provider Skill bytes differ from the audited commit"
+    return True, "eligible"
+
+
+def _catalog_paths(provenance, remaining, upstream_index):
+    catalog = {}
+    groups = [
+        provenance.get("skills", []),
+        remaining.get("remaining", []),
+        remaining.get("excluded", []),
+        remaining.get("out_of_scope", []),
+    ]
+    for rows in groups:
+        if not isinstance(rows, list):
+            raise SystemExit("provider metadata arrays must be lists")
+        for row in rows:
+            skill_id, path = row.get("id"), row.get("upstream_path")
+            if not skill_id:
+                raise SystemExit("provider metadata row is missing id")
+            if path:
+                if skill_id in catalog and catalog[skill_id] != path:
+                    raise SystemExit(f"conflicting upstream paths for {skill_id}")
+                catalog[skill_id] = path
+    for skill_id, path in upstream_index.items():
+        catalog.setdefault(skill_id, path)
+    return catalog
+
+
+def _audit_date(row):
+    value = row.get("audited_on")
+    return value if isinstance(value, str) else ""
+
+
+def _render_remaining(remaining, finished, catalog):
+    pending = remaining["remaining"]
+    excluded = remaining["excluded"]
+    out_of_scope = remaining["out_of_scope"]
+    by = {}
+    for row in pending:
+        folder = row["upstream_path"].split("/", 1)[0]
+        by.setdefault(folder, []).append(row["id"])
+    done = {}
+    for row in finished:
+        folder = row["upstream_path"].split("/", 1)[0]
+        done[folder] = done.get(folder, 0) + 1
+    needs_fix = [row for row in finished if row.get("fix_pass") == "needed"]
+    stale = [row for row in finished if row.get("reaudit") == "needed"]
+    source_commit = remaining["source"].split("@", 1)[-1]
+    lines = [
+        "# Remaining Skills", "",
+        "Not yet refined. Scope is deliberately limited to the rest of",
+        "[GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit",
+        f"`{source_commit}`; other source corpora are out of scope for now.", "",
+        f"**{len(pending)} remaining** across {len(by)} folders. {len(finished)} are already refined and live in `skills/`.", "",
+        (
+            f"The source tree holds {remaining['reconciliation']['skills_in_source_tree']} Skills: "
+            f"{len(finished)} refined, {len(excluded)} audited and excluded, "
+            f"{len(out_of_scope)} out of scope, {len(pending)} remaining."
+        ), "",
+        "| folder | remaining | refined |", "| --- | ---: | ---: |",
+    ]
+    for folder in sorted(by, key=lambda name: (-len(by[name]), name)):
+        lines.append(f"| {folder} | {len(by[folder])} | {done.get(folder, 0)} |")
+    lines += [
+        "", "## Promoted, fix pass still needed", "",
+        "These Skills are in `skills/` because their audit found them deployable with no open P0.",
+        "They have not yet been through a fix pass, however high they scored. Their open findings",
+        "are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.", "",
+        "| skill | score | grade |", "| --- | ---: | --- |",
+    ]
+    for row in needs_fix:
+        lines.append(f"| `{row['id']}` | {row['score']} | {row['grade']} |")
+    lines += [
+        "", "## Promoted, re-audit still needed", "",
+        "Changed in the provider after its latest audit, so the score describes earlier bytes.",
+        "`reaudit` in PROVENANCE.json carries the same flag.", "",
+        "| skill | score at last audit | audited on |", "| --- | ---: | --- |",
+    ]
+    for row in stale:
+        lines.append(f"| `{row['id']}` | {row['score']} | {row.get('audited_on')} |")
+    lines += [
+        "", "## Audited and excluded", "",
+        "Audited and did not pass. Not pending — rejected until the defects behind the score are",
+        "fixed.", "", "| skill | score | grade | open P0 |",
+        "| --- | ---: | --- | ---: |",
+    ]
+    for row in excluded:
+        lines.append(
+            f"| `{row['id']}` | {row.get('score')} | {row.get('grade')} | {row.get('open_p0')} |"
+        )
+    lines += ["", "## Out of scope", "", "| skill | reason |", "| --- | --- |"]
+    for row in out_of_scope:
+        lines.append(f"| `{row['id']}` | {row.get('reason')} |")
+    lines += ["", "## The list", ""]
+    for folder in sorted(by):
+        lines += [f"### {folder}", ""]
+        for skill_id in sorted(by[folder]):
+            lines.append(f"- `{skill_id}` — `{catalog[skill_id]}`")
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def build_metadata(records_repo=REC, provider_repo=OUT, upstream_repo=UPSTREAM,
+                   upstream_commit=UPSTREAM_COMMIT, holds_path=MARKETPLACE_HOLDS,
+                   provider_ref=PROVIDER_REF):
+    """Build a deterministic metadata reconciliation plan without writing any repository."""
+    records_repo = Path(records_repo)
+    provider_repo = Path(provider_repo)
+    upstream_repo = Path(upstream_repo)
+    provenance_path = provider_repo / "PROVENANCE.json"
+    remaining_path = provider_repo / "REMAINING.json"
+    provenance = _read_json(provenance_path, "provider provenance")
+    remaining = _read_json(remaining_path, "provider remaining inventory")
+    if provenance.get("schema_version") != 1 or remaining.get("schema_version") != 1:
+        raise SystemExit("provider metadata must use schema_version 1")
+
+    _resolve(provider_repo, provider_ref)
+    provider_skills_tree = tree_fingerprint(provider_repo, provider_ref, "skills")
+    if not provider_skills_tree:
+        raise SystemExit(f"{provider_repo}:{provider_ref}: provider has no skills tree")
+    upstream_commit = _resolve(upstream_repo, upstream_commit)
+    provider_index = _skill_index(provider_repo, provider_ref)
+    upstream_index = _skill_index(upstream_repo, upstream_commit)
+    existing_rows = copy.deepcopy(provenance.get("skills"))
+    if not isinstance(existing_rows, list):
+        raise SystemExit(f"{provenance_path}: skills must be an array")
+    existing = {}
+    for row in existing_rows:
+        skill_id = row.get("id")
+        if not skill_id or skill_id in existing:
+            raise SystemExit(f"{provenance_path}: missing or duplicate Skill id {skill_id!r}")
+        existing[skill_id] = row
+    missing_provider = sorted(set(existing) - set(provider_index))
+    if missing_provider:
+        raise SystemExit("provenance Skill(s) missing from provider main: "
+                         + ", ".join(missing_provider))
+
+    latest = load_latest_audits(records_repo)
+    holds = load_marketplace_holds(holds_path)
+    unknown_holds = sorted(set(holds) - set(provider_index))
+    if unknown_holds:
+        raise SystemExit("marketplace hold(s) do not name provider Skills: "
+                         + ", ".join(unknown_holds))
+    catalog = _catalog_paths(provenance, remaining, upstream_index)
+    messages, added = [], []
+    rows = existing_rows
+    for skill_id in sorted(set(provider_index) - set(existing)):
+        entry = latest.get(skill_id)
+        if entry is None:
+            messages.append(f"skipping {skill_id}: no published audit record")
+            continue
+        eligible, reason = _candidate_eligibility(skill_id, entry, provider_repo, provider_ref)
+        if not eligible:
+            messages.append(f"skipping {skill_id}: {reason}")
+            continue
+        upstream_path = catalog.get(skill_id)
+        if not upstream_path:
+            raise SystemExit(f"{skill_id}: no upstream path in provider metadata or upstream tree")
+        record, report = entry["record"], entry["report"]
+        category = report.get("meta", {}).get("category")
+        if category not in VALID_CATEGORIES:
+            raise SystemExit(f"{skill_id}: audit has invalid category {category!r}")
+        declared = _source_category(
+            provider_repo, provider_ref, provider_index[skill_id], required=False
+        )
+        if declared is not None and declared != category:
+            raise SystemExit(
+                f"{skill_id}: provider category {declared!r} does not match audit {category!r}"
+            )
+        kind, files = classify_across_repositories(
+            provider_repo, provider_ref, provider_index[skill_id],
+            upstream_repo, upstream_commit, upstream_path,
+        )
+        final = report["final"]
+        fix_log = records_repo / "fixes" / f"{skill_id}.md"
+        row = {
+            "id": skill_id,
+            "upstream_path": upstream_path,
+            "score": final["score"],
+            "grade": final["grade"],
+            "deployable": True,
+            "open_p0": 0,
+            "audited_on": record.get("audit", {}).get("audited_on")
+                          or report.get("meta", {}).get("evaluated_on"),
+            "fix_log": f"fixes/{skill_id}.md" if fix_log.is_file() else None,
+            "fix_pass": "done" if fix_log.is_file() else "needed",
+            "category": category,
+            "reaudit": "not needed",
+            "relative_to_upstream": kind,
+            "changed_files": files,
+        }
+        rows.append(row)
+        added.append(skill_id)
+        messages.append(
+            f"adding {skill_id}: audited {record['source']['commit'][:12]}, bytes match {provider_ref}"
+        )
+
+    # Existing rows, including their already-published marketplace disposition, are preserved.
+    # Only an explicit configured hold may tighten one. Recomputing all historical readiness here
+    # would mutate the release state of already-pinned marketplace submissions.
+    for row in rows:
+        hold = holds.get(row["id"])
+        if row["id"] not in added:
+            if hold:
+                row["marketplace_ready"] = False
+                row["marketplace_hold"] = copy.deepcopy(hold)
+            continue
+        declared = _source_category(
+            provider_repo, provider_ref, provider_index[row["id"]], required=False
+        )
+        category_ready = declared == row.get("category")
+        set_marketplace_status(row, hold, category_ready)
+        if declared is None:
+            messages.append(
+                f"holding marketplace readiness for {row['id']}: provider frontmatter has no category"
+            )
+    rows.sort(key=lambda row: row["id"])
+    finished_ids = {row["id"] for row in rows}
+
+    new_provenance = copy.deepcopy(provenance)
+    new_provenance["generated"] = max((_audit_date(row) for row in rows), default="")
+    sources = new_provenance.setdefault("sources", {})
+    source = copy.deepcopy(sources.get("gptomics-bioskills", {}))
+    source.update({
+        "upstream_repository": "https://github.com/GPTomics/bioSkills",
+        "upstream_commit": upstream_commit,
+        "upstream_licence": "MIT",
+        "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
+        "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "provider_ref": provider_ref,
+        # A tree id stays stable across later metadata-only commits, so repeated reconciliation is
+        # idempotent while still pinning the exact shipped Skill bytes represented by this document.
+        "provider_skills_tree": provider_skills_tree,
+    })
+    source.pop("staging_repository", None)
+    source.pop("staging_commit", None)
+    sources["gptomics-bioskills"] = source
+    new_provenance["skills"] = rows
+
+    new_remaining = copy.deepcopy(remaining)
+    for key in ("remaining", "excluded", "out_of_scope"):
+        values = new_remaining.get(key)
+        if not isinstance(values, list):
+            raise SystemExit(f"{remaining_path}: {key} must be an array")
+        if key != "out_of_scope":
+            values = [row for row in values if row.get("id") not in finished_ids]
+        new_remaining[key] = sorted(values, key=lambda row: row["id"])
+    new_remaining["generated"] = new_provenance["generated"]
+    new_remaining["source"] = f"GPTomics/bioSkills@{upstream_commit}"
+    new_remaining["reconciliation"] = {
+        "skills_in_source_tree": len(upstream_index),
+        "refined": len(rows),
+        "audited_and_excluded": len(new_remaining["excluded"]),
+        "out_of_scope": len(new_remaining["out_of_scope"]),
+        "remaining": len(new_remaining["remaining"]),
+    }
+    accounted = (len(rows) + len(new_remaining["excluded"])
+                 + len(new_remaining["out_of_scope"]) + len(new_remaining["remaining"]))
+    if accounted != len(upstream_index):
+        raise SystemExit(
+            f"metadata accounts for {accounted} Skills but upstream has {len(upstream_index)}"
+        )
+    remaining_md = _render_remaining(new_remaining, rows, catalog)
+    return PromotionResult(new_provenance, new_remaining, remaining_md, messages, added)
+
+
+def _atomic_write(path, text):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle, temp_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8", newline="\n") as stream:
+            stream.write(text)
+        os.replace(temp_name, path)
+    finally:
+        if os.path.exists(temp_name):
+            os.unlink(temp_name)
+
+
+def write_metadata(provider_repo, result):
+    """Write exactly the three generated metadata files; never touch ``skills/``."""
+    provider_repo = Path(provider_repo)
+    _atomic_write(
+        provider_repo / "PROVENANCE.json",
+        json.dumps(result.provenance, indent=2, ensure_ascii=False) + "\n",
+    )
+    _atomic_write(
+        provider_repo / "REMAINING.json",
+        json.dumps(result.remaining, indent=2, ensure_ascii=False) + "\n",
+    )
+    _atomic_write(provider_repo / "REMAINING.md", result.remaining_md)
+
+
+def acquire_promote_lock(provider_repo=OUT, timeout=600, poll=2):
+    """Acquire an atomic metadata-reconciliation lock."""
+    lock_dir = Path(provider_repo) / ".promote.lock"
     waited = 0
     while True:
         try:
-            os.mkdir(lock_dir)
+            lock_dir.mkdir()
             break
         except FileExistsError:
             if waited >= timeout:
                 raise SystemExit(
-                    f"{lock_dir}: another promote_skills.py --apply run holds this lock "
-                    f"(waited {timeout}s). Retry once it finishes, or rmdir it by hand if it's "
-                    "stale (its owner crashed without cleaning up).")
+                    f"{lock_dir}: another promote_skills.py --apply holds this lock "
+                    f"(waited {timeout}s)"
+                )
             time.sleep(poll)
             waited += poll
     atexit.register(lambda: shutil.rmtree(lock_dir, ignore_errors=True))
 
 
-def main():
-    # Refresh only the fixed 157-Skill shelf (Sam, 2026-09-24). Deployable audit records outside
-    # that membership stay in the backlog instead of silently expanding the published repository.
-    apply = "--apply" in sys.argv
-    if apply:
-        acquire_promote_lock()
-    idx = skill_index()
-    existing_shelf_rows = {row["id"]: row for row in load_shelf_rows()}
-    shelf_scope = set(existing_shelf_rows)
-    unknown_shelf_ids = sorted(shelf_scope - set(idx))
-    if unknown_shelf_ids:
-        raise SystemExit("published shelf Skill(s) missing from the pinned source tree: "
-                         + ", ".join(unknown_shelf_ids))
-    rep = audits()
-    marketplace_holds = load_marketplace_holds()
-    unknown_holds = sorted(set(marketplace_holds) - set(idx))
-    if unknown_holds:
-        raise SystemExit("marketplace hold(s) do not name Skills in the pinned source tree: "
-                         + ", ".join(unknown_holds))
-    fixlogs = {f[:-3] for f in os.listdir(os.path.join(REC, "fixes")) if f.endswith(".md")}
+def _assert_safe_apply_tree(provider_repo, provider_ref):
+    head = _resolve(provider_repo, "HEAD")
+    target = _resolve(provider_repo, provider_ref)
+    if head != target:
+        raise SystemExit(f"--apply requires checked-out {provider_ref}; HEAD is {head[:12]}")
+    protected = ["skills", "PROVENANCE.json", "REMAINING.json", "REMAINING.md"]
+    status = _git(provider_repo, "status", "--porcelain=v1", "--", *protected).stdout.strip()
+    if status:
+        raise SystemExit("--apply requires clean Skill and metadata paths:\n" + status)
 
-    # Records whose own commit never landed on the path to FORK_COMMIT: skip them entirely this run
-    # rather than promoting (or rejecting) on a score that does not describe the published bytes.
-    # Everything else still promotes normally. See unmerged_records()'s docstring.
-    unmerged = dict(unmerged_records(rep, idx))
-    if unmerged:
-        for sid, c in unmerged.items():
-            print(f"skipping  : {sid} (audited at {c[:8]}, not an ancestor of {FORK_COMMIT[:8]} "
-                  "-- that fix has not landed; record does not describe the published bytes)")
-        rep = {sid: r for sid, r in rep.items() if sid not in unmerged}
 
-    finished, excluded = [], []
-    for sid, r in rep.items():
-        if sid not in idx:
-            continue
-        fin = r["final"]
-        category = None
-        if sid in shelf_scope:
-            category = r.get("meta", {}).get("category")
-            if category not in VALID_CATEGORIES:
-                raise SystemExit(f"{sid}: audit report has missing or invalid category {category!r}")
-            declared_category = source_category(idx[sid])
-            if declared_category != category:
-                raise SystemExit(
-                    f"{sid}: source category {declared_category!r} does not match audit category "
-                    f"{category!r}")
-        if fin["deployable"]:
-            expected_grade = grade_for_score(fin["score"])
-            if fin["grade"] != expected_grade:
-                raise SystemExit(
-                    f"{sid}: score {fin['score']} requires AIPOCH grade {expected_grade!r}, "
-                    f"found {fin['grade']!r}")
-        p0 = [x for x in r.get("recommendations", []) if str(x.get("priority", "")).upper() == "P0"]
-        row = {
-            "id": sid,
-            "upstream_path": idx[sid],
-            "score": fin["score"],
-            "grade": fin["grade"],
-            "deployable": fin["deployable"],
-            "open_p0": len(p0),
-            "audited_on": r.get("meta", {}).get("evaluated_on"),
-            "fix_log": f"fixes/{sid}.md" if sid in fixlogs else None,
-            "fix_pass": "done" if sid in fixlogs else "needed",
-        }
-        if category is not None:
-            row["category"] = category
-        # Changed since its audit (e.g. the 2026-09-16 P2 backlog round, fixed without a re-audit):
-        # still promoted, but flagged so the score is never read as describing these bytes.
-        row["reaudit"] = ("needed" if audited_bytes_differ(
-            r.get("source") or r.get("meta", {}).get("source"), idx[sid]) else "not needed")
-        if fin["deployable"] and not p0:
-            if sid in shelf_scope:
-                finished.append(row)
-        else:
-            excluded.append(row)
+def _parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply", action="store_true", help="write the three provider metadata files")
+    parser.add_argument("--records", type=Path, default=REC)
+    parser.add_argument("--provider", type=Path, default=OUT)
+    parser.add_argument("--provider-ref", default=PROVIDER_REF)
+    parser.add_argument("--upstream", type=Path, default=UPSTREAM)
+    parser.add_argument("--upstream-commit", default=UPSTREAM_COMMIT)
+    parser.add_argument("--holds", type=Path, default=MARKETPLACE_HOLDS)
+    return parser
 
-    carried_unmerged = []
-    for sid in sorted(set(unmerged) & shelf_scope):
-        row = dict(existing_shelf_rows[sid])
-        if not shelf_bytes_match_pinned_source(row):
-            raise SystemExit(
-                f"{sid}: cannot carry the existing shelf entry because its files differ from "
-                f"{FORK_COMMIT[:8]}:{row['upstream_path']}"
-            )
-        finished.append(row)
-        carried_unmerged.append(sid)
-    if carried_unmerged:
-        print("carried   : " + ", ".join(carried_unmerged))
 
-    for row in finished:
-        kind, files = classify(row["upstream_path"])
-        row["relative_to_upstream"] = kind
-        row["changed_files"] = files
-        # Cleared to submit to the marketplace: at the Production Ready target (process/COMMON.md, Thresholds),
-        # a fix pass done, and no changes since the last audit. Versions there are immutable and each
-        # is reviewed, so a Skill that is still moving, or short of the target, is not ready.
-        set_marketplace_status(row, marketplace_holds.get(row["id"]))
-
-    finished.sort(key=lambda r: r["id"])
-    excluded.sort(key=lambda r: r["id"])
-    remaining = sorted(set(idx) - {r["id"] for r in finished} - {r["id"] for r in excluded}
-                       - set(OUT_OF_SCOPE))
-    needs_fix = [r for r in finished if r["fix_pass"] == "needed"]
-
-    print(f"finished  : {len(finished)}")
-    for k in ("modified", "declarations-only", "unmodified"):
-        print(f"   {k:26s} {sum(1 for r in finished if r['relative_to_upstream'] == k)}")
-    print(f"   fix pass done              {len(finished) - len(needs_fix)}")
-    print(f"   fix pass needed            {len(needs_fix)}")
-    print(f"excluded  : {len(excluded)}  {[r['id'] for r in excluded]}")
-    stale = [r for r in finished if r["reaudit"] == "needed"]
-    print(f"   re-audit needed            {len(stale)}")
-    ready = [r for r in finished if r["marketplace_ready"]]
-    print(f"   marketplace ready          {len(ready)}")
-    held = [r for r in finished if r.get("marketplace_hold")]
-    if held:
-        print("   marketplace held           " + ", ".join(r["id"] for r in held))
-    print(f"remaining : {len(remaining)}")
-
-    if not apply:
-        print("\nDRY RUN — pass --apply to write the repository")
+def main(argv=None):
+    args = _parser().parse_args(argv)
+    if args.apply:
+        acquire_promote_lock(args.provider)
+        _assert_safe_apply_tree(args.provider, args.provider_ref)
+    result = build_metadata(
+        args.records, args.provider, args.upstream, args.upstream_commit,
+        args.holds, args.provider_ref,
+    )
+    for message in result.messages:
+        print(message)
+    print(f"refined  : {len(result.provenance['skills'])}")
+    print(f"added    : {len(result.added)} {result.added}")
+    print(f"excluded : {len(result.remaining['excluded'])}")
+    print(f"remaining: {len(result.remaining['remaining'])}")
+    ready = sum(1 for row in result.provenance["skills"] if row.get("marketplace_ready"))
+    print(f"marketplace ready metadata: {ready}")
+    if not args.apply:
+        print("\nDRY RUN — no files written; pass --apply to write metadata only")
         return
-
-    if len(finished) != SHELF_SIZE:
-        raise SystemExit(
-            f"refusing to rewrite the fixed shelf: expected {SHELF_SIZE} publishable Skills, "
-            f"found {len(finished)}")
-
-    os.makedirs(OUT, exist_ok=True)
-    sk = os.path.join(OUT, "skills")
-    if os.path.isdir(sk):
-        shutil.rmtree(sk)
-    os.makedirs(sk)
-    # Extract from the staging repo at the pinned commit, then verify every promoted file against
-    # that commit's blob hashes. A promotion that cannot prove what it copied is not a promotion.
-    tree = staging_tree()
-    blobs = {}
-    for line in (git(["ls-tree", "-r", FORK_COMMIT]).stdout or "").splitlines():
-        meta, path = line.split("\t", 1)
-        blobs[path] = meta.split()[2]
-    promoted = 0
-    for row in finished:
-        prefix = row["upstream_path"] + "/"
-        members = [p for p in tree if p.startswith(prefix)]
-        if not members:
-            raise SystemExit(f"{row['id']}: nothing at {prefix} in {FORK_COMMIT[:8]}")
-        for path in members:
-            dst = os.path.join(sk, row["id"], *path[len(prefix):].split("/"))
-            os.makedirs(os.path.dirname(dst), exist_ok=True)
-            data = subprocess.run(["git", "show", f"{FORK_COMMIT}:{path}"], cwd=FORK,
-                                  capture_output=True).stdout
-            with open(dst, "wb") as f:
-                f.write(data)
-            actual = subprocess.run(["git", "hash-object", "--stdin"], cwd=FORK,
-                                    input=data, capture_output=True, text=False).stdout.decode().strip()
-            if actual != blobs[path]:
-                raise SystemExit(f"{path}: promoted bytes do not match {FORK_COMMIT[:8]}")
-            promoted += 1
-    print(f"promoted {promoted} files, each verified against {FORK_COMMIT[:8]} by blob hash")
-
-    json.dump({
-        "schema_version": 1,
-        "generated": "2026-09-17",
-        "note": "Provenance is per Skill. The tree is flat by Skill id; upstream_path records where "
-                "each Skill came from in its source repository.",
-        "sources": {
-            "gptomics-bioskills": {
-                "upstream_repository": "https://github.com/GPTomics/bioSkills",
-                "upstream_commit": UPSTREAM_COMMIT,
-                "upstream_licence": "MIT",
-                "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
-                "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-                "staging_commit": FORK_COMMIT,
-            }
-        },
-        "skills": finished,
-    }, open(os.path.join(OUT, "PROVENANCE.json"), "w", encoding="utf-8", newline="\n"), indent=2)
-
-    json.dump({"schema_version": 1, "generated": "2026-09-17",
-               "source": "GPTomics/bioSkills@" + UPSTREAM_COMMIT,
-               "reconciliation": {
-                   "skills_in_source_tree": len(idx),
-                   "refined": len(finished),
-                   "audited_and_excluded": len(excluded),
-                   "out_of_scope": len(OUT_OF_SCOPE),
-                   "remaining": len(remaining),
-               },
-               "remaining": [{"id": i, "upstream_path": idx[i]} for i in remaining],
-               "excluded": excluded,
-               "out_of_scope": [{"id": i, "upstream_path": idx.get(i), "reason": why}
-                                for i, why in sorted(OUT_OF_SCOPE.items())]},
-              open(os.path.join(OUT, "REMAINING.json"), "w", encoding="utf-8", newline="\n"), indent=2)
-    by = {}
-    for r in remaining:
-        by.setdefault(idx[r].split("/")[0], []).append(r)
-    done = {}
-    for s in finished:
-        done[s["upstream_path"].split("/")[0]] = done.get(s["upstream_path"].split("/")[0], 0) + 1
-    L = ["# Remaining Skills", "",
-         "Not yet refined. Scope is deliberately limited to the rest of",
-         "[GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit",
-         f"`{UPSTREAM_COMMIT}`; other source corpora are out of scope for now.", "",
-         f"**{len(remaining)} remaining** across {len(by)} folders. {len(finished)} are already "
-         "refined and live in `skills/`.", "",
-         "The source tree holds "
-         f"{len(idx)} Skills: {len(finished)} refined, {len(excluded)} audited and excluded, "
-         f"{len(OUT_OF_SCOPE)} out of scope, {len(remaining)} remaining.", "",
-         "| folder | remaining | refined |", "| --- | ---: | ---: |"]
-    for f in sorted(by, key=lambda f: (-len(by[f]), f)):
-        L.append(f"| {f} | {len(by[f])} | {done.get(f, 0)} |")
-    L += ["", "## Promoted, fix pass still needed", "",
-          "These Skills are in `skills/` because their audit found them deployable with no open P0.",
-          "They have not yet been through a fix pass, however high they scored. Their open findings",
-          "are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.", "",
-          "| skill | score | grade |", "| --- | ---: | --- |"]
-    for r in needs_fix:
-        L.append(f"| `{r['id']}` | {r['score']} | {r['grade']} |")
-    L += ["", "## Promoted, re-audit still needed", "",
-          "Changed in staging after their latest audit, so the score below describes earlier bytes.",
-          "`reaudit` in PROVENANCE.json carries the same flag.", "",
-          "| skill | score at last audit | audited on |", "| --- | ---: | --- |"]
-    for r in stale:
-        L.append(f"| `{r['id']}` | {r['score']} | {r['audited_on']} |")
-    L += ["", "## Audited and excluded", "",
-          "Audited and did not pass. Not pending — rejected until the defects behind the score are",
-          "fixed.", "", "| skill | score | grade | open P0 |", "| --- | ---: | --- | ---: |"]
-    for e in excluded:
-        L.append(f"| `{e['id']}` | {e['score']} | {e['grade']} | {e['open_p0']} |")
-    L += ["", "## Out of scope", "", "| skill | reason |", "| --- | --- |"]
-    for i, why in sorted(OUT_OF_SCOPE.items()):
-        L.append(f"| `{i}` | {why} |")
-    L += ["", "## The list", ""]
-    for f in sorted(by):
-        L += [f"### {f}", ""]
-        L += [f"- `{i}` — `{idx[i]}`" for i in sorted(by[f])]
-        L.append("")
-    with open(os.path.join(OUT, "REMAINING.md"), "w", encoding="utf-8", newline="\n") as fh:
-        fh.write("\n".join(L))
-    print(f"\nwrote {OUT}")
+    write_metadata(args.provider, result)
+    print("\nwrote PROVENANCE.json, REMAINING.json, and REMAINING.md; skills/ was untouched")
 
 
 if __name__ == "__main__":
