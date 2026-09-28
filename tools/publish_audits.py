@@ -230,13 +230,19 @@ def header(skill_id, source, report, candidate=None):
             f"> - Read from [{fork['repository']}@{fork['commit'][:7]}]({fork['url']}), a fork in which this "
             "Skill's files are unchanged from upstream; the audited content is upstream's."
         )
+    test_data_note = (
+        "> - Test inputs and provenance are described in the published scripts/inputs and audit body; "
+        "raw run outputs are not published. Local paths below refer to the auditor's workstation."
+        if candidate
+        else "> - Test data are synthetic. Scripts the auditor ran are in [scripts/](scripts/); raw run "
+        "outputs are not published. Local paths below refer to the auditor's workstation."
+    )
     lines += [
         f"> - Audit method: [{AUDIT_METHOD['name']}]({AUDIT_METHOD['url']}) by {AUDIT_METHOD['author']} "
         f"({AUDIT_METHOD['license']}), {report.get('meta', {}).get('evaluator_version', 'skill-auditor')}.",
         f"> - Performed on {report.get('meta', {}).get('evaluated_on')} by {performed_by}, commissioned by "
         f"{COMMISSIONED_BY}. Not reviewed or endorsed by the Skill's authors.",
-        "> - Test data are synthetic. Scripts the auditor ran are in [scripts/](scripts/); raw run outputs are not published. "
-        "Local paths below refer to the auditor's workstation.",
+        test_data_note,
         "",
     ]
     return "\n".join(lines)

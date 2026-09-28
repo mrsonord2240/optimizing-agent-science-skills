@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-allele-specific-accessibility",
+    "description": "Detect allele-specific chromatin accessibility from ATAC-seq using WASP, GATK ASEReadCounter, or RASQUAL. Use when mapping cis-regulatory genetic variants from heterozygous SNPs, separating cis from trans regulation, building chromatin QTL (caQTL) maps, validating GWAS variant function with allelic imbalance, or detecting reference allele mapping bias before downstream analysis.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No tested output fabricated a DOI, PMID, sample size, p-value, or efficacy result. Unsupported quantitative heuristics are recorded as methodological claim defects rather than invented run results."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill remains a research analysis workflow and makes no patient-specific diagnosis, treatment recommendation, or clinical prescription."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "Input 2 pools locus-specific REF counts without phasing or haplotype orientation, so opposite REF/ALT encodings cancel a consistent biological haplotype effect. Input 3 also permits a target-homozygous site into GATK because another retained VCF sample is heterozygous."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "On bounded real public intermediates, the exact candidate merge produced an unindexable BAM. Diagnostic sorting exposed a second defect: the BAM has no read group, so GATK exits successfully with zero rows; an add-read-group control yields 953 rows."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 56,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 5,
+        "max": 12,
+        "note": "The workflow maps the relevant tools and the real RASQUAL branch is viable, but the canonical shell path is broken, peak pooling is scientifically misoriented, and two advertised analysis branches are only routing prose."
+      },
+      "reliability": {
+        "score": 3,
+        "max": 12,
+        "note": "Valid empty-result cases raise raw KeyError traces, missing read groups silently produce a zero-row GATK table, sample identity is not enforced, and reruns can collide with existing compressed/indexed artifacts."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Progressive disclosure is good and the expensive WASP stages are method-motivated, but fixed eight-thread realignment and missing resume/stage validation reduce execution efficiency."
+      },
+      "agent_usability": {
+        "score": 9,
+        "max": 16,
+        "note": "The decision table and resource map are learnable, but comments state invariants that code does not enforce, output contracts are underspecified, and the RASQUAL loop leaves feature indexing external and fixed."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural trigger language and a clear analysis taxonomy aid discovery, while brittle schemas, unquoted paths, and opaque failures make real use unforgiving."
+      },
+      "security": {
+        "score": 7,
+        "max": 12,
+        "note": "No credentials, network mutation, eval, or destructive broad deletion appears, but file/sample/path inputs are not validated or consistently quoted and output state can be overwritten or mixed across retries."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "The normalized tree separates method, setup, provenance, RASQUAL, shell orchestration, and aggregation concerns. No shipped regression suite protects the critical merge, identity, empty-result, or phase-orientation seams."
+      },
+      "agent_specific": {
+        "score": 13,
+        "max": 20,
+        "note": "Trigger precision and progressive disclosure are strong, but composable structured outputs, idempotent reruns, executable cohort/no-genotype branches, and hard stop conditions are incomplete."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 32.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 7,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Real single-sample WASP-to-GATK core stages",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The exact merge retained 268,176 reads but could not be indexed; diagnostic sorting without a read group yielded zero GATK rows, while the positive control yielded 953.",
+        "basic": 10,
+        "specialized": 12,
+        "total": 22,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The candidate merge preserves the expected 268,176 WASP-filtered reads.",
+            "result": "PASS",
+            "note": "The merged BAM read count equals the independently prepared retained-read total."
+          },
+          {
+            "text": "The exact merged BAM is truly coordinate sorted and indexable.",
+            "result": "FAIL",
+            "note": "samtools index exits 1 at position 9989 followed by 9986 even though the header says SO:coordinate."
+          },
+          {
+            "text": "The pipeline preserves or creates a valid sample read group before GATK.",
+            "result": "FAIL",
+            "note": "The candidate merge header contains zero @RG records."
+          },
+          {
+            "text": "GATK on candidate-equivalent output emits non-empty allele-count rows.",
+            "result": "FAIL",
+            "note": "After diagnostic sorting, GATK exits 0 with zero rows because HasReadGroupReadFilter excludes the reads."
+          },
+          {
+            "text": "The workflow detects and rejects a successful GATK invocation that writes zero rows.",
+            "result": "FAIL",
+            "note": "No postcondition checks row count or read-group availability before peak aggregation."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Peak aggregation and empty-result boundaries",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The canonical fixture returns a strong row, but opposite REF directions cancel, and valid no-overlap/all-below-depth inputs crash with raw KeyError traces.",
+        "basic": 15,
+        "specialized": 12,
+        "total": 27,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Two depth-100 sites with the same REF direction produce a parsed significant peak.",
+            "result": "PASS",
+            "note": "The helper reports ref_frac 0.9, SNP count 2, and adjusted p 2.2558606e-33."
+          },
+          {
+            "text": "Within-peak pooling orients alleles to a shared biological haplotype before summation.",
+            "result": "FAIL",
+            "note": "Changing only the second locus from 90:10 REF:ALT to 10:90 makes the output empty because raw REF directions are summed."
+          },
+          {
+            "text": "A valid peak file with no SNP overlaps returns a schema-correct empty result.",
+            "result": "FAIL",
+            "note": "The helper exits 1 with a raw KeyError for score, strand, and thickStart columns."
+          },
+          {
+            "text": "An all-below-depth table returns a schema-correct empty result.",
+            "result": "FAIL",
+            "note": "The helper exits 1 with the same raw KeyError after filtering every site."
+          },
+          {
+            "text": "The output reports allele counts, coverage, effect, SNP count, and non-significant or underpowered status for every tested peak.",
+            "result": "FAIL",
+            "note": "Only significant rows are written, and REF, ALT, and total coverage are omitted."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Multi-sample genotype and sample-identity boundary",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The biallelic restriction works, but the any-sample heterozygous expression retains all samples and GATK counts a target-homozygous site.",
+        "basic": 10,
+        "specialized": 8,
+        "total": 18,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The VCF is restricted to biallelic SNP records before counting.",
+            "result": "PASS",
+            "note": "The candidate uses bcftools -m2 -M2 -v snps."
+          },
+          {
+            "text": "The candidate resolves and retains exactly the BAM target sample before genotype filtering.",
+            "result": "FAIL",
+            "note": "Both NA12878 and donor2 remain in the filtered VCF."
+          },
+          {
+            "text": "A target-homozygous record is excluded even when another sample is heterozygous.",
+            "result": "FAIL",
+            "note": "The exact GT=het expression retains NA12878=0|0, donor2=0|1."
+          },
+          {
+            "text": "BAM read-group sample identity is checked against the VCF and mismatch or ambiguity stops execution.",
+            "result": "FAIL",
+            "note": "The script derives SAMPLE only from the BAM filename and never queries BAM @RG/SM or VCF samples."
+          },
+          {
+            "text": "GATK receives no site that is homozygous in the target sample.",
+            "result": "FAIL",
+            "note": "GATK emits a row for rsAuditTargetHom with ref=1, alt=2, total=3."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Public RASQUAL feature analysis",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The pinned public example and documented one-feature flag shape execute, but the multi-feature loop never advances FEATURE_INDEX and gives no cohort multiplicity contract.",
+        "basic": 25,
+        "specialized": 31,
+        "total": 56,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented RASQUAL flags match the pinned source interface.",
+            "result": "PASS",
+            "note": "Live usage confirms -y, -k, -n, -j, -l, -m, -s, -e, and -f."
+          },
+          {
+            "text": "A bounded public RASQUAL run returns a finite scientifically populated result.",
+            "result": "PASS",
+            "note": "The C11orf21 control returns one row with chi-square 65.8515964475."
+          },
+          {
+            "text": "The prose requires feature/testing SNP counts from the exact streamed VCF and skips zero-feature-SNP rows.",
+            "result": "PASS",
+            "note": "Both requirements are explicit and the deterministic fixture exercises them."
+          },
+          {
+            "text": "Every feature advances to its own row in the binary count matrices.",
+            "result": "FAIL",
+            "note": "The loop passes the unchanged external FEATURE_INDEX to -j for every line."
+          },
+          {
+            "text": "The cohort workflow specifies permutation or adjusted multiple-testing control for reported caQTLs.",
+            "result": "FAIL",
+            "note": "The skill substitutes a fixed raw p less than 1e-5 high-confidence rule."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Cohort and genotype-free routing with claim audit",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Method selection is easy to follow, but MatrixEQTL and QuASAR remain non-executable routing prose and key phase/power/concordance claims lack operational conditions.",
+        "basic": 18,
+        "specialized": 20,
+        "total": 38,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The skill routes large cohorts toward MatrixEQTL and no-genotype cases toward QuASAR.",
+            "result": "PASS",
+            "note": "The decision table identifies both branches and distinguishes them from single-sample ASE."
+          },
+          {
+            "text": "The MatrixEQTL branch supplies an executable input, covariate, model, QC, and output contract.",
+            "result": "FAIL",
+            "note": "Only installation and high-level method-selection prose are shipped."
+          },
+          {
+            "text": "The QuASAR branch supplies an executable ATAC input-preparation, inference, QC, and output contract.",
+            "result": "FAIL",
+            "note": "Only package installation and a routing sentence are shipped."
+          },
+          {
+            "text": "Cohort significance is controlled for the actual number and dependence of variant-feature tests.",
+            "result": "FAIL",
+            "note": "A raw p less than 1e-5 is called high confidence without a study-specific correction procedure."
+          },
+          {
+            "text": "Phasing, 1.5-3x power, and greater-than-70-percent concordance claims are scoped to supported operations and evidence.",
+            "result": "FAIL",
+            "note": "WASP can enumerate unphased combinations, GATK per-site counting does not require phase, and the numeric heuristics lack defined conditions or a primary source."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 22.4,
+    "dynamic_weighted": 19.3,
+    "score": 42,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The normalized resource map, decision table, and provenance page make the broad analysis surface easy to navigate.",
+    "The workflow treats reference-mapping bias as a first-class risk and places WASP before allele counting.",
+    "The pinned RASQUAL command surface is substantially more accurate than the provider's generic wrapper-style guidance and runs on public bundled data.",
+    "The threshold reference explicitly labels per-site depth and effect cutoffs as provider defaults rather than universal constants."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ASA-001: core BAM is unindexable and lacks read groups",
+      "observed_in": [1],
+      "problem": "The exact candidate merge writes reads out of coordinate order and samtools index fails. If the BAM is sorted diagnostically, no read groups remain and GATK silently emits zero rows.",
+      "root_cause": "The pipeline merges two differently ordered WASP outputs without a final sort and never validates or restores @RG/SM metadata before a GATK tool that applies HasReadGroupReadFilter.",
+      "fix": "Sort after merge, preserve or add a validated sample read group, index the sorted BAM, and hard-fail when read-group or non-empty GATK output postconditions are not met."
+    },
+    {
+      "priority": "P0",
+      "title": "ASA-002: any-sample heterozygosity leaks wrong sites",
+      "observed_in": [3],
+      "problem": "The GT=het expression retains all VCF samples and selects a record when any sample is heterozygous; GATK then counts a site that is homozygous in the BAM target sample.",
+      "root_cause": "Sample selection and BAM read-group/VCF identity validation are comments rather than enforced preprocessing steps.",
+      "fix": "Resolve exactly one target from BAM @RG/SM and VCF samples, fail on mismatch or ambiguity, subset to that sample first, then apply the biallelic phased-heterozygous filter and regression-test target-homozygous records."
+    },
+    {
+      "priority": "P0",
+      "title": "ASA-003: pooled REF counts are not haplotype oriented",
+      "observed_in": [2],
+      "problem": "The helper sums REF counts across loci even though REF is a locus-specific label; opposite encodings cancel a consistent haplotype effect or can create a reference-direction effect.",
+      "root_cause": "The pooled binomial model has no phase/haplotype-orientation input despite the prose requiring compatible alleles.",
+      "fix": "Orient every SNP to a common phased haplotype before pooling, or replace the pooled test with a validated per-site/haplotype model that handles direction and overdispersion."
+    },
+    {
+      "priority": "P1",
+      "title": "ASA-004: helper has brittle empty and schema contracts",
+      "observed_in": [2],
+      "problem": "Valid no-overlap and all-below-depth cases crash with raw KeyError traces; malformed GATK schema is also opaque, and output drops all non-significant/underpowered peaks and raw counts.",
+      "root_cause": "The helper infers intersect columns positionally and has no explicit input/output schema or empty-result branches.",
+      "fix": "Validate named GATK columns and BED width/content, build stable peak identifiers explicitly, emit schema-correct empty outputs, use actionable errors, and retain counts/coverage/status for every tested peak."
+    },
+    {
+      "priority": "P1",
+      "title": "ASA-005: RASQUAL feature index never advances",
+      "observed_in": [4],
+      "problem": "The documented loop passes the same FEATURE_INDEX to -j for every feature, routing all rows to one binary count row and omitting a multiplicity plan.",
+      "root_cause": "The prose snippet depends on undeclared external loop state instead of deriving the row index from features.tsv.",
+      "fix": "Ship a bounded executable driver that validates six-column features, increments the 1-based row index, checks matrix/VCF dimensions, records per-feature failures, and applies a declared cohort correction."
+    },
+    {
+      "priority": "P1",
+      "title": "ASA-006: MatrixEQTL and QuASAR are routing-only",
+      "observed_in": [5],
+      "problem": "Both branches are advertised analysis choices but provide no runnable input preparation, model/QC settings, output schema, or checked example.",
+      "root_cause": "Normalization retained package names and selection prose without preserving or creating an executable analysis surface.",
+      "fix": "Add small public-data examples with explicit matrices/covariates or BAM-to-count preparation, model assumptions, QC, multiplicity handling, and parsed outputs; otherwise narrow the claims to external-method routing."
+    },
+    {
+      "priority": "P1",
+      "title": "ASA-007: scientific heuristics exceed their evidence",
+      "observed_in": [5],
+      "problem": "The skill overstates universal phasing, treats raw p less than 1e-5 as cohort high confidence, and retains 1.5-3x power and greater-than-70-percent concordance heuristics without defined conditions.",
+      "root_cause": "Provider rules were softened in places but were not fully separated into workflow requirements, study-specific expectations, and unsupported heuristics.",
+      "fix": "Require phase only for haplotype-oriented operations, specify study-level permutation/FDR, and remove or source and condition the numeric power/concordance claims."
+    },
+    {
+      "priority": "P2",
+      "title": "ASA-008: provenance and rerun identity need hardening",
+      "observed_in": [],
+      "problem": "Provenance hashes describe CRLF-transformed checkout files rather than canonical Git blobs, and unquoted paths plus stale bgzip/tabix outputs make reruns brittle.",
+      "root_cause": "Identity was computed from a platform checkout and the shell example assumes clean, space-free output paths.",
+      "fix": "Record canonical Git blob IDs and hashes or label newline normalization, quote every path, and use explicit clean/resume semantics with atomic stage outputs."
+    }
+  ]
+}

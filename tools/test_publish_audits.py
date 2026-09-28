@@ -74,7 +74,10 @@ class ModularPublicationTests(unittest.TestCase):
             self.assertEqual((target / "source-identity.json").read_bytes(), (run / "source-identity.json").read_bytes())
             self.assertTrue((target / "scripts" / "run_cases.py").is_file())
             self.assertTrue((target / "scripts" / "data" / "input.tsv").is_file())
-            self.assertIn("Audited working candidate", (target / "viewer.md").read_text(encoding="utf-8"))
+            viewer = (target / "viewer.md").read_text(encoding="utf-8")
+            self.assertIn("Audited working candidate", viewer)
+            self.assertIn("Test inputs and provenance are described", viewer)
+            self.assertNotIn("Test data are synthetic", viewer)
 
             repeated = publish.publish_modular(
                 str(records), "sample-skill", str(run), ["run_cases.py", "data/input.tsv"]

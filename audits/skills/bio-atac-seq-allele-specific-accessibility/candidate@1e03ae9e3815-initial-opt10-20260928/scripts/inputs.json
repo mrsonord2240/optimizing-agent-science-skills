@@ -1,0 +1,32 @@
+[
+  {
+    "index": 1,
+    "type": "Canonical",
+    "label": "Real single-sample WASP-to-GATK core stages",
+    "prompt": "Run the shipped single-sample workflow on the bounded public GM12878/NA12878 chr1 data after WASP remapping. Verify that the merged BAM is coordinate-sortable and indexable, that sample read groups survive or are restored, and that GATK ASEReadCounter emits non-empty checked-value output."
+  },
+  {
+    "index": 2,
+    "type": "Variant A",
+    "label": "Peak aggregation and empty-result boundaries",
+    "prompt": "Aggregate two depth-100 heterozygous sites in one peak, then repeat with opposite REF/ALT directions, a valid peak set with no overlaps, all sites below the depth threshold, and a named BED4. Preserve biological allele orientation and return an explicit empty result for valid no-call cases."
+  },
+  {
+    "index": 3,
+    "type": "Edge",
+    "label": "Multi-sample genotype and sample-identity boundary",
+    "prompt": "Use a two-sample VCF in which NA12878 is homozygous and donor2 is heterozygous at a covered site. Run the candidate filter for an NA12878 BAM, confirm exactly one target sample is selected, enforce BAM/VCF identity, and verify that the target-homozygous site never reaches allele counting."
+  },
+  {
+    "index": 4,
+    "type": "Variant B",
+    "label": "Public RASQUAL feature analysis",
+    "prompt": "Run the documented RASQUAL branch on the pinned public C11orf21 data. Verify live flags, a finite result, correct feature-SNP/testing-SNP counts, per-feature row routing for more than one feature, and a multiple-testing plan for cohort reporting."
+  },
+  {
+    "index": 5,
+    "type": "Stress",
+    "label": "Cohort and genotype-free routing with claim audit",
+    "prompt": "Design executable analyses for an at-least-100-sample MatrixEQTL caQTL cohort and a no-genotype QuASAR case. Specify input schemas, model/QC/output contracts, multiplicity control, when phasing is required, and the evidence needed before using the 1.5-3x power or greater-than-70-percent concordance heuristics."
+  }
+]

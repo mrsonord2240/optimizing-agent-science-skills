@@ -1,0 +1,64 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/allele-specific-accessibility",
+    "subtree": "1d84e31c0fdc0b2636e5a553d71796b996be6a23",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "git_blob": "e0941c7bde0a2e4540e6f1b962575bfcfa77254a",
+        "git_blob_sha256": "516426242161aa119dfef2337b7cd8cc5ac0b83d9b66c48f69e6f99f67862e39",
+        "git_blob_bytes": 17049,
+        "windows_checkout_sha256": "7ec772e1932319afa74903ee5ef5e1b7a16294efb78ffcf8cf540b3555653418",
+        "windows_checkout_bytes": 17351
+      },
+      {
+        "path": "usage-guide.md",
+        "git_blob": "f3e7ccbebed3654a2efa24b5a62b58e43719c0cc",
+        "git_blob_sha256": "5ee176598ececc0dee82dc4e09b5a154f5e760e08c6d6ca84635d5b7674d7b94",
+        "git_blob_bytes": 6853,
+        "windows_checkout_sha256": "00da2f3cbf8d87951b1910fbed4cc7d94eea6f46d42c1e038e45ae8361394e3d",
+        "windows_checkout_bytes": 6981
+      },
+      {
+        "path": "examples/wasp_ase_pipeline.sh",
+        "git_blob": "e8920f67859dede6e3f9b49793047a7a153e91da",
+        "git_blob_sha256": "3d95bb0913e586bcad0f21308216f2e8f08400ecce9bc18b8c92ee51b3f52e99",
+        "git_blob_bytes": 4667,
+        "windows_checkout_sha256": "632b403ff339f34fa3254afa5fd2e6d1f71e7298f0582a8c241d745481b98d0d",
+        "windows_checkout_bytes": 4782
+      }
+    ]
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane2-atac-asa",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-atac-asa\\skills\\bio-atac-seq-allele-specific-accessibility",
+    "status_before": "untracked normalized subtree only",
+    "status_after_execution": "untracked normalized subtree only",
+    "content_sha256": "1e03ae9e381527982e1bc41be03aedb9934c37655091da90d13d443d201e1e6f",
+    "content_manifest": {
+      "file_count": 7,
+      "bytes": 693,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted with StringComparer.Ordinal and separated by LF; no trailing LF"
+    },
+    "files": [
+      {"path": "SKILL.md", "bytes": 6425, "git_blob": "1e563f6f7bc7fa748d2e75ea96c4017be1818cce", "sha256": "35e83cd9846bfffdc17d5dd910360765914aab099b420e8e3cc69b5a97ce4dcd"},
+      {"path": "references/method-selection-and-failures.md", "bytes": 7952, "git_blob": "7546bc19207d40bd6206eaa9e7c286a9dac787ef", "sha256": "9232ebacf3ac8d7e9c12a4c76c6d8ce87750acd9ea7750e9c8b364b36f996adf"},
+      {"path": "references/provenance.md", "bytes": 932, "git_blob": "08465ec609f84e38b7c8da42269f600c13c3a655", "sha256": "ac841919bab3f0010c321b648eba10e5294569082f0bb22e74cffbcb0f7e06c1"},
+      {"path": "references/rasqual-joint-modeling.md", "bytes": 2177, "git_blob": "799f2d23060d6b08f86689285e27973914025342", "sha256": "b7fe7ae43259f5ea9b19154973bef0cddf02d5197e5c0370f6baa2b778fdd2c7"},
+      {"path": "references/setup-and-inputs.md", "bytes": 2681, "git_blob": "6218011d7f6b3ea2d6a2b767a34de79d412c7038", "sha256": "fdfb7a3ae56620cd606d2420316b98b4652f30726658561a57ac388ec79713db"},
+      {"path": "scripts/aggregate_peak_ase.py", "bytes": 2323, "git_blob": "5c64466c63a13b7401e38ee8fe29fe13876dd5c1", "sha256": "b276aa5b0541350aa3aa9c4534f67323db6f87f72f7989ce96ec1b3f49e1d5b1"},
+      {"path": "scripts/wasp_ase_pipeline.sh", "bytes": 3394, "git_blob": "bb0851952fa584f2420a1c1898bc4735e8cf6647", "sha256": "b39a7d6bdb85e678d0a29ebd1b76dda486d9f99db30c42efa927391e3e460528"}
+    ]
+  },
+  "tooling": {
+    "tools_md_sha256": "ca90f50072d3d7bc6a0e595a2b825b69f983fe686555d12300271f89d0c08dc2",
+    "environment_fingerprint_sha256": "5a5eade861ecf5133d8163ee303ad396c8b565120bdb028a747118de0135a7de",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

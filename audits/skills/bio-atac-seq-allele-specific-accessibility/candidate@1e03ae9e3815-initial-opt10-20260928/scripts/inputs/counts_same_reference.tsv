@@ -1,0 +1,3 @@
+contig	position	variantID	refAllele	altAllele	refCount	altCount	totalCount	lowMAPQDepth	lowBaseQDepth	rawDepth	otherBases	improperPairs
+chrAudit	101	rsA	A	G	90	10	100	0	0	100	0	0
+chrAudit	201	rsB	C	T	90	10	100	0	0	100	0	0
