@@ -1,0 +1,68 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "liquid-biopsy/cfdna-preprocessing",
+    "subtree": "aeaf01458e707a8084c054de0411d9a641b36e5a",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane4-cfdna",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-cfdna\\skills\\bio-cfdna-preprocessing",
+    "status_before": "untracked normalized subtree only",
+    "status_after_execution": "untracked normalized subtree only",
+    "content_sha256": "9852987be2107ca7d54ae6e211f1fbd25ed2710910b1cd43c80c45dc8444059b",
+    "content_manifest": {
+      "file_count": 6,
+      "bytes": 594,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted with ordinal Unicode code-point ordering and separated by LF; the final record has a trailing LF"
+    },
+    "files": [
+      {
+        "path": "SKILL.md",
+        "bytes": 7978,
+        "git_blob": "ba2fa6a5c33c7b28221ad743fcba1a0532aec806",
+        "sha256": "f7a42c51b28c303fcb19439135bad0f7d1f6106ff5cc9e1827bf8e657a868e55"
+      },
+      {
+        "path": "references/fgbio-consensus-workflow.md",
+        "bytes": 4079,
+        "git_blob": "39e0abbae9a4622e0bd8b52329fc8ea3690dfa3c",
+        "sha256": "60f3488c26028bb3848bf25be4e7ccca0c5a9f2939de53608ae2891e456b0e55"
+      },
+      {
+        "path": "references/method-selection-and-fragment-qc.md",
+        "bytes": 7513,
+        "git_blob": "7331175ca7dc1636a5a86c8f37bd1c46eab4ab02",
+        "sha256": "7b6f54c66a2b838f49eb858aac95a70561833a059ddffc3dc46f63721ffc54c0"
+      },
+      {
+        "path": "references/scientific-references.md",
+        "bytes": 2107,
+        "git_blob": "a5da2ae9d65dd60b6aaf4a111d08106d82511559",
+        "sha256": "fe8f63759087a6d66ae140c7ca68f72a1da6b97f0fb3f3f05998660f8e39805c"
+      },
+      {
+        "path": "scripts/preprocess_cfdna.py",
+        "bytes": 5327,
+        "git_blob": "d261d5a0b1d7a7ad4251ceb16ad588f51dc0c513",
+        "sha256": "db7f4d70271bb8d765084ef27f5815ab91700685ef64d0d22b417dc4478316af"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 1836,
+        "git_blob": "1acb75f385aa21c9aee09420618ae04a8633cb77",
+        "sha256": "d3fe63da67c2c39d0e087c56e6ba422ce72952537fc85a3531d09d17ab0f062c"
+      }
+    ]
+  },
+  "tooling": {
+    "tools_md_sha256": "3f4863092b9567002584070794b7e5f7b798788054ffc2ef7dc2ae83d5f87b77",
+    "environment_fingerprint_sha256": "4ff4e1e3cfb2c785f25687261ae2d864291ed679eb1de31faddaf9f93874cc0e",
+    "environment_lock_sha256": "de8e635467ca49547a3b9d678525df4944ac48eb9d4fec7a3c8a121f57a8f269",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

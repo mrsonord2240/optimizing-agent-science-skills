@@ -1,0 +1,38 @@
+{
+  "skill": "bio-cfdna-preprocessing",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "complexity": "Moderate",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "Public cfDNA insert-size QC",
+      "prompt": "Summarize the insert-size distribution of this public paired-end human BAM and report the observation count, mode, median, 90-150 bp fraction, and fraction above 250 bp."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "Simplex UMI consensus wrapper",
+      "prompt": "Run the bundled preprocess_cfdna() wrapper on a paired-end inline-UMI uBAM using the documented 6M11S+T read structure and the simplex path."
+    },
+    {
+      "index": 3,
+      "type": "Variant B",
+      "label": "Duplex UMI consensus wrapper",
+      "prompt": "Run the bundled preprocess_cfdna() wrapper on reciprocal paired UMIs with duplex=True and produce a filtered, indexed consensus BAM."
+    },
+    {
+      "index": 4,
+      "type": "Edge",
+      "label": "Flag-contaminated fragment QC",
+      "prompt": "Run insert_size_qc() on a BAM containing ordinary primary reads plus secondary, supplementary, duplicate, and QC-fail records, and verify that the advertised primary-fragment QC population is enforced."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "Manual recipe and path robustness",
+      "prompt": "Execute the documented fgbio/bwa/samtools recipe, including paths containing spaces, and verify UMI extraction, BAM-to-alignment conversion, tag transfer, consensus filtering order, and final indexed output."
+    }
+  ]
+}

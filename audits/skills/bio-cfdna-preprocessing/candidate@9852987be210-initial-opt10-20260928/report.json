@@ -1,0 +1,358 @@
+{
+  "meta": {
+    "skill_name": "bio-cfdna-preprocessing",
+    "description": "Decides how to preprocess plasma cfDNA sequencing data so the recoverable signal survives - library-prep-aware fragment expectations (dsDNA vs ssDNA/adaptase prep), UMI/duplex consensus with fgbio (ExtractUmisFromBam, GroupReadsByUmi --strategy paired for duplex, CallMolecularConsensusReads vs CallDuplexConsensusReads, FilterConsensusReads min-reads \"total s1 s2\"), the align->group->consensus->RE-align ordering, and the cfDNA dedup trap where naive coordinate dedup collapses nucleosome-coincident independent molecules. Covers when single-strand consensus suffices vs when duplex is mandatory, the singleton/sensitivity tax at low input, and reading the insert-size histogram as a pre-analytical QC instrument. Use when processing plasma cfDNA reads before fragmentomics, ctDNA mutation calling, or tumor-fraction estimation.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "FAIL"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No tested output fabricated a DOI, PMID, trial result, sample size, p-value, or efficacy result. Core literature claims inspected against primary records were traceable, with remaining provenance precision routed as CFD-006."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill stays at preprocessing and analytical interpretation and makes no patient-specific diagnosis or treatment recommendation."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The advertised UMI pipeline omits required UMI tag mapping, sends binary BAM bytes to BWA as sequence input, and sends coordinate-sorted consensus to a filter that requires query-grouped input. Its categorical rule that duplex is mandatory for every MRD or sub-0.1% VAF setting also exceeds the cited evidence and ignores validated non-duplex background-suppression designs."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "All ten consecutive advertised preprocess_cfdna() calls failed before producing an output BAM; both simplex and duplex branches are unrunnable in the pinned supported stack."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 51,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 5,
+        "max": 12,
+        "note": "The chemistry and fragment-signal overview is useful, but the promised executable simplex and duplex workflows are broken at three independent stages and the decision table overstates when duplex is mandatory."
+      },
+      "reliability": {
+        "score": 2,
+        "max": 12,
+        "note": "Ten of ten representative wrapper calls failed, errors surface as tool help plus raw stack traces, and partial intermediates make retry behavior unclear."
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "Progressive disclosure is compact, but the implementation performs invalid alignment work and an index that cannot support the subsequent required query-grouped filter."
+      },
+      "agent_usability": {
+        "score": 8,
+        "max": 16,
+        "note": "The conceptual order and reporting checklist are readable, but the exact commands encode invalid interfaces and do not define structured success, failure, or run-summary outputs."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural trigger examples and method-selection prose are strong; ordinary valid UMI inputs fail and paths containing spaces are not supported."
+      },
+      "security": {
+        "score": 6,
+        "max": 12,
+        "note": "No credentials are handled, but input-derived reference, output, intermediate paths, and thread count are interpolated into shell=True command strings without validation or quoting."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "The tree is small and separated into focused references and one script, but no shipped regression suite checks the documented command chain, flag population, or path handling."
+      },
+      "agent_specific": {
+        "score": 12,
+        "max": 20,
+        "note": "Trigger precision and progressive disclosure are good; the wrapper lacks a composable result contract, is not safely idempotent, and omits stop rules for unsupported library layouts and invalid QC parameters."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 29.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 8,
+      "total": 24
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Public cfDNA insert-size QC",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All five numerical fields reproduce independently on the public BAM, but the bare dictionary does not state that chemistry and pre-analytical context are required before biological interpretation.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The observation count, mode, median, 90-150 bp fraction, and greater-than-250 bp fraction match an independent implementation.",
+            "result": "PASS",
+            "note": "Both implementations returned n=2819, mode 96, median 123, short fraction 0.64349059950337, and long fraction 0.0."
+          },
+          {
+            "text": "The output contains all five fields promised for the reusable insert-size summary.",
+            "result": "PASS",
+            "note": "All named fields are present with stable numeric types."
+          },
+          {
+            "text": "Repeated execution is deterministic and does not modify the input BAM.",
+            "result": "PASS",
+            "note": "The calculation is read-only and matches the independently saved tooling result exactly."
+          },
+          {
+            "text": "The executable output warns that chemistry, size selection, and collection conditions are required before contamination or ctDNA interpretation.",
+            "result": "FAIL",
+            "note": "The function returns an unlabeled numeric dictionary; the necessary interpretive boundaries exist only in prose."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Simplex UMI consensus wrapper",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The exact wrapper exits 1 at ExtractUmisFromBam because two molecular-index segments are supplied with zero molecular-index tags; no final BAM exists.",
+        "basic": 5,
+        "specialized": 7,
+        "total": 12,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both inline UMI segments are extracted to valid molecular-index tags and the combined RX tag.",
+            "result": "FAIL",
+            "note": "fgbio 4.1.1 reports two molecular barcode segments but zero molecular-index tags."
+          },
+          {
+            "text": "The unmapped BAM is converted to paired sequence records before BWA alignment while UMI metadata is preserved.",
+            "result": "FAIL",
+            "note": "The next documented stage passes the binary BAM pathname directly to bwa mem."
+          },
+          {
+            "text": "Consensus filtering receives queryname-sorted or query-grouped mapped consensus reads.",
+            "result": "FAIL",
+            "note": "The wrapper coordinate-sorts and indexes consensus_mapped before calling FilterConsensusReads."
+          },
+          {
+            "text": "A non-empty filtered and indexed simplex BAM is produced.",
+            "result": "FAIL",
+            "note": "Execution stops at the first fgbio stage and the final output does not exist."
+          },
+          {
+            "text": "The failed process exits nonzero rather than claiming a usable consensus result.",
+            "result": "PASS",
+            "note": "subprocess.check=True propagates a nonzero CalledProcessError."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Duplex UMI consensus wrapper",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The duplex branch fails at the shared extraction stage and produces no final BAM; paired grouping is configured in unreachable downstream code.",
+        "basic": 5,
+        "specialized": 7,
+        "total": 12,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Reciprocal duplex UMIs are extracted into the tags required to construct A/B families.",
+            "result": "FAIL",
+            "note": "The same missing molecular-index-tag error occurs before duplex grouping."
+          },
+          {
+            "text": "The duplex branch selects paired UMI grouping rather than adjacency grouping.",
+            "result": "PASS",
+            "note": "Static inspection confirms strategy='paired' when duplex=True."
+          },
+          {
+            "text": "The consensus caller receives mapped, valid UMI-tagged templates.",
+            "result": "FAIL",
+            "note": "Execution never reaches grouping or calling, and the intervening documented BWA-on-BAM stage is invalid."
+          },
+          {
+            "text": "The true-duplex filter runs on query-grouped input with the documented 2 1 1 policy.",
+            "result": "FAIL",
+            "note": "The wrapper supplies coordinate-sorted input to FilterConsensusReads."
+          },
+          {
+            "text": "A filtered and indexed duplex BAM is produced.",
+            "result": "FAIL",
+            "note": "Execution exits 1 and the final output does not exist."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Flag-contaminated fragment QC",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The function is deterministic but includes supplementary, duplicate, and QC-fail records in the advertised primary-fragment population and silently accepts a negative maximum size.",
+        "basic": 18,
+        "specialized": 19,
+        "total": 37,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Secondary alignments are excluded from the insert-size population.",
+            "result": "PASS",
+            "note": "The focused fixture's secondary record is not counted."
+          },
+          {
+            "text": "Supplementary alignments are excluded so the implementation matches its primary-alignment claim.",
+            "result": "FAIL",
+            "note": "One supplementary record is included in the four-record result."
+          },
+          {
+            "text": "Duplicate and QC-fail records are either excluded by a documented policy or reported separately.",
+            "result": "FAIL",
+            "note": "One duplicate and one QC-fail record are silently included."
+          },
+          {
+            "text": "A nonpositive max_size parameter is rejected with an actionable domain error.",
+            "result": "FAIL",
+            "note": "max_size=-1 silently returns an all-zero summary."
+          },
+          {
+            "text": "The focused result is deterministic and independently reproducible.",
+            "result": "PASS",
+            "note": "Both implementations return n=4, median 190, mode 100, and fractions 0.5 and 0.5."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Manual recipe and path robustness",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The exact recipe fails UMI extraction, BWA returns zero while emitting unparsable SAM from BAM bytes, FilterConsensusReads rejects coordinate order, and unquoted spaces split every pipeline path.",
+        "basic": 4,
+        "specialized": 6,
+        "total": 10,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented ExtractUmisFromBam command accepts the paired read structures.",
+            "result": "FAIL",
+            "note": "It exits 1 because molecular-index tags are omitted."
+          },
+          {
+            "text": "The first alignment consumes sequence data rather than interpreting binary BAM bytes as FASTA or FASTQ.",
+            "result": "FAIL",
+            "note": "BWA returns zero after reading two apparent 7,012 bp sequences, and samtools cannot parse the emitted SAM."
+          },
+          {
+            "text": "The documented consensus filter order satisfies the live fgbio input contract.",
+            "result": "FAIL",
+            "note": "Coordinate input exits 1; the queryname-sorted control writes all four records."
+          },
+          {
+            "text": "Paths containing spaces execute without shell splitting or command injection risk.",
+            "result": "FAIL",
+            "note": "The unquoted realignment pipeline exits 1 with split-argument usage errors and no output."
+          },
+          {
+            "text": "Corrected controls prove that the pinned primary tools can complete realignment and filtering.",
+            "result": "PASS",
+            "note": "The quoted ordinary realignment writes four records and the queryname-filter control writes four records."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 20.4,
+    "dynamic_weighted": 17.9,
+    "score": 38,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The candidate clearly explains why cfDNA chemistry, fragment preservation, and UMI family construction affect downstream interpretation.",
+    "The insert-size arithmetic is deterministic and agrees with an independent implementation on both public and focused fixtures.",
+    "The tree uses concise progressive disclosure and provides a traceable primary-literature bibliography.",
+    "Corrected controls demonstrate that all primary tools are available in the pinned environment; failures are candidate defects rather than access blockers."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "CFD-001: UMI extraction omits required tags",
+      "observed_in": [2, 3, 5],
+      "problem": "Both wrapper branches and the documented command fail because two molecular-index segments are supplied without molecular-index tags.",
+      "root_cause": "The recipe treats --single-tag RX as a replacement for the per-segment tag mapping required by the supported fgbio interface.",
+      "fix": "Require a validated read-structure and tag layout, pass molecular-index tags such as ZA and ZB for the two segments, retain RX as the combined tag when appropriate, and add simplex and reciprocal-duplex extraction tests."
+    },
+    {
+      "priority": "P0",
+      "title": "CFD-002: Alignment consumes BAM as sequence input",
+      "observed_in": [2, 3, 5],
+      "problem": "The first alignment passes with_umis.bam directly to bwa mem; BWA exits zero after misreading binary bytes and emits SAM that samtools cannot parse.",
+      "root_cause": "The implementation omits the BAM-to-interleaved-FASTQ conversion and metadata zipper required by the fgbio alignment pattern.",
+      "fix": "Convert or stream query-grouped uBAM to paired FASTQ, align with smart pairing, and use ZipperBams to restore UMI and metadata tags. Assert proper pairs, parseable output, preserved RX tags, and nonzero records before continuing."
+    },
+    {
+      "priority": "P0",
+      "title": "CFD-003: Consensus filter receives wrong order",
+      "observed_in": [2, 3, 5],
+      "problem": "The wrapper coordinate-sorts and indexes consensus alignments before FilterConsensusReads, which rejects that order because templates must be queryname sorted or query grouped.",
+      "root_cause": "The final coordinate sort and index were placed before rather than after the template-aware consensus filter.",
+      "fix": "Feed queryname-sorted or query-grouped mapped consensus to FilterConsensusReads, then coordinate-sort and index the filtered output. Add an assertion that the live filter succeeds and the final BAM is coordinate sorted, nonempty, and indexable."
+    },
+    {
+      "priority": "P0",
+      "title": "CFD-004: Shell interpolation permits injection",
+      "observed_in": [5],
+      "problem": "Reference, output, intermediate paths, and thread count are interpolated into two shell=True pipelines without quoting or validation; ordinary space-bearing paths already fail.",
+      "root_cause": "Complex pipelines are assembled as raw shell strings instead of validated argv or explicitly quoted stages.",
+      "fix": "Remove shell=True by connecting subprocess.Popen stages with argv lists, validate threads as a positive bounded integer, and add regression cases for spaces and shell metacharacters with all output confined to a temporary directory."
+    },
+    {
+      "priority": "P1",
+      "title": "CFD-005: Fragment QC population is contaminated",
+      "observed_in": [4],
+      "problem": "insert_size_qc() includes supplementary, duplicate, and QC-fail records while describing its population as primary proper-pair fragments, and invalid max_size values silently yield a normal-looking zero summary.",
+      "root_cause": "The read predicate excludes only secondary alignments and the function has no input-domain or flag-policy contract.",
+      "fix": "Define and enforce the intended primary/PF/duplicate policy, reject nonpositive maximum sizes, report filtering counts, and test secondary, supplementary, duplicate, QC-fail, unmapped, and empty populations explicitly."
+    },
+    {
+      "priority": "P1",
+      "title": "CFD-006: Assay-path rules are too categorical",
+      "observed_in": [],
+      "problem": "The decision table says duplex is mandatory for every MRD or VAF below about 0.1 percent and implies a single chemistry path for fragmentomics, although achievable performance depends on recovery, molecule count, background suppression, target design, and validated error models.",
+      "root_cause": "Method-specific evidence and illustrative thresholds were promoted to universal decision rules without stating assay-validation conditions.",
+      "fix": "Recast these rows as conditional choices, distinguish error-suppression capability from achieved assay LoD, cite stable DOI or PMID identifiers, and require empirical validation of recovery, background error, molecular depth, and final calling rules."
+    }
+  ]
+}
