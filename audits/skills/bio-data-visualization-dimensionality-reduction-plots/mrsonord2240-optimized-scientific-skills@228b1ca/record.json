@@ -1,10 +1,10 @@
 {
   "skill_id": "bio-data-visualization-dimensionality-reduction-plots",
-  "version": "mrsonord2240-bioSkills@64b3b15",
+  "version": "mrsonord2240-optimized-scientific-skills@228b1ca",
   "source": {
-    "repository": "mrsonord2240/bioSkills",
-    "commit": "64b3b150c9b989c102f7ee69e0bb07c16842d894",
-    "path": "data-visualization/dimensionality-reduction-plots",
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "228b1caf42f42053a16db2dfe0f67fcb2005a413",
+    "path": "skills/bio-data-visualization-dimensionality-reduction-plots",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
     "license": "MIT",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots"
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/228b1caf42f42053a16db2dfe0f67fcb2005a413/skills/bio-data-visualization-dimensionality-reduction-plots"
   },
   "audit": {
     "method": {
@@ -26,16 +26,17 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-20",
+    "audited_on": "2026-09-27",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
-    "test_data": "synthetic"
+    "test_data": "synthetic",
+    "auditor_independent": true
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-optimized-scientific-skills@f3de5bc",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 21
+    "scripts": 26
   }
 }

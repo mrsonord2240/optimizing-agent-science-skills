@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (61)
+## P1 (55)
 
 ### `bio-data-visualization-network-visualization` — examples/cytoscape_automation.py fails silently
 
@@ -49,54 +49,6 @@ None open.
 - Problem: ForceAtlas2, hive plots, Datashader, adjustText labelling and Python edge bundling have no code; HiveNetX is not on PyPI; the usage-guide prompt for a 5000-node ForceAtlas2, bundled, rasterized network cannot be met (nx.spring_layout takes 104 s at n=5000).
 - Root cause: Decision-tree rows were added without matching recipes.
 - Fix: Add short tested recipes (nx.forceatlas2_layout in networkx >= 3.4, a Datashader raster of a large edge list, pyveplot or a hand-written hive), or remove the names from the description; replace HiveNetX with a real package.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — Rtsne seed=42 advice is silently ignored
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 4
-- Problem: Failure-mode 'Fix' says set seed=42 for R uwot/Rtsne. Rtsne(seed=42) is absorbed by `...` with no error and two runs differ; only set.seed() (used in the Skill's code block) reproduces. Same wording is in usage-guide Tips.
-- Root cause: One sentence generalises uwot's seed argument to Rtsne.
-- Fix: Say: uwot seed=42 or set.seed(42); Rtsne set.seed(42) before the call (Rtsne has no seed argument).
-
-### `bio-data-visualization-dimensionality-reduction-plots` — 'PCA is deterministic' but the sklearn block is not
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1
-- Problem: SKILL.md calls PCA deterministic and says random_state matters only for t-SNE/UMAP. PCA(n_components=10) on a wide matrix (>500 features) auto-selects the randomized solver; two identical runs gave different scores (max abs diff 15.3) and variance ratios differing by ~1e-4. svd_solver='full' or random_state=42 is reproducible.
-- Root cause: Determinism asserted from the algorithm, not from sklearn's default solver.
-- Fix: Add random_state=42 (or svd_solver='full') to the PCA block and drop 'deterministic' unless a seed/solver is fixed.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — Shipped example is not runnable as shipped
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 6
-- Problem: embedding_phd.py stops at highly_variable_genes(flavor='seurat_v3') with 'No module named skmisc'; sc.tl.leiden as written needs leidenalg (or flavor='igraph', n_iterations=2, directed=False in scanpy 1.12); processed.h5ad is not shipped; the usage-guide pip line lists none of scikit-misc, leidenalg, igraph.
-- Root cause: Prerequisites list only the headline packages; example written against placeholder data.
-- Fix: Add scikit-misc and leidenalg (or igraph flavor) to Prerequisites, state the input h5ad requirements (raw counts, obs['condition'], >=2000 genes), and use leiden flavor='igraph'.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — Example runs seurat_v3 HVG on log-normalised data
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 6
-- Problem: scanpy warns flavor='seurat_v3' 'expects raw count data'; on the audit data it captured 288/300 planted marker genes vs 295/300 on raw counts and changed 251 of 2000 HVGs.
-- Root cause: HVG call placed after normalize_total/log1p.
-- Fix: Run seurat_v3 on raw counts (layer or before normalisation), or use flavor='seurat' after log1p.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — Batch/library-size guidance is inaccurate or incomplete
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 7
-- Problem: 'log + scale' is offered as the fix for library-size-driven PC1 but leaves the library-size PC at r = 0.99 (only size-factor normalisation removes it); batch diagnosis is framed as PC1 vs PC2 though the planted batch lived on PC4; 'UMAP can hide batch' was contradicted (UMAP separated it more than PCA).
-- Root cause: Rules of thumb stated as facts without a test.
-- Fix: Normalise for library size before log+scale; screen PC1-PC5 (or the top PCs by R2 with batch) for batch; soften the UMAP claim to 'UMAP does not quantify batch; use PCA R2 or kNN batch mixing'.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — Example drops figures and prints a literal caption
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 6
-- Problem: Scree and PHATE figures are built but never saved (2 savefig for 4 figures); caption is a plain string so 'N={n}' prints literally; condition coloured with cmap='tab10' over category codes (blue/cyan for two groups) with no legend.
-- Root cause: Example written as snippets rather than a runnable script.
-- Fix: Save all four figures, make caption an f-string, use a categorical palette with a legend.
 
 ### `bio-data-visualization-ggplot2-fundamentals` — ggtext '\u2212' label prints a literal backslash sequence
 
@@ -498,7 +450,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (144)
+## P2 (138)
 
 ### `bio-data-visualization-network-visualization` — Hub-label rule and edge-width advice are not adaptive
 
@@ -523,54 +475,6 @@ None open.
 - Problem: networkx >= 3.4 has forceatlas2_layout but the Skill points to fa2_modified or Gephi; ggraph 'graphopt' is labelled OpenOrd-style (it is not); the PyVis heading appears twice; the block writes network.pdf relative to Cytoscape's working directory.
 - Root cause: Version drift and unchecked comments.
 - Fix: Update the layout notes, use absolute output paths for Cytoscape exports and drop the heading duplication.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — openTSNE default statements are wrong for openTSNE
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 4
-- Problem: 'learning_rate = n/12, not the default 200' and 'init=pca, NOT random' are already openTSNE 1.0.4 defaults (learning_rate='auto', initialization='pca'); explicit KB settings gave the same result as defaults.
-- Root cause: Kobak-Berens' comparison was against other implementations' defaults.
-- Fix: Say these are the openTSNE defaults and only need setting explicitly for Rtsne/sklearn.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — 'Local neighborhoods preserved by construction' overstates
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 7
-- Problem: Measured 15-NN retention in 2-D was 0.39-0.41 on real pbmc68k_reduced (UMAP) and 0.14-0.23 on synthetic data.
-- Root cause: Simplified summary of Chari & Pachter.
-- Fix: Reword to 'local neighborhoods are only partly preserved (typically well under half of the 15 nearest neighbours)' and give a retention check.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — PC1=5%/PC2=4% 'may be noise' heuristic contradicted
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 6
-- Problem: In the example run PC1 is 1.1% and PC2 1.05% yet the five planted clusters are perfect (ARI 1.0); low variance % is normal for sparse scRNA-seq.
-- Root cause: Bulk-RNA-seq intuition applied to single cell.
-- Fix: Limit the heuristic to bulk data or replace with a permutation/elbow check.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — Perplexity failure-mode heading contradicts its body
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 4
-- Problem: Heading 'Perplexity too low for the data' but trigger/mechanism/Common Errors describe perplexity too high; openTSNE clamps with a warning ('Using perplexity 19.67'), Rtsne errors.
-- Root cause: Copy-editing slip.
-- Fix: Rename to 'too high for n' and mention both behaviours.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — No Python loadings/biplot/legend code; scanpy seed and save notes
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2, 3
-- Problem: Loadings-arrow request has no code (PCAtools showLoadings=TRUE, sklearn components_); PCA block has no legend/category mapping; 'without seed results vary' is false for scanpy (random_state=0 default); sc.pl.umap(save=) is deprecated in scanpy 1.12; sklearn's randomized solver on wide matrices moves the variance percentages by up to 0.07 points.
-- Root cause: Blocks are minimal sketches.
-- Fix: Add a loadings/biplot snippet and legend, scope the seed claim to umap-learn/uwot/openTSNE, use fig.savefig after show=False.
-
-### `bio-data-visualization-dimensionality-reduction-plots` — usage-guide repeats SKILL.md
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/dimensionality-reduction-plots) · [viewer](skills/bio-data-visualization-dimensionality-reduction-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: —
-- Problem: Tips section restates SKILL.md failure modes almost line for line.
-- Root cause: Two overlapping documents.
-- Fix: Keep the tips in one place and point to it.
 
 ### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
 

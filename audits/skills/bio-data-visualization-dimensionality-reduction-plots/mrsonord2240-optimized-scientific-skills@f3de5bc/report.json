@@ -1,0 +1,527 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-dimensionality-reduction-plots",
+    "description": "Produce and interpret PCA, t-SNE, UMAP, and PHATE plots for high-dimensional omics data with explicit preprocessing, reproducibility, validation, and interpretation limits.",
+    "evaluated_on": "2026-09-27",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/optimized-scientific-skills@f3de5bc6421ca81d37ca532c1771e533a9af5cdf:skills/bio-data-visualization-dimensionality-reduction-plots",
+    "auditor_independent": true,
+    "executed": true,
+    "execution_note": "Executed all seven archived regression inputs plus two genuinely new inputs. The nine-input count intentionally exceeds the schema's ordinary 7-input complexity cap to satisfy the re-audit requirement."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All reported statistics came from executed scripts or independent computations; no DOI, PMID, efficacy, or study result was fabricated."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Outputs concern research visualization and do not diagnose, prescribe, or triage an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Preprocessing, seed semantics, neighborhood limits, batch checks, and trajectory validation were methodologically sound across all nine inputs."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All valid workflows executed; invalid inputs raised intended ValueErrors. Five example PDFs rendered in both full and boundary runs."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Covers PCA, t-SNE, UMAP, PHATE, method selection, limitations, and runnable examples; the shipped PCA palette is ambiguous beyond ten conditions."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Raw-count, shape, and metadata validation is clear and strict; invalid inputs recover by correction and rerun, though errors do not include structured codes."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The 220-line main skill uses progressive references well; the all-method comparison is intentionally heavier than method-specific recipes."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tree, method rules, output conventions, and failure modes are highly actionable; one reference sentence says four saved figures although five are produced."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger language and many realistic prompts are present; large categorical legends need a palette/faceting guard."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, network calls, raw-string code execution, destructive operations, or sensitive-data logging are present."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Concise main file, two focused references, a CLI example, and five regression tests provide clear modularity and testability."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, deterministic reruns, and stop conditions are strong; integration output contracts and palette escape hatches could be more explicit."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 44,
+      "total": 45
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Bulk PCA with variance labels and library-size diagnosis",
+        "status": "COMPLETED",
+        "note": "The fixed full-SVD recipe matched independent SVD, used a truthful categorical legend, and reduced PC1-library correlation from +0.960 to +0.188 after library-size normalization.",
+        "basic": 38,
+        "specialized": 57,
+        "executed": true,
+        "execution_note": "Executed run/input1_bulk_pca.py on archived synthetic counts and visually inspected figs/input1_bulk_pca.png.",
+        "assertions": [
+          {
+            "text": "Library-size normalization precedes log transform and scaling",
+            "result": "PASS",
+            "note": "CPM normalization was applied before log2 and scaling."
+          },
+          {
+            "text": "PCA variance labels match an independent SVD",
+            "result": "PASS",
+            "note": "Maximum ratio difference was 1.11e-16; PC1 was 6.6% in both computations."
+          },
+          {
+            "text": "The PCA implementation is deterministic for identical input",
+            "result": "PASS",
+            "note": "Two full-SVD fits were bit-identical."
+          },
+          {
+            "text": "String condition groups receive a truthful categorical legend",
+            "result": "PASS",
+            "note": "Legend labels were ctrl, trtA, and trtB with one scatter per group."
+          },
+          {
+            "text": "The output contains both a scree view and loading arrows",
+            "result": "PASS",
+            "note": "Ten-component scree and five strongest loadings were rendered."
+          }
+        ],
+        "total": 95,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "PCAtools biplot, scree, and loadings on real airway data",
+        "status": "COMPLETED",
+        "note": "The real-airway R route produced three non-empty figures; PCAtools variance percentages matched prcomp and the scree adapted to eight available components.",
+        "basic": 37,
+        "specialized": 57,
+        "executed": true,
+        "execution_note": "Executed run/input2_pcatools_airway.R through r.sh; output assertions completed despite the documented Windows wrapper status anomaly; opened all three PNGs.",
+        "assertions": [
+          {
+            "text": "Count data are variance-stabilized before PCA",
+            "result": "PASS",
+            "note": "DESeq2 vst(blind=FALSE) was applied before PCAtools."
+          },
+          {
+            "text": "PCAtools variance percentages match an independent implementation",
+            "result": "PASS",
+            "note": "All eight available component percentages matched prcomp at tolerance 1e-6."
+          },
+          {
+            "text": "The scree plot does not request nonexistent components",
+            "result": "PASS",
+            "note": "The component count was bounded to eight and no NA slot appeared."
+          },
+          {
+            "text": "Treatment, cell line, and loadings are visibly encoded",
+            "result": "PASS",
+            "note": "Opened biplot showed treatment color, four cell-line shapes, and loading arrows/labels."
+          },
+          {
+            "text": "All requested R figures are non-empty and interpretable",
+            "result": "PASS",
+            "note": "Biplot, scree, and loadings PNGs were 51-112 KB and visually inspected."
+          }
+        ],
+        "total": 94,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Raw-HVG Scanpy UMAP and igraph Leiden",
+        "status": "COMPLETED",
+        "note": "The corrected order and igraph route executed, recovered all four planted clusters (ARI 1.000), saved exactly, and quantified 15-NN retention at 21.6%.",
+        "basic": 38,
+        "specialized": 58,
+        "executed": true,
+        "execution_note": "Executed run/input3_scanpy_umap.py on archived synthetic raw counts and opened the rendered PDF.",
+        "assertions": [
+          {
+            "text": "seurat_v3 HVG selection runs on raw integer counts",
+            "result": "PASS",
+            "note": "Raw integer status was verified before the HVG call, which preceded normalization."
+          },
+          {
+            "text": "The documented igraph Leiden route works without leidenalg",
+            "result": "PASS",
+            "note": "flavor=igraph completed and produced four clusters."
+          },
+          {
+            "text": "The planted cluster structure is recovered",
+            "result": "PASS",
+            "note": "Adjusted Rand index was 1.000."
+          },
+          {
+            "text": "Seeded UMAP is reproducible",
+            "result": "PASS",
+            "note": "Repeated seed-42 embeddings were bit-identical."
+          },
+          {
+            "text": "The exact output path and quantitative retention are reported",
+            "result": "PASS",
+            "note": "The requested PDF existed and 15-NN retention was 0.216."
+          }
+        ],
+        "total": 96,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "openTSNE, Rtsne, uwot seeds and small-n perplexity",
+        "status": "COMPLETED",
+        "note": "The corrected implementation-specific guidance held: openTSNE defaults are PCA/auto, Rtsne requires set.seed, uwot accepts seed, and only Rtsne errors for invalid perplexity.",
+        "basic": 37,
+        "specialized": 57,
+        "executed": true,
+        "execution_note": "Executed run/i4_tsne.py, run/i4b_rtsne_uwot.R, and run/i4c_seedarg.R on the archived six-cluster hierarchy.",
+        "assertions": [
+          {
+            "text": "Explicit openTSNE PCA initialization and auto learning rate execute reproducibly",
+            "result": "PASS",
+            "note": "Two seed-42 fits were bit-identical."
+          },
+          {
+            "text": "The skill states openTSNE 1.0 defaults accurately",
+            "result": "PASS",
+            "note": "Runtime signature reported initialization=pca and learning_rate=auto."
+          },
+          {
+            "text": "Rtsne reproducibility uses set.seed rather than an ignored seed argument",
+            "result": "PASS",
+            "note": "set.seed reproduced exactly; seed=42 without set.seed did not."
+          },
+          {
+            "text": "uwot uses its supported seed argument",
+            "result": "PASS",
+            "note": "Two uwot seed-42 calls were identical."
+          },
+          {
+            "text": "Small-sample perplexity behavior is distinguished by implementation",
+            "result": "PASS",
+            "note": "Rtsne errored at 30 while openTSNE warned and clamped."
+          }
+        ],
+        "total": 94,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "PHATE on continuous and branching trajectories",
+        "status": "COMPLETED",
+        "note": "PHATE was reproducible, captured planted order, and modestly improved branch-neighborhood metrics over UMAP; the runtime also surfaced SGD-MDS convergence warnings.",
+        "basic": 37,
+        "specialized": 55,
+        "executed": true,
+        "execution_note": "Executed run/i5_phate.py and run/i5b_branching.py; opened PHATE and UMAP comparison figures.",
+        "assertions": [
+          {
+            "text": "PHATE returns a seeded, reproducible two-dimensional embedding",
+            "result": "PASS",
+            "note": "Two seed-42 embeddings were bit-identical."
+          },
+          {
+            "text": "Continuous ordering is checked against known pseudotime",
+            "result": "PASS",
+            "note": "Absolute Spearman correlation was 0.97."
+          },
+          {
+            "text": "Branch preservation is compared quantitatively with UMAP",
+            "result": "PASS",
+            "note": "PHATE had lower pseudotime-neighbor and cross-branch errors in this planted case."
+          },
+          {
+            "text": "The output avoids claiming PHATE universally outperforms UMAP",
+            "result": "PASS",
+            "note": "The measured advantage was described as modest and dataset-specific."
+          },
+          {
+            "text": "Trajectory interpretation is not based on 2D geometry alone",
+            "result": "PASS",
+            "note": "All conclusions used planted pseudotime and branch labels."
+          }
+        ],
+        "total": 92,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Shipped example end to end on archived 1,200-cell H5AD",
+        "status": "COMPLETED",
+        "note": "The fixed CLI produced and rendered five PDFs and printed N=1200; an independent implementation reproduced 15-NN retention at 0.164944 (16.5%).",
+        "basic": 37,
+        "specialized": 56,
+        "executed": true,
+        "execution_note": "Executed the immutable example copy in run/example with task-local scikit-misc 0.5.2; checked via run/input6_check_full_example.py; rendered and opened five first pages.",
+        "assertions": [
+          {
+            "text": "All five promised PDF figures are written and non-empty",
+            "result": "PASS",
+            "note": "PCA, scree, UMAP, t-SNE, and PHATE PDFs were 13-265 KB."
+          },
+          {
+            "text": "Every first page renders into a meaningful, nonblank plot",
+            "result": "PASS",
+            "note": "All five pages were rendered to PNG and visually opened."
+          },
+          {
+            "text": "The caption interpolates the true cell count",
+            "result": "PASS",
+            "note": "stdout contained N=1200, not a literal placeholder."
+          },
+          {
+            "text": "The printed 15-NN retention is independently reproducible",
+            "result": "PASS",
+            "note": "Independent computation yielded 0.164944, which rounds to 16.5%."
+          },
+          {
+            "text": "Raw-count HVG selection completes without the prior ordering warning",
+            "result": "PASS",
+            "note": "seurat_v3 ran before normalization and emitted no raw-count warning."
+          }
+        ],
+        "total": 93,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Reject lineage and batch claims inferred from UMAP layout",
+        "status": "COMPLETED",
+        "note": "The skill correctly refuses both visual inferences and supplies quantitative alternatives: high-dimensional distance, 15-NN retention, PC1-PC5 batch R2, and within-cell-type batch mixing.",
+        "basic": 38,
+        "specialized": 58,
+        "executed": true,
+        "execution_note": "Executed run/i3b_batch_hierarchy.py and run/i7_local_preservation.py on archived planted and real PBMC data.",
+        "assertions": [
+          {
+            "text": "Inter-cluster UMAP distance is not treated as lineage evidence",
+            "result": "PASS",
+            "note": "Planted equidistant clusters had seed-dependent UMAP distance ranks."
+          },
+          {
+            "text": "Local-neighborhood preservation is measured rather than asserted",
+            "result": "PASS",
+            "note": "15-NN overlap was reported for real and synthetic data."
+          },
+          {
+            "text": "Batch association is screened beyond PC1 and PC2",
+            "result": "PASS",
+            "note": "PC1-PC5 were tested and the planted effect appeared on PC4."
+          },
+          {
+            "text": "Batch mixing is quantified within biological groups",
+            "result": "PASS",
+            "note": "Same-batch kNN fractions were computed within cell type."
+          },
+          {
+            "text": "The response stays within research visualization boundaries",
+            "result": "PASS",
+            "note": "No individual diagnostic or treatment inference was made."
+          }
+        ],
+        "total": 96,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 8,
+        "type": "Edge",
+        "label": "New: invalid log-like and metadata-incomplete AnnData",
+        "status": "COMPLETED",
+        "note": "Both invalid inputs were rejected deterministically with specific ValueErrors and no silent coercion.",
+        "basic": 36,
+        "specialized": 55,
+        "executed": true,
+        "execution_note": "Executed run/input8_invalid_contract.py against the fixed example's validator on two new synthetic invalid objects.",
+        "assertions": [
+          {
+            "text": "Fractional/log-like values are rejected",
+            "result": "PASS",
+            "note": "The validator raised a raw-count ValueError."
+          },
+          {
+            "text": "Missing condition metadata is rejected",
+            "result": "PASS",
+            "note": "The validator named obs['condition'] explicitly."
+          },
+          {
+            "text": "Invalid inputs are not silently coerced",
+            "result": "PASS",
+            "note": "Both checks hard-stopped as required for data integrity."
+          },
+          {
+            "text": "The errors identify the violated input contract",
+            "result": "PASS",
+            "note": "Messages specify raw integers and the required metadata column."
+          },
+          {
+            "text": "Re-running validation is side-effect free",
+            "result": "PASS",
+            "note": "The validator only reads the supplied AnnData and deterministically raises."
+          }
+        ],
+        "total": 91,
+        "assertions_total": 5,
+        "assertions_passed": 5,
+        "status_flag": "✅"
+      },
+      {
+        "index": 9,
+        "type": "Stress",
+        "label": "New: minimum shape with twelve condition categories",
+        "status": "COMPLETED",
+        "note": "The boundary input completed and wrote five PDFs, but tab10 indexed with 12 integer category codes produced only 10 distinct colors; conditions 09-11 share the final color.",
+        "basic": 32,
+        "specialized": 48,
+        "executed": true,
+        "execution_note": "Generated and executed a new synthetic 100x2,000 raw-count H5AD via run/input9_make_boundary.py; checked via run/input9_check_boundary.py; rendered and opened all five PDFs.",
+        "assertions": [
+          {
+            "text": "The documented minimum shape is accepted",
+            "result": "PASS",
+            "note": "The 100-cell by 2,000-gene raw-count object completed."
+          },
+          {
+            "text": "All five figures are written at the boundary",
+            "result": "PASS",
+            "note": "All expected PDFs existed and were non-empty."
+          },
+          {
+            "text": "The caption reports the boundary cell count",
+            "result": "PASS",
+            "note": "stdout contained N=100."
+          },
+          {
+            "text": "Missing pseudotime uses the documented neutral PHATE fallback",
+            "result": "PASS",
+            "note": "PHATE rendered as an uncolored scatter without failure."
+          },
+          {
+            "text": "Every condition category receives a unique visual color",
+            "result": "FAIL",
+            "note": "Twelve categories produced only ten colors; conditions 09, 10, and 11 share tab10's last color."
+          }
+        ],
+        "total": 80,
+        "assertions_total": 5,
+        "assertions_passed": 4,
+        "status_flag": "✅"
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 55.4,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The fixed raw-count HVG order, igraph Leiden dependency route, deterministic PCA/t-SNE/UMAP settings, and exact-path saving all executed as documented.",
+    "The shipped comparison now produces five usable plots and independently reproducible 15-NN retention rather than overstating geometric preservation.",
+    "Batch interpretation is grounded in PC1-PC5 association and within-biological-group kNN mixing rather than UMAP appearance.",
+    "Progressive disclosure reduced the main skill to 220 lines while preserving actionable method recipes and validation guidance."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Use a categorical palette beyond ten conditions",
+      "observed_in": [
+        9
+      ],
+      "problem": "The shipped PCA code indexes tab10 with integer category positions. With 12 conditions, positions 9-11 all render with the final tab10 color, so the legend is not visually one-to-one.",
+      "root_cause": "A fixed ten-color ListedColormap is used without a category-count guard or faceting fallback.",
+      "fix": "Select a palette with at least n_categories distinct colors (for example tab20 up to 20), and require faceting or a documented alternative when cardinality exceeds the safe palette size. Add a test asserting unique RGBA values per category."
+    },
+    {
+      "priority": "P2",
+      "title": "Correct the four-versus-five figure description",
+      "observed_in": [],
+      "problem": "SKILL.md describes the runnable example as saving four figures, while the example and prerequisite checks correctly produce five: PCA, scree, UMAP, t-SNE, and PHATE.",
+      "root_cause": "The reference summary was not updated when the scree output was added.",
+      "fix": "Change 'four saved figures' to 'five saved figures' and keep the explicit filename list in the regression test."
+    },
+    {
+      "priority": "P2",
+      "title": "Improve PCA loading-label collision handling",
+      "observed_in": [
+        1,
+        6,
+        9
+      ],
+      "problem": "The five loading labels can remain congested near the origin, especially in the full and minimum-boundary examples, reducing publication readability even though the arrows are numerically correct.",
+      "root_cause": "Labels use a fixed vertical offset pattern rather than collision-aware placement.",
+      "fix": "Use adjustText or a small deterministic collision-avoidance routine and add a visual-regression check for overlapping loading labels."
+    }
+  ]
+}
