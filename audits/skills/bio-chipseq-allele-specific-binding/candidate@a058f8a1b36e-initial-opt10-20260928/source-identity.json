@@ -1,0 +1,103 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "chip-seq/allele-specific-binding",
+    "subtree": "3674e1603cbc7a17731f9f5ea652ae7aa9f6e1e5",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane5-chipseq-asb",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-chipseq-asb\\skills\\bio-chipseq-allele-specific-binding",
+    "status_before": "untracked normalized subtree only",
+    "status_after_execution": "untracked normalized subtree only",
+    "content_sha256": "a058f8a1b36e22f587781bc63dfc65efaef7817c7be1374aaf367ca7dedcb111",
+    "content_manifest": {
+      "file_count": 4,
+      "bytes": 374,
+      "recipe": "UTF-8 path<TAB>lowercase file SHA-256 rows in the declared order below, LF joined, no trailing LF"
+    },
+    "files": [
+      {
+        "path": "SKILL.md",
+        "bytes": 9785,
+        "git_blob": "0d3b7fa6142407184aa2814cf3e439e8a0cf798d",
+        "sha256": "b0c8b79f5e2841668d6f97a0161f4d58350cd48849c2a359a7325bd9dbedaae9"
+      },
+      {
+        "path": "references/methods-and-commands.md",
+        "bytes": 9022,
+        "git_blob": "ce47f494bc7f03fac86508eb8960db61d3e4e341",
+        "sha256": "535dc482b959701c4b344228fb8bb6928d9fc1378ee51f5fc38ea5782c739b83"
+      },
+      {
+        "path": "references/pitfalls-and-troubleshooting.md",
+        "bytes": 7608,
+        "git_blob": "c7ac200160d59dee93cd5298e73f7aae5ef7b4a7",
+        "sha256": "a92f9767c96d95634fc2aa23bd3af58c521eb32866bcb526b926ac17d57ec43a"
+      },
+      {
+        "path": "scripts/baalchip_workflow.R",
+        "bytes": 5351,
+        "git_blob": "858396dd98891a1b2e5dbb1a6178a5bb9fe59eea",
+        "sha256": "21a963b7d544d33ac0e0ac7fbc859ca622e9d66e6178fc195cc81895f69aeb29"
+      }
+    ]
+  },
+  "tooling": {
+    "tools_md_sha256": "ce2e0d27ce16ca780c68bbf52acad9fb219798ab0c2e697ffb11a4ba6d3a40c2",
+    "environment_fingerprint_sha256": "d13dbe674c2b75121873a2636d6c453105c85b1181bf5d8bed41be9fd80c288d",
+    "environment_fingerprint_file_sha256": "0d4e3bb65ceabd8b5cc1eaad06cef77fb051551029a1aff5db1e400d856d9c45",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "execution_classification": {
+    "accessible_and_rerun": [
+      "WASP paired-end mapping-bias path",
+      "WASP HDF5 snp2h5 path",
+      "RASQUAL public C11orf21 example",
+      "bedtools imprinting filter",
+      "awk chrX filter",
+      "AlleleSeq prerequisite and Make dry-run probe"
+    ],
+    "resource_infeasible_bounded": [
+      "BaalChIP full candidate script and live report probe"
+    ],
+    "resource_not_staged": [
+      "BSgenome.Hsapiens.UCSC.hg38 compact example"
+    ],
+    "unavailable_full_toolchain": [
+      "AlleleSeq2 end-to-end execution: Python 2, STAR, Picard, and official vcf2diploid artifact unavailable"
+    ],
+    "static_official_source": [
+      "BaalChIP 1.38.0 constructor, sample-sheet, het-table, RAF, getASB, and report contracts"
+    ]
+  },
+  "audit_artifacts": {
+    "report.json": "70435c9cddbb28d22e00f8995d8cfbf6596180a2d286f7f79ee66a90b13f17dd",
+    "viewer.md": "6db24b9b2e93d555fafdd2accaebfa810cdc035912d0f5c91b2d8e0671838b53",
+    "finding-ledger.md": "0a26c71c3a49bd45e8ba8d2f7ca82bda1f0079bce842ca3d06ced24f2899ec91",
+    "scientific-source-notes.md": "5e10552c11d02d9b2c47dd57815d21c53db9e9cb1998db9862d17a5b096b10c0",
+    "inputs/test-inputs.md": "fa98ea91cc372f23793dece0f6c4a1c43eb18be3cde66c1496d0934108e83e27",
+    "scripts/run_accessible_surfaces.sh": "1a692bc2698535e9b9fbe79a6d73de786bacaa670a9e2cd4356a319af4476963",
+    "scripts/inspect_baal_contract.R": "2f7100059a85b64935cb4dc997429ea454d4bf947ecf631d702ed332f773deed",
+    "validate_report.py": "a53ee4eeb5739442d99bcc8bea1a6180f9f970633ac10104a65ef1114c7dab57",
+    "evidence/accessible-surfaces.status": "b029a1c4892cf91382326dcc6013292d384646627694849c8635038a18c72a39",
+    "evidence/schema-validation.json": "f063345136ad23f9b2f225ce6bbb49dbe55aa727a20f2a46d41ccafef20f16fb",
+    "evidence/wasp-smoke.txt": "0d759ec6edb6eb38a97d19647de0b59200715788b124d6689c88eecb121b5c58",
+    "evidence/wasp-hdf5-smoke.txt": "896562633d3fa33f4a27314f57b11cf67735b8efc2fdb8aca43a636af156ec5f",
+    "evidence/wasp-snp2h5.stderr": "1762758bc3bfab9e61a107b778a812ebf213a8ccca91105a8feee9d13fa2b952",
+    "evidence/rasqual-smoke.log": "8905d989dcf574b6f2e0006e722ddd49fd22f45faf767b5908854e9a5a45742e",
+    "evidence/rasqual-output.tsv": "2498749a837a4aa7d437b08ae9e107a400ff48cfdd86afc9b6c38daaff55446b",
+    "evidence/interval-smoke.txt": "486a12327fadd93db9a73ffe4eee01df0e0f54f93b94d7dc68ae5707e46e07b7",
+    "evidence/alleleseq-probe.txt": "ca34a2f6aa1a3fedd598da833f98e4d164302970af27166453ad75afae254062",
+    "evidence/alleleseq-make-dryrun.stdout": "597344e9acbb71379144699132b1dfb982807aeb9ed034d1800cff5e9b5bb1da",
+    "evidence/alleleseq-make-dryrun.stderr": "4699524d63ac9a47738e1dfa021e30f43eda00b5f32baf2df8c4c9a70a8edf39",
+    "evidence/baal-contract-inspection.txt": "52d4a6cc6104c36991263a42c43adabfe49482ece16fde8cee992b7dca7a5cf7",
+    "evidence/baalchip-source-interface.txt": "c36217bc5d2dc96571ac2525b12787dfd74a39672497769aa151cb46657e7687",
+    "evidence/baalchip-probe.json": "cfc758f16f5f1f924284eaef85265df6f6023e312159bdfd67beec75152cd480",
+    "evidence/baalchip-surface-status.txt": "cf742017f1f0591d99e31d184f586cb36bb38f94d983e102d65a521481ec4dd9"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

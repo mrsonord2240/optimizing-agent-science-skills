@@ -1,0 +1,371 @@
+{
+  "meta": {
+    "skill_name": "bio-chipseq-allele-specific-binding",
+    "description": "Detects allele-specific transcription factor or histone modification binding from heterozygous-variant ChIP-seq using WASP (reference-bias filter; mandatory upstream), RASQUAL (joint QTL + bias-corrected testing), BaalChIP (Bayesian beta-binomial with copy-number-aware overdispersion), and AlleleSeq (personalized diploid genome). Handles imprinted-locus awareness, X-inactivation artifacts, cancer copy-number imbalance, and integration with downstream caQTL / bQTL mapping. Use when identifying variants with allelic effects on TF binding, fine-mapping causal regulatory variants, validating deep-learning variant predictions, or characterizing cis-acting regulatory effects.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated a DOI, PMID, sample size, p-value, or efficacy result. Live and static-only observations are explicitly separated."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill remains a research analysis workflow and makes no patient-specific diagnosis, treatment recommendation, or clinical prescription."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "Input 2 claims copy-number-aware BaalChIP correction although the detached ASCAT BED is never consumed, the heterozygous table supplies AF rather than the required RAF, and the official implementation therefore substitutes neutral RAF 0.5. Input 1 also breaks the mandatory paired-end WASP remap contract."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The BaalChIP script passes a data frame where version 1.38.0 requires a sample-sheet filename, omits required sample and variant fields, and indexes the list returned by BaalChIP.report as a data frame. The documented paired-end WASP command also omits mate 2 and names a nonexistent remap FASTQ."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 57,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 5,
+        "max": 12,
+        "note": "The skill covers the major ASB methods and confounders, but its default WASP example and full BaalChIP implementation are broken, the RASQUAL branch is only a single-feature command, and the AlleleSeq route is incomplete."
+      },
+      "reliability": {
+        "score": 3,
+        "max": 12,
+        "note": "Hardcoded paths, incompatible live APIs, absent schema checks, no empty-result guard, and overwrite-prone outputs make retries and failure diagnosis brittle."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Progressive disclosure and method routing are efficient, but several incomplete command surfaces send an agent into avoidable failed executions."
+      },
+      "agent_usability": {
+        "score": 9,
+        "max": 16,
+        "note": "The method table, preflight list, and interpretation boundaries are clear; executable contracts contradict those instructions and omit stage postconditions and structured results."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural triggers and extensive troubleshooting aid discovery, while hardcoded sample-specific scripts and raw downstream errors make real adaptation unforgiving."
+      },
+      "security": {
+        "score": 7,
+        "max": 12,
+        "note": "No credentials, eval, raw command interpolation, or destructive broad deletion appears, but candidate paths, schemas, sample identity, output locations, and existing-output state are not validated."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "The tree cleanly separates core guidance, methods, troubleshooting, and R code. No regression suite protects the WASP mate contract, BaalChIP API, copy-number ingestion, report shape, or empty-result behavior."
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Trigger precision, routing, and escape-hatch prose are strong. Composable input/output contracts, idempotent execution, complete cohort iteration, and enforceable stop conditions are missing."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 46.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 13,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Paired-end WASP mapping-bias route",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The pinned underlying tool passed, but the candidate's paired-end remap command uses a nonexistent single FASTQ and omits mate 2.",
+        "basic": 20,
+        "specialized": 27,
+        "total": 47,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The pinned WASP paired-end path produces retained paired alignments",
+            "result": "PASS",
+            "note": "The independent bounded run retained 4 of 4 input alignments as 4 paired final alignments."
+          },
+          {
+            "text": "The documented remap command consumes both paired FASTQ outputs",
+            "result": "FAIL",
+            "note": "It supplies only -1 and no -2 mate."
+          },
+          {
+            "text": "The documented remap filenames match the live WASP release",
+            "result": "FAIL",
+            "note": "Live version 0.3.4 emits step1.remap.fq1.gz and step1.remap.fq2.gz, not step1.remap.fq.gz."
+          },
+          {
+            "text": "The workflow requires observed attrition rather than a fixed loss assumption",
+            "result": "PASS",
+            "note": "SKILL.md explicitly requires input and retained counts."
+          },
+          {
+            "text": "The output stays within research-analysis scope",
+            "result": "PASS",
+            "note": "No diagnostic or clinical conclusion is made."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Cancer BaalChIP workflow with copy-number correction",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Full runtime was resource-infeasible, but official 1.38.0 source proves multiple candidate API and method-contract failures before model execution.",
+        "basic": 9,
+        "specialized": 11,
+        "total": 20,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The candidate R file is syntactically parseable",
+            "result": "PASS",
+            "note": "Base R parse completed successfully."
+          },
+          {
+            "text": "The sample sheet satisfies the official constructor contract",
+            "result": "FAIL",
+            "note": "A data frame with incompatible columns is passed where a TSV filename and five exact columns are required."
+          },
+          {
+            "text": "The declared ASCAT copy-number resource reaches RAF correction",
+            "result": "FAIL",
+            "note": "The cnvs variable is inert; AF is not RAF, so official source substitutes RAF 0.5."
+          },
+          {
+            "text": "The report is handled using its official list-of-groups return type",
+            "result": "FAIL",
+            "note": "Candidate data-frame indexing on the returned list raises incorrect number of dimensions."
+          },
+          {
+            "text": "Unexecuted BaalChIP behavior is not misrepresented as a live pass",
+            "result": "PASS",
+            "note": "The audit classifies the runtime as RESOURCE_INFEASIBLE_BOUNDED and relies only on official source for contract findings."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Imprinting and chrX interval filters",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The bounded interval commands return the expected rows, but the candidate does not preserve exclusion reasons or enforce build and contig compatibility.",
+        "basic": 30,
+        "specialized": 40,
+        "total": 70,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Imprinted-locus exclusion retains the expected two of three rows",
+            "result": "PASS",
+            "note": "The pinned bedtools fixture passed."
+          },
+          {
+            "text": "chrX exclusion retains the expected two autosomal rows",
+            "result": "PASS",
+            "note": "The pinned awk fixture passed."
+          },
+          {
+            "text": "Excluded variants and reason codes are preserved for audit",
+            "result": "FAIL",
+            "note": "The full R script drops rows and writes only the filtered table despite SKILL.md requiring an auditable excluded set."
+          },
+          {
+            "text": "Assembly and contig naming mismatches are programmatically rejected",
+            "result": "FAIL",
+            "note": "The requirement exists only as prose; the script performs no such check."
+          },
+          {
+            "text": "Imprinted and X-linked skew is not overinterpreted as differential binding",
+            "result": "PASS",
+            "note": "The interpretation boundary is stated correctly."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Public RASQUAL feature analysis",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The live single-feature route is valid, but the advertised cohort branch lacks binary-input construction, feature iteration, parsed reporting, and multiplicity control.",
+        "basic": 27,
+        "specialized": 38,
+        "total": 65,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented flags match the pinned RASQUAL interface",
+            "result": "PASS",
+            "note": "The tabix pipe and single-dash options are valid."
+          },
+          {
+            "text": "The public example returns a finite populated result",
+            "result": "PASS",
+            "note": "One 25-column C11orf21 row was produced."
+          },
+          {
+            "text": "The result records a finite bias estimate and successful convergence",
+            "result": "PASS",
+            "note": "phi is 0.520004 and convergence status is 0."
+          },
+          {
+            "text": "The candidate iterates and validates one row per cohort feature",
+            "result": "FAIL",
+            "note": "Only a placeholder FEATURE_INDEX single invocation is given."
+          },
+          {
+            "text": "The cohort reporting contract controls the actual test family",
+            "result": "FAIL",
+            "note": "No multiple-testing procedure or parsed cohort output is defined."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "AlleleSeq personalized-genome route",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The official Makefile dry-runs, but candidate inputs are unset and the complete legacy toolchain is unavailable without the official vcf2diploid artifact and several prerequisites.",
+        "basic": 13,
+        "specialized": 18,
+        "total": 31,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented Make invocation supplies reads, sample prefix, and all required input variables",
+            "result": "FAIL",
+            "note": "READS_R1, READS_R2, and PREFIX are empty in the generated plan."
+          },
+          {
+            "text": "The documented prerequisite list covers the full official runtime",
+            "result": "FAIL",
+            "note": "Python 2, STAR, Picard, and additional pipeline resources are omitted."
+          },
+          {
+            "text": "No unofficial vcf2diploid substitute is used",
+            "result": "PASS",
+            "note": "The official host timeout is retained as an unavailable-access boundary."
+          },
+          {
+            "text": "Unavailable full execution is classified rather than credited as a pass",
+            "result": "PASS",
+            "note": "The surface is explicitly UNAVAILABLE_FULL_TOOLCHAIN."
+          },
+          {
+            "text": "The separately generated maternal and paternal alignments are connected to the documented Make target",
+            "result": "FAIL",
+            "note": "The Make plan ignores those SAMs and instead plans a STAR alignment from unset reads."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 22.8,
+    "dynamic_weighted": 28.0,
+    "score": 51,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The skill correctly centers mapping-bias control and separates within-sample ASB from population caQTL or bQTL association.",
+    "Progressive disclosure and the method-selection table make the broad scientific decision space navigable.",
+    "Imprinting, chrX, copy number, blacklists, peak restriction, and prediction-versus-measurement boundaries are all explicitly recognized.",
+    "Pinned WASP, RASQUAL, and interval fixtures can support strong regression coverage after the command contracts are repaired."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Repair the BaalChIP constructor and report contract",
+      "observed_in": [2],
+      "problem": "The full script passes an incompatible in-memory sample data frame and later treats the list returned by BaalChIP.report as one data frame.",
+      "root_cause": "The normalized example was not aligned to the official BaalChIP 1.38.0 file-based sample-sheet and per-group report API.",
+      "fix": "Generate and validate the required TSV sample sheet and het table, pass their filenames, select the intended group from the report list, and add focused contract and empty-result tests."
+    },
+    {
+      "priority": "P0",
+      "title": "Remove the false copy-number-aware execution claim",
+      "observed_in": [2],
+      "problem": "The ASCAT CNV BED variable is never consumed and AF is not the required RAF, so RAFcorrection uses neutral 0.5 values while outputs claim CN-aware analysis.",
+      "root_cause": "A detached CNV resource was assumed to be a supported BaalChIP input without deriving per-variant RAF or supplying group-named gDNA BAMs.",
+      "fix": "Implement a validated CN-segment-to-variant RAF derivation or use CorrectWithgDNA, confirm the RAF field at runtime, and fail closed when CN-aware analysis is requested but unavailable."
+    },
+    {
+      "priority": "P0",
+      "title": "Restore the paired-end WASP remap contract",
+      "observed_in": [1],
+      "problem": "The command names one nonexistent remap FASTQ and omits the second mate, breaking the mandatory mapping-bias stage for paired-end data.",
+      "root_cause": "The example collapsed release-specific fq1 and fq2 outputs into a single-end placeholder.",
+      "fix": "Use the actual paired outputs with both -1 and -2 and preserve the original aligner parameters; add a bounded paired-end regression that asserts retained paired alignments and stage counts."
+    },
+    {
+      "priority": "P1",
+      "title": "Make the RASQUAL cohort branch executable",
+      "observed_in": [4],
+      "problem": "The valid single-feature command does not construct binary inputs, iterate feature rows, parse results, or control multiplicity for a cohort.",
+      "root_cause": "The documentation stops at an interface sketch while the description advertises a complete population-analysis path.",
+      "fix": "Ship a bounded driver with explicit matrix schemas, row-safe feature iteration, convergence checks, parsed output fields, and a declared family-wise or FDR procedure."
+    },
+    {
+      "priority": "P1",
+      "title": "Define an honest AlleleSeq executable boundary",
+      "observed_in": [5],
+      "problem": "The Make plan has blank read and prefix variables, ignores the separately produced SAMs, and omits critical legacy prerequisites.",
+      "root_cause": "Two different personalized-genome alignment sketches were joined without matching the official pipeline's real entry points and dependency contract.",
+      "fix": "Either provide a complete pinned official route with every required variable and prerequisite or narrow this branch to documented external routing with exact unavailable-toolchain requirements."
+    },
+    {
+      "priority": "P1",
+      "title": "Add validated and idempotent analysis boundaries",
+      "observed_in": [2, 3],
+      "problem": "The R workflow uses hardcoded paths, does not enforce file schemas or build compatibility, drops exclusion reasons, overwrites outputs, and has no empty-report guard.",
+      "root_cause": "The script is a hand-edited demonstration rather than a parameterized agent-facing analysis surface.",
+      "fix": "Add explicit arguments and preflight checks, structured stage summaries, preserved exclusion ledgers, safe output-state handling, and focused invalid-input and empty-result regressions."
+    },
+    {
+      "priority": "P2",
+      "title": "Pin claim-level provenance and live interfaces",
+      "observed_in": [],
+      "problem": "Planning heuristics and method claims cite papers generically while command compatibility is expressed as broad version floors.",
+      "root_cause": "The normalization retained high-level references without a canonical source map for each quantitative or API-sensitive claim.",
+      "fix": "Add stable DOI or canonical tool links, exact tested commits or package versions, and claim-specific provenance for attrition and depth heuristics."
+    }
+  ]
+}

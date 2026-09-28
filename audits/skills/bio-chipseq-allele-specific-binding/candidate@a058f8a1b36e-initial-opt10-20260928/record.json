@@ -1,0 +1,46 @@
+{
+  "skill_id": "bio-chipseq-allele-specific-binding",
+  "version": "candidate@a058f8a1b36e-initial-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "chip-seq/allele-specific-binding",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chip-seq/allele-specific-binding",
+    "subtree": "3674e1603cbc7a17731f9f5ea652ae7aa9f6e1e5"
+  },
+  "candidate": {
+    "identity": "a058f8a1b36e22f587781bc63dfc65efaef7817c7be1374aaf367ca7dedcb111",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane5-chipseq-asb",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "a058f8a1b36e22f587781bc63dfc65efaef7817c7be1374aaf367ca7dedcb111",
+    "path": "F:\\OpenScience\\wt\\opt10-chipseq-asb\\skills\\bio-chipseq-allele-specific-binding"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 6
+  }
+}
