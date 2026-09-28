@@ -1,0 +1,260 @@
+One-sided group sequential design with
+90 % power and 2.5 % Type I Error.
+           Sample
+            Size 
+  Analysis Ratio*  Z   Nominal p  Spend
+         1  0.334 3.73    0.0001 0.0001
+         2  0.678 2.50    0.0061 0.0061
+         3  1.012 1.99    0.0231 0.0188
+     Total                       0.0250 
+
+++ alpha spending:
+ Lan-DeMets O'Brien-Fleming approximation spending function (no parameters).
+* Sample size ratio compared to fixed design with no interim
+
+Boundary crossing probabilities and expected sample size
+assume any cross stops the trial
+
+Upper boundary (power or Type I Error)
+          Analysis
+   Theta      1      2      3 Total   E{N}
+  0.0000 0.0001 0.0061 0.0188 0.025 1.0100
+  3.2415 0.0316 0.5343 0.3340 0.900 0.8121
+Group sequential design (method=LachinFoulkes; k=3 analyses; Two-sided symmetric)
+HR=0.650 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%
+N=449.4 subjects | D=229.4 events | T=30.0 study duration | accrual=12.0 Accrual duration | minfup=18.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)
+
+Spending functions:
+  Bounds derived using a  Lan-DeMets O'Brien-Fleming approximation spending function (no parameters).
+
+Analysis summary:
+Method: LachinFoulkes 
+    Analysis               Value Efficacy Futility
+   IA 1: 33%                   Z   3.7103  -3.7103
+      N: 450         p (1-sided)   0.0001   0.0001
+  Events: 77        ~HR at bound   0.4280   2.3362
+   Month: 12    P(Cross) if HR=1   0.0001   0.0001
+             P(Cross) if HR=0.65   0.0338   0.0000
+   IA 2: 67%                   Z   2.5114  -2.5114
+      N: 450         p (1-sided)   0.0060   0.0060
+ Events: 153        ~HR at bound   0.6662   1.5010
+   Month: 19    P(Cross) if HR=1   0.0060   0.0060
+             P(Cross) if HR=0.65   0.5603   0.0000
+       Final                   Z   1.9930  -1.9930
+      N: 450         p (1-sided)   0.0231   0.0231
+ Events: 230        ~HR at bound   0.7686   1.3010
+   Month: 30    P(Cross) if HR=1   0.0250   0.0250
+             P(Cross) if HR=0.65   0.9000   0.0000
+
+Key inputs (names preserved):
+                               desc    item  value input
+                    Accrual rate(s)   gamma 37.447     1
+           Accrual rate duration(s)       R     12    12
+             Control hazard rate(s) lambdaC   0.04  0.04
+            Control dropout rate(s)     eta  0.005 0.005
+       Experimental dropout rate(s)    etaE  0.005  etaE
+ Event and dropout rate duration(s)       S   NULL     S
+Installation qualification for rpact 4.4.0 has not yet been performed.
+Please run testPackage() before using the package in GxP relevant environments.
+Design plan parameters and output for means:
+
+Design parameters:
+  Critical values                              : 1.960 
+  Significance level                           : 0.0250 
+  Type II error rate                           : 0.2000 
+  Test                                         : one-sided 
+
+User defined parameters:
+  Alternatives                                 : 5 
+  Standard deviation                           : 12 
+
+Default parameters:
+  Mean ratio                                   : FALSE 
+  Theta H0                                     : 0 
+  Normal approximation                         : FALSE 
+  Treatment groups                             : 2 
+  Planned allocation ratio                     : 1 
+
+Sample size and output:
+  Number of subjects fixed                     : 182.8 
+  Number of subjects fixed (1)                 : 91.4 
+  Number of subjects fixed (2)                 : 91.4 
+  Critical values (treatment effect scale)     : 3.503 
+
+Legend:
+  (i): values of treatment arm i
+Design plan parameters and output for means:
+
+Design parameters:
+  Critical values                              : 1.960 
+  Significance level                           : 0.0250 
+  Type II error rate                           : 0.2000 
+  Test                                         : one-sided 
+
+User defined parameters:
+  Alternatives                                 : 5 
+  Standard deviation                           : 14 
+
+Default parameters:
+  Mean ratio                                   : FALSE 
+  Theta H0                                     : 0 
+  Normal approximation                         : FALSE 
+  Treatment groups                             : 2 
+  Planned allocation ratio                     : 1 
+
+Sample size and output:
+  Number of subjects fixed                     : 248.1 
+  Number of subjects fixed (1)                 : 124 
+  Number of subjects fixed (2)                 : 124 
+  Critical values (treatment effect scale)     : 3.502 
+
+Legend:
+  (i): values of treatment arm i
+$lambda_e
+[1] 0.2364907
+
+$lambda_d
+[1] 0.3585195
+
+$boundary_tab
+                                   
+Number of patients treated 3 6 9 12
+Escalate if # of DLT <=    0 1 2  2
+Deescalate if # of DLT >=  2 3 4  5
+Eliminate if # of DLT >=   3 4 5  7
+
+$full_boundary_tab
+                                                       
+Number of patients treated  1  2 3 4 5 6 7 8 9 10 11 12
+Escalate if # of DLT <=     0  0 0 0 1 1 1 1 2  2  2  2
+Deescalate if # of DLT >=   1  1 2 2 2 3 3 3 4  4  4  5
+Eliminate if # of DLT >=   NA NA 3 3 4 4 5 5 5  6  6  7
+
+attr(,"class")
+[1] "boin"
+$selpercent
+[1]  0.8  7.7 34.1 33.7 19.7  4.0
+
+$npatients
+[1] 3.708 5.208 7.503 6.312 3.252 0.870
+
+$ntox
+[1] 0.193 0.517 1.547 1.956 1.248 0.469
+
+$totaltox
+[1] 5.93
+
+$totaln
+[1] 26.853
+
+$percentstop
+[1] 0
+
+$overdose60
+[1] 0
+
+$overdose80
+[1] 0
+
+$simu.setup
+  target p.true ncohort cohortsize startdose p.saf p.tox cutoff.eli extrasafe
+1    0.3   0.05      10          3         1  0.18  0.42       0.95     FALSE
+2    0.3   0.10      10          3         1  0.18  0.42       0.95     FALSE
+3    0.3   0.20      10          3         1  0.18  0.42       0.95     FALSE
+4    0.3   0.30      10          3         1  0.18  0.42       0.95     FALSE
+5    0.3   0.40      10          3         1  0.18  0.42       0.95     FALSE
+6    0.3   0.55      10          3         1  0.18  0.42       0.95     FALSE
+  offset ntrial dose
+1   0.05   1000    1
+2   0.05   1000    2
+3   0.05   1000    3
+4   0.05   1000    4
+5   0.05   1000    5
+6   0.05   1000    6
+
+$flowchart
+[1] TRUE
+
+$lambda_e
+[1] 0.2364907
+
+$lambda_d
+[1] 0.3585195
+
+attr(,"class")
+[1] "boin"
+
+Number of simulations:	 1000 
+Patient accrued:	 30 
+Target DLT rate:	 0.3 
+             1     2     3      4     5     6
+Truth    0.050 0.100 0.200  0.300 0.400 0.550
+Prior    0.050 0.100 0.200  0.300 0.500 0.650
+Selected 0.002 0.019 0.231  0.509 0.223 0.016
+Nexpt    1.715 2.881 6.864 10.443 6.460 1.637
+Ntox     0.081 0.302 1.336  3.136 2.621 0.937
+
+The trials are generated by a CRM starting at dose 1 
+
+Restriction apply to avoid
+	 (1) Skipping doses in escalation;
+	 (2) Escalation immediately after a toxic outcome.
+
+The working model is logistic 
+	logit(ptox) = a + exp(beta)*dose, with a = 3 
+	and doses = -5.94 -5.2 -4.39 -3.85 -3 -2.38 
+	and beta is estimated by its posterior mean 
+	assuming a normal prior with mean 0 and variance 1.34 
+This is RBesT version 1.12.0 (released 2026-09-18, git-sha )
+Generalized Meta Analytic Predictive Prior Analysis
+
+Call:  gMAP(formula = cbind(r, n - r) ~ 1 | study, family = binomial, 
+    data = historical_data, tau.dist = "HalfNormal", tau.prior = 0.5, 
+    beta.prior = cbind(0, 2), iter = 2400, warmup = 800, thin = 2, 
+    chains = 2, cores = 1)
+
+Exchangeability tau strata: 1 
+Prediction tau stratum    : 1 
+Maximal Rhat              : 1 
+
+Between-trial heterogeneity of tau prediction stratum
+        mean median   sd    q2.5   q50 q97.5
+tau[1] 0.277  0.218 0.23 0.00996 0.218 0.907
+
+MAP Prior MCMC sample
+                 mean median     sd   q2.5   q50 q97.5
+theta_resp_pred 0.218  0.208 0.0809 0.0952 0.208 0.444
+EM for Beta Mixture Model
+Log-Likelihood = 2016.915
+
+Univariate beta mixture
+Mixture Components:
+  comp1      comp2     
+w  0.7758492  0.2241508
+a 14.7525255  2.3518898
+b 56.4234115  6.7884381
+[1] 44.35927
+$seeds
+$seeds$boin
+[1] 20260928
+
+$seeds$crm
+[1] 20260928
+
+$seeds$map
+[1] 20260928
+
+
+$replicates
+$replicates$boin
+[1] 1000
+
+$replicates$crm
+[1] 1000
+
+
+$package_versions
+ gsDesign     rpact      BOIN     dfcrm     RBesT 
+ "3.11.0"   "4.4.0"   "2.7.2" "0.2.2.1"  "1.12.0" 
+
+adaptive_designs regression: PASS

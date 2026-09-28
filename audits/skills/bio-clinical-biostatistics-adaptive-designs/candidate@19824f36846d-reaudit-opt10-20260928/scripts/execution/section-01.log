@@ -1,0 +1,22 @@
+One-sided group sequential design with
+90 % power and 2.5 % Type I Error.
+           Sample
+            Size 
+  Analysis Ratio*  Z   Nominal p  Spend
+         1  0.334 3.73    0.0001 0.0001
+         2  0.678 2.50    0.0061 0.0061
+         3  1.012 1.99    0.0231 0.0188
+     Total                       0.0250 
+
+++ alpha spending:
+ Lan-DeMets O'Brien-Fleming approximation spending function (no parameters).
+* Sample size ratio compared to fixed design with no interim
+
+Boundary crossing probabilities and expected sample size
+assume any cross stops the trial
+
+Upper boundary (power or Type I Error)
+          Analysis
+   Theta      1      2      3 Total   E{N}
+  0.0000 0.0001 0.0061 0.0188 0.025 1.0100
+  3.2415 0.0316 0.5343 0.3340 0.900 0.8121

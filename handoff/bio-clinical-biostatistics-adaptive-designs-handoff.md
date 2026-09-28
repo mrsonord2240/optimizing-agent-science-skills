@@ -1,64 +1,60 @@
-# Handoff: bio-clinical-biostatistics-adaptive-designs / audit-scientific-skill
+# Handoff: bio-clinical-biostatistics-adaptive-designs / independent re-audit
 
-- Updated: 2026-09-28T21:20:00Z
+- Updated: 2026-09-28T22:08:00Z
 - Lane: 1
-- Status: ready-for-phase
-- Owner leaving: /root/lane1_adaptive_audit
-- Next role: fix-scientific-skill
+- Status: candidate-ready evidence; local record publication pending
+- Owner leaving: `/root/lane1_adaptive_reaudit`
+- Next role: orchestrator publication and candidate-ready parking
 
 ## Source identity
 
 - Origin: `GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clinical-biostatistics/adaptive-designs`; source subtree `85188936f8fee497db8c92c095bcbd0a888e376e`.
-- Candidate: `F:\OpenScience\wt\opt10-adaptive-designs\skills\bio-clinical-biostatistics-adaptive-designs` on `optimize/ten-20260928-lane1-adaptive-designs` at HEAD `0bc0b31fc52742dbec1034f698103434cc9460c3`.
-- Exact audited identity: `sha256-manifest-v1:73116b86978447d18f14945b236561b0685796da68f1a993420352c3c6953546` (8 files; 764 manifest bytes).
-- Immutable identity record: `F:\OpenScience\audits\bio-clinical-biostatistics-adaptive-designs\initial-opt10-20260928\source-identity.json` (SHA-256 `121fe8d11f41658803f4630f0af1d3b4e4f88c8ca6d92e1f2cd5af5ad4750808`).
+- Candidate: `F:\OpenScience\wt\opt10-adaptive-designs\skills\bio-clinical-biostatistics-adaptive-designs` on branch `optimize/ten-20260928-lane1-adaptive-designs`; HEAD `0bc0b31fc52742dbec1034f698103434cc9460c3`.
+- Exact audited identity: `sha256-manifest-v1:19824f36846d65aeeb7e5cee1a76114f5e5325529fcc3a0e0e3572bf5851d1aa` (9 files; 867 manifest bytes).
+- Applicable initial audit: `F:\OpenScience\audits\bio-clinical-biostatistics-adaptive-designs\initial-opt10-20260928\report.json`; SHA-256 `9c930743e3ba6071f35eb83ef0c02c256856e3c488f51d5c7430c63db041d544`.
 
 ## Completed this phase
 
-- Read the retained `skill-auditor@1.0` rubric and independently audited the complete exact candidate with no audit-local repair.
-- Re-ran all candidate sections in the prepared isolated WSL boundary: 1/2/4/5 pass; 3/6/8 error; 7/9/10 are documented-only. The shipped full script exits `1` at section 3.
-- Re-ran the current-interface control harness: 9/9 pass for gsDesign/gsSurv, rpact, BOIN, dfcrm, RBesT, gsDesign2, simtrial, adaptr, and invalid-input contracts.
-- Adjudicated current authoritative FDA status: 2019 adaptive guidance final; 2022 oncology master-protocol guidance final; September 2025 ICH E20 FDA draft; January 2026 Bayesian draft; June 2026 broader master-protocol revised draft; BOIN remains Fit-for-Purpose, not generally FDA-preferred.
-- Produced a schema-valid diagnostic report: static `71/100`, dynamic `50.4/100`, assertions `18/35`, final `59/100 Reject`; structural veto FAIL (stability, determinism) and research veto FAIL (methodological ground, code usability).
-- Raw record: `F:\OpenScience\audits\bio-clinical-biostatistics-adaptive-designs\initial-opt10-20260928`; `report.json` SHA-256 `9c930743e3ba6071f35eb83ef0c02c256856e3c488f51d5c7430c63db041d544`; `viewer.md` SHA-256 `3ee96561170583eab1f6cacf3be94a9d18d98f632b6c624f77097ad16d4c9648`.
+- Independently re-audited the exact candidate under the current `skill-auditor.zip` rubric without editing candidate bytes.
+- Final verdict: `Production Ready`, score `96/100`, structural veto `PASS`, research veto `PASS`, assertion pass rate `35/35`; all production-readiness floors pass.
+- Both R files parse; candidate sections 1, 2, 3, 5, 6 and 8 pass; sections 4, 7, 9 and 10 are correctly `DOCUMENTED_ONLY`.
+- Full shipped runner exits `0`; the shipped focused regression exits `0` with `adaptive_designs regression: PASS`; the independent valid/control suite remains `9/9 PASS`.
+- Independently confirmed deterministic BOIN/CRM, malformed CRM-grid rejection, blinded-SSR ordering, `gMAP -> automixfit -> ess`, and absence of an executable promising-zone object.
+- Adjudicated current FDA/ICH/BOIN claims against authoritative sources on 2026-09-28; all candidate status and qualification statements are accurate.
 
 ## Required next actions
 
-1. Fix all P0 and P1 findings in order without widening scientific scope: repair current rpact fixed-design SSR, align and validate CRM grids, implement true EXNEX or relabel MAP, seed stochastic runs, complete or demote promising-zone execution, and qualify Type-I language.
-2. Address P2 regulatory wording while touching the relevant files: remove the FDA-preference claim and distinguish the 2022 oncology final guidance, June 2026 broader draft, ICH Step 2 milestone, and September 2025 FDA draft issue date.
-3. Recompute a new exact candidate identity and route to fresh delta tooling; do not treat the valid-control harness as a candidate fix.
-4. After delta tooling passes, route the new exact bytes to a fresh independent `reaudit-scientific-skill` worker. Do not publish this raw audit from the fixer role.
+1. Publish this modular raw re-audit through the records tooling with explicit artifacts; regenerate and check audit views.
+2. Bind the resulting local record to exact identity `19824f36846d65aeeb7e5cee1a76114f5e5325529fcc3a0e0e3572bf5851d1aa` and record the publication identifier here.
+3. Park this exact worktree as candidate-ready for the single run-closing product assembly; do not mutate its bytes.
 
 ## Open findings and blockers
 
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| ADAPT-001 | P0 | open | `report.json` input 2; `evidence/section-03.json` | Replace incompatible fixed `asUser` contract; execute and assert both blinded-SSR sample sizes. |
-| ADAPT-002 | P0 | open | input 5; `evidence/section-06.json` | Align six-dose CRM truth/skeleton, validate dimensions before simulation, and make result printable. |
-| ADAPT-003 | P0 | open | input 6; `evidence/section-08.json` | Implement actual EXNEX/robust detachment plus current RBesT density conversion, or relabel the method. |
-| ADAPT-004 | P1 | open | inputs 4-6; `evidence/valid-api-smoke.json` | Set/report seeds and add deterministic schema/tolerance assertions. |
-| ADAPT-005 | P1 | open | input 3; candidate section 4 | Implement conditional power, adaptation, `n_max`, original weights, and null calibration, or mark documented-only. |
-| ADAPT-006 | P1 | open | input 2; candidate section 3 | Replace unconditional Type-I guarantee with method conditions and evidence. |
-| ADAPT-007 | P2 | open | input 4; candidate section 5 | Replace “FDA prefers BOIN” with exact Fit-for-Purpose status. |
-| ADAPT-008 | P2 | open | `scientific-source-notes.md` | Refresh current master-protocol and ICH E20 status routing. |
-| OPTIONAL-ADAPT-001 | P3 | bounded | `evidence/optional-package-classification.md` | `trialr`/`escalation` remain unavailable after the bounded ceiling; extend only if future audit scope requires them. |
-| ACCESS-ADAPT-001 | P3 | blocked | `evidence/TOOLS.md` | East/EastHorizon, ADDPLAN, and FACTS require legitimately supplied licenses/binaries; no bypass is permitted. |
+- Initial findings `ADAPT-001` through `ADAPT-008` are independently `CLOSED`.
+- No open P0, P1, or P2 finding remains; `recommendations` is empty.
+- `trialr` and `escalation` remain bounded unavailable in the prepared environment but are not invoked by the candidate.
+- East/EastHorizon, ADDPLAN, and FACTS remain licensed/restricted documented-only alternatives; no bypass was attempted.
+- Local audit-record publication is pending orchestrator ownership; it is not a scientific or tooling blocker.
 
 ## Environment and evidence
 
-- Tooling inventory: `F:\OpenScience\audit-envs\bio-clinical-biostatistics-adaptive-designs\TOOLS.md` (SHA-256 `429d5bb80ad823427b285b5b34eb36d8bf2d4179bfbc66e81a8ec9f210dd7f09`).
-- Exact lock: sibling `environment-explicit.lock` (SHA-256 `5f0bb3bca2660982c18770fd76ac9deffbd6157c5bd4db55f46c1c1d69aa230c`); environment fingerprint SHA-256 `f5d8518ba132b9e31b0c592534e241b3d1ab7af5b3186f9a4909b22f5573592c`.
-- Audit artifacts: `report.json`, `viewer.md`, `finding-ledger.md`, `inputs.json`, `execution-classifications.json`, `scientific-source-notes.md`, `commands.txt`, `artifact-hashes.tsv`, and `evidence/schema-validation.json` (`PASS`).
-- Execution evidence: `evidence/candidate-section-status.tsv`, `evidence/section-01.json` through `section-10.json`, `evidence/full-script.log`, and `evidence/valid-api-smoke.json` (`all_passed: true` for the independent controls).
-- Deferred surfaces: sections 7/9/10 are responsibly documented-only and cannot support readiness; optional `trialr`/`escalation` are bounded unavailable; commercial tools are restricted documented-only.
+- Raw run root: `F:\OpenScience\audits\bio-clinical-biostatistics-adaptive-designs\reaudit-opt10-20260928`.
+- Strict report SHA-256: `1a1f3a03024b2ee9049fd1112090f0cdcfb90892ed88ba68ae9d66e5d530eebd`; viewer SHA-256: `7757e942429fd6e423ccf0ca27ef7c78084591b3b5f8dae842ca0082e1b5a920`.
+- Source identity SHA-256: `c53b950fce48b3111d59a9540c9684e41265ba89424b4404ee9e7156b4ee43b2`; artifact index SHA-256: `49a294355113276e02254993cd0208d855fe69b53ea5e61f1f53f9d623d7f12a`.
+- Tooling root: `F:\OpenScience\audit-envs\bio-clinical-biostatistics-adaptive-designs`; `TOOLS.md` SHA-256 `0a65891cb9c9347c30515457ecd6ab8f5a3a5d29d3227f104fcd12cda0035be2`.
+- Environment fingerprint SHA-256: `52c994639b6ed5235543d129d396dcc4fdcbff8f70d898e854c47d865848cdf7`; exact conda lock SHA-256 `5f0bb3bca2660982c18770fd76ac9deffbd6157c5bd4db55f46c1c1d69aa230c`.
+- Key artifacts: `report.json`, `viewer.md`, `source-identity.json`, `candidate-manifest.tsv`, `regulatory-adjudication.md`, `test-inputs.md`, `structural-precheck.json`, `artifact-hashes.tsv`, and the `execution/` evidence set.
 
 ## Worktree safety
 
-- Product worktree status remains only `?? skills/bio-clinical-biostatistics-adaptive-designs/`; the audited candidate bytes still hash to the exact normalization identity.
-- Audit writes are confined to the raw run root and this canonical handoff. No candidate file was repaired or edited.
-- The exact audit was published locally as `candidate@73116b869784-initial-opt10-20260928` with 44 explicit scripts/inputs; generated views were refreshed. The matching record/view/handoff changes await the run-owned control commit. No product commit, push, pull request, release, Marketplace action, dependency installation, or licensed-tool bypass occurred.
+- Product worktree status remains only `?? skills/bio-clinical-biostatistics-adaptive-designs/`; no unrelated tracked file changed.
+- Candidate identity was rechecked after all execution and remains exact; the candidate tree has no cache artifact.
+- The exact final audit was published locally as `candidate@19824f36846d-reaudit-opt10-20260928` with 34 explicit scripts/inputs after full 36-artifact existence/size/hash validation; generated views were refreshed. The matching record/view/handoff changes await the run-owned control commit. No candidate repair, dependency installation, product commit, push, pull request, release, Marketplace action, or remote mutation occurred.
+- The control-repository change from this worker is limited to this canonical handoff.
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes
-- If no: n/a
+- Next-phase prerequisites met: yes.
+- Candidate identity exact and read-only: yes.
+- Final report schema, score arithmetic, artifact hashes, and execution classifications validated: yes.
+- Ready for orchestrator publication and candidate-ready parking: yes.

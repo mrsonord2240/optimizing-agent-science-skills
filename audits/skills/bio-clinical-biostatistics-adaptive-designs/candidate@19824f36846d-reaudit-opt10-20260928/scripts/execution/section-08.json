@@ -1,0 +1,18 @@
+{
+  "section": 8,
+  "heading": "8. Historical-data MAP prior demonstration (not EXNEX)",
+  "classification": "candidate-executable",
+  "required_package": "RBesT",
+  "package_version": "1.12.0",
+  "candidate_identity": {
+    "sha256": "19824f36846d65aeeb7e5cee1a76114f5e5325529fcc3a0e0e3572bf5851d1aa",
+    "file_count": 9,
+    "manifest_bytes": 867
+  },
+  "status": "PASS",
+  "elapsed_seconds": 1.87,
+  "warnings": [],
+  "messages": [],
+  "error": null,
+  "objects_created": ["execution_metadata", "historical_data", "map_ess", "map_fit", "map_prior", "simulation_replicates", "simulation_seeds"]
+}

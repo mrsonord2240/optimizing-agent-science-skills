@@ -1,0 +1,254 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-biostatistics-adaptive-designs",
+    "description": "Designs adaptive clinical trials including group-sequential (O'Brien-Fleming, Pocock, Lan-DeMets spending), sample-size re-estimation (blinded Friede-Kieser, unblinded Cui-Hung-Wang, Mehta-Pocock promising zone), seamless Phase 2/3 with treatment-arm selection, population enrichment, and response-adaptive randomisation. Covers FDA 2019 Final Adaptive Designs Guidance, the March 2022 final oncology Master Protocols guidance, the June 2026 broader Master Protocols revised draft, and non-final ICH E20 guidance. Use when planning interim analyses, sample-size re-estimation, or master/platform-trial designs.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated a boundary, sample size, operating characteristic, regulatory status, DOI, PMID, p-value, or efficacy result; numerical claims came from the exact candidate, retained controls, or identified authoritative sources."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill supports protocol and statistical design rather than patient-specific diagnosis or treatment, requires IDMC separation and pre-specification, and distinguishes drafts, final guidance, examples, and design-specific review."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Group-sequential, blinded versus unblinded SSR, dose-finding, MAP, selection-bias, Type-I control, simulation, and regulatory boundaries are methodologically sound; promising-zone, enrichment, graduation, and RAR surfaces are explicitly documented-only where implementation is absent."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Both R files parse, all six executable candidate sections pass, four conceptual sections are classified documented-only, the full runner exits zero, the focused regression passes, and the independent nine-case API/control suite passes."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "The skill covers every promised design family with executable examples or an explicit documented-only boundary; full promising-zone, enrichment, graduation, and RAR analyses intentionally require project-specific implementation."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Core executable surfaces validate material invariants and fail malformed CRM grids actionably; the examples are fixed demonstrations rather than a universal parameter-validation framework."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The concise core routes method detail into four focused references and keeps expensive simulations bounded, seeded, and version-reported."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Design selection, non-negotiable guardrails, routing, required deliverables, error prevention, and executable-versus-conceptual boundaries are explicit and consistent."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger language, scenario prompts, comparison tables, and clear stop conditions make the skill discoverable and recoverable without silently inferring design parameters."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "There are no credentials, raw-code execution paths, destructive operations, or patient-data retention; the shipped program uses fixed examples and validates the principal cross-vector CRM input contract."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "The package is modular, provenance-preserving, version-aware, deterministic, and covered by a focused shipped regression plus independently executable section and API controls."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Trigger precision, progressive disclosure, composition, idempotent seeded examples, and escape hatches are strong; restricted commercial alternatives remain external documented-only dependencies."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 35,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "O'Brien-Fleming and survival group-sequential design",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Sections 1 and 2 passed; the null crossing probability was 0.025000000388, the three efficacy boundaries were finite, and the survival design reported 229.4 events and about 449.4 subjects.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The exact O'Brien-Fleming example executes and returns three ordered efficacy boundaries.", "result": "PASS", "note": "The boundaries were 3.7307, 2.5039, and 1.9937 and section 1 exited zero."},
+          {"text": "The one-sided null crossing probability remains calibrated near 0.025.", "result": "PASS", "note": "The independent control returned 0.025000000388."},
+          {"text": "The survival example executes with explicit accrual, dropout, hazard, duration, follow-up, and allocation assumptions.", "result": "PASS", "note": "Section 2 exited zero and reported 229.4 final events and approximately 449.4 subjects."},
+          {"text": "Delayed-effect immunotherapy is not analyzed with the proportional-hazards calculation without qualification.", "result": "PASS", "note": "The routed guidance requires Lakatos or trial simulation under a time-varying hazard ratio."},
+          {"text": "Output distinguishes design calculations from clinical efficacy claims.", "result": "PASS", "note": "All reported numbers are operating-design outputs and no treatment result is inferred."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Blinded variance sample-size re-estimation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The repaired fixed-design rpact contract executed both SD scenarios without a section warning; subjects increased from 182.8 to 248.1 and the Type-I statement remained explicitly conditional.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The exact candidate executes both SD 12 and SD 14 sample-size calculations.", "result": "PASS", "note": "Section 3 exited zero and both subject counts were finite."},
+          {"text": "The higher blinded nuisance estimate increases required sample size.", "result": "PASS", "note": "The values increased from 182.7789 to 248.0763 subjects."},
+          {"text": "The implementation distinguishes nuisance-only blinded recalculation from treatment-effect adaptation.", "result": "PASS", "note": "The section and routed reference specify pooled blinded variance and unchanged treatment-effect analysis."},
+          {"text": "The Type-I statement is conditional rather than an unconditional guarantee.", "result": "PASS", "note": "It requires a prespecified blinded rule, no treatment-effect leakage, and an unchanged valid final test."},
+          {"text": "The section uses the supported current fixed-design contract.", "result": "PASS", "note": "It constructs kMax=1 without the obsolete asUser spending contract that caused ADAPT-001."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Promising-zone documented-only boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Section 4 is visibly DOCUMENTED_ONLY, creates no executable promising-zone object, and enumerates conditional power, adaptation, n_max, preserved weights, IDMC output, and calibrated simulations as prerequisites.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The candidate does not present an inverse-normal object alone as a complete promising-zone design.", "result": "PASS", "note": "Section 4 explicitly says no executable promising-zone design is supplied."},
+          {"text": "Conditional-power zones and n_max are required before promotion.", "result": "PASS", "note": "Both are named in the script, main workflow, routed reference, and reviewer checklist."},
+          {"text": "Original combination-test weights and Type-I calibration are required.", "result": "PASS", "note": "The documented-only contract requires original weights and null/alternative simulations with Monte Carlo uncertainty."},
+          {"text": "The IDMC firewall and released operational decision are treated as design requirements.", "result": "PASS", "note": "The routed reference limits sponsor communication and requires the exact firewall."},
+          {"text": "The regression proves no misleading executable promising-zone object is created.", "result": "PASS", "note": "The shipped regression asserts that design_promising does not exist."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "BOIN boundaries and seeded operating characteristics",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The six-dose table and 1,000-trial operating-characteristic simulation passed with seed 20260928, six selection percentages summing to 100, expected N 26.853, and correctly qualified FDA Fit-for-Purpose wording.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The exact BOIN escalation/de-escalation table executes for target 0.30 and ten cohorts of three.", "result": "PASS", "note": "Section 5 exited zero and returned complete boundary tables."},
+          {"text": "The six-dose operating-characteristic result has a valid schema and bounded sample size.", "result": "PASS", "note": "Six selection values summed to 100 and expected N was 26.853 within the maximum 30."},
+          {"text": "The BOIN result is reproducible from the recorded seed.", "result": "PASS", "note": "Seed 20260928 is named and the focused regression reproduced selection percentages and expected N exactly."},
+          {"text": "The candidate does not describe Fit-for-Purpose as general FDA preference or trial approval.", "result": "PASS", "note": "The code and reference explicitly limit the December 2021 determination to the method."},
+          {"text": "The current FDA Fit-for-Purpose claim is supported by an authoritative source.", "result": "PASS", "note": "The FDA table lists BOIN dose-finding with issuance date December 10, 2021."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Aligned and malformed CRM dose grids",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The aligned six-dose 1,000-trial CRM completed and printed; seed 20260928 repeated exactly, while a shortened skeleton was rejected by the candidate validator before simulation.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Truth, skeleton, and dose-label dimensions are aligned and validated before simulation.", "result": "PASS", "note": "All three vectors have six elements and validate_crm_grid runs before crmsim."},
+          {"text": "The 1,000-trial CRM executes and prints a valid sim object.", "result": "PASS", "note": "Section 6 exited zero with six selected-dose probabilities and the expected dfcrm fields."},
+          {"text": "The CRM result is deterministic under the recorded seed.", "result": "PASS", "note": "A second crmsim call with seed 20260928 was identical to the candidate object."},
+          {"text": "Malformed dose-grid dimensions fail actionably before expensive simulation.", "result": "PASS", "note": "A shortened skeleton raised the stable identical-lengths error in the preflight validator."},
+          {"text": "The guidance warns that skeleton calibration materially affects CRM behavior.", "result": "PASS", "note": "The routed dose-finding reference requires calibration and misspecification comparisons."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Historical MAP prior, explicitly not EXNEX",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The bounded RBesT chain gMAP to automixfit to ess passed with two mixture components and finite ESS 44.35927; all candidate surfaces explicitly deny that this is stratum-level EXNEX.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The current RBesT gMAP fit succeeds on the retained three-study fixture.", "result": "PASS", "note": "Section 8 completed with finite MCMC summaries and maximal Rhat 1."},
+          {"text": "The fit is converted with automixfit before effective sample size is computed.", "result": "PASS", "note": "The resulting two-component beta mixture produced ESS 44.35927."},
+          {"text": "The script labels the surface as a historical-data MAP demonstration rather than EXNEX.", "result": "PASS", "note": "The heading and comments explicitly state not EXNEX."},
+          {"text": "The guidance requires explicit exchangeability weights and conflict sensitivity for an EXNEX claim.", "result": "PASS", "note": "The routed basket section names stratum-level EX/NEX components and detachment requirements."},
+          {"text": "No basket efficacy or clinical conclusion is inferred from the illustrative prior.", "result": "PASS", "note": "Only prior-mixture and ESS diagnostics are reported."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Complete runner, controls, claims, and restricted boundaries",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both scripts parsed; executable sections 1,2,3,5,6,8 passed; sections 4,7,9,10 were documented-only; the full runner and regression exited zero; all nine independent controls and current FDA/ICH claim checks passed.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The full shipped script completes all executable sections without stopping at an earlier error.", "result": "PASS", "note": "The full runner exited zero and printed execution metadata after MAP ESS."},
+          {"text": "The focused shipped regression closes repaired SSR, BOIN, CRM, MAP, and documented-only contracts.", "result": "PASS", "note": "It exited zero with adaptive_designs regression: PASS."},
+          {"text": "The inherited independent valid-control suite remains live across all nine cases.", "result": "PASS", "note": "gsDesign, rpact, BOIN, dfcrm, RBesT, gsDesign2, simtrial, adaptr, and invalid-input checks all passed."},
+          {"text": "Dated FDA and ICH status claims are current and source-qualified as of 2026-09-28.", "result": "PASS", "note": "Independent authoritative adjudication confirmed the 2019 final, 2022 final, 2026 draft, E20 draft, Bayesian draft, dosage, and BOIN claims."},
+          {"text": "Licensed commercial alternatives are neither bypassed nor represented as locally validated.", "result": "PASS", "note": "East/EastHorizon, ADDPLAN, and FACTS remain explicitly restricted documented-only surfaces."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 57.8,
+    "score": 96,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All six executable statistical surfaces run against pinned current packages, while the four unimplemented design families are visibly documented-only rather than overstated.",
+    "The repaired blinded SSR, aligned CRM, seeded BOIN/CRM/MAP examples, and gMAP-to-mixture ESS chain are independently executable and regression-covered.",
+    "Type-I control, IDMC separation, selection bias, delayed effects, drift, misspecification, and Monte Carlo uncertainty are treated as protocol requirements rather than optional polish.",
+    "Current FDA and ICH status wording distinguishes final guidance, draft guidance, ICH process stage, and Fit-for-Purpose determination without implying trial approval."
+  ],
+  "recommendations": []
+}

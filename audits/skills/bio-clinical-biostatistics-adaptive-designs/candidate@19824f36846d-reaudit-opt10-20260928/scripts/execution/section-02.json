@@ -1,0 +1,18 @@
+{
+  "section": 2,
+  "heading": "2. Sample size for survival group-sequential",
+  "classification": "candidate-executable",
+  "required_package": "gsDesign",
+  "package_version": "3.11.0",
+  "candidate_identity": {
+    "sha256": "19824f36846d65aeeb7e5cee1a76114f5e5325529fcc3a0e0e3572bf5851d1aa",
+    "file_count": 9,
+    "manifest_bytes": 867
+  },
+  "status": "PASS",
+  "elapsed_seconds": 0.251,
+  "warnings": [],
+  "messages": [],
+  "error": null,
+  "objects_created": ["n_gs", "simulation_replicates", "simulation_seeds"]
+}

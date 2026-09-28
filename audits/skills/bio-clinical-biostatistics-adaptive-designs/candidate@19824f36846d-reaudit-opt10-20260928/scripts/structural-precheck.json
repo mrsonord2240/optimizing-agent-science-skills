@@ -1,0 +1,45 @@
+{
+  "step1_basic_veto": {
+    "T1. Stability": "PASS",
+    "T2. Contract": "PASS",
+    "T3. Determinism": "PASS",
+    "T4. Security": "PASS"
+  },
+  "gate_result": "PASSED Step 1 \u2014 proceed to Steps 2\u20138",
+  "step2_static_metadata": {
+    "name": "bio-clinical-biostatistics-adaptive-designs",
+    "description": "Designs adaptive clinical trials including group-sequential (O'Brien-Fleming, Pocock, Lan-DeMets spending), sample-size re-estimation (blinded Friede-Kieser, unblinded Cui-Hung-Wang, Mehta-Pocock promising zone), seamless Phase 2/3 with treatment-arm selection, population enrichment, and response-adaptive randomisation. Covers FDA 2019 Final Adaptive Designs Guidance, the March 2022 final oncology Master Protocols guidance, the June 2026 broader Master Protocols revised draft, and non-final ICH E20 guidance. Use when planning interim analyses, sample-size re-estimation, or master/platform-trial designs.",
+    "description_word_count": 68,
+    "skill_md_lines": 132,
+    "reference_files": 4,
+    "script_files": 0,
+    "section_headers": [
+      "Version Compatibility",
+      "Adaptive Clinical Trial Designs",
+      "Core Workflow",
+      "Select the Design",
+      "Non-Negotiable Guardrails",
+      "Routed Guidance",
+      "Required Deliverables",
+      "Related Skills"
+    ],
+    "has_code_blocks": false,
+    "has_when_to_use_section": false,
+    "has_workflow_section": true
+  },
+  "step3_classification": {
+    "category": "Protocol Design",
+    "execution_mode": "A (Claude Direct)",
+    "category_keyword_scores": {
+      "Evidence Insight": 0,
+      "Protocol Design": 2,
+      "Data Analysis": 0,
+      "Academic Writing": 0
+    }
+  },
+  "step4_complexity": {
+    "level": "Moderate",
+    "n_inputs": 5
+  },
+  "instructions_for_claude": "Structural pre-check complete. Proceed with Steps 2\u20138 using SKILL.md instructions.\n  Category: Protocol Design\n  Execution Mode: A (Claude Direct)\n  Complexity: Moderate \u2192 Generate 5 test inputs in Step 4."
+}

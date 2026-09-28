@@ -1,0 +1,54 @@
+Design plan parameters and output for means:
+
+Design parameters:
+  Critical values                              : 1.960 
+  Significance level                           : 0.0250 
+  Type II error rate                           : 0.2000 
+  Test                                         : one-sided 
+
+User defined parameters:
+  Alternatives                                 : 5 
+  Standard deviation                           : 12 
+
+Default parameters:
+  Mean ratio                                   : FALSE 
+  Theta H0                                     : 0 
+  Normal approximation                         : FALSE 
+  Treatment groups                             : 2 
+  Planned allocation ratio                     : 1 
+
+Sample size and output:
+  Number of subjects fixed                     : 182.8 
+  Number of subjects fixed (1)                 : 91.4 
+  Number of subjects fixed (2)                 : 91.4 
+  Critical values (treatment effect scale)     : 3.503 
+
+Legend:
+  (i): values of treatment arm i
+Design plan parameters and output for means:
+
+Design parameters:
+  Critical values                              : 1.960 
+  Significance level                           : 0.0250 
+  Type II error rate                           : 0.2000 
+  Test                                         : one-sided 
+
+User defined parameters:
+  Alternatives                                 : 5 
+  Standard deviation                           : 14 
+
+Default parameters:
+  Mean ratio                                   : FALSE 
+  Theta H0                                     : 0 
+  Normal approximation                         : FALSE 
+  Treatment groups                             : 2 
+  Planned allocation ratio                     : 1 
+
+Sample size and output:
+  Number of subjects fixed                     : 248.1 
+  Number of subjects fixed (1)                 : 124 
+  Number of subjects fixed (2)                 : 124 
+  Critical values (treatment effect scale)     : 3.502 
+
+Legend:
+  (i): values of treatment arm i

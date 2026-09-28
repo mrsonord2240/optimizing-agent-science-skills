@@ -1,0 +1,73 @@
+$lambda_e
+[1] 0.2364907
+
+$lambda_d
+[1] 0.3585195
+
+$boundary_tab
+                                   
+Number of patients treated 3 6 9 12
+Escalate if # of DLT <=    0 1 2  2
+Deescalate if # of DLT >=  2 3 4  5
+Eliminate if # of DLT >=   3 4 5  7
+
+$full_boundary_tab
+                                                       
+Number of patients treated  1  2 3 4 5 6 7 8 9 10 11 12
+Escalate if # of DLT <=     0  0 0 0 1 1 1 1 2  2  2  2
+Deescalate if # of DLT >=   1  1 2 2 2 3 3 3 4  4  4  5
+Eliminate if # of DLT >=   NA NA 3 3 4 4 5 5 5  6  6  7
+
+attr(,"class")
+[1] "boin"
+$selpercent
+[1]  0.8  7.7 34.1 33.7 19.7  4.0
+
+$npatients
+[1] 3.708 5.208 7.503 6.312 3.252 0.870
+
+$ntox
+[1] 0.193 0.517 1.547 1.956 1.248 0.469
+
+$totaltox
+[1] 5.93
+
+$totaln
+[1] 26.853
+
+$percentstop
+[1] 0
+
+$overdose60
+[1] 0
+
+$overdose80
+[1] 0
+
+$simu.setup
+  target p.true ncohort cohortsize startdose p.saf p.tox cutoff.eli extrasafe
+1    0.3   0.05      10          3         1  0.18  0.42       0.95     FALSE
+2    0.3   0.10      10          3         1  0.18  0.42       0.95     FALSE
+3    0.3   0.20      10          3         1  0.18  0.42       0.95     FALSE
+4    0.3   0.30      10          3         1  0.18  0.42       0.95     FALSE
+5    0.3   0.40      10          3         1  0.18  0.42       0.95     FALSE
+6    0.3   0.55      10          3         1  0.18  0.42       0.95     FALSE
+  offset ntrial dose
+1   0.05   1000    1
+2   0.05   1000    2
+3   0.05   1000    3
+4   0.05   1000    4
+5   0.05   1000    5
+6   0.05   1000    6
+
+$flowchart
+[1] TRUE
+
+$lambda_e
+[1] 0.2364907
+
+$lambda_d
+[1] 0.3585195
+
+attr(,"class")
+[1] "boin"

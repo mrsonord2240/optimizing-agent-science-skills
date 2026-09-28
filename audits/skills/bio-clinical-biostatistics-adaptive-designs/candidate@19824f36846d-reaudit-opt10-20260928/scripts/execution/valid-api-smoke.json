@@ -1,0 +1,112 @@
+{
+  "captured_utc": "2026-09-28 22:03:12 UTC",
+  "all_passed": true,
+  "results": {
+    "gsdesign_obf_and_survival": {
+      "status": "PASS",
+      "elapsed_seconds": 6.556,
+      "warnings": [],
+      "error": null,
+      "evidence": {
+        "boundary_z": [3.7306652932, 2.5038709023, 1.9937099189],
+        "null_crossing_probability": 0.025000000388,
+        "survival_total_subjects": [228.4998764151, 184.0039115092],
+        "survival_final_events": 229.4408738362
+      }
+    },
+    "rpact_ssr_and_combination": {
+      "status": "PASS",
+      "elapsed_seconds": 1.994,
+      "warnings": "'typeOfDesign' (asUser) will be ignored because design is fixed",
+      "error": null,
+      "evidence": {
+        "subjects_sd12": 182.7788876272,
+        "subjects_sd14": 248.0763187044,
+        "inverse_critical_values": [2.2414027276, 2.1251187995],
+        "fisher_critical_values": [0.012308546719, 0.0016635922955, 0.00029106687241]
+      }
+    },
+    "boin_deterministic_oc": {
+      "status": "PASS",
+      "elapsed_seconds": 1.673,
+      "warnings": [],
+      "error": null,
+      "evidence": {
+        "lambda_e": 0.23649068524,
+        "lambda_d": 0.35851946464,
+        "selected_mtd_percent": [0.33333333333, 7.3333333333, 33, 35.6666666667, 19.6666666667, 4],
+        "expected_total_n": 26.87,
+        "seed": 20260928
+      }
+    },
+    "dfcrm_deterministic_crm": {
+      "status": "PASS",
+      "elapsed_seconds": 16.731,
+      "warnings": [],
+      "error": null,
+      "evidence": {
+        "class": "sim",
+        "fields": ["PI", "prior", "target", "n", "x0", "nsim", "MTD", "level", "tox", "beta.hat", "final.est", "design", "method", "prior.var", "model", "intcpt", "mcohort", "restriction", "seed", "tite", "dosescaled", "msg"],
+        "seed": 20260928,
+        "simulations": 100
+      }
+    },
+    "rbest_map_mixture_ess": {
+      "status": "PASS",
+      "elapsed_seconds": 9.198,
+      "warnings": [],
+      "error": null,
+      "evidence": {
+        "mixture_components": 2,
+        "effective_sample_size": 44.3592740971,
+        "seed": 20260928,
+        "iterations": 2400,
+        "chains": 2
+      }
+    },
+    "gsdesign2_nonph_design": {
+      "status": "PASS",
+      "elapsed_seconds": 1.07,
+      "warnings": [],
+      "error": null,
+      "evidence": {
+        "analysis_rows": 4,
+        "analysis_columns": ["analysis", "time", "n", "event", "ahr", "theta", "info", "info0", "info_frac", "info_frac0"]
+      }
+    },
+    "simtrial_fixed_n": {
+      "status": "PASS",
+      "elapsed_seconds": 11.838,
+      "warnings": [],
+      "error": null,
+      "evidence": {
+        "rows": 100,
+        "columns": ["method", "parameter", "estimate", "se", "z", "event", "ln_hr", "cut", "duration", "sim"],
+        "seed": 20260928
+      }
+    },
+    "adaptr_multiarm_rar_engine": {
+      "status": "PASS",
+      "elapsed_seconds": 0.834,
+      "warnings": [],
+      "error": null,
+      "evidence": {
+        "replicates": 20,
+        "seed": 20260928,
+        "arms": 3
+      }
+    },
+    "invalid_input_contracts": {
+      "status": "PASS",
+      "elapsed_seconds": 0.032,
+      "warnings": "number of rows of result is not a multiple of vector length (arg 2)",
+      "error": null,
+      "evidence": {
+        "nonmonotone_information": "input timing of interim analyses must be increasing strictly between 0 and 1",
+        "rpact_missing_user_spending": "Missing argument: parameter 'userAlphaSpending' must be specified in design",
+        "boin_invalid_target": "the target is too high!",
+        "crm_shape_mismatch": "length of 'dimnames' [2] not equal to array extent"
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane1-adaptive-designs",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "19824f36846d65aeeb7e5cee1a76114f5e5325529fcc3a0e0e3572bf5851d1aa",
+    "identity_recipe": "relative POSIX-path sort; each row is path\\tbytes\\tsha256; rows joined by literal \\n; SHA-256 over UTF-8",
+    "path": "F:\\OpenScience\\wt\\opt10-adaptive-designs\\skills\\bio-clinical-biostatistics-adaptive-designs",
+    "status": "?? skills/bio-clinical-biostatistics-adaptive-designs/"
+  },
+  "candidate_cache_artifacts": [],
+  "files": [
+    {"path": "LICENSE", "bytes": 1065, "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"},
+    {"path": "SKILL.md", "bytes": 8258, "sha256": "ced2e52e63a19e36a78bc152ae7a9adab16b4d540aa40c4e9f6d0a17f14f1723"},
+    {"path": "references/group-sequential-ssr-enrichment.md", "bytes": 6324, "sha256": "2973ec2b079d28b5c9ec8f0adecd3e75092618329e0f466976110356a1f9d53e"},
+    {"path": "references/platform-rar-dose-finding.md", "bytes": 6534, "sha256": "12f7d1de319c37b4799e54d487a56de347c131a4c26fc09499d1ce08b56239d2"},
+    {"path": "references/provenance.md", "bytes": 616, "sha256": "ebff33f500947901075b70634c9ac312e1c5ab0cd3170a925fe597fe6e0111bf"},
+    {"path": "references/regulatory-and-review.md", "bytes": 7323, "sha256": "f3e3c377c9519fbb0c36353c7c95efcd6c64042d85c7230b1152c44266400918"},
+    {"path": "scripts/adaptive_designs.R", "bytes": 10684, "sha256": "3cf1c5421893d14d9c8477c6d662332e7d6d884bcee5d1c9588b0e695238d234"},
+    {"path": "scripts/test_adaptive_designs.R", "bytes": 2133, "sha256": "229ecd23f657162772d75570e13597d73c39b2c61f598fc8449d3f5597e345f7"},
+    {"path": "usage-guide.md", "bytes": 4332, "sha256": "d8ecd88de3ca99e57f35b69b3913a39d74e5c00fcf564e14fcbf0fc4d20acd9f"}
+  ],
+  "independence": {
+    "candidate_bytes_modified": false,
+    "performed_candidate_fix": false,
+    "performed_initial_audit": false,
+    "performed_tooling_delta": false
+  },
+  "origin": {
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clinical-biostatistics/adaptive-designs",
+    "repository": "GPTomics/bioSkills",
+    "status": "clean",
+    "subtree": "85188936f8fee497db8c92c095bcbd0a888e376e"
+  },
+  "phase": "independent reaudit-scientific-skill",
+  "tooling": {
+    "applicable_initial_report_sha256": "9c930743e3ba6071f35eb83ef0c02c256856e3c488f51d5c7430c63db041d544",
+    "environment_fingerprint_sha256": "52c994639b6ed5235543d129d396dcc4fdcbff8f70d898e854c47d865848cdf7",
+    "environment_lock_sha256": "5f0bb3bca2660982c18770fd76ac9deffbd6157c5bd4db55f46c1c1d69aa230c",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "tools_md_sha256": "0a65891cb9c9347c30515457ecd6ab8f5a3a5d29d3227f104fcd12cda0035be2"
+  }
+}
