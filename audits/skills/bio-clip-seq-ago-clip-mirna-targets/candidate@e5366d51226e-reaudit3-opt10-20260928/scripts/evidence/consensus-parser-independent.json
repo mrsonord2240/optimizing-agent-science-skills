@@ -1,0 +1,113 @@
+{
+  "assertions_passed": 16,
+  "malformed_values": [
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/malformed-0.tsv:2: invalid expression_value",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "not-a-number"
+    },
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/malformed-1.tsv:2: invalid expression_value",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": ""
+    }
+  ],
+  "missing_value": {
+    "diagnostic": "invalid expression_value",
+    "outputs_absent": true,
+    "returncode": 1
+  },
+  "nonfinite_spellings": [
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/value-0.tsv:2: expression_value must be finite",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "NaN"
+    },
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/value-1.tsv:2: expression_value must be finite",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "nan"
+    },
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/value-2.tsv:2: expression_value must be finite",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "+Inf"
+    },
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/value-3.tsv:2: expression_value must be finite",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "Infinity"
+    },
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/value-4.tsv:2: expression_value must be finite",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "nAn"
+    },
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/value-5.tsv:2: expression_value must be finite",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "-inf"
+    },
+    {
+      "diagnostic": "/tmp/ago009-parser-delta-dihrk644/value-6.tsv:2: expression_value must be finite",
+      "outputs_absent": true,
+      "returncode": 1,
+      "value": "-Infinity"
+    }
+  ],
+  "nonfinite_thresholds": [
+    {
+      "diagnostic": "expression threshold must be finite",
+      "outputs_absent": true,
+      "returncode": 2,
+      "value": "NaN"
+    },
+    {
+      "diagnostic": "expression threshold must be finite",
+      "outputs_absent": true,
+      "returncode": 2,
+      "value": "+Inf"
+    },
+    {
+      "diagnostic": "expression threshold must be finite",
+      "outputs_absent": true,
+      "returncode": 2,
+      "value": "-Inf"
+    },
+    {
+      "diagnostic": "expression threshold must be finite",
+      "outputs_absent": true,
+      "returncode": 2,
+      "value": "Infinity"
+    },
+    {
+      "diagnostic": "expression threshold must be finite",
+      "outputs_absent": true,
+      "returncode": 2,
+      "value": "-Infinity"
+    }
+  ],
+  "parser": "/mnt/openscience/wt/opt10-ago-clip/skills/bio-clip-seq-ago-clip-mirna-targets/scripts/consensus_hyb.py",
+  "valid_acceptance": {
+    "accepted_read_ids": [
+      "above"
+    ],
+    "exclusions": [
+      {
+        "read_id": "below",
+        "reason": "below_expression_threshold",
+        "runs_present": "2",
+        "runs_required": "2"
+      }
+    ],
+    "returncode": 0
+  }
+}

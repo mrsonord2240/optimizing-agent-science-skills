@@ -1,54 +1,54 @@
-# Handoff: bio-clip-seq-ago-clip-mirna-targets / fix-scientific-skill
+# Handoff: bio-clip-seq-ago-clip-mirna-targets / reaudit-scientific-skill
 
-- Updated: 2026-09-28T18:34:57-07:00
+- Updated: 2026-09-28T19:42:16-07:00
 - Lane: 4
-- Status: phase-failed
-- Owner leaving: independent final reaudit2 / Codex
-- Next role: fresh `fix-scientific-skill`
+- Status: candidate-ready
+- Owner leaving: fresh independent reaudit3 / Codex
+- Next role: orchestrator
 
 ## Source identity
 
 - Origin: `GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clip-seq/ago-clip-mirna-targets`; subtree `6326a423789826240d0840be6897ddd69b21d940`.
-- Candidate: `F:\OpenScience\wt\opt10-ago-clip\skills\bio-clip-seq-ago-clip-mirna-targets`; branch `optimize/ten-20260928-lane4-ago-clip`, product HEAD `0bc0b31fc52742dbec1034f698103434cc9460c3`.
-- Exact `sha256-manifest-v1`: `a89a7ecad19a3cc207ab6b82bc0910b126b663e32e7c74c3c2b74dc105d780fa` (10 files, 989-byte manifest); independently reproduced before and after audit. Manifest: `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\reaudit2-opt10-20260928\candidate-manifest.tsv`.
-- Audit root: `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\reaudit2-opt10-20260928`; verdict Reject, score 92/100; research veto FAIL; nondeployable. Report SHA-256 `a9baa40e4397a103c519bc1a846c37fb7c7a7d45045b7febb507c8fb7bf51551`.
+- Candidate tree: `F:\OpenScience\wt\opt10-ago-clip\skills\bio-clip-seq-ago-clip-mirna-targets` on `optimize/ten-20260928-lane4-ago-clip`, product HEAD `0bc0b31fc52742dbec1034f698103434cc9460c3`.
+- Identity: `sha256-manifest-v1 e5366d51226e2ad2c96030cb26581bc84808194b7a17ef7bb376d337280d1b30`; 10 files, 989-byte manifest, reproduced before and after.
+- Fresh audit root: `F:\OpenScience\audits\bio-clip-seq-ago-clip-mirna-targets\reaudit3-opt10-20260928`.
+- Report SHA-256: `4193ffa07317ebcd064796b2b86f5bc59a756959de07a3cba1969c1c8795a708`; strict report schema validation: PASS.
 
 ## Completed this phase
 
-- Fresh independent full audit and schema/arithmetic validation passed; see `report.json`, `viewer.md`, `evidence/schema-validation.json`.
-- AGO-004 closed: two fresh full two-replicate Hyb workflows agreed across 25/25 non-stdout artifacts; stdout differs only at its first wall-clock timestamp line. Details: `evidence/hyb-repeatability.json`.
-- AGO-005 closed locally: explicit targeted UMI lengths 9 and 10 pass; absent/invalid declarations fail closed. Upstream 9-nt prose versus 10-nt default remains disclosed: `evidence/umi-contract.json`.
-- Fresh TargetScan projection/overlap and auxiliary UMI/trim/soft-clip diagnostic checks recorded in `evidence/targetscan-contract.json` and `evidence/secondary-routes.json`.
-- New finding AGO-009 P0 reproduced: `expression_value=NaN` exits successfully and is accepted at threshold 100; the research methodology veto fails. Evidence: `evidence/expression-nan-check.json`, reproduction `scripts/expression_finite_check.py`.
+- Independent full-tree review and accessible-surface retest completed. Final score 95/100 (static 93, execution average 96.6, assertions 35/35); skill and research vetoes PASS; no open P0 or required recommendations.
+- Fresh pinned Hyb cross-workflow repeatability passed: 111 accepted, 0 excluded, 111 targets, 2/2 support; all structured and non-stdout files match. Stdout differs only on its first timestamp line.
+- AGO-009 retest passed finite acceptance, below-threshold exclusion, 13 Python non-finite spellings for values and thresholds, malformed/missing values, and no result files on invalid inputs. AGO-005 explicit 9/10-nt UMI contract passed.
+- Fresh TargetScan projection/strand, wrapper boundaries, Yeo total-route synthetic checks, and schema validator passed. Publisher source-identity compatibility was checked read-only; no records were published.
+- Evidence, viewer, findings, source identity, candidate manifest, and artifact hashes are under the audit root; report/viewer hashes are in `artifact-hashes.sha256`.
 
 ## Required next actions
 
-1. Fresh fixer: address AGO-009 in the candidate, require finite expression values before thresholding, and add NaN, positive-infinity, and negative-infinity regressions with fail-closed/no-publication assertions.
-2. Preserve scientific/source notes and the explicit upstream UMI ambiguity disclosure. After repair, reproduce the candidate identity and request a new independent final re-audit; this exact identity is not candidate-ready.
+1. Orchestrator may accept this exact identity as `candidate-ready`; any later candidate-byte change requires a fresh independent re-audit.
+2. Keep promotion, records publication, Marketplace intake, product commits, and remote actions outside this audit handoff.
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| AGO-009 | P0 | open | `evidence/expression-nan-check.json`; `finding-ledger.md` | Reject non-finite expression values before they can bypass thresholding; regress NaN and ±Inf. |
-| AGO-004 | P0 | closed on this identity | `evidence/hyb-repeatability.json` | No further action; preserve timestamped-stdout limitation. |
-| AGO-005 | P1 | closed locally; upstream ambiguity disclosed | `evidence/umi-contract.json` | Keep protocol-declared length/provenance fail-closed contract. |
+| AGO-004 | P0 | closed; independently rechecked | `reaudit3-opt10-20260928/evidence/hyb-repeatability.json` | Retain the stdout first-line timestamp limitation in interpretation. |
+| AGO-005 | P1 | closed locally; upstream ambiguity disclosed | `reaudit3-opt10-20260928/evidence/umi-contract-independent.json` | Protocol owners supply declared targeted UMI length; upstream prose/default remain 9/10 nt. |
+| AGO-009 | P0 | closed; independently rechecked | `reaudit3-opt10-20260928/evidence/consensus-parser-independent.json`, `float-spellings-independent.json` | None for audited bytes. |
+| Biological and remote surfaces | — | deferred | `reaudit3-opt10-20260928/evidence/deferred-limitations.md`, `TOOLS.md` | Full Yeo/HEAP need biological inputs; DIANA example returned HTTP 500. |
 
 ## Environment and evidence
 
-- Tool inventory: `F:\OpenScience\audit-envs\bio-clip-seq-ago-clip-mirna-targets\TOOLS.md`; SHA-256 `a1cb55f6384dcd9f10dd37e971f539cf65fe461a20490ecc4cc39f0642858d86`; environment fingerprint `fcd7556256ce1a32f3473718ad2f0fa3d1821039dc4994ecf4aa626fe97d7e5c`.
-- Report/viewer: `report.json` SHA-256 `a9baa40e4397a103c519bc1a846c37fb7c7a7d45045b7febb507c8fb7bf51551`; `viewer.md` SHA-256 `12d78f7d64a82d50cb09282d012a34eaa5357e515c3ea02ff7147e0040e8ffa9`.
-- Finding/source/identity: `finding-ledger.md` SHA-256 `ae715c3265fafb3a6ff7429503160338c536f8b33d676ab03a9e577933784137`; `scientific-source-notes.md` SHA-256 `10ec8909f75a07d5ae330e8fd4cdd949ae92d5ce7c07b07a5b7d66a111607009`; `source-identity.json` SHA-256 `9a7210c73e0ded745103b34de159f8d2a9e38125ca8c7f786b2b3791a60013d0`.
-- Full artifact inventory: `evidence/audit-artifacts.sha256` SHA-256 `2b5f2ba2580c86381262da604959d2ecba0d63776b011bb83d26ca65b5830c8c`; strict report validation: `evidence/schema-validation.json`.
-- Deferred surfaces: full Yeo needs a real library and species-matched STAR repeat/genome indices; HEAP needs Halo-Ago2 wet-lab material; DIANA example endpoint previously returned HTTP 500; AGO peak calling is not bundled. No private inputs, credentials, paid services, or Marketplace were used. Tooling impact: none.
+- Tool inventory: `F:\OpenScience\audit-envs\bio-clip-seq-ago-clip-mirna-targets\TOOLS.md` (SHA-256 `f94c31cfa09e69331c164602a850022d034551e7af840f5965ae181f8e0e9a3a`); environment fingerprint `fcd7556256ce1a32f3473718ad2f0fa3d1821039dc4994ecf4aa626fe97d7e5c`; lock SHA-256 `ba5f355bb2d907197f723c7424742517b0e4fb4839a4273382d2293c5b2f3340`.
+- Core artifacts: `report.json`, `viewer.md`, `findings.md`, `source-identity.json`, `candidate-manifest.tsv`, `evidence/schema-validation.json`, and `artifact-hashes.sha256` in the audit root.
+- Tooling impact: none; prepared environment and candidate dependencies were unchanged.
 
 ## Worktree safety
 
-- Candidate/product bytes were read-only; the expected identity matches before and after. Product worktree contains the candidate directory as untracked; no product commit, stage, or push occurred.
-- Audit artifacts are confined to the audit root above. No records were published.
-- Pre-existing control-repository user changes/deletions and untracked worker files were preserved untouched; only this canonical handoff was replaced.
+- Candidate files were not modified; before/after/final manifests are identical. Product worktree remains the untracked Skill directory only; nothing staged or committed.
+- Existing control-repository edits, deletions, and untracked worker files were preserved. This task replaced only this canonical handoff and wrote its isolated fresh audit root.
+- No audit records were published; no product/provider change, Marketplace action, commit, push, release, or submission occurred.
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes; exact candidate identity, full report, reproducible P0 evidence, and bounded fixer action are recorded.
-- Transition: route to a fresh `fix-scientific-skill` for AGO-009. Do not route to candidate-ready unless a later independent re-audit passes all gates.
+- Next-phase prerequisites met: yes. Exact identity, strict schema, readiness metrics, all three prior findings, and deferred surfaces are durably evidenced.
+- Verdict: `candidate-ready` for `e5366d51226e2ad2c96030cb26581bc84808194b7a17ef7bb376d337280d1b30` only.

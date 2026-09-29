@@ -1,0 +1,12 @@
+{
+  "assertions_passed": 5,
+  "assertions_total": 5,
+  "cutadapt_returncode": 0,
+  "scope_note": "Synthetic bounded route fixtures; full biological Yeo and AGO peak-calling workflows were not run.",
+  "softclip_diagnostic_returncode": 0,
+  "softclipped_records": 1,
+  "trimmed_r1_length": 20,
+  "trimmed_r2_length": 20,
+  "umi_header_has_10nt_suffix": true,
+  "yeo_total_umi_tools_returncode": 0
+}

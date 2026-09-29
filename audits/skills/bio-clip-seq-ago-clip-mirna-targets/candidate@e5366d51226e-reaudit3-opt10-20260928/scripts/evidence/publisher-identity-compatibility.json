@@ -1,0 +1,16 @@
+{
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clip-seq/ago-clip-mirna-targets",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/clip-seq/ago-clip-mirna-targets",
+    "subtree": "6326a423789826240d0840be6897ddd69b21d940"
+  },
+  "candidate_identity": "e5366d51226e2ad2c96030cb26581bc84808194b7a17ef7bb376d337280d1b30",
+  "candidate_identity_kind": "sha256-manifest",
+  "file_count": 10,
+  "publisher_compatible": true
+}
