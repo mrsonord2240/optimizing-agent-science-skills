@@ -1,0 +1,25 @@
+{
+  "schema": "scientific-skill-audit.validation.v1",
+  "status": "PASS",
+  "candidate_identity": "3186a1debc804852b3ea016b9aeabebc4436a04791b84b13dba8669878d7e4dd",
+  "candidate_file_count": 11,
+  "candidate_manifest_bytes": 1051,
+  "execution_checks": {
+    "passed": 57,
+    "total": 57
+  },
+  "static_score": 96,
+  "execution_average": 97.4,
+  "assertions": {
+    "passed": 25,
+    "total": 25
+  },
+  "final_score": 97,
+  "grade": "Production Ready",
+  "veto_gates": {
+    "skill": "PASS",
+    "research": "PASS"
+  },
+  "recommendation_count": 0,
+  "required_files_checked": 14
+}

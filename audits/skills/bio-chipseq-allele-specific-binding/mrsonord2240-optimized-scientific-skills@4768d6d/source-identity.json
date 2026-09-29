@@ -1,0 +1,96 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "chip-seq/allele-specific-binding",
+    "subtree": "3674e1603cbc7a17731f9f5ea652ae7aa9f6e1e5",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "read-only"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane5-chipseq-asb",
+    "head": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-chipseq-asb\\skills\\bio-chipseq-allele-specific-binding",
+    "identity_algorithm": "SHA-256 of eight UTF-8 lines path<TAB>sha256 joined by LF without a trailing LF, sorted by relative POSIX path UTF-8 bytes",
+    "content_sha256": "03415aabaa66de0ef1b747e3fc664dae6d2868e42bf52a2c104d990db5e6057f",
+    "status_before": "one expected fixer-owned untracked skill tree; no other isolated-worktree changes",
+    "status_after_execution": "same expected untracked skill tree; no candidate cache artifacts or auditor changes"
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "5d9b5f43b093462312418abb369e7bd681f1068c737fc9f198bbe0411f843c46",
+      "git_blob": "7fffebeefae6edbafc54dc087419edc0167b688d",
+      "bytes": 11781
+    },
+    {
+      "path": "references/methods-and-commands.md",
+      "sha256": "862dc661967047b39519269923539f837df2901bfa1f19284cd57763e1d35578",
+      "git_blob": "1e6eb15a2a51724df380d43caa0c8777837ac53c",
+      "bytes": 12747
+    },
+    {
+      "path": "references/pitfalls-and-troubleshooting.md",
+      "sha256": "177f4627de9b60985f3d106995d0a96bd7b9e30d6450f8f7176e898f03e1956c",
+      "git_blob": "867683dc9b3e917bb2da0b3ef465af62fde45c05",
+      "bytes": 7731
+    },
+    {
+      "path": "scripts/baalchip_contracts.R",
+      "sha256": "5cdfc904edb4428015420aef51287f28eb0480f19ffbdd796e4adad44d926193",
+      "git_blob": "fd3250a433a765056fe33e0fffe060a9956589ef",
+      "bytes": 8534
+    },
+    {
+      "path": "scripts/baalchip_workflow.R",
+      "sha256": "0a599f1643ec700ba18f152423295396a3a9fd9ad9d2c18a26a834df2c12b85c",
+      "git_blob": "494ba03818f955d6f19d521968b485fb041c920f",
+      "bytes": 9172
+    },
+    {
+      "path": "scripts/rasqual_cohort.py",
+      "sha256": "076d90a6396e7072c6b2c41f0760d0d981dec58eeb96d52c3d550172b537a59a",
+      "git_blob": "fbbce2f853e7fcdfdde9bf2fc20c5d689efbe16f",
+      "bytes": 13941
+    },
+    {
+      "path": "tests/test_baalchip_contracts.R",
+      "sha256": "c4d4ccf95524b34df652d1d7ed80cf172ffec5372370813268050f79c0abd613",
+      "git_blob": "003127d5519ee2eb23858658739decc51e293676",
+      "bytes": 2884
+    },
+    {
+      "path": "tests/test_rasqual_cohort.py",
+      "sha256": "84158118680dd5867f466b591a74c23afaca2764c25f95b3e689a1e679c6deae",
+      "git_blob": "56b77127eabff2016e886125d115cfe22bfefc36",
+      "bytes": 1813
+    }
+  ],
+  "independent_auditor": {
+    "phase": "reaudit-scientific-skill",
+    "performed_initial_audit": false,
+    "performed_fix": false,
+    "performed_tooling_delta": false,
+    "candidate_bytes_changed": false,
+    "fresh_execution_run_count": 1
+  },
+  "tooling": {
+    "tools_md_sha256": "59fa3d4ff6e88eeb717f2b312a1b2ade4594944f6a06981ef895aaa83077ace9",
+    "delta3_fingerprint": "0032bf762101dada0b00cc047935e6bd0ef528579fae355ac1a2eec22fd27b44",
+    "delta3_fingerprint_file_sha256": "ea76e968b5b8a98fa79f0e8357269dab18031b5c895c1c949e5dde1db4de4c9d",
+    "environment_lock_sha256": "5c1f84081967c537196e341afe8a3d5e0913258f0232b873af650dc2aebd9247",
+    "r_packages_sha256": "2facdaed4d0b50854506d79161341114dda38f9fea4000601ef6f3cf4282734b"
+  },
+  "execution_classifications": {
+    "wasp_paired": "PASS_LIVE",
+    "wasp_hdf5": "PASS_LIVE",
+    "rasqual_prepare_and_cohort": "PASS_LIVE",
+    "baalchip_source_and_version_binding": "PASS_INDEPENDENT",
+    "baalchip_preflight_contracts_and_cleanup": "PASS_LIVE",
+    "baalchip_full_model": "RESOURCE_INFEASIBLE_BOUNDED_NOT_CREDITED",
+    "baalchip_all_excluded_and_no_call_publication": "RESOURCE_INFEASIBLE_BOUNDED_NOT_CREDITED",
+    "alleleseq_source_binding": "PASS_INDEPENDENT",
+    "alleleseq_full_toolchain": "UNAVAILABLE_EXTERNAL_ONLY_NOT_CREDITED"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

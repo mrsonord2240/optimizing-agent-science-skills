@@ -1,0 +1,61 @@
+PASS	candidate_identity	rows=8 bytes=750 digest=03415aabaa66de0ef1b747e3fc664dae6d2868e42bf52a2c104d990db5e6057f
+PASS	environment	pinned tool and lock identities captured
+PASS	baalchip_binding	official Bioconductor 3.22 / BaalChIP 1.36.0 / R 4.5 and used APIs
+PASS	alleleseq_binding	trgaleev/AlleleSeq2@cfe8acf; canonical paper separate
+baalchip contract tests: PASS
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.003s
+
+OK
+expected version mismatch: [version_mismatch] this runner is contract-tested against BaalChIP 1.36.0 (Bioconductor 3.22); found 1.38.0 
+PASS	candidate_tests	R helper/version suite and Python 3/3
+PASS	bounded_install_probe	exit=1; exact source blocked by missing compiled dependencies
+PASS	raf_gdna_preflights	real indexed BAM; 1.36.0 status; measured RAF and gDNA provenance
+PASS	af_not_raf	exit=1 expected=[missing_raf]
+PASS	missing_alt	exit=1 expected=[schema_mismatch]
+PASS	assembly_mismatch	exit=1 expected=[assembly_mismatch]
+PASS	contig_mismatch	exit=1 expected=[contig_mismatch]
+PASS	sample_mismatch	exit=1 expected=[sample_mismatch]
+PASS	empty_intervals	exit=1 expected=[empty_intervals]
+PASS	missing_bam	exit=1 expected=[missing_input]
+PASS	missing_bed	exit=1 expected=[missing_input]
+PASS	existing_output	exit=1 expected=[output_exists]
+PASS	missing_gdna	exit=1 expected=[missing_gdna]
+PASS	negative_baal_boundaries	ten expected structured failures
+PASS	atomic_cleanup	missing-package exit=1; no final/partial; unrelated sentinel preserved
+PASS	wasp_live	paired names/count invariants; final=4 input=4
+PASS	rasqual_live	public 2-feature cohort; exact binary sizes; converged rows; finite phi/p/q; overwrite refused
+PASS	interval_filters	2/3 non-imprinted; 2/3 autosomal
+long alleles will be truncated to 100bp
+writing genotype probabilities to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit2-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/geno_probs.h5
+writing haplotypes to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit2-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/haps.h5
+writing SNP index to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit2-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/snp_index.h5
+writing SNP table to: /mnt/openscience/audits/bio-chipseq-allele-specific-binding/reaudit2-opt10-20260928/evidence/secondary-artifacts/wasp-hdf5/snp_tab.h5
+guessing chromosome name from filename /chr22.hg19.impute2.gz
+best matching chromosome: chr22
+guessing chromosome name from filename /chr22.hg19.impute2_haps.gz
+best matching chromosome: chr22
+     /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2.gz pairs with /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2_haps.gz
+guessing chromosome name from filename /chr22.hg19.impute2.gz
+best matching chromosome: chr22
+chromosome: chr22, length: 51304566bp
+reading from file /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2.gz
+counting lines in file
+  total lines: 247303
+  number of samples: 60
+initializing HDF5 matrix with dimension: (247303, 180)
+parsing file and writing to HDF5 files
+........................
+initializing HDF5 matrix with dimension: (247303, 120)
+reading from file /mnt/openscience/audit-envs/bio-chipseq-allele-specific-binding/sources/WASP/examples/example_data/genotypes/chr22.hg19.impute2_haps.gz
+parsing file and writing to HDF5 files
+...................WARNING: snp2h5.c:923: SNP rs116119147 as position 41050149 is present in impute2_haps file but not in impute2 file
+....
+WARNING: snp2h5.c:944: 44451 SNPs were present in impute2_haps file but not in impute2 file
+WARNING: snp2h5.c:951: 54827 SNPs were present in impute file but not in impute2_haps file
+
+done
+PASS	wasp_hdf5	provider chr22 IMPUTE2/HAPS shapes verified
+PASS	alleleseq_boundary	exact implementation bound; full legacy runtime remains unavailable and uncredited
+PASS	baalchip_runtime_boundary	full model/all-excluded/no-call unavailable after bounded exact-source probe; no credit

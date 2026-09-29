@@ -1,0 +1,878 @@
+{
+  "alternate_table": {
+    "cases": [
+      {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGAAGA",
+        "source_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "source_protein": "MW*"
+      },
+      {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGGAGG",
+        "source_codons": [
+          "ATG",
+          "TGG",
+          "AGG"
+        ],
+        "source_protein": "MW*"
+      },
+      {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGAAGG",
+        "source_codons": [
+          "ATG",
+          "TGA",
+          "AGG"
+        ],
+        "source_protein": "MW*"
+      },
+      {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGGAGA",
+        "source_codons": [
+          "ATG",
+          "TGG",
+          "AGA"
+        ],
+        "source_protein": "MW*"
+      }
+    ],
+    "mismatch_error": "CAI index was not constructed with genetic-code table 2"
+  },
+  "biopython_semantics": {
+    "guarded_excluded": [
+      [
+        0,
+        "ATG",
+        "Biopython 1.85 hard-coded exclusion"
+      ]
+    ],
+    "guarded_included": 2,
+    "guarded_score": 1.0,
+    "pseudocount_weight_gcc": 0.05,
+    "standard_optimized": "ATGGCTGCTCTGGACGACAAAGGTTAA",
+    "standard_protein": "MAALDDKG*",
+    "standard_query": "ATGGCAGCATTAGATGATAAAGGATAA",
+    "stop_with": 0.5,
+    "stop_without": 1.0,
+    "strict_false_warnings": [],
+    "strict_true_error": "TTT and TTC are equally preferred.",
+    "zero_guard_error": "CAI is undefined because the validated query has no included codons (excluded: 0:ATG, 1:TGG)"
+  },
+  "canonical": {
+    "scripts": {
+      "basic_analysis.py": {
+        "first": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+            "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/basic_analysis.py"
+          ],
+          "cwd": null,
+          "returncode": 0,
+          "stderr": "",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout": "Sequence: ATGCGATCGATCGATCGATCGATCGATCGATCGTAA\nLength: 36 bp (12 codons)\nGenetic-code table: 1\nDiscarded input: none\n\n=== Codon Counts ===\nATC: 2\nATG: 1\nCGA: 3\nGAT: 2\nTAA: 1\nTCG: 3\n\n=== Codon Frequencies ===\nCGA: 0.250 ############\nTCG: 0.250 ############\nATC: 0.167 ########\nGAT: 0.167 ########\nATG: 0.083 ####\nTAA: 0.083 ####\n\n=== GC at Codon Positions ===\nTotal GC:        47.2%\n1st position:    41.7%\n2nd position:    50.0%\n3rd position:    50.0% (wobble)\n\n=== Amino Acid Usage ===\nR: 3\nS: 3\nI: 2\nD: 2\nM: 1\n*: 1\n",
+          "stdout_sha256": "3f7fbc381a787d2a310fcf922dce467ed7e608a1009ad13af39da3bcd6ca4474"
+        },
+        "second": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+            "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/basic_analysis.py"
+          ],
+          "cwd": null,
+          "returncode": 0,
+          "stderr": "",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout": "Sequence: ATGCGATCGATCGATCGATCGATCGATCGATCGTAA\nLength: 36 bp (12 codons)\nGenetic-code table: 1\nDiscarded input: none\n\n=== Codon Counts ===\nATC: 2\nATG: 1\nCGA: 3\nGAT: 2\nTAA: 1\nTCG: 3\n\n=== Codon Frequencies ===\nCGA: 0.250 ############\nTCG: 0.250 ############\nATC: 0.167 ########\nGAT: 0.167 ########\nATG: 0.083 ####\nTAA: 0.083 ####\n\n=== GC at Codon Positions ===\nTotal GC:        47.2%\n1st position:    41.7%\n2nd position:    50.0%\n3rd position:    50.0% (wobble)\n\n=== Amino Acid Usage ===\nR: 3\nS: 3\nI: 2\nD: 2\nM: 1\n*: 1\n",
+          "stdout_sha256": "3f7fbc381a787d2a310fcf922dce467ed7e608a1009ad13af39da3bcd6ca4474"
+        }
+      },
+      "cai_optimization.py": {
+        "first": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+            "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/cai_optimization.py"
+          ],
+          "cwd": null,
+          "returncode": 0,
+          "stderr": "",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout": "Index built from 3 reference genes (64 codon weights)\nRelative adaptiveness of GCT (Ala): 1.000\n\nQuery: ATGGCAGCATTAGATGATAAAGGATAA (9 codons)\nGenetic-code table: 1\nDiscarded input: none\nCAI codons included/excluded: 8/1\nQuery CAI: 0.098\n\nOptimized: ATGGCTGCTCTGGACGACAAAGGTTAA\nOptimized CAI: 1.000\nProtein preserved: MAALDDKG*\n\nCodons changed: 6\n  codon 1: GCA -> GCT\n  codon 2: GCA -> GCT\n  codon 3: TTA -> CTG\n  codon 4: GAT -> GAC\n  codon 5: GAT -> GAC\n  codon 7: GGA -> GGT\n",
+          "stdout_sha256": "ec97650ad8ea324ceb619680b160d52141607cb4a775748f84923071aebaa263"
+        },
+        "second": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+            "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/cai_optimization.py"
+          ],
+          "cwd": null,
+          "returncode": 0,
+          "stderr": "",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout": "Index built from 3 reference genes (64 codon weights)\nRelative adaptiveness of GCT (Ala): 1.000\n\nQuery: ATGGCAGCATTAGATGATAAAGGATAA (9 codons)\nGenetic-code table: 1\nDiscarded input: none\nCAI codons included/excluded: 8/1\nQuery CAI: 0.098\n\nOptimized: ATGGCTGCTCTGGACGACAAAGGTTAA\nOptimized CAI: 1.000\nProtein preserved: MAALDDKG*\n\nCodons changed: 6\n  codon 1: GCA -> GCT\n  codon 2: GCA -> GCT\n  codon 3: TTA -> CTG\n  codon 4: GAT -> GAC\n  codon 5: GAT -> GAC\n  codon 7: GGA -> GGT\n",
+          "stdout_sha256": "ec97650ad8ea324ceb619680b160d52141607cb4a775748f84923071aebaa263"
+        }
+      },
+      "rscu_analysis.py": {
+        "first": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+            "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/rscu_analysis.py"
+          ],
+          "cwd": null,
+          "returncode": 0,
+          "stderr": "",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout": "Sequence: ATGCTTCTGCTACTGCTTCTACTGCTGCTACTGTAA\nGenetic-code table: 1\nDiscarded input: none\n\n=== RSCU Analysis ===\nRSCU values (1.0 = no bias, >1 = preferred, <1 = avoided):\n\nL:\n  CTG: 3.00 +++++++++++++++ (preferred)\n  CTA: 1.80 +++++++++ (preferred)\n  CTT: 1.20 ++++++ (neutral)\n\n=== Rare Codons (RSCU < 0.5) ===\n",
+          "stdout_sha256": "9b23048a6354368a44a22bda6375dd6dfc076fc32cd30a8b6969d40f52bfba97"
+        },
+        "second": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+            "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/scripts/rscu_analysis.py"
+          ],
+          "cwd": null,
+          "returncode": 0,
+          "stderr": "",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout": "Sequence: ATGCTTCTGCTACTGCTTCTACTGCTGCTACTGTAA\nGenetic-code table: 1\nDiscarded input: none\n\n=== RSCU Analysis ===\nRSCU values (1.0 = no bias, >1 = preferred, <1 = avoided):\n\nL:\n  CTG: 3.00 +++++++++++++++ (preferred)\n  CTA: 1.80 +++++++++ (preferred)\n  CTT: 1.20 ++++++ (neutral)\n\n=== Rare Codons (RSCU < 0.5) ===\n",
+          "stdout_sha256": "9b23048a6354368a44a22bda6375dd6dfc076fc32cd30a8b6969d40f52bfba97"
+        }
+      }
+    },
+    "tests": {
+      "first": {
+        "command": [
+          "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+          "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/tests/test_codon_usage.py"
+        ],
+        "cwd": null,
+        "returncode": 0,
+        "stderr": "test_biopython_185_semantics_are_pinned (__main__.CAITests.test_biopython_185_semantics_are_pinned) ... ok\ntest_guard_prevents_zero_denominator (__main__.CAITests.test_guard_prevents_zero_denominator) ... ok\ntest_guarded_scoring_reports_exclusions (__main__.CAITests.test_guarded_scoring_reports_exclusions) ... ok\ntest_table_mismatch_is_rejected (__main__.CAITests.test_table_mismatch_is_rejected) ... ok\ntest_table_two_optimization_preserves_all_target_codons (__main__.CAITests.test_table_two_optimization_preserves_all_target_codons) ... ok\ntest_nonstandard_nc_helper_is_not_shipped_or_advertised (__main__.SurfaceTests.test_nonstandard_nc_helper_is_not_shipped_or_advertised) ... ok\ntest_scripts_are_import_safe (__main__.SurfaceTests.test_scripts_are_import_safe) ... ok\ntest_counts_and_rscu_share_validation (__main__.ValidationTests.test_counts_and_rscu_share_validation) ... ok\ntest_permissive_discards_and_reports_without_shifting_triplets (__main__.ValidationTests.test_permissive_discards_and_reports_without_shifting_triplets) ... ok\ntest_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop (__main__.ValidationTests.test_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop) ... ok\ntest_strict_validates_full_cds (__main__.ValidationTests.test_strict_validates_full_cds) ... ok\ntest_table_two_tga_tgg_are_sense_and_aga_agg_are_stops (__main__.ValidationTests.test_table_two_tga_tgg_are_sense_and_aga_agg_are_stops) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.160s\n\nOK\n",
+        "stderr_sha256": "c0b1b4cbf789ac3679c600afc887bb11c22ab9ad52a130efe8cfcddbf4175199",
+        "stdout": "",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "second": {
+        "command": [
+          "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/python",
+          "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage/tests/test_codon_usage.py"
+        ],
+        "cwd": null,
+        "returncode": 0,
+        "stderr": "test_biopython_185_semantics_are_pinned (__main__.CAITests.test_biopython_185_semantics_are_pinned) ... ok\ntest_guard_prevents_zero_denominator (__main__.CAITests.test_guard_prevents_zero_denominator) ... ok\ntest_guarded_scoring_reports_exclusions (__main__.CAITests.test_guarded_scoring_reports_exclusions) ... ok\ntest_table_mismatch_is_rejected (__main__.CAITests.test_table_mismatch_is_rejected) ... ok\ntest_table_two_optimization_preserves_all_target_codons (__main__.CAITests.test_table_two_optimization_preserves_all_target_codons) ... ok\ntest_nonstandard_nc_helper_is_not_shipped_or_advertised (__main__.SurfaceTests.test_nonstandard_nc_helper_is_not_shipped_or_advertised) ... ok\ntest_scripts_are_import_safe (__main__.SurfaceTests.test_scripts_are_import_safe) ... ok\ntest_counts_and_rscu_share_validation (__main__.ValidationTests.test_counts_and_rscu_share_validation) ... ok\ntest_permissive_discards_and_reports_without_shifting_triplets (__main__.ValidationTests.test_permissive_discards_and_reports_without_shifting_triplets) ... ok\ntest_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop (__main__.ValidationTests.test_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop) ... ok\ntest_strict_validates_full_cds (__main__.ValidationTests.test_strict_validates_full_cds) ... ok\ntest_table_two_tga_tgg_are_sense_and_aga_agg_are_stops (__main__.ValidationTests.test_table_two_tga_tgg_are_sense_and_aga_agg_are_stops) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.141s\n\nOK\n",
+        "stderr_sha256": "f3c0cb84a58bc02404654c327d58a14138d12c5800c23dfd46e6725b1b9fb27f",
+        "stdout": "",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  "checks": [
+    {
+      "detail": 0,
+      "group": "canonical",
+      "name": "basic_analysis.py first run exits zero",
+      "pass": true
+    },
+    {
+      "detail": 0,
+      "group": "canonical",
+      "name": "basic_analysis.py second run exits zero",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "group": "canonical",
+      "name": "basic_analysis.py stderr empty",
+      "pass": true
+    },
+    {
+      "detail": {
+        "first": "3f7fbc381a787d2a310fcf922dce467ed7e608a1009ad13af39da3bcd6ca4474",
+        "second": "3f7fbc381a787d2a310fcf922dce467ed7e608a1009ad13af39da3bcd6ca4474"
+      },
+      "group": "determinism",
+      "name": "basic_analysis.py reruns are byte-identical",
+      "pass": true
+    },
+    {
+      "detail": {
+        "stderr": "",
+        "stdout": ""
+      },
+      "group": "canonical",
+      "name": "basic_analysis.py is import-safe",
+      "pass": true
+    },
+    {
+      "detail": 0,
+      "group": "canonical",
+      "name": "rscu_analysis.py first run exits zero",
+      "pass": true
+    },
+    {
+      "detail": 0,
+      "group": "canonical",
+      "name": "rscu_analysis.py second run exits zero",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "group": "canonical",
+      "name": "rscu_analysis.py stderr empty",
+      "pass": true
+    },
+    {
+      "detail": {
+        "first": "9b23048a6354368a44a22bda6375dd6dfc076fc32cd30a8b6969d40f52bfba97",
+        "second": "9b23048a6354368a44a22bda6375dd6dfc076fc32cd30a8b6969d40f52bfba97"
+      },
+      "group": "determinism",
+      "name": "rscu_analysis.py reruns are byte-identical",
+      "pass": true
+    },
+    {
+      "detail": {
+        "stderr": "",
+        "stdout": ""
+      },
+      "group": "canonical",
+      "name": "rscu_analysis.py is import-safe",
+      "pass": true
+    },
+    {
+      "detail": 0,
+      "group": "canonical",
+      "name": "cai_optimization.py first run exits zero",
+      "pass": true
+    },
+    {
+      "detail": 0,
+      "group": "canonical",
+      "name": "cai_optimization.py second run exits zero",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "group": "canonical",
+      "name": "cai_optimization.py stderr empty",
+      "pass": true
+    },
+    {
+      "detail": {
+        "first": "ec97650ad8ea324ceb619680b160d52141607cb4a775748f84923071aebaa263",
+        "second": "ec97650ad8ea324ceb619680b160d52141607cb4a775748f84923071aebaa263"
+      },
+      "group": "determinism",
+      "name": "cai_optimization.py reruns are byte-identical",
+      "pass": true
+    },
+    {
+      "detail": {
+        "stderr": "",
+        "stdout": ""
+      },
+      "group": "canonical",
+      "name": "cai_optimization.py is import-safe",
+      "pass": true
+    },
+    {
+      "detail": {
+        "first": 0,
+        "second": 0
+      },
+      "group": "canonical",
+      "name": "focused candidate tests pass twice",
+      "pass": true
+    },
+    {
+      "detail": {
+        "first": "test_biopython_185_semantics_are_pinned (__main__.CAITests.test_biopython_185_semantics_are_pinned) ... ok\ntest_guard_prevents_zero_denominator (__main__.CAITests.test_guard_prevents_zero_denominator) ... ok\ntest_guarded_scoring_reports_exclusions (__main__.CAITests.test_guarded_scoring_reports_exclusions) ... ok\ntest_table_mismatch_is_rejected (__main__.CAITests.test_table_mismatch_is_rejected) ... ok\ntest_table_two_optimization_preserves_all_target_codons (__main__.CAITests.test_table_two_optimization_preserves_all_target_codons) ... ok\ntest_nonstandard_nc_helper_is_not_shipped_or_advertised (__main__.SurfaceTests.test_nonstandard_nc_helper_is_not_shipped_or_advertised) ... ok\ntest_scripts_are_import_safe (__main__.SurfaceTests.test_scripts_are_import_safe) ... ok\ntest_counts_and_rscu_share_validation (__main__.ValidationTests.test_counts_and_rscu_share_validation) ... ok\ntest_permissive_discards_and_reports_without_shifting_triplets (__main__.ValidationTests.test_permissive_discards_and_reports_without_shifting_triplets) ... ok\ntest_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop (__main__.ValidationTests.test_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop) ... ok\ntest_strict_validates_full_cds (__main__.ValidationTests.test_strict_validates_full_cds) ... ok\ntest_table_two_tga_tgg_are_sense_and_aga_agg_are_stops (__main__.ValidationTests.test_table_two_tga_tgg_are_sense_and_aga_agg_are_stops) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in <elapsed>\n\nOK\n",
+        "second": "test_biopython_185_semantics_are_pinned (__main__.CAITests.test_biopython_185_semantics_are_pinned) ... ok\ntest_guard_prevents_zero_denominator (__main__.CAITests.test_guard_prevents_zero_denominator) ... ok\ntest_guarded_scoring_reports_exclusions (__main__.CAITests.test_guarded_scoring_reports_exclusions) ... ok\ntest_table_mismatch_is_rejected (__main__.CAITests.test_table_mismatch_is_rejected) ... ok\ntest_table_two_optimization_preserves_all_target_codons (__main__.CAITests.test_table_two_optimization_preserves_all_target_codons) ... ok\ntest_nonstandard_nc_helper_is_not_shipped_or_advertised (__main__.SurfaceTests.test_nonstandard_nc_helper_is_not_shipped_or_advertised) ... ok\ntest_scripts_are_import_safe (__main__.SurfaceTests.test_scripts_are_import_safe) ... ok\ntest_counts_and_rscu_share_validation (__main__.ValidationTests.test_counts_and_rscu_share_validation) ... ok\ntest_permissive_discards_and_reports_without_shifting_triplets (__main__.ValidationTests.test_permissive_discards_and_reports_without_shifting_triplets) ... ok\ntest_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop (__main__.ValidationTests.test_strict_rejects_empty_partial_shifted_ambiguous_and_internal_stop) ... ok\ntest_strict_validates_full_cds (__main__.ValidationTests.test_strict_validates_full_cds) ... ok\ntest_table_two_tga_tgg_are_sense_and_aga_agg_are_stops (__main__.ValidationTests.test_table_two_tga_tgg_are_sense_and_aga_agg_are_stops) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in <elapsed>\n\nOK\n"
+      },
+      "group": "determinism",
+      "name": "focused test reruns have identical cases and outcomes",
+      "pass": true
+    },
+    {
+      "detail": "Index built from 3 reference genes (64 codon weights)\nRelative adaptiveness of GCT (Ala): 1.000\n\nQuery: ATGGCAGCATTAGATGATAAAGGATAA (9 codons)\nGenetic-code table: 1\nDiscarded input: none\nCAI codons included/excluded: 8/1\nQuery CAI: 0.098\n\nOptimized: ATGGCTGCTCTGGACGACAAAGGTTAA\nOptimized CAI: 1.000\nProtein preserved: MAALDDKG*\n\nCodons changed: 6\n  codon 1: GCA -> GCT\n  codon 2: GCA -> GCT\n  codon 3: TTA -> CTG\n  codon 4: GAT -> GAC\n  codon 5: GAT -> GAC\n  codon 7: GGA -> GGT\n",
+      "group": "canonical",
+      "name": "standard example reports CAI 1.000 and preserved protein",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGAAGA",
+        "source_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGA/AGA preserves table-2 protein",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGAAGA",
+        "source_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGA/AGA retains a table-2 terminal stop",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGGAGG",
+        "source_codons": [
+          "ATG",
+          "TGG",
+          "AGG"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGG/AGG preserves table-2 protein",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGGAGG",
+        "source_codons": [
+          "ATG",
+          "TGG",
+          "AGG"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGG/AGG retains a table-2 terminal stop",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGAAGG",
+        "source_codons": [
+          "ATG",
+          "TGA",
+          "AGG"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGA/AGG preserves table-2 protein",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGAAGG",
+        "source_codons": [
+          "ATG",
+          "TGA",
+          "AGG"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGA/AGG retains a table-2 terminal stop",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGGAGA",
+        "source_codons": [
+          "ATG",
+          "TGG",
+          "AGA"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGG/AGA preserves table-2 protein",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGTGAAGA",
+        "optimized_codons": [
+          "ATG",
+          "TGA",
+          "AGA"
+        ],
+        "optimized_protein": "MW*",
+        "query": "ATGTGGAGA",
+        "source_codons": [
+          "ATG",
+          "TGG",
+          "AGA"
+        ],
+        "source_protein": "MW*"
+      },
+      "group": "alternate_table",
+      "name": "TGG/AGA retains a table-2 terminal stop",
+      "pass": true
+    },
+    {
+      "detail": "CAI index was not constructed with genetic-code table 2",
+      "group": "alternate_table",
+      "name": "CAI table mismatch is rejected",
+      "pass": true
+    },
+    {
+      "detail": "CDS is empty; provide at least one complete codon",
+      "group": "validation",
+      "name": "strict validator rejects empty",
+      "pass": true
+    },
+    {
+      "detail": "CDS length 5 is not divisible by three; trailing bases 'AA' at offset 3",
+      "group": "validation",
+      "name": "strict validator rejects partial",
+      "pass": true
+    },
+    {
+      "detail": "first codon AAT is not a start codon in genetic-code table 1",
+      "group": "validation",
+      "name": "strict validator rejects shifted",
+      "pass": true
+    },
+    {
+      "detail": "invalid DNA codon 'NNN' at offset 3; illegal symbols: N",
+      "group": "validation",
+      "name": "strict validator rejects ambiguous",
+      "pass": true
+    },
+    {
+      "detail": "internal stop codon(s) at codon indices [1] under genetic-code table 1",
+      "group": "validation",
+      "name": "strict validator rejects internal_stop",
+      "pass": true
+    },
+    {
+      "detail": "CDS contains whitespace; normalize FASTA input before validation",
+      "group": "validation",
+      "name": "strict validator rejects whitespace",
+      "pass": true
+    },
+    {
+      "detail": "ATGGCTTAA",
+      "group": "validation",
+      "name": "permissive validator retains exact in-frame CDS",
+      "pass": true
+    },
+    {
+      "detail": [
+        {
+          "offset": 3,
+          "reason": "codon contains non-ACGT symbols",
+          "text": "NNN"
+        },
+        {
+          "offset": 12,
+          "reason": "incomplete trailing codon",
+          "text": "AA"
+        }
+      ],
+      "group": "validation",
+      "name": "permissive validator reports exact discards",
+      "pass": true
+    },
+    {
+      "detail": {
+        "codons": [
+          "ATG",
+          "GCT",
+          "TAA"
+        ]
+      },
+      "group": "validation",
+      "name": "counts frequencies and RSCU share validator state",
+      "pass": true
+    },
+    {
+      "detail": {
+        "ATG": 1,
+        "GCT": 1,
+        "TAA": 1
+      },
+      "group": "validation",
+      "name": "permissive counts are exact",
+      "pass": true
+    },
+    {
+      "detail": {
+        "ATG": 0.3333333333333333,
+        "GCT": 0.3333333333333333,
+        "TAA": 0.3333333333333333
+      },
+      "group": "validation",
+      "name": "permissive frequencies sum to one",
+      "pass": true
+    },
+    {
+      "detail": {
+        "GCA": 0.0,
+        "GCC": 0.0,
+        "GCG": 0.0,
+        "GCT": 4.0
+      },
+      "group": "validation",
+      "name": "RSCU alanine family preserves expected sum",
+      "pass": true
+    },
+    {
+      "detail": {
+        "with_stop": 0.5,
+        "without_stop": 1.0
+      },
+      "group": "biopython_semantics",
+      "name": "indexed stop contributes to Biopython CAI",
+      "pass": true
+    },
+    {
+      "detail": 0.05,
+      "group": "biopython_semantics",
+      "name": "unobserved GCC normalizes to 0.05",
+      "pass": true
+    },
+    {
+      "detail": [],
+      "group": "biopython_semantics",
+      "name": "strict false emits no warning",
+      "pass": true
+    },
+    {
+      "detail": "TTT and TTC are equally preferred.",
+      "group": "biopython_semantics",
+      "name": "strict true rejects a synonymous tie",
+      "pass": true
+    },
+    {
+      "detail": "CAI is undefined because the validated query has no included codons (excluded: 0:ATG, 1:TGG)",
+      "group": "biopython_semantics",
+      "name": "zero denominator is intercepted with actionable error",
+      "pass": true
+    },
+    {
+      "detail": {
+        "excluded": [
+          [
+            0,
+            "ATG",
+            "Biopython 1.85 hard-coded exclusion"
+          ]
+        ],
+        "included": 2
+      },
+      "group": "biopython_semantics",
+      "name": "guard reports included and excluded codons",
+      "pass": true
+    },
+    {
+      "detail": {
+        "optimized": "ATGGCTGCTCTGGACGACAAAGGTTAA",
+        "protein": "MAALDDKG*",
+        "query": "ATGGCAGCATTAGATGATAAAGGATAA"
+      },
+      "group": "biopython_semantics",
+      "name": "standard max-CAI optimization preserves protein",
+      "pass": true
+    },
+    {
+      "detail": {
+        "codons": 821,
+        "first": "ATG",
+        "last": "TGA",
+        "length": 2463
+      },
+      "group": "public_control",
+      "name": "public thrA validates under table 11",
+      "pass": true
+    },
+    {
+      "detail": "none",
+      "group": "public_control",
+      "name": "public analyses share exact validation state",
+      "pass": true
+    },
+    {
+      "detail": {
+        "counts": 821,
+        "frequency_sum": 1.0
+      },
+      "group": "public_control",
+      "name": "public counts and frequencies are complete",
+      "pass": true
+    },
+    {
+      "detail": {
+        "gc123": [
+          53.06536743808364,
+          61.26674786845311,
+          40.31668696711328,
+          57.61266747868453
+        ],
+        "rscu_size": 61
+      },
+      "group": "public_control",
+      "name": "public RSCU and GC123 are finite",
+      "pass": true
+    },
+    {
+      "detail": 0,
+      "group": "external_nc_boundary",
+      "name": "fresh codonW heterogeneous exits zero",
+      "pass": true
+    },
+    {
+      "detail": "title Nc \nnc-heterogeneous 30.77 \n",
+      "group": "external_nc_boundary",
+      "name": "fresh codonW heterogeneous reproduces expected Nc",
+      "pass": true
+    },
+    {
+      "detail": 0,
+      "group": "external_nc_boundary",
+      "name": "fresh codonW public_thra exits zero",
+      "pass": true
+    },
+    {
+      "detail": "title Nc \nnc-public-thrA 47.41 \n",
+      "group": "external_nc_boundary",
+      "name": "fresh codonW public_thra reproduces expected Nc",
+      "pass": true
+    },
+    {
+      "detail": {
+        "implementation_absent": true,
+        "trigger_claim_absent": true
+      },
+      "group": "external_nc_boundary",
+      "name": "false standard-Nc implementation and trigger claim are absent",
+      "pass": true
+    },
+    {
+      "detail": "present",
+      "group": "external_nc_boundary",
+      "name": "SKILL explicitly says Nc is not calculated",
+      "pass": true
+    },
+    {
+      "detail": "explicit",
+      "group": "external_nc_boundary",
+      "name": "cross-study estimator boundary is explicit",
+      "pass": true
+    }
+  ],
+  "public_and_external_boundary": {
+    "codonw": {
+      "heterogeneous": {
+        "invocation": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw",
+            "/tmp/codon-reaudit-bha2zkty/nc-heterogeneous.fasta",
+            "-nomenu",
+            "-silent",
+            "-nowarn",
+            "-machine",
+            "-enc",
+            "-noblk"
+          ],
+          "cwd": "/tmp/codon-reaudit-bha2zkty",
+          "returncode": 0,
+          "stderr": "\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t /tmp/codon-reaudit-bha2zkty/nc-heterogeneous.fasta \n Output file was\t /tmp/codon-reaudit-bha2zkty/nc-heterogeneous.out  (codon usage indices, e.g. gc3s)\n Output file was\t /tmp/codon-reaudit-bha2zkty/nc-heterogeneous.blk  (bulk output e.g. raw codon usage)\n",
+          "stderr_sha256": "8d9e10b4879e202e20d92fd89af246f2ba695a2b3fa9c9dcc4d77baa02f92533",
+          "stdout": "\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n",
+          "stdout_sha256": "0fbee06db2bde7be00d1069b243f43b0f6f0d5cee249fadec66a23eb7b8c6a7d"
+        },
+        "output": "title Nc \nnc-heterogeneous 30.77 \n",
+        "output_sha256": "34d0faef560ae3c7fc8ff77aa66924b29d10f6e3564db7def2a8b7ebf58d7a53"
+      },
+      "public_thra": {
+        "invocation": {
+          "command": [
+            "/mnt/openscience/audit-envs/bio-codon-usage/env/bin/codonw",
+            "/tmp/codon-reaudit-bha2zkty/nc-public-thrA.fasta",
+            "-nomenu",
+            "-silent",
+            "-nowarn",
+            "-machine",
+            "-enc",
+            "-noblk"
+          ],
+          "cwd": "/tmp/codon-reaudit-bha2zkty",
+          "returncode": 0,
+          "stderr": "\n\n\t\tNumber of sequences: 1\nFiles used:\n Input file was\t /tmp/codon-reaudit-bha2zkty/nc-public-thrA.fasta \n Output file was\t /tmp/codon-reaudit-bha2zkty/nc-public-thrA.out  (codon usage indices, e.g. gc3s)\n Output file was\t /tmp/codon-reaudit-bha2zkty/nc-public-thrA.blk  (bulk output e.g. raw codon usage)\n",
+          "stderr_sha256": "22458b77482ca32587aa4e8582c1c376907516b93394818d58a2190c40e35f4b",
+          "stdout": "\n Welcome to CodonW  for Help type h\n\n\n\n CodonW has finished\n",
+          "stdout_sha256": "0fbee06db2bde7be00d1069b243f43b0f6f0d5cee249fadec66a23eb7b8c6a7d"
+        },
+        "output": "title Nc \nnc-public-thrA 47.41 \n",
+        "output_sha256": "39058f341f9918e763fbe3cadbc0bbbcbe3722bbf41dc35cd084e21e7c3023ca"
+      }
+    },
+    "nc_boundary": {
+      "cross_study_boundary": true,
+      "implementation_absent": true,
+      "skill_disclaims_nc": true
+    },
+    "public_thrA": {
+      "codons": 821,
+      "count_total": 821,
+      "discarded": [],
+      "first": "ATG",
+      "frequency_sum": 1.0,
+      "gc123": [
+        53.06536743808364,
+        61.26674786845311,
+        40.31668696711328,
+        57.61266747868453
+      ],
+      "id": "NC_000913.3:337-2799",
+      "last": "TGA",
+      "length": 2463
+    }
+  },
+  "runtime": {
+    "biopython": "1.85",
+    "candidate": "/mnt/openscience/wt/opt10-codon-usage/skills/bio-codon-usage",
+    "python": "3.12.11 | packaged by conda-forge | (main, Jun  4 2025, 14:45:31) [GCC 13.3.0]"
+  },
+  "summary": {
+    "failed": [],
+    "passed": 57,
+    "total": 57
+  },
+  "validation": {
+    "permissive": {
+      "codons": [
+        "ATG",
+        "GCT",
+        "TAA"
+      ],
+      "counts": {
+        "ATG": 1,
+        "GCT": 1,
+        "TAA": 1
+      },
+      "discard_summary": "offset 3: 'NNN' (codon contains non-ACGT symbols); offset 12: 'AA' (incomplete trailing codon)",
+      "discarded": [
+        {
+          "offset": 3,
+          "reason": "codon contains non-ACGT symbols",
+          "text": "NNN"
+        },
+        {
+          "offset": 12,
+          "reason": "incomplete trailing codon",
+          "text": "AA"
+        }
+      ],
+      "frequencies": {
+        "ATG": 0.3333333333333333,
+        "GCT": 0.3333333333333333,
+        "TAA": 0.3333333333333333
+      },
+      "rscu_alanine": {
+        "GCA": 0.0,
+        "GCC": 0.0,
+        "GCG": 0.0,
+        "GCT": 4.0
+      },
+      "sequence": "ATGGCTTAA"
+    },
+    "strict": {
+      "ambiguous": "invalid DNA codon 'NNN' at offset 3; illegal symbols: N",
+      "empty": "CDS is empty; provide at least one complete codon",
+      "internal_stop": "internal stop codon(s) at codon indices [1] under genetic-code table 1",
+      "partial": "CDS length 5 is not divisible by three; trailing bases 'AA' at offset 3",
+      "shifted": "first codon AAT is not a start codon in genetic-code table 1",
+      "whitespace": "CDS contains whitespace; normalize FASTA input before validation"
+    }
+  }
+}

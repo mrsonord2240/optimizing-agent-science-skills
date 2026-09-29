@@ -1,0 +1,315 @@
+{
+  "meta": {
+    "skill_name": "bio-chipseq-allele-specific-binding",
+    "description": "Detects allele-specific transcription factor or histone modification binding from heterozygous-variant ChIP-seq using WASP, RASQUAL, BaalChIP with measured RAF or gDNA correction, and an explicitly external-only AlleleSeq route.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricates study identifiers, sample sizes, p-values, efficacy data, or live execution. Public and synthetic fixtures are labeled, and unavailable BaalChIP model and AlleleSeq full-toolchain execution receive no credit."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill remains a research-analysis workflow, makes no patient-specific diagnosis or treatment recommendation, and keeps prediction, within-sample ASB, and population QTL interpretations distinct."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Mapping bias, imprinting, chrX, allele dose, replicate depth, convergence, multiplicity, and correction-source provenance are handled explicitly. Versioned method claims are bound to their exact sources and runtime contracts."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All accessible code parsed and executed: R contracts and version gates, Python tests, RAF and gDNA preflights, ten negative boundaries, cleanup, paired WASP and provider HDF5, interval controls, and a two-feature public RASQUAL cohort. Resource-infeasible or unavailable surfaces remain uncredited."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "The four advertised routes, confounders, outputs, and scientific boundaries are covered with coherent exact bindings; the BaalChIP statistical model is not runnable in the bounded prepared environment."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Accessible runners fail closed, refuse output reuse, preserve atomicity, and expose structured errors. Full BaalChIP terminal publication remains resource-infeasible and therefore unverified."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Progressive disclosure and bounded runners are efficient; the legacy AlleleSeq and compiled Bioconductor surfaces necessarily carry substantial dependency cost."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Routing, preflights, stop conditions, version gates, output contracts, failure classifications, and interpretation guidance are explicit and coherent."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural triggers, method selection, prerequisite lists, command surfaces, and troubleshooting boundaries make the skill discoverable without weakening scientific validation."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, raw-code evaluation, user-command shell interpolation, broad deletion, or private-data retention appears; schemas and paths are validated before execution."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Documentation, contracts, model runner, cohort driver, and focused tests are cleanly separated; a live BaalChIP integration regression awaits a prepared compiled dependency stack."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Trigger precision, progressive disclosure, composable file contracts, idempotent output refusal, exact source identities, and explicit external routing are strong."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Paired-end WASP mapping-bias route",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh v0.3.4 paired execution and provider HDF5 construction passed filenames, shapes, pairing, and stage-count invariants.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The paired remap command consumes the exact fq1 and fq2 files emitted by WASP v0.3.4.",
+            "result": "PASS",
+            "note": "Fresh output names were input.remap.fq1.gz and input.remap.fq2.gz, and both contained six records."
+          },
+          {
+            "text": "Every final WASP alignment remains paired.",
+            "result": "PASS",
+            "note": "All four final alignments carried the paired flag."
+          },
+          {
+            "text": "Final alignments equal direct keeps plus remap keeps and do not exceed input alignments.",
+            "result": "PASS",
+            "note": "The fresh run satisfied final=4, direct+remap=4, and input=4."
+          },
+          {
+            "text": "The provider chromosome-22 IMPUTE2 and haplotype inputs produce the expected HDF5 shapes.",
+            "result": "PASS",
+            "note": "All four expected /chr22 shapes were independently inspected and matched."
+          },
+          {
+            "text": "The workflow reports observed attrition rather than assuming a fixed percentage.",
+            "result": "PASS",
+            "note": "The documentation requires input, remap, retained, tested, and significant counts."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Cancer BaalChIP workflow with RAF or gDNA correction",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Every accessible contract, preflight, error boundary, version gate, and cleanup behavior passed; the model and terminal publications remain resource-infeasible and uncredited.",
+        "basic": 34,
+        "specialized": 48,
+        "total": 82,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "RAF mode requires measured RAF and refuses ordinary AF.",
+            "result": "PASS",
+            "note": "Measured RAF preflight passed and AF substitution stopped with [missing_raf]."
+          },
+          {
+            "text": "gDNA mode records the indexed BAM actually used for correction.",
+            "result": "PASS",
+            "note": "The fresh correction-provenance file names the indexed gDNA BAM and records a matching chr contig style."
+          },
+          {
+            "text": "Invalid schema, assembly, contig, sample, interval, file, correction, and output states fail closed.",
+            "result": "PASS",
+            "note": "Ten independent negative probes returned the expected structured error codes."
+          },
+          {
+            "text": "A package-load failure removes only the owned staging directory and publishes no final result.",
+            "result": "PASS",
+            "note": "The missing-package run exited nonzero, left no final or matching partial, and preserved an unrelated sentinel."
+          },
+          {
+            "text": "The documented release, runtime gate, and used source interfaces form one reproducible BaalChIP contract.",
+            "result": "PASS",
+            "note": "Official metadata and source bind BaalChIP 1.36.0 to Bioconductor 3.22 and R 4.5; candidate constants, status, tests, and used APIs match."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Imprinting, blacklist, chrX, and contract boundaries",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Live interval controls and focused helper tests passed, including report-list shape, structured empty schema, assembly rejection, and exclusion boundaries.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Imprinted-locus exclusion retains the expected two of three rows.",
+            "result": "PASS",
+            "note": "The live bedtools control retained the non-overlapping chr1 and chrX rows."
+          },
+          {
+            "text": "Autosomal filtering removes chrX and retains two rows.",
+            "result": "PASS",
+            "note": "The live awk control produced two autosomal rows and no chrX row."
+          },
+          {
+            "text": "Assembly and contig-style mismatches are rejected before model execution.",
+            "result": "PASS",
+            "note": "Fresh probes stopped with [assembly_mismatch] and [contig_mismatch]."
+          },
+          {
+            "text": "The group report contract selects a named data frame and supports a structured empty result.",
+            "result": "PASS",
+            "note": "The base-R helper suite passed named-list, required-column, empty-report, and incompatible-report cases."
+          },
+          {
+            "text": "Imprinting and X-linked skew are not overinterpreted as ordinary differential binding.",
+            "result": "PASS",
+            "note": "The skill consistently requires filtering or separate labeling and an X-aware interpretation."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Public two-feature RASQUAL cohort",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The candidate prepared exact binary matrices and ran both public chr11 features once, with convergence, phi, p-value, cohort BH, and overwrite assertions.",
+        "basic": 40,
+        "specialized": 59,
+        "total": 99,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The prepare command validates matrix dimensions and emits exact native-double byte counts.",
+            "result": "PASS",
+            "note": "Fresh binaries represented two features by 24 samples and 24 samples by four covariates at eight bytes per value."
+          },
+          {
+            "text": "Every manifest feature executes exactly once.",
+            "result": "PASS",
+            "note": "C11orf21 and TSPAN32 each appeared once in the two-row result family."
+          },
+          {
+            "text": "Every emitted row satisfies the 25-column RASQUAL contract with finite phi and convergence zero.",
+            "result": "PASS",
+            "note": "Both public rows passed all three checks."
+          },
+          {
+            "text": "The wrapper derives finite raw p-values and Benjamini-Hochberg q-values across the emitted cohort family.",
+            "result": "PASS",
+            "note": "Both appended p and cohort q fields were finite and within [0,1]."
+          },
+          {
+            "text": "A repeated cohort run refuses to overwrite the existing output.",
+            "result": "PASS",
+            "note": "The repeated command exited two with the candidate-level refusing-to-overwrite error."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "AlleleSeq personalized-genome routing boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact tested implementation is bound separately from the canonical method citation and the unavailable legacy stack remains external-only and uncredited.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The skill does not advertise an incomplete local AlleleSeq execution as a success.",
+            "result": "PASS",
+            "note": "The route is explicitly external-only and the fresh probe records an unavailable full toolchain."
+          },
+          {
+            "text": "The required legacy prerequisites are named precisely.",
+            "result": "PASS",
+            "note": "Python 2, STAR, Picard, Java, Make, reference and liftOver resources, and the official vcf2diploid JAR are listed."
+          },
+          {
+            "text": "No unofficial vcf2diploid substitute is used.",
+            "result": "PASS",
+            "note": "No JAR was present or substituted, and no personalized-genome result was claimed."
+          },
+          {
+            "text": "The tested implementation is bound to its exact repository and commit.",
+            "result": "PASS",
+            "note": "The read-only checkout reports https://github.com/trgaleev/AlleleSeq2.git at cfe8acf88989922da841e71238b360f8f57e813a, matching the candidate."
+          },
+          {
+            "text": "The canonical method paper is retained separately from implementation provenance.",
+            "result": "PASS",
+            "note": "The candidate identifies Rozowsky et al. as the canonical method and trgaleev/AlleleSeq2 as the tested implementation."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 56.6,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The paired WASP route matches the pinned provider filenames and preserves explicit fragment-count, pairing, and provider-HDF5 invariants.",
+    "The RASQUAL driver validates binary dimensions, exact feature coverage, strict output shape, convergence, finite phi, and family-level BH correction.",
+    "The BaalChIP route binds one official 1.36.0/3.22/R4.5 contract, validates correction provenance, fails closed, and cleans only owned staging state.",
+    "Unavailable BaalChIP model and AlleleSeq legacy components are classified honestly and receive no inferred execution credit.",
+    "Claim-level provenance separates canonical scientific methods from exact tested implementations."
+  ],
+  "recommendations": []
+}

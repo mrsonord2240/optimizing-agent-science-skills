@@ -1,0 +1,91 @@
+expression(simulation_seeds <- list(boin = 20260928L, crm = 20260928L, 
+    map = 20260928L), simulation_replicates <- list(boin = 1000L, 
+    crm = 1000L), library(gsDesign), design_obf <- gsDesign(k = 3, 
+    test.type = 1, alpha = 0.025, beta = 0.1, sfu = sfLDOF, timing = c(0.33, 
+        0.67, 1)), print(design_obf), plot(design_obf), n_gs <- gsSurv(k = 3, 
+    test.type = 2, alpha = 0.025, beta = 0.1, sfu = sfLDOF, lambdaC = 0.04, 
+    hr = 0.65, eta = 0.005, T = 30, minfup = 18, ratio = 1), 
+    print(n_gs), library(rpact), design_initial <- getDesignGroupSequential(kMax = 1, 
+        alpha = 0.025, beta = 0.2, sided = 1), ss_initial <- getSampleSizeMeans(design = design_initial, 
+        alternative = 5, stDev = 12, groups = 2), print(ss_initial), 
+    ss_recomputed <- getSampleSizeMeans(design = design_initial, 
+        alternative = 5, stDev = 14, groups = 2), print(ss_recomputed), 
+    stopifnot(is.finite(ss_initial$maxNumberOfSubjects), is.finite(ss_recomputed$maxNumberOfSubjects), 
+        ss_recomputed$maxNumberOfSubjects > ss_initial$maxNumberOfSubjects), 
+    library(BOIN), boin_table <- get.boundary(target = 0.3, ncohort = 10, 
+        cohortsize = 3, n.earlystop = 12, p.saf = 0.6 * 0.3, 
+        p.tox = 1.4 * 0.3), print(boin_table), boin_oc <- get.oc(target = 0.3, 
+        p.true = c(0.05, 0.1, 0.2, 0.3, 0.4, 0.55), ncohort = 10, 
+        cohortsize = 3, ntrial = simulation_replicates$boin, 
+        n.earlystop = 12, seed = simulation_seeds$boin), print(boin_oc), 
+    stopifnot(is.numeric(boin_oc$selpercent), length(boin_oc$selpercent) == 
+        6L, abs(sum(boin_oc$selpercent) - 100) < 1e-08, is.numeric(boin_oc$totaln), 
+        length(boin_oc$totaln) == 1L, boin_oc$totaln > 0, boin_oc$totaln <= 
+            30), library(dfcrm), true_dlt_rates <- c(0.05, 0.1, 
+        0.2, 0.3, 0.4, 0.55), prior_skeleton <- c(0.05, 0.1, 
+        0.2, 0.3, 0.5, 0.65), dose_labels <- seq_along(true_dlt_rates), 
+    target <- 0.3, validate_crm_grid <- function(truth, skeleton, 
+        labels) {
+        if (length(truth) != length(skeleton) || length(truth) != 
+            length(labels)) {
+            stop("CRM truth, skeleton, and dose labels must have identical lengths")
+        }
+        if (length(truth) < 2L || any(!is.finite(truth)) || any(!is.finite(skeleton)) || 
+            any(truth <= 0 | truth >= 1) || any(skeleton <= 0 | 
+            skeleton >= 1) || any(diff(truth) <= 0) || any(diff(skeleton) <= 
+            0)) {
+            stop("CRM truth and skeleton must be finite, strictly increasing probabilities")
+        }
+        invisible(TRUE)
+    }, validate_crm_grid(true_dlt_rates, prior_skeleton, dose_labels), 
+    crm_sim <- crmsim(PI = true_dlt_rates, prior = prior_skeleton, 
+        target = target, n = 30, x0 = 1, nsim = simulation_replicates$crm, 
+        mcohort = 1, count = FALSE, method = "bayes", model = "logistic", 
+        seed = simulation_seeds$crm), print(crm_sim), stopifnot(inherits(crm_sim, 
+        "sim"), identical(length(crm_sim$PI), length(prior_skeleton)), 
+        all(c("PI", "prior", "MTD", "level", "tox", "seed") %in% 
+            names(crm_sim)), identical(as.integer(crm_sim$seed), 
+            simulation_seeds$crm)), library(RBesT), historical_data <- data.frame(study = c("study1", 
+        "study2", "study3"), n = c(40, 35, 50), r = c(8, 6, 12)), 
+    set.seed(simulation_seeds$map), map_fit <- gMAP(cbind(r, 
+        n - r) ~ 1 | study, data = historical_data, family = binomial, 
+        tau.dist = "HalfNormal", tau.prior = 0.5, beta.prior = cbind(0, 
+            2), iter = 2400, warmup = 800, thin = 2, chains = 2, 
+        cores = 1), print(map_fit), map_prior <- automixfit(map_fit), 
+    map_ess <- ess(map_prior), print(map_prior), print(map_ess), 
+    stopifnot(is.matrix(map_prior), ncol(map_prior) > 0L, is.numeric(map_ess), 
+        length(map_ess) == 1L, is.finite(map_ess), map_ess > 
+            0), execution_metadata <- list(seeds = simulation_seeds, 
+        replicates = simulation_replicates, package_versions = vapply(c("gsDesign", 
+            "rpact", "BOIN", "dfcrm", "RBesT"), function(package) as.character(packageVersion(package)), 
+            character(1))), print(execution_metadata))
+expression(args <- commandArgs(trailingOnly = TRUE), target <- if (length(args) > 
+    0L) args[[1L]] else "scripts/adaptive_designs.R", if (!file.exists(target)) {
+    stop("adaptive-design example script not found: ", target)
+}, example <- new.env(parent = globalenv()), source(target, local = example, 
+    echo = FALSE), boin_repeat <- BOIN::get.oc(target = 0.3, 
+    p.true = c(0.05, 0.1, 0.2, 0.3, 0.4, 0.55), ncohort = 10, 
+    cohortsize = 3, ntrial = example$simulation_replicates$boin, 
+    n.earlystop = 12, seed = example$simulation_seeds$boin), 
+    crm_repeat <- dfcrm::crmsim(PI = example$true_dlt_rates, 
+        prior = example$prior_skeleton, target = example$target, 
+        n = 30, x0 = 1, nsim = example$simulation_replicates$crm, 
+        mcohort = 1, count = FALSE, method = "bayes", model = "logistic", 
+        seed = example$simulation_seeds$crm), shape_error <- tryCatch({
+        example$validate_crm_grid(example$true_dlt_rates, example$prior_skeleton[-1L], 
+            example$dose_labels)
+        NULL
+    }, error = conditionMessage), stopifnot(example$ss_recomputed$maxNumberOfSubjects > 
+        example$ss_initial$maxNumberOfSubjects, identical(boin_repeat$selpercent, 
+        example$boin_oc$selpercent), identical(boin_repeat$totaln, 
+        example$boin_oc$totaln), length(example$boin_oc$selpercent) == 
+        6L, abs(sum(example$boin_oc$selpercent) - 100) < 1e-08, 
+        inherits(example$crm_sim, "sim"), identical(crm_repeat, 
+            example$crm_sim), length(example$crm_sim$PI) == length(example$prior_skeleton), 
+        grepl("identical lengths", shape_error, fixed = TRUE), 
+        is.finite(example$map_ess), example$map_ess > 0, !exists("design_promising", 
+            envir = example, inherits = FALSE), identical(example$simulation_seeds$boin, 
+            20260928L), identical(example$simulation_seeds$crm, 
+            20260928L), identical(example$simulation_seeds$map, 
+            20260928L)), cat("adaptive_designs regression: PASS\n"))
+syntax: PASS

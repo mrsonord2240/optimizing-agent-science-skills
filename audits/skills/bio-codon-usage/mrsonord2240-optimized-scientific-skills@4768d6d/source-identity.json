@@ -1,0 +1,44 @@
+{
+  "schema": "scientific-skill-audit.source-identity.v1",
+  "skill_id": "bio-codon-usage",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "sequence-manipulation/codon-usage",
+    "subtree": "3874a00444ef0856451fece587c051cfc34aaf80",
+    "license": "MIT"
+  },
+  "candidate": {
+    "identity_algorithm": "sha256-manifest-v1",
+    "identity": "3186a1debc804852b3ea016b9aeabebc4436a04791b84b13dba8669878d7e4dd",
+    "identity_label": "sha256-manifest-v1:3186a1debc804852b3ea016b9aeabebc4436a04791b84b13dba8669878d7e4dd",
+    "file_count": 11,
+    "manifest_bytes": 1051,
+    "manifest_path": "candidate-manifest.tsv",
+    "path": "F:\\OpenScience\\wt\\opt10-codon-usage\\skills\\bio-codon-usage",
+    "worktree": "F:\\OpenScience\\wt\\opt10-codon-usage",
+    "branch": "optimize/ten-20260928-lane2-codon-usage",
+    "product_head": "0bc0b31fc52742dbec1034f698103434cc9460c3"
+  },
+  "audit": {
+    "phase": "independent-final-reaudit",
+    "run_id": "reaudit-opt10-20260928",
+    "candidate_repaired": false,
+    "published": false,
+    "auditor": "/root/lane2_codon_reaudit",
+    "performed_initial_audit": false,
+    "performed_fix": false,
+    "performed_delta_tooling": false
+  },
+  "environment": {
+    "tool_record": "F:\\OpenScience\\audit-envs\\bio-codon-usage\\TOOLS.md",
+    "tool_record_sha256": "85d20ee3a35162342e1be753e5e5c792a9530f617a9cb88c4354b9eb74e403a8",
+    "explicit_lock": "F:\\OpenScience\\audit-envs\\bio-codon-usage\\environment-explicit.lock",
+    "explicit_lock_sha256": "82d908a7a84f66a533a12a7b564cee57392b49312b2c1d503ffdafec88b24021",
+    "python": "3.12.11",
+    "biopython": "1.85",
+    "codonw": "1.4.4",
+    "isolation": "science WSL environment using /mnt/openscience paths only"
+  },
+  "audited_on": "2026-09-28"
+}

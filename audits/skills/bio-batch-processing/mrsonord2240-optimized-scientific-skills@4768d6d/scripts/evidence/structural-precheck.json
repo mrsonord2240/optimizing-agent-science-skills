@@ -1,0 +1,38 @@
+{
+  "step1_basic_veto": {
+    "T1. Stability": "PASS",
+    "T2. Contract": "PASS",
+    "T3. Determinism": "PASS",
+    "T4. Security": "PASS"
+  },
+  "gate_result": "PASSED Step 1 — proceed to Steps 2–8",
+  "step2_static_metadata": {
+    "name": "bio-batch-processing",
+    "description_word_count": 50,
+    "skill_md_lines": 123,
+    "reference_files": 2,
+    "script_files": 2,
+    "section_headers": [
+      "Batch Processing",
+      "Version compatibility",
+      "Core rules",
+      "Workflow",
+      "Routing",
+      "Minimal streaming pattern",
+      "Failure checks",
+      "Related skills",
+      "Provenance"
+    ],
+    "has_code_blocks": true,
+    "has_workflow_section": true
+  },
+  "step3_classification": {
+    "automated_category": "Data Analysis",
+    "auditor_execution_mode": "D",
+    "mode_note": "The automated precheck reports B from the scripts directory; the current rubric's Hybrid definition applies because reader/operation selection and reference-guided reasoning accompany the shipped functions and CLIs."
+  },
+  "step4_complexity": {
+    "level": "Moderate",
+    "n_inputs": 5
+  }
+}

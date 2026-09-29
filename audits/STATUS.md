@@ -27,16 +27,16 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
-| `bio-analytical-validation` | Protocol Design | 96 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-analytical-validation/candidate@bd66239b9133-reaudit-opt10-20260928/viewer.md) |
-| `bio-atac-seq-allele-specific-accessibility` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-atac-seq-allele-specific-accessibility/candidate@275ff0a1b8d9-reaudit2-opt10-20260928/viewer.md) |
-| `bio-batch-processing` | Data Analysis | 97 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-batch-processing/candidate@f5558565b7f1-reaudit-opt10-20260928/viewer.md) |
-| `bio-cfdna-preprocessing` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-cfdna-preprocessing/candidate@148b254a3107-reaudit-opt10-20260928/viewer.md) |
-| `bio-chipseq-allele-specific-binding` | Data Analysis | 95 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-chipseq-allele-specific-binding/candidate@03415aabaa66-reaudit2-opt10-20260928/viewer.md) |
-| `bio-clinical-biostatistics-adaptive-designs` | Protocol Design | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-biostatistics-adaptive-designs/candidate@19824f36846d-reaudit-opt10-20260928/viewer.md) |
-| `bio-clinical-databases-acmg-classification` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-databases-acmg-classification/candidate@286df2647ef2-reaudit2-opt10-20260928/viewer.md) |
-| `bio-clip-seq-ago-clip-mirna-targets` | Data Analysis | 95 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/candidate@e5366d51226e-reaudit3-opt10-20260928/viewer.md) |
-| `bio-codon-usage` | Data Analysis | 97 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-codon-usage/candidate@3186a1debc80-reaudit-opt10-20260928/viewer.md) |
-| `bio-comparative-genomics-ancestral-reconstruction` | Data Analysis | 92 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-comparative-genomics-ancestral-reconstruction/candidate@a9eb2d1e1c3a-final-reaudit-opt10-20260929/viewer.md) |
+| `bio-analytical-validation` | Protocol Design | 96 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-analytical-validation/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-atac-seq-allele-specific-accessibility` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-atac-seq-allele-specific-accessibility/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-batch-processing` | Data Analysis | 97 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-batch-processing/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-cfdna-preprocessing` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-cfdna-preprocessing/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-chipseq-allele-specific-binding` | Data Analysis | 95 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-chipseq-allele-specific-binding/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-clinical-biostatistics-adaptive-designs` | Protocol Design | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-biostatistics-adaptive-designs/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-clinical-databases-acmg-classification` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-databases-acmg-classification/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-clip-seq-ago-clip-mirna-targets` | Data Analysis | 95 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-codon-usage` | Data Analysis | 97 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-codon-usage/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
+| `bio-comparative-genomics-ancestral-reconstruction` | Data Analysis | 92 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-comparative-genomics-ancestral-reconstruction/mrsonord2240-optimized-scientific-skills@4768d6d/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |

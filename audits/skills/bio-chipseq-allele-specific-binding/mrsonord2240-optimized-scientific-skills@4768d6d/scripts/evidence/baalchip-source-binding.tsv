@@ -1,0 +1,7 @@
+package	BaalChIP
+version	1.36.0
+bioconductor	3.22
+r	4.5
+tar_sha256	f3d033913484173f5ae6bcdb62d199f122736e634b3861c8f165b32c475a227e
+api	CorrectWithgDNA,Iter,RMcorrection,RAFcorrection,mergedCounts,named-group-reports
+status	PASS

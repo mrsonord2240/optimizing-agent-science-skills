@@ -1,0 +1,21 @@
+{
+  "schema": "skill-auditor report schema v4.0",
+  "valid": true,
+  "errors": [],
+  "static_subtotal": 96,
+  "dynamic_average": 95.4,
+  "layer1_average": 38.4,
+  "layer2_average": 57.0,
+  "assertions": {
+    "passed": 25,
+    "total": 25
+  },
+  "weighted": {
+    "static": 38.4,
+    "dynamic": 57.2,
+    "rounded_final": 96
+  },
+  "skill_veto": "PASS",
+  "research_veto": "PASS",
+  "open_findings": 0
+}

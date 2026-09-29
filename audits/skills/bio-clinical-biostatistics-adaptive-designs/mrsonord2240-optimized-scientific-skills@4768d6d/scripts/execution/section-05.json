@@ -1,0 +1,18 @@
+{
+  "section": 5,
+  "heading": "5. BOIN Phase 1 dose-finding (FDA Fit-for-Purpose 2021)",
+  "classification": "candidate-executable",
+  "required_package": "BOIN",
+  "package_version": "2.7.2",
+  "candidate_identity": {
+    "sha256": "19824f36846d65aeeb7e5cee1a76114f5e5325529fcc3a0e0e3572bf5851d1aa",
+    "file_count": 9,
+    "manifest_bytes": 867
+  },
+  "status": "PASS",
+  "elapsed_seconds": 2.958,
+  "warnings": [],
+  "messages": [],
+  "error": null,
+  "objects_created": ["boin_oc", "boin_table", "simulation_replicates", "simulation_seeds"]
+}

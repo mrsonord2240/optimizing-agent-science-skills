@@ -1,0 +1,11 @@
+user=sci
+WSL_INTEROP=<unset>
+mnt_f=not-mounted
+Python 3.12.14
+IQ-TREE multicore version 2.4.0 for Linux x86 64-bit built Feb 12 2025
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor, Heiko Schmidt,
+Dominik Schrempf, Michael Woodhams, Ly Trong Nhan, Thomas Wong
+
+openjdk version "21.0.10-internal" 2026-01-20
+R version 4.4.3 (2025-02-28) ape 5.8.1 phytools 2.5.2 geiger 2.0.12 corHMM 2.8 OUwie 3.0.3 
+216277a7a3841fb84bd731034fbfe09ca28a7514289e9bc15c8a8d92e6f4856c  /mnt/openscience/audit-envs/bio-comparative-genomics-ancestral-reconstruction/environment-explicit.lock

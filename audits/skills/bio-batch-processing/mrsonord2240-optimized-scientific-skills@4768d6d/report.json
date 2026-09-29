@@ -1,0 +1,323 @@
+{
+  "meta": {
+    "skill_name": "bio-batch-processing",
+    "description": "Process many sequence files in batch (count, merge, split, convert, summarize) with memory-safe streaming and on-disk indexing using Biopython, pysam, or pyfastx. Use when iterating over a directory of FASTA/FASTQ files, merging or splitting datasets, building random access across many or huge files, or automating per-file operations without exhausting RAM.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated sequence counts, identifiers, quality values, studies, sample sizes, p-values, or efficacy data; all numerical results came from retained public fixtures or bounded generated records."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill performs sequence-file engineering and makes no patient-specific diagnostic, treatment, or clinical recommendation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Streaming, persistent indexing, deterministic traversal, format-loss, and Phred+33 versus Phred+64 guidance were methodologically correct in all five independent cases."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three Python files parsed; every accessible advertised function and both CLIs executed; fork and spawn paths agreed; the shipped 11-test suite passed with ResourceWarning fatal."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Count, merge, split, conversion, summary, persistent indexing, thin-reader, gzip-index, and parallel workflows are complete and independently correct."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Major invalid and partial-operation states are explicit and recoverable; record-count split destinations remain caller-managed rather than manifest-backed."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Progressive references, streaming iteration, persistent indexes, bounded chunks, and bounded prefix handles match the high-volume scope."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Routing, outputs, safety checks, and error prevention are clear; recursive summary and worker rows use basenames, which can make duplicate nested names ambiguous."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger language, explicit workflow choices, readable outputs, and actionable failure checks support both discovery and recovery."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials or raw-code execution are present; untrusted ID prefixes, reserved names, containment, case collisions, and overwrite safety are enforced."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "The package is modular, deterministic, and covered by 11 focused regressions plus independently callable public functions."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, composition, and stop conditions are strong; read-only paths are repeatable and prefix outputs intentionally refuse overwrite, while count-split output reuse is caller-controlled."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Count, merge, split, index, convert, and standalone demo",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Two fresh FASTA inputs produced checked counts, stable merge order, 3/1 and 2/2/1 splits, a seven-record reopened index, 94 converted public records, and the documented standalone values.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Streaming counts and stable merge preserve all records in deterministic order.",
+            "result": "PASS",
+            "note": "Counts were three and four; the merged output contained seven records in a.fasta then b.fasta order."
+          },
+          {
+            "text": "Two fresh record-count splits are bounded and lossless.",
+            "result": "PASS",
+            "note": "Four records split as 3/1 and five records split as 2/2/1 with every chunk parsed back."
+          },
+          {
+            "text": "Persistent multi-file indexing survives close and reopen with exact lookup values.",
+            "result": "PASS",
+            "note": "The reopened SQLite index contained seven records and preserved the checked a2 and b3 sequence lengths."
+          },
+          {
+            "text": "GenBank-to-FASTA conversion preserves record count and sequence while the documentation warns about annotation loss.",
+            "result": "PASS",
+            "note": "All 94 public orchid records converted; the checked first identifier and sequence matched the GenBank source."
+          },
+          {
+            "text": "The standalone demonstration is runnable and emits readable checked values.",
+            "result": "PASS",
+            "note": "It exited zero and reported 5/5/5 records, three chunks, 15 indexed records, and lookup length 52."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "pyfastx gzip reuse and pysam quality semantics",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The function and CLI reused one gzip FASTA index for 94 records and checked lengths 740/592/740; public Phred+33 values matched and a legacy quality demonstrated the documented 71 versus 40 interpretation boundary.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The importable pyfastx function builds a persistent gzip FASTA index and returns meaningful record metadata.",
+            "result": "PASS",
+            "note": "It indexed 94 records and returned checked first/last selected lengths of 740 and 592."
+          },
+          {
+            "text": "Function reuse and CLI reuse preserve the same persistent index.",
+            "result": "PASS",
+            "note": "The .fxi hash and inode were unchanged across the second function call and CLI invocation."
+          },
+          {
+            "text": "The CLI output is valid JSON and agrees with function-level random access.",
+            "result": "PASS",
+            "note": "The CLI reported 94 records and selected length 740 for the checked identifier."
+          },
+          {
+            "text": "pysam thin FASTQ parsing agrees with explicit Biopython parsing for Phred+33 data.",
+            "result": "PASS",
+            "note": "Three public reads, the first sequence, and its quality array matched; the first range was 18 to 26."
+          },
+          {
+            "text": "The documented legacy Phred+64 caveat is scientifically observable rather than merely stated.",
+            "result": "PASS",
+            "note": "ASCII h was 71 under pysam's fixed subtraction of 33 and 40 under Biopython fastq-illumina parsing."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Empty summaries and invalid chunk/worker bounds",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "No-match and empty-file summaries were explicit; six invalid chunk values and four invalid worker values failed actionably, and the valid split remained 2/2/1.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "No-match summary output is a valid header-only CSV with the complete public schema.",
+            "result": "PASS",
+            "note": "The result was [] and the exact columns were file,sequences,total_bp,min_len,max_len,avg_len."
+          },
+          {
+            "text": "An empty FASTA produces explicit, readable zero metrics rather than a crash or blank file.",
+            "result": "PASS",
+            "note": "The row identified empty.fasta and returned zero for all five numerical measures."
+          },
+          {
+            "text": "Invalid chunk sizes fail before input access or output creation with an actionable parameter message.",
+            "result": "PASS",
+            "note": "False, True, 0, -1, 1.5, and '2' all raised the stable positive-integer ValueError against a deliberately missing input without filesystem changes."
+          },
+          {
+            "text": "A valid boundary split remains lossless after validation was added.",
+            "result": "PASS",
+            "note": "Five records parsed back as chunks 2, 2, and 1."
+          },
+          {
+            "text": "Invalid multiprocessing worker counts are rejected before pool construction.",
+            "result": "PASS",
+            "note": "Zero, negative, Boolean, and floating-point worker counts all raised the stable positive-integer error."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Contained prefix splitting under hostile and high-cardinality inputs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Traversal, reserved names, manifest escape, existing target, and case collision were safely rejected; 2,048 prefixes completed under a 32-descriptor limit with max_open_files=8 and no descriptor growth.",
+        "basic": 40,
+        "specialized": 59,
+        "total": 99,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Record-derived paths cannot escape the output directory or alter an existing sibling.",
+            "result": "PASS",
+            "note": "The ../ prefix was rejected, the sibling sentinel was byte-preserved, and the partial manifest recorded zero writes."
+          },
+          {
+            "text": "Reserved filenames and manifest path traversal are rejected before unsafe output is created.",
+            "result": "PASS",
+            "note": "CON was rejected and ../escaped.json could not leave the output directory."
+          },
+          {
+            "text": "Existing targets are never overwritten and case-insensitive collisions are explicitly accounted.",
+            "result": "PASS",
+            "note": "The existing target sentinel remained unchanged; Sample/sample stopped with a one-record partial manifest."
+          },
+          {
+            "text": "Open handles remain bounded while all 2,048 distinct prefixes are written and parseable.",
+            "result": "PASS",
+            "note": "Under RLIMIT_NOFILE=32 and max_open_files=8, manifest rows, count sum, output-file count, and parsed records all equaled 2,048; descriptors were 4 before and after."
+          },
+          {
+            "text": "Reopening an evicted prefix appends without truncating earlier records.",
+            "result": "PASS",
+            "note": "The interleaved a group parsed back as a_1 then a_2 with four total records across the manifest."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Creation-order determinism and fork/spawn parity",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Opposite creation histories yielded a.fasta,z/a.fasta,z/B.fasta and byte-identical summaries/merges; fork, spawn, and spawn rerun agreed on stable rows, six records, and 15 bp. Basename-only row identifiers remain a minor recursive-readability limitation.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Opposite filesystem creation histories produce the same documented relative-path order.",
+            "result": "PASS",
+            "note": "Both trees resolved to a.fasta, z/a.fasta, z/B.fasta using the casefolded/exact stable key."
+          },
+          {
+            "text": "Summary output is row-stable and byte-identical across creation histories.",
+            "result": "PASS",
+            "note": "Rows matched and both CSV files had SHA-256 baf79636270cad3d4a4f4442eb03eee6cfe3fb06188ad3f7f460d6ddcdafcb79."
+          },
+          {
+            "text": "Streaming merge output is record-stable and byte-identical across creation histories.",
+            "result": "PASS",
+            "note": "Both six-record merges had SHA-256 fa38059609575f34feb44e5e3ddc886f976ae7549b7993a5c394e393a4f9dd3f."
+          },
+          {
+            "text": "Real two-worker fork and spawn execution return identical stable results.",
+            "result": "PASS",
+            "note": "Fork, spawn, and a second spawn run returned the same three ordered rows."
+          },
+          {
+            "text": "Parallel results preserve complete checked totals across start methods.",
+            "result": "PASS",
+            "note": "Every run reported six records and 15 total base pairs; duplicate nested basenames did not alter values or order."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 58.2,
+    "score": 97,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Untrusted sequence identifiers are separated from filesystem paths through portable-prefix validation, resolved containment, case-collision detection, and exclusive creation.",
+    "The prefix splitter completed 2,048 outputs under a 32-descriptor limit with exact manifest and parsed totals and no descriptor growth.",
+    "Every multi-file path is deterministically ordered, and real fork/spawn/rerun results plus summary and merge bytes agreed across opposite creation histories.",
+    "Biopython, pysam, and pyfastx routes were executed against retained public fixtures with exact count, random-access, conversion, and quality-encoding checks."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "BATCH-008: Preserve relative paths in recursive rows",
+      "observed_in": [5],
+      "problem": "summarize_files and process_file emit Path.name, so recursively discovered files with the same basename produce stable but visually ambiguous row identifiers.",
+      "root_cause": "The public result schema was designed for flat directories and does not accept or retain a caller root for relative-path labels.",
+      "fix": "In a future compatible polish pass, accept an optional label root or input-label mapping and emit reviewed relative POSIX paths while preserving the current flat-directory default. Add a duplicate-basename recursive regression."
+    }
+  ]
+}

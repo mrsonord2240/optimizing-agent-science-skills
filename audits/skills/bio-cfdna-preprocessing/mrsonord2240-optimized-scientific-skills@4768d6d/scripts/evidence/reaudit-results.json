@@ -1,0 +1,1740 @@
+{
+  "auditor": "independent fresh re-auditor; did not perform initial audit or fix",
+  "direct_execution": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "cfDNA preprocessing pipeline\npreprocess_cfdna(in_bam, out_bam, ref, duplex=False) - simplex UMI consensus\npreprocess_cfdna(in_bam, out_bam, ref, duplex=True)  - duplex consensus\ninsert_size_qc(bam) - fragment-length QC with explicit filter counts\n"
+  },
+  "identity_after": {
+    "content_sha256": "148b254a310719e781dacc9a782cd45f61e6cc8dd508124e1941d589458b47e1",
+    "file_count": 7,
+    "files": [
+      {
+        "bytes": 6005,
+        "path": "references/fgbio-consensus-workflow.md",
+        "sha256": "de070854a1519b315bbf5200d091b7151af22567f1df4a299354eed5693ec1e7"
+      },
+      {
+        "bytes": 8311,
+        "path": "references/method-selection-and-fragment-qc.md",
+        "sha256": "1e683cd87ddf7db04ba66b69c23741f084e21aa872490efa4d1fd606660b6282"
+      },
+      {
+        "bytes": 2302,
+        "path": "references/scientific-references.md",
+        "sha256": "694edd1c2fc51271d77af08b935963be193e05e9ee8b949e1b7e301d3767805b"
+      },
+      {
+        "bytes": 13912,
+        "path": "scripts/preprocess_cfdna.py",
+        "sha256": "7bcb29ee6ddc2f389941690b005be2c51b4b7c93017c99e658af369b691c9dc3"
+      },
+      {
+        "bytes": 8615,
+        "path": "SKILL.md",
+        "sha256": "19370e7f5b8e25726b0440ee192c49fcdce5e3932ce3a5aa242a6de69d23b6bc"
+      },
+      {
+        "bytes": 6426,
+        "path": "tests/test_preprocess_cfdna.py",
+        "sha256": "f5ae69d4704149919af7e62dfc7b18e28a54a31fcd79cfe44d6b9071e7ede8ac"
+      },
+      {
+        "bytes": 2572,
+        "path": "usage-guide.md",
+        "sha256": "098375710d26fa91a3519e57e31e80dc19787f81e9331f06604f60505cf924de"
+      }
+    ],
+    "manifest_bytes": 696,
+    "schema": "sha256-manifest-v1"
+  },
+  "identity_before": {
+    "content_sha256": "148b254a310719e781dacc9a782cd45f61e6cc8dd508124e1941d589458b47e1",
+    "file_count": 7,
+    "files": [
+      {
+        "bytes": 6005,
+        "path": "references/fgbio-consensus-workflow.md",
+        "sha256": "de070854a1519b315bbf5200d091b7151af22567f1df4a299354eed5693ec1e7"
+      },
+      {
+        "bytes": 8311,
+        "path": "references/method-selection-and-fragment-qc.md",
+        "sha256": "1e683cd87ddf7db04ba66b69c23741f084e21aa872490efa4d1fd606660b6282"
+      },
+      {
+        "bytes": 2302,
+        "path": "references/scientific-references.md",
+        "sha256": "694edd1c2fc51271d77af08b935963be193e05e9ee8b949e1b7e301d3767805b"
+      },
+      {
+        "bytes": 13912,
+        "path": "scripts/preprocess_cfdna.py",
+        "sha256": "7bcb29ee6ddc2f389941690b005be2c51b4b7c93017c99e658af369b691c9dc3"
+      },
+      {
+        "bytes": 8615,
+        "path": "SKILL.md",
+        "sha256": "19370e7f5b8e25726b0440ee192c49fcdce5e3932ce3a5aa242a6de69d23b6bc"
+      },
+      {
+        "bytes": 6426,
+        "path": "tests/test_preprocess_cfdna.py",
+        "sha256": "f5ae69d4704149919af7e62dfc7b18e28a54a31fcd79cfe44d6b9071e7ede8ac"
+      },
+      {
+        "bytes": 2572,
+        "path": "usage-guide.md",
+        "sha256": "098375710d26fa91a3519e57e31e80dc19787f81e9331f06604f60505cf924de"
+      }
+    ],
+    "manifest_bytes": 696,
+    "schema": "sha256-manifest-v1"
+  },
+  "identity_stable": true,
+  "metachar_shell_side_effect_absent": true,
+  "metachar_simplex": {
+    "commands": [
+      [
+        "fgbio",
+        "ExtractUmisFromBam",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/raw ; input $.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_umis.bam",
+        "--read-structure",
+        "6M11S+T",
+        "6M11S+T",
+        "--molecular-index-tags",
+        "ZA",
+        "ZB",
+        "--single-tag",
+        "RX"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_umis.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_umis.bam"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--template-coordinate",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_aligned.template-coordinate.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_aligned.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "GroupReadsByUmi",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_aligned.template-coordinate.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_grouped.bam",
+        "--strategy",
+        "adjacency",
+        "--edits",
+        "1"
+      ],
+      [
+        "fgbio",
+        "CallMolecularConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_grouped.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.unmapped.bam",
+        "--min-reads",
+        "1"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.mapped.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.mapped.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "FilterConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.mapped.queryname.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_filtered.queryname.bam",
+        "--ref",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/reference.fa",
+        "--min-reads",
+        "2",
+        "--max-read-error-rate",
+        "0.025",
+        "--max-base-error-rate",
+        "0.1",
+        "--min-base-quality",
+        "40",
+        "--reverse-per-base-tags"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_filtered.queryname.bam"
+      ],
+      [
+        "samtools",
+        "index",
+        "--threads",
+        "2",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final.bam"
+      ]
+    ],
+    "duplex": false,
+    "elapsed_seconds": 32.693,
+    "index_present": true,
+    "output_matches_requested": true,
+    "pipelines": [
+      [
+        [
+          "samtools",
+          "fastq",
+          "-T",
+          "RX,ZA,ZB",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_umis.queryname.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-C",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_umis.queryname.bam",
+          "--ref",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/reference.fa",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_aligned.unsorted.bam"
+        ]
+      ],
+      [
+        [
+          "samtools",
+          "fastq",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.unmapped.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.unmapped.bam",
+          "--ref",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/reference.fa",
+          "--tags-to-reverse",
+          "Consensus",
+          "--tags-to-revcomp",
+          "Consensus",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.mapped.unsorted.bam"
+        ]
+      ]
+    ],
+    "quickcheck_returncode": 0,
+    "quickcheck_stderr": "",
+    "quickcheck_stdout": "",
+    "returned_output": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final.bam",
+    "stages": {
+      "aligned_template_coordinate": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "query",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_aligned.template-coordinate.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "aligned_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "none",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_aligned.unsorted.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "consensus_mapped_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": null,
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.mapped.queryname.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_mapped_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": "query",
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.mapped.unsorted.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_unmapped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": "query",
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_consensus.unmapped.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "extracted_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_umis.queryname.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "extracted_umis": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_umis.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "filtered_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": null,
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_filtered.queryname.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "final": {
+        "adjacent_first_pairs": false,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:0",
+          "synthetic:1"
+        ],
+        "group_order": null,
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "coordinate",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "grouped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ba-01",
+          "family-ba-01",
+          "family-ba-02",
+          "family-ba-02",
+          "family-ba-03",
+          "family-ba-03",
+          "family-ba-04",
+          "family-ba-04"
+        ],
+        "group_order": "query",
+        "mi_records": 32,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/space ; dollar $ and [brackets]/output ; $ [safe]/final_grouped.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      }
+    }
+  },
+  "ordinary_duplex": {
+    "commands": [
+      [
+        "fgbio",
+        "ExtractUmisFromBam",
+        "--input",
+        "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/raw.unmapped.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_umis.bam",
+        "--read-structure",
+        "6M11S+T",
+        "6M11S+T",
+        "--molecular-index-tags",
+        "ZA",
+        "ZB",
+        "--single-tag",
+        "RX"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_umis.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_umis.bam"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--template-coordinate",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_aligned.template-coordinate.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_aligned.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "GroupReadsByUmi",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_aligned.template-coordinate.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_grouped.bam",
+        "--strategy",
+        "paired",
+        "--edits",
+        "1"
+      ],
+      [
+        "fgbio",
+        "CallDuplexConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_grouped.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.unmapped.bam",
+        "--min-reads",
+        "1"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.mapped.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.mapped.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "FilterConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.mapped.queryname.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_filtered.queryname.bam",
+        "--ref",
+        "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+        "--min-reads",
+        "2",
+        "1",
+        "1",
+        "--max-read-error-rate",
+        "0.025",
+        "--max-base-error-rate",
+        "0.1",
+        "--min-base-quality",
+        "40",
+        "--reverse-per-base-tags"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_filtered.queryname.bam"
+      ],
+      [
+        "samtools",
+        "index",
+        "--threads",
+        "2",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final.bam"
+      ]
+    ],
+    "duplex": true,
+    "elapsed_seconds": 35.377,
+    "index_present": true,
+    "output_matches_requested": true,
+    "pipelines": [
+      [
+        [
+          "samtools",
+          "fastq",
+          "-T",
+          "RX,ZA,ZB",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_umis.queryname.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-C",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_umis.queryname.bam",
+          "--ref",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_aligned.unsorted.bam"
+        ]
+      ],
+      [
+        [
+          "samtools",
+          "fastq",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.unmapped.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.unmapped.bam",
+          "--ref",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "--tags-to-reverse",
+          "Consensus",
+          "--tags-to-revcomp",
+          "Consensus",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.mapped.unsorted.bam"
+        ]
+      ]
+    ],
+    "quickcheck_returncode": 0,
+    "quickcheck_stderr": "",
+    "quickcheck_stdout": "",
+    "returned_output": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final.bam",
+    "stages": {
+      "aligned_template_coordinate": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "query",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_aligned.template-coordinate.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "aligned_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "none",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_aligned.unsorted.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "consensus_mapped_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": null,
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.mapped.queryname.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_mapped_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": "query",
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.mapped.unsorted.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_unmapped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": "query",
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_consensus.unmapped.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "extracted_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_umis.queryname.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "extracted_umis": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_umis.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "filtered_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": null,
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_filtered.queryname.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "final": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": null,
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "coordinate",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "grouped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "query",
+        "mi_records": 32,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex/final_grouped.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      }
+    }
+  },
+  "ordinary_simplex": {
+    "commands": [
+      [
+        "fgbio",
+        "ExtractUmisFromBam",
+        "--input",
+        "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/raw.unmapped.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_umis.bam",
+        "--read-structure",
+        "6M11S+T",
+        "6M11S+T",
+        "--molecular-index-tags",
+        "ZA",
+        "ZB",
+        "--single-tag",
+        "RX"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_umis.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_umis.bam"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--template-coordinate",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_aligned.template-coordinate.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_aligned.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "GroupReadsByUmi",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_aligned.template-coordinate.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_grouped.bam",
+        "--strategy",
+        "adjacency",
+        "--edits",
+        "1"
+      ],
+      [
+        "fgbio",
+        "CallMolecularConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_grouped.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.unmapped.bam",
+        "--min-reads",
+        "1"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.mapped.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.mapped.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "FilterConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.mapped.queryname.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_filtered.queryname.bam",
+        "--ref",
+        "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+        "--min-reads",
+        "2",
+        "--max-read-error-rate",
+        "0.025",
+        "--max-base-error-rate",
+        "0.1",
+        "--min-base-quality",
+        "40",
+        "--reverse-per-base-tags"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_filtered.queryname.bam"
+      ],
+      [
+        "samtools",
+        "index",
+        "--threads",
+        "2",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final.bam"
+      ]
+    ],
+    "duplex": false,
+    "elapsed_seconds": 40.701,
+    "index_present": true,
+    "output_matches_requested": true,
+    "pipelines": [
+      [
+        [
+          "samtools",
+          "fastq",
+          "-T",
+          "RX,ZA,ZB",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_umis.queryname.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-C",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_umis.queryname.bam",
+          "--ref",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_aligned.unsorted.bam"
+        ]
+      ],
+      [
+        [
+          "samtools",
+          "fastq",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.unmapped.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.unmapped.bam",
+          "--ref",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "--tags-to-reverse",
+          "Consensus",
+          "--tags-to-revcomp",
+          "Consensus",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.mapped.unsorted.bam"
+        ]
+      ]
+    ],
+    "quickcheck_returncode": 0,
+    "quickcheck_stderr": "",
+    "quickcheck_stdout": "",
+    "returned_output": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final.bam",
+    "stages": {
+      "aligned_template_coordinate": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "query",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_aligned.template-coordinate.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "aligned_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "none",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_aligned.unsorted.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "consensus_mapped_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": null,
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.mapped.queryname.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_mapped_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": "query",
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.mapped.unsorted.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_unmapped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": "query",
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_consensus.unmapped.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "extracted_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_umis.queryname.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "extracted_umis": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_umis.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "filtered_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:1"
+        ],
+        "group_order": null,
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_filtered.queryname.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "final": {
+        "adjacent_first_pairs": false,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:1",
+          "synthetic:0",
+          "synthetic:1"
+        ],
+        "group_order": null,
+        "mi_records": 4,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final.bam",
+        "records": 4,
+        "rx_records": 4,
+        "sort_order": "coordinate",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "grouped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ba-01",
+          "family-ba-01",
+          "family-ba-02",
+          "family-ba-02",
+          "family-ba-03",
+          "family-ba-03",
+          "family-ba-04",
+          "family-ba-04"
+        ],
+        "group_order": "query",
+        "mi_records": 32,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-simplex/final_grouped.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      }
+    }
+  },
+  "phase": "reaudit-scientific-skill",
+  "qc": {
+    "empty": {
+      "filtered_counts": {
+        "accepted": 0,
+        "duplicate": 0,
+        "input_records": 0,
+        "nonpositive_template_length": 0,
+        "not_proper_pair": 0,
+        "over_max_size": 0,
+        "qc_fail": 0,
+        "secondary": 0,
+        "supplementary": 0,
+        "unmapped": 0
+      },
+      "frac_over_250bp": 0.0,
+      "interpretation_context": [
+        "library_chemistry",
+        "collection_and_plasma_processing",
+        "physical_or_in_silico_size_selection"
+      ],
+      "median_bp": 0.0,
+      "mode_bp": 0,
+      "n": 0,
+      "short_frac_90_150": 0.0
+    },
+    "flag_fixture": {
+      "filtered_counts": {
+        "accepted": 1,
+        "duplicate": 1,
+        "input_records": 5,
+        "nonpositive_template_length": 0,
+        "not_proper_pair": 0,
+        "over_max_size": 0,
+        "qc_fail": 1,
+        "secondary": 1,
+        "supplementary": 1,
+        "unmapped": 0
+      },
+      "frac_over_250bp": 0.0,
+      "interpretation_context": [
+        "library_chemistry",
+        "collection_and_plasma_processing",
+        "physical_or_in_silico_size_selection"
+      ],
+      "median_bp": 100.0,
+      "mode_bp": 100,
+      "n": 1,
+      "short_frac_90_150": 1.0
+    },
+    "invalid_bounds": {
+      "-1": {
+        "message": "max_size must be greater than zero",
+        "type": "ValueError"
+      },
+      "0": {
+        "message": "max_size must be greater than zero",
+        "type": "ValueError"
+      },
+      "1.5": {
+        "message": "max_size must be an integer",
+        "type": "TypeError"
+      },
+      "True": {
+        "message": "max_size must be an integer",
+        "type": "TypeError"
+      }
+    },
+    "public_deterministic": true,
+    "public_first": {
+      "filtered_counts": {
+        "accepted": 2819,
+        "duplicate": 0,
+        "input_records": 5644,
+        "nonpositive_template_length": 2824,
+        "not_proper_pair": 4,
+        "over_max_size": 0,
+        "qc_fail": 0,
+        "secondary": 2,
+        "supplementary": 0,
+        "unmapped": 2
+      },
+      "frac_over_250bp": 0.0,
+      "interpretation_context": [
+        "library_chemistry",
+        "collection_and_plasma_processing",
+        "physical_or_in_silico_size_selection"
+      ],
+      "median_bp": 123.0,
+      "mode_bp": 96,
+      "n": 2819,
+      "short_frac_90_150": 0.64349059950337
+    },
+    "public_max_150": {
+      "filtered_counts": {
+        "accepted": 2190,
+        "duplicate": 0,
+        "input_records": 5644,
+        "nonpositive_template_length": 2824,
+        "not_proper_pair": 4,
+        "over_max_size": 630,
+        "qc_fail": 0,
+        "secondary": 2,
+        "supplementary": 0,
+        "unmapped": 2
+      },
+      "frac_over_250bp": 0.0,
+      "interpretation_context": [
+        "library_chemistry",
+        "collection_and_plasma_processing",
+        "physical_or_in_silico_size_selection"
+      ],
+      "median_bp": 114.0,
+      "mode_bp": 96,
+      "n": 2190,
+      "short_frac_90_150": 0.828310502283105
+    },
+    "public_second": {
+      "filtered_counts": {
+        "accepted": 2819,
+        "duplicate": 0,
+        "input_records": 5644,
+        "nonpositive_template_length": 2824,
+        "not_proper_pair": 4,
+        "over_max_size": 0,
+        "qc_fail": 0,
+        "secondary": 2,
+        "supplementary": 0,
+        "unmapped": 2
+      },
+      "frac_over_250bp": 0.0,
+      "interpretation_context": [
+        "library_chemistry",
+        "collection_and_plasma_processing",
+        "physical_or_in_silico_size_selection"
+      ],
+      "median_bp": 123.0,
+      "mode_bp": 96,
+      "n": 2819,
+      "short_frac_90_150": 0.64349059950337
+    }
+  },
+  "second_duplex": {
+    "commands": [
+      [
+        "fgbio",
+        "ExtractUmisFromBam",
+        "--input",
+        "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/raw.unmapped.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_umis.bam",
+        "--read-structure",
+        "6M11S+T",
+        "6M11S+T",
+        "--molecular-index-tags",
+        "ZA",
+        "ZB",
+        "--single-tag",
+        "RX"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_umis.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_umis.bam"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--template-coordinate",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_aligned.template-coordinate.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_aligned.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "GroupReadsByUmi",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_aligned.template-coordinate.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_grouped.bam",
+        "--strategy",
+        "paired",
+        "--edits",
+        "1"
+      ],
+      [
+        "fgbio",
+        "CallDuplexConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_grouped.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.unmapped.bam",
+        "--min-reads",
+        "1"
+      ],
+      [
+        "samtools",
+        "sort",
+        "-n",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.mapped.queryname.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.mapped.unsorted.bam"
+      ],
+      [
+        "fgbio",
+        "FilterConsensusReads",
+        "--input",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.mapped.queryname.bam",
+        "--output",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_filtered.queryname.bam",
+        "--ref",
+        "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+        "--min-reads",
+        "2",
+        "1",
+        "1",
+        "--max-read-error-rate",
+        "0.025",
+        "--max-base-error-rate",
+        "0.1",
+        "--min-base-quality",
+        "40",
+        "--reverse-per-base-tags"
+      ],
+      [
+        "samtools",
+        "sort",
+        "--threads",
+        "2",
+        "-o",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final.bam",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_filtered.queryname.bam"
+      ],
+      [
+        "samtools",
+        "index",
+        "--threads",
+        "2",
+        "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final.bam"
+      ]
+    ],
+    "duplex": true,
+    "elapsed_seconds": 38.433,
+    "index_present": true,
+    "output_matches_requested": true,
+    "pipelines": [
+      [
+        [
+          "samtools",
+          "fastq",
+          "-T",
+          "RX,ZA,ZB",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_umis.queryname.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-C",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_umis.queryname.bam",
+          "--ref",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_aligned.unsorted.bam"
+        ]
+      ],
+      [
+        [
+          "samtools",
+          "fastq",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.unmapped.bam"
+        ],
+        [
+          "bwa",
+          "mem",
+          "-t",
+          "2",
+          "-K",
+          "150000000",
+          "-Y",
+          "-p",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "-"
+        ],
+        [
+          "fgbio",
+          "ZipperBams",
+          "--unmapped",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.unmapped.bam",
+          "--ref",
+          "/mnt/openscience/audit-envs/bio-cfdna-preprocessing/data/synthetic-umi/reference.fa",
+          "--tags-to-reverse",
+          "Consensus",
+          "--tags-to-revcomp",
+          "Consensus",
+          "--output",
+          "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.mapped.unsorted.bam"
+        ]
+      ]
+    ],
+    "quickcheck_returncode": 0,
+    "quickcheck_stderr": "",
+    "quickcheck_stdout": "",
+    "returned_output": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final.bam",
+    "stages": {
+      "aligned_template_coordinate": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "query",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_aligned.template-coordinate.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "aligned_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "none",
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_aligned.unsorted.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "consensus_mapped_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": null,
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.mapped.queryname.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_mapped_unsorted": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": "query",
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.mapped.unsorted.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "consensus_unmapped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": "query",
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_consensus.unmapped.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "unsorted",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "extracted_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_umis.queryname.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "extracted_umis": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": null,
+        "mi_records": 0,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_umis.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "queryname",
+        "za_records": 32,
+        "zb_records": 32
+      },
+      "filtered_queryname": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": null,
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_filtered.queryname.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "queryname",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "final": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "synthetic:0",
+          "synthetic:0"
+        ],
+        "group_order": null,
+        "mi_records": 2,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final.bam",
+        "records": 2,
+        "rx_records": 2,
+        "sort_order": "coordinate",
+        "za_records": 0,
+        "zb_records": 0
+      },
+      "grouped": {
+        "adjacent_first_pairs": true,
+        "first_qnames": [
+          "family-ab-01",
+          "family-ab-01",
+          "family-ab-02",
+          "family-ab-02",
+          "family-ab-03",
+          "family-ab-03",
+          "family-ab-04",
+          "family-ab-04"
+        ],
+        "group_order": "query",
+        "mi_records": 32,
+        "path": "/mnt/openscience/audits/bio-cfdna-preprocessing/reaudit-opt10-20260928/work/fresh-duplex-repeat/final_grouped.bam",
+        "records": 32,
+        "rx_records": 32,
+        "sort_order": "unsorted",
+        "za_records": 32,
+        "zb_records": 32
+      }
+    }
+  },
+  "static": {
+    "dois": [
+      "10.1016/j.cell.2015.11.050",
+      "10.1038/nbt.3520",
+      "10.1038/nprot.2014.170",
+      "10.1038/srep27859",
+      "10.1126/scitranslmed.aat4921",
+      "10.1371/journal.pgen.1006162"
+    ],
+    "eval_exec": [],
+    "guidance_terms": {
+      "assay_conditional": true,
+      "background": true,
+      "caller": true,
+      "lod": true,
+      "molecule_count": true,
+      "preanalytics": true,
+      "recovery": true,
+      "targets": true
+    },
+    "shell_true_lines": []
+  }
+}

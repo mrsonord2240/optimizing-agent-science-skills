@@ -1,0 +1,12 @@
+test_consensus_orientation_expression_and_ambiguity (__main__.ScriptTests.test_consensus_orientation_expression_and_ambiguity) ... ok
+test_consensus_rejects_wrong_schema (__main__.ScriptTests.test_consensus_rejects_wrong_schema) ... ok
+test_expression_values_must_be_finite_and_numeric (__main__.ScriptTests.test_expression_values_must_be_finite_and_numeric) ... ok
+test_targeted_umi_requires_declared_length_and_records_provenance (__main__.ScriptTests.test_targeted_umi_requires_declared_length_and_records_provenance) ... ok
+test_targetscan_plus_minus_and_release_contract (__main__.ScriptTests.test_targetscan_plus_minus_and_release_contract) ... ok
+test_wrapper_propagates_hyb_status_and_preserves_existing_output (__main__.ScriptTests.test_wrapper_propagates_hyb_status_and_preserves_existing_output) ... ok
+test_wrapper_quotes_paths_and_publishes_atomically (__main__.ScriptTests.test_wrapper_quotes_paths_and_publishes_atomically) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 17.454s
+
+OK

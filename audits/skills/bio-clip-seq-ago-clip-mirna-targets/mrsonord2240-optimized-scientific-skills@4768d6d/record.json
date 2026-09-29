@@ -1,0 +1,105 @@
+{
+  "skill_id": "bio-clip-seq-ago-clip-mirna-targets",
+  "version": "mrsonord2240-optimized-scientific-skills@4768d6d",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "4768d6d40a2ca58b8323aca739c5598b6c5782ff",
+    "path": "skills/bio-clip-seq-ago-clip-mirna-targets",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/4768d6d40a2ca58b8323aca739c5598b6c5782ff/skills/bio-clip-seq-ago-clip-mirna-targets"
+  },
+  "candidate": {
+    "identity": "e5366d51226e2ad2c96030cb26581bc84808194b7a17ef7bb376d337280d1b30",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane4-ago-clip",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "content_sha256": "e5366d51226e2ad2c96030cb26581bc84808194b7a17ef7bb376d337280d1b30",
+    "path": "F:\\OpenScience\\wt\\opt10-ago-clip\\skills\\bio-clip-seq-ago-clip-mirna-targets",
+    "files": [
+      {
+        "bytes": 9075,
+        "path": "SKILL.md",
+        "sha256": "115a2b3c2653586e2b48acb0d667d6d8eb65a1c5a162d74cd93ddbafedf57ad4"
+      },
+      {
+        "bytes": 5571,
+        "path": "references/failure-modes.md",
+        "sha256": "c042ad22c3fc262809998ce582f690746efb8f0ca7443439749902aefba7288e"
+      },
+      {
+        "bytes": 6094,
+        "path": "references/method-selection-and-pairing.md",
+        "sha256": "2540d012f97b4fd56b9d96e15ae4e0df71b70db2525dc144ed16bc56dbe7dd92"
+      },
+      {
+        "bytes": 2519,
+        "path": "references/provenance.md",
+        "sha256": "f529183737de0ddfe47f0e33597fdd65360bcaaaaea2386bfec8052f2a239404"
+      },
+      {
+        "bytes": 7593,
+        "path": "references/workflows-and-commands.md",
+        "sha256": "1dd43414b787940236977b782afbbe273218548dc4fb1da8b0d4066aece11263"
+      },
+      {
+        "bytes": 13386,
+        "path": "scripts/consensus_hyb.py",
+        "sha256": "36d791220ab29cdcfbc07e5d772f500f22ee20a2e8b7a849745432d605b3dca9"
+      },
+      {
+        "bytes": 6562,
+        "path": "scripts/extract_targeted_umi.py",
+        "sha256": "8da720c6172d35158f8ff835261053e7508568763e2dcb73071539761f91dea0"
+      },
+      {
+        "bytes": 6459,
+        "path": "scripts/run_chimeric_eclip.sh",
+        "sha256": "535985c8bb2d2881dd96d4a3b47c2d6248da7c6d2067b0a35888e59a0f89a8b8"
+      },
+      {
+        "bytes": 6245,
+        "path": "scripts/targetscan_sites_to_bed12.py",
+        "sha256": "4c64f7158915cef30a538b9fd4ef3abfb843b29b80900d7dbca0c03850f9b034"
+      },
+      {
+        "bytes": 19616,
+        "path": "tests/test_scripts.py",
+        "sha256": "4b2cb866b97a1d674f1774feeed57c3ec40e89582f163ed3966f43b9e50976aa"
+      }
+    ],
+    "provider_commit": "4768d6d40a2ca58b8323aca739c5598b6c5782ff",
+    "provider_tree": "7fdd35cc1a3407d02a9572fbea2187bcd5925e45"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@e5366d51226e-reaudit3-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 39,
+    "provider_binding": "binding.json"
+  }
+}

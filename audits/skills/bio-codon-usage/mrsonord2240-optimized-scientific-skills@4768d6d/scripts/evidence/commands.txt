@@ -1,0 +1,16 @@
+Environment: science WSL; CPython 3.12.11; Biopython 1.85; codonW 1.4.4
+
+wsl.exe -d science --exec /mnt/openscience/audit-envs/bio-codon-usage/env/bin/python /mnt/openscience/audits/bio-codon-usage/reaudit-opt10-20260928/reaudit_harness.py
+
+python <rubric>/scripts/evaluate_skill.py --json-only F:\OpenScience\wt\opt10-codon-usage\skills\bio-codon-usage
+
+The harness independently invoked:
+- env/bin/python <candidate>/scripts/basic_analysis.py (twice)
+- env/bin/python <candidate>/scripts/rscu_analysis.py (twice)
+- env/bin/python <candidate>/scripts/cai_optimization.py (twice)
+- env/bin/python <candidate>/tests/test_codon_usage.py (twice)
+- env/bin/codonw <fresh copied fixture> -nomenu -silent -nowarn -machine -enc -noblk (two controls)
+
+Candidate identity was independently generated from ordinally sorted relative paths as:
+<relative-path><TAB><byte-count><TAB><file-sha256>
+with rows joined by LF and no final newline, then SHA-256 hashed.

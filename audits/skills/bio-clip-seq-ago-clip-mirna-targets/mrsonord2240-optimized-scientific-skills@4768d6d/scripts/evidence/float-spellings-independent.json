@@ -1,0 +1,161 @@
+{
+  "assertions_passed": 27,
+  "expression_values": [
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "NaN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "nan"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "NAN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "+NaN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "-NaN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "Inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "+Inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "-Inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "Infinity"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "infinity"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "+Infinity"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "-Infinity"
+    }
+  ],
+  "finite_values": {
+    "accepted_expression": "+1.5e2",
+    "accepted_ids": [
+      "above"
+    ],
+    "below_threshold_expression": "5e1",
+    "exclusion_reason": "below_expression_threshold",
+    "finite_threshold": "1e2"
+  },
+  "python_float_nonfinite_spellings": [
+    "NaN",
+    "nan",
+    "NAN",
+    "+NaN",
+    "-NaN",
+    "Inf",
+    "inf",
+    "+Inf",
+    "-Inf",
+    "Infinity",
+    "infinity",
+    "+Infinity",
+    "-Infinity"
+  ],
+  "thresholds": [
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "NaN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "nan"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "NAN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "+NaN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "-NaN"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "Inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "+Inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "-Inf"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "Infinity"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "infinity"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "+Infinity"
+    },
+    {
+      "outputs_absent": true,
+      "rejected": true,
+      "value": "-Infinity"
+    }
+  ]
+}

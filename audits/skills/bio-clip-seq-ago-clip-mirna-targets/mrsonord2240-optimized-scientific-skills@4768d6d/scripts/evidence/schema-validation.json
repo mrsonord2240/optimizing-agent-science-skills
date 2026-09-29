@@ -1,0 +1,24 @@
+{
+  "schema_reference": "skill-auditor/references/report_json_schema.md v4.0",
+  "validation": "PASS",
+  "checks": {
+    "top_level_exact": true,
+    "meta_exact": true,
+    "skill_identity": true,
+    "veto_shapes": true,
+    "skill_veto_consistency": true,
+    "research_veto_consistency": true,
+    "static_shape_and_ranges": true,
+    "static_subtotal": true,
+    "dynamic_shapes": true,
+    "input_and_assertion_shapes": true,
+    "input_math_status": true,
+    "dynamic_aggregates": true,
+    "final_shape": true,
+    "final_arithmetic": true,
+    "readiness_gate": true,
+    "strengths_recommendations": true,
+    "candidate_manifest_identity": true,
+    "viewer_consistency": true
+  }
+}

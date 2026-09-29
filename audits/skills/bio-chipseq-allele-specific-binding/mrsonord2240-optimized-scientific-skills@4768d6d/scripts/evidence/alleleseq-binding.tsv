@@ -1,0 +1,5 @@
+remote	https://github.com/trgaleev/AlleleSeq2.git
+head	cfe8acf88989922da841e71238b360f8f57e813a
+canonical_method	Rozowsky et al. 2011; separate from tested implementation
+classification	external-only legacy implementation
+status	PASS

@@ -1,0 +1,6 @@
+af_low_percent	af_high_percent	sensitivity_percent	ci90_low_percent	ci90_high_percent
+1.00	1.30	99.17	97.40	99.85
+0.50	0.65	99.63	98.26	99.98
+0.25	0.33	89.17	85.29	92.30
+0.13	0.16	69.26	64.31	73.89
+0.06	0.08	37.41	32.50	42.52

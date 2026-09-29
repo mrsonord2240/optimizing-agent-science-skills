@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "skill_name": "bio-comparative-genomics-ancestral-reconstruction",
+    "description": "Reconstruct ancestral states at internal phylogenetic nodes for sequences (PAML codeml, IQ-TREE --ancestral, GRASP, FastML), discrete traits (corHMM hidden-rate Markov, ape::ace, phytools::make.simmap stochastic mapping, BayesTraits), and continuous traits (phytools::fastAnc, geiger Brownian/OU, RPANDA). Use when designing constructs for ancestral protein resurrection, tracing trait evolution along a tree, performing stochastic character mapping, testing models of trait evolution (BM vs OU vs EB), inferring ancestral genome content via Dollo or DTL reconciliation, or quantifying ancestral-state uncertainty for downstream comparative analyses.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 3
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Fresh codon and protein posterior records were compared with the exact source rows produced by PAML; no hardcoded expected posterior values or fabricated scientific results were accepted."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The guidance does not make patient-facing diagnostic or treatment decisions; uncertainty and exploratory OUwie output are explicitly bounded."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The fixed parser preserves codon and amino-acid posterior meanings, hidden-rate guidance is conditional, and unsupported transformed-model ASR fails closed."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Four focused unit tests and three fresh real PAML 4.10.10 routes passed; unchanged IQ-TREE, GRASP, R/corHMM/OUwie, and no-data evidence was reused after byte, runtime, interface, and input checks."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 10, "max": 12, "note": "The main sequence, discrete-trait, continuous-trait, and gene-content workflows are routed clearly; several optional methods remain documentation-only."},
+      "reliability": {"score": 11, "max": 12, "note": "Core parsers validate schemas, posterior bounds, row coverage, taxon agreement, and unsupported model outputs; optional provider APIs remain unexecuted."},
+      "performance_context": {"score": 7, "max": 8, "note": "The entry Skill uses routed references and bounded examples; broad analyses still require users to assess their data and compute needs."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Workflows and decision tables name assumptions and uncertainty; model selection still requires scientific judgment rather than one universal route."},
+      "human_usability": {"score": 7, "max": 8, "note": "Expected inputs, outputs, limitations, and recovery guidance are easy to locate across the entry file and references."},
+      "security": {"score": 11, "max": 12, "note": "No credentials or raw user-string code execution were found; runnable scripts quote shell arguments and check core input contracts."},
+      "maintainability": {"score": 11, "max": 12, "note": "Responsibilities are separated across references and scripts, with a focused PAML regression suite and explicit tested-version boundaries."},
+      "agent_specific": {"score": 17, "max": 20, "note": "Natural task triggers, progressive disclosure, reproducibility metadata, refusal paths, and composable script examples are present; broad scope creates some trigger and upkeep burden."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 15, "total": 15},
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Fresh PAML codon ancestral reconstruction",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh CODONML 4.10.10 run produced 7 nodes × 110 sites; all parsed codon and amino-acid values matched their own rst source rows.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The shipped codon control-file route completes a real current CODONML run and produces a marginal rst.", "result": "PASS", "note": "PAML 4.10.10 exited 0; the fresh rst is 179,979 bytes and has a recorded SHA-256."},
+          {"text": "The parser returns exactly seven ancestral nodes and 110 codon sites per node.", "result": "PASS", "note": "Seven nodes and 770 codon posterior rows were observed."},
+          {"text": "Every parsed codon state, codon probability, translation, amino-acid state, and amino-acid probability matches the same rst source row.", "result": "PASS", "note": "The focused test compared all seven nodes across all 110 sites against raw PAML rows."},
+          {"text": "Posterior values remain in range and codon posterior values do not exceed the listed amino-acid marginal beyond the documented rounding tolerance.", "result": "PASS", "note": "All 770 rows passed bounds and codon-to-amino-acid consistency checks."},
+          {"text": "The four shipped PAML parser unit tests pass, including codon semantics and the explicit no-data contract.", "result": "PASS", "note": "Four of four unit tests passed."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Two PAML protein writer/parser routes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh provider and extracted protein CODeml routes each produced 7 × 110 posterior records; values were checked against each route's own rst.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Both shipped protein control-file writers complete against PAML 4.10.10 and produce a real rst.", "result": "PASS", "note": "Fresh provider and extracted CODeml invocations both exited 0 and emitted rst files."},
+          {"text": "Each route returns seven ancestral nodes, 110 sites per node, and 770 posterior records.", "result": "PASS", "note": "Both real output families met the expected node/site cardinality."},
+          {"text": "Provider and extracted parser values match their own PAML source rows across every site and node.", "result": "PASS", "note": "All parsed states and probabilities were source-derived; run-specific posterior magnitudes were not assumed."},
+          {"text": "The shared parser preserves residue-state and probability semantics through both public wrapper APIs.", "result": "PASS", "note": "Provider sequence/probability APIs and extracted node-grouped API returned the expected source-matched values."},
+          {"text": "Real-fixture regression checks avoid brittle exact posterior constants while retaining deterministic synthetic parser checks.", "result": "PASS", "note": "The real tests compare against fixture source rows; exact assertions are limited to synthetic cases."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Reused unaffected core workflows and outputs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reused identity-matched IQ-TREE, GRASP, seeded R/corHMM, BM/OUwie, and no-data evidence after confirming unchanged candidate surfaces, pinned environment, runtime versions, fixture assumptions, and interfaces.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The unchanged IQ-TREE route has an inspected real state table with normalized posterior rows and matching maximum states, and rejects malformed controls.", "result": "PASS", "note": "Saved current evidence covers 660 rows, six internal nodes, 110 sites, 20 posterior columns, and five malformed-table guards; wrapper/parser bytes match the fixed manifest."},
+          {"text": "The unchanged GRASP current CLI and packaged wrapper produce the advertised sequence, tree, and structured outputs.", "result": "PASS", "note": "Identity-matched evidence validates seven ancestor sequences × 110 columns, eight tree tips, and four JSON fields with the official 21-Mar-2024 CLI."},
+          {"text": "The unchanged seeded discrete-trait route reports the seed and requested mappings, while tree/trait mismatch is clearly rejected.", "result": "PASS", "note": "Reused R 4.4.3/corHMM 2.8 evidence covers 1,000 maps, node summaries, and named taxon reconciliation."},
+          {"text": "The continuous-trait routes distinguish BM intervals from OUwie exploratory point estimates and refuse unsupported transformed-model substitutions.", "result": "PASS", "note": "Reused evidence inspects 34 BM estimates/intervals, 29 OUwie points without uncertainty, and EB/lambda/kappa/delta refusals."},
+          {"text": "The reusable evidence runtime and assumptions still match the prepared audit environment and exact fixed candidate surfaces.", "result": "PASS", "note": "All candidate files match the fix-phase manifest; the environment lock SHA-256 and live Python, IQ-TREE, Java, R, ape, phytools, geiger, corHMM, and OUwie versions match recorded evidence."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 57.0,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Fresh real PAML codon and protein outputs now parse with complete node/site coverage and source-row-matched posterior values.",
+    "The parser retains the distinction between codon-state probability, codon translation, amino-acid state, and amino-acid marginal probability.",
+    "IQ-TREE posterior validation, seeded discrete mapping, taxon reconciliation, continuous-trait uncertainty limits, and transformed-model refusals are supported by current identity-matched evidence.",
+    "The corHMM recommendation is consistently conditional on plausible, estimable rate heterogeneity; the full Skill tree contains no surviving unconditional superiority or mandatory hidden-rate claim."
+  ],
+  "recommendations": []
+}

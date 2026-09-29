@@ -1,0 +1,13 @@
+{
+  "schema": "skill-auditor-report-v4.0",
+  "valid": true,
+  "inputs": 3,
+  "assertions": "15/15",
+  "static": 88,
+  "execution": 95.0,
+  "layer1_average": 38.0,
+  "layer2_average": 57.0,
+  "final_score": 92,
+  "readiness_floors_pass": true,
+  "veto_override": false
+}

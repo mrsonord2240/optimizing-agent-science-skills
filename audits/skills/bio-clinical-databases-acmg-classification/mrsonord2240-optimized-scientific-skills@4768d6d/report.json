@@ -1,0 +1,359 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-acmg-classification",
+    "description": "Builds a non-diagnostic ACMG/AMP or AMP/ASCO/CAP evidence ledger using current ClinGen SVI methods, calibrated PP3/BP4 and PS3/BS3 thresholds, PVS1 prerequisite gates, and explicit somatic tiers. Use for training or qualified-review support, never stand-alone patient diagnosis or treatment decisions.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated clinical observations, patient results, studies, sample sizes, p-values, efficacy data, or evidence provenance; all observations trace to bounded synthetic fixtures, published threshold tables, or current public interfaces."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The instructions, germline and somatic result objects, and standalone demonstration all retain an explicit non-diagnostic qualified-review boundary and prohibit protected health information in public services."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The implementation rejects retired PP5/BP6, duplicate or aliased evidence families, opposing PP3/BP4 codes, contradictory NMD representations, non-semantic dates, and unsafe somatic evidence conflicts; calibrated endpoint and PVS1 stop-state execution matched the cited methods."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three shipped Python surfaces compiled; 24 shipped tests, 25 independent invalid probes, the standalone demonstration, and current GeneBe and CSpec live calls completed in the pinned isolated environment."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "The promised germline and somatic evidence-ledger routes, authority hierarchy, calibrated helpers, stop states, and qualified-review outputs are all represented and executable at the documented boundary."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Typed and domain validation, evidence-family conflict checks, semantic date parsing, deterministic stop states, and actionable errors are comprehensive; live public services necessarily retain ordinary availability and schema-drift risk."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The concise primary skill routes method depth to one reference and reusable computation to one module without redundant execution or unnecessary context loading."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Authority order, branch selection, current-rule integrity checks, result fields, stop conditions, and escalation to qualified review are explicit; the bounded helper remains intentionally narrower than a full clinical evidence system."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger language, readable method tables, explicit unresolved context, and concrete failure-mode guidance make the skill discoverable and interpretable without weakening scientific input validation."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, raw-code execution, destructive operation, or patient data are embedded; public-request fields are validated before transport and the instructions prohibit protected health information."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "The module is separated from the workflow reference and backed by 24 deterministic regressions spanning methods, boundaries, interfaces, and failure paths; external guidance and public APIs still require periodic review."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger precision, progressive disclosure, deterministic result contracts, idempotent pure helpers, and explicit review stops support composition; external clinical curation tools remain documented-only rather than agent-callable integrations."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Shipped regression and guarded demonstration",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 24 shipped tests, compilation, and the standalone non-diagnostic training example passed on the exact candidate.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "All shipped Python tests pass without candidate-tree artifacts",
+            "result": "PASS",
+            "note": "Twenty-four tests passed and no __pycache__ or .pyc file appeared in the candidate tree."
+          },
+          {
+            "text": "The standalone example executes with coherent criteria and classification",
+            "result": "PASS",
+            "note": "The example retained one computational predictor, PS3_Moderate, PM2_Supporting, and a seven-point Likely Pathogenic illustration."
+          },
+          {
+            "text": "The standalone output exposes unresolved scientific context",
+            "result": "PASS",
+            "note": "Disease, transcript, VCEP review, and assay validity are printed as unresolved or unreviewed."
+          },
+          {
+            "text": "The standalone output is explicitly non-diagnostic and requires qualified review",
+            "result": "PASS",
+            "note": "Diagnosis, treatment, and stand-alone clinical reporting are prohibited in the emitted notice."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "PVS1 gates, review stops, and contradictory state",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Nine prerequisite and branch states matched expectations and all three contradictory NMD representations stopped before assignment.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Loss-of-function mechanism and disease-relevant transcript gates precede PVS1",
+            "result": "PASS",
+            "note": "Either absent prerequisite returned no criterion."
+          },
+          {
+            "text": "Canonical splice variants stop when consequence or rescue review is incomplete",
+            "result": "PASS",
+            "note": "Both incomplete fixtures returned PVS1_REVIEW_REQUIRED rather than an evidence strength."
+          },
+          {
+            "text": "Contradictory NMD representations are rejected before evidence assignment",
+            "result": "PASS",
+            "note": "False versus nmd, true versus in-frame, and true versus no-impact fixtures each raised a specific ValueError."
+          },
+          {
+            "text": "Initiation, deletion, NMD, and no-impact branches remain distinct",
+            "result": "PASS",
+            "note": "The observed strengths and no-impact outcome matched the bounded decision sketch."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Brnich OddsPath boundaries and prose consistency",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fourteen exact or adjacent functional-evidence boundaries passed and the former prose contradiction is absent.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Pathogenic OddsPath boundaries match Brnich Table 3",
+            "result": "PASS",
+            "note": "Supporting, Moderate, Strong, and Very Strong transitions passed at 2.1, 4.3, 18.7, and 350."
+          },
+          {
+            "text": "Benign OddsPath boundaries match Brnich Table 3",
+            "result": "PASS",
+            "note": "Supporting, Moderate, and Strong benign transitions passed at 0.48, 0.23, and 0.053."
+          },
+          {
+            "text": "Nonpositive and non-finite OddsPath values are rejected",
+            "result": "PASS",
+            "note": "Typed finite-positive guards are enforced before calibration."
+          },
+          {
+            "text": "Reference prose states greater than 4.3 as Moderate and greater than 18.7 as Strong",
+            "result": "PASS",
+            "note": "The corrected sentence is present and the obsolete greater-than-4.3-for-Strong sentence is absent."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Current evidence-family and predictor integrity",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Retired, duplicate, aliased, and opposed criteria were rejected; 26 independent calibrated predictor endpoints passed.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "PP5 and BP6 are rejected as retired current-rule evidence",
+            "result": "PASS",
+            "note": "Both codes raised explicit retired-code errors before point summation."
+          },
+          {
+            "text": "Multiple strengths or aliases from one evidence family are rejected",
+            "result": "PASS",
+            "note": "PVS1, PS3, PM2, PP3, and BP4 collision probes each stopped with family-specific errors."
+          },
+          {
+            "text": "Opposed PP3 and BP4 evidence is surfaced for conflict review",
+            "result": "PASS",
+            "note": "The pair raised an opposing-evidence error rather than silently cancelling."
+          },
+          {
+            "text": "Exact REVEL, BayesDel, and AlphaMissense endpoints preserve inclusive semantics",
+            "result": "PASS",
+            "note": "Eleven REVEL, seven BayesDel, and eight AlphaMissense exact or adjacent cases matched the published interval tables."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Somatic tiers, semantic dates, and guarded result contracts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All six AMP tiers were distinct and guarded; two real dates passed and four invalid or noncanonical dates stopped.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "AMP Tier I-A, I-B, II-C, II-D, III, and IV are separately reachable",
+            "result": "PASS",
+            "note": "Explicit evidence category, tumor context, and clinical significance produced all six expected tiers."
+          },
+          {
+            "text": "Tier III and Tier IV retain distinct uncertainty and benign rationales",
+            "result": "PASS",
+            "note": "The returned rationales are distinct and preserve uncertain versus benign meaning."
+          },
+          {
+            "text": "Access dates are validated as real canonical ISO calendar dates",
+            "result": "PASS",
+            "note": "Valid ordinary and leap dates passed; invalid month, day, non-leap date, and noncanonical formatting failed."
+          },
+          {
+            "text": "Every germline and somatic result requires review and prohibits diagnostic use",
+            "result": "PASS",
+            "note": "Observed result dictionaries retained review_required and the full non-diagnostic clinical-use notice."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Current public GeneBe and ClinGen CSpec interfaces",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The bounded public documentation example returned one GeneBe record and the GATM CSpec route returned six version records.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The current GeneBe coordinate contract executes on public example data",
+            "result": "PASS",
+            "note": "hg38 chr17:28364411 C>A returned one structured variant record."
+          },
+          {
+            "text": "The current CSpec versioned-gene route executes on a public gene symbol",
+            "result": "PASS",
+            "note": "GATM returned six records whose identifiers contain a version route."
+          },
+          {
+            "text": "Invalid request fields stop before transport",
+            "result": "PASS",
+            "note": "Chromosome, position, allele, timeout, and path-like gene-symbol probes were rejected locally."
+          },
+          {
+            "text": "No private variant, credential, or protected-health data is used",
+            "result": "PASS",
+            "note": "Only the documented public coordinate example and public gene symbol were sent."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Malformed, conflicting, and out-of-scope inputs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Twenty-five independent invalid probes produced typed, actionable failures without remote mutation or unsafe classification.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Wrong types, unknown codes, and non-finite values are rejected",
+            "result": "PASS",
+            "note": "Sequence, string, boolean, unknown-code, NaN, and domain probes failed explicitly."
+          },
+          {
+            "text": "Population-frequency threshold contradictions stop before classification",
+            "result": "PASS",
+            "note": "Zero penetrance and max-credible-AF above BA1 both raised actionable errors."
+          },
+          {
+            "text": "Somatic evidence conflicts and missing provenance stop before tier assignment",
+            "result": "PASS",
+            "note": "Actionable evidence with benign significance and blank knowledgebase evidence were rejected."
+          },
+          {
+            "text": "The skill does not silently expand into autonomous clinical interpretation",
+            "result": "PASS",
+            "note": "Incomplete context, conflicts, and unproven oncogenic significance route to review or error rather than a diagnostic conclusion."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 58.4,
+    "score": 96,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Current-rule evidence integrity is enforced before summation: retired codes, aliases, duplicate strengths, and opposing computational evidence stop explicitly.",
+    "PVS1 requires mechanism and transcript prerequisites, preserves review-required states, and rejects contradictory representations of NMD before assigning strength.",
+    "Published Brnich, Pejaver, Bergquist, SpliceAI, Tavtigian, and semantic-date boundaries are executable, deterministic, and backed by shipped regressions.",
+    "Every result remains non-diagnostic and review-required, while current public GeneBe and ClinGen CSpec interfaces are bounded, validated, and rerunnable."
+  ],
+  "recommendations": []
+}

@@ -1,0 +1,215 @@
+{
+  "meta": {
+    "skill_name": "bio-codon-usage",
+    "description": "Analyze codon usage and calculate CAI (Codon Adaptation Index) and RSCU with Biopython, and produce table-aware naive max-CAI codon-optimized sequences. Use when scoring a gene's codon bias against a host, optimizing a CDS for heterologous expression, or studying synonymous codon selection.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated sequences, reference provenance, measurements, or expression outcomes; all numerical observations trace to exact candidate execution, the public thrA fixture, Biopython 1.85, or codonW 1.4.4."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill stays within sequence analysis and construct-design support, explicitly refuses to equate CAI with expression, and requires additional biological screening before synthesis."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The selected genetic code is enforced end to end, all routed analyses share an explicit CDS validation contract, CAI interpretation remains host-reference-relative, and the removed nonstandard Nc quantity is not exposed as a candidate capability."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three entrypoints ran twice with empty stderr and byte-identical output, 12 focused tests passed twice, and 57 of 57 independent final checks passed without a candidate mutation."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "The promised counts, frequencies, RSCU, GC123, guarded host-relative CAI, and table-aware max-CAI draft routes are complete and executable; Nc and tAI boundaries are explicit."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "A shared table-aware validator, actionable typed errors, exact discard reports, table-consistency checks, and deterministic reruns cover the major failure modes."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The concise entrypoint routes version details, methods, optimization constraints, and provenance into focused references without unnecessary loading."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Task routing, validation order, output context, stop conditions, and scientific interpretation are clear; the examples remain adaptable scripts rather than a single structured multi-command CLI."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger language and actionable troubleshooting are strong, though users adapt built-in examples instead of supplying every input through command-line arguments."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, sensitive-data retention, destructive operations, raw-code execution, or unvalidated sequence path was found in the runnable candidate."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Shared helpers separate validation and CAI behavior from the demonstrations, provenance is exact, and 12 focused regressions pin the repaired boundaries."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger precision, progressive disclosure, composability, idempotency, and escape hatches are strong; result presentation is intentionally human-readable rather than a common machine-output schema."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Deterministic standard-code shipped surfaces",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three entrypoints exited zero twice with empty stderr and byte-identical output; 12 focused tests passed twice; standard optimization reached CAI 1.000 and preserved MAALDDKG*.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "All three supplied scripts execute successfully on both invocations.", "result": "PASS", "note": "Each of six script invocations exited zero with empty stderr."},
+          {"text": "Repeated script invocations produce byte-identical stdout and stderr.", "result": "PASS", "note": "SHA-256 values matched independently for every script pair."},
+          {"text": "The focused candidate regression suite passes twice with the same cases and outcomes.", "result": "PASS", "note": "Twelve tests passed on both invocations; only elapsed-time text required normalization."},
+          {"text": "Standard-code optimization reaches the documented maximum and preserves the protein.", "result": "PASS", "note": "The output reports optimized CAI 1.000 and protein MAALDDKG*."},
+          {"text": "The canonical workflow does not infer expression success from CAI alone.", "result": "PASS", "note": "The skill labels the result a naive max-CAI draft and requires downstream screening."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Vertebrate-mitochondrial table-2 optimization",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every TGA/TGG x AGA/AGG query validated and optimized under table 2 while preserving MW*; an index/table mismatch was rejected.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "TGA and TGG are accepted as table-2 tryptophan codons in all tested combinations.", "result": "PASS", "note": "All four source validation results retained the selected sense codon."},
+          {"text": "AGA and AGG are accepted as table-2 terminal stops in all tested combinations.", "result": "PASS", "note": "Every optimized validation result ended in AGA or AGG."},
+          {"text": "Every table-2 optimization preserves the source protein.", "result": "PASS", "note": "All four source and optimized sequences translated to MW*."},
+          {"text": "A CAI index built for another genetic code is rejected before scoring.", "result": "PASS", "note": "The table mismatch raised an explicit not-constructed-with-table-2 error."},
+          {"text": "The documented route avoids Biopython's unsafe nonstandard DNA optimization path.", "result": "PASS", "note": "The wrapper translates with table 2 and calls the protein optimization path before revalidation."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Strict and permissive CDS validation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Strict mode rejected six malformed boundaries with actionable messages; permissive mode retained ATGGCTTAA and reported NNN at offset 3 and AA at offset 12 exactly.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Strict validation rejects empty, partial, shifted, ambiguous, internal-stop, and whitespace inputs.", "result": "PASS", "note": "All six cases raised CDSValidationError with input-specific text."},
+          {"text": "Permissive validation discards only whole invalid codons and a trailing partial while retaining frame.", "result": "PASS", "note": "The exact retained sequence was ATGGCTTAA."},
+          {"text": "Permissive validation reports every discarded segment with exact offsets and reasons.", "result": "PASS", "note": "NNN at offset 3 and AA at offset 12 matched the declared contract."},
+          {"text": "Counts, frequencies, and RSCU operate from the identical validation result.", "result": "PASS", "note": "All three returned validation objects equal the direct permissive result."},
+          {"text": "The admitted sequence produces coherent counts, normalized frequencies, and synonymous-family RSCU.", "result": "PASS", "note": "Counts were one each for ATG/GCT/TAA, frequencies summed to one, and alanine RSCU summed to four."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Biopython 1.85 CAI semantics and guards",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Live 1.85 execution reproduced indexed-stop contribution, GCC weight 0.05, silent non-strict tie selection, strict tie rejection, guarded excluded-only input, and standard protein preservation.",
+        "basic": 40,
+        "specialized": 58,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "A stop codon present in the CAI mapping contributes to the live score.", "result": "PASS", "note": "The score with TAG was lower than the otherwise identical score without it."},
+          {"text": "An unobserved GCC pseudocount normalizes to weight 0.05 against ten observed GCT codons.", "result": "PASS", "note": "The exact live weight was 0.05."},
+          {"text": "Biopython 1.85 strict false is silent while strict true rejects an equal preferred-codon tie.", "result": "PASS", "note": "The warning list was empty and strict true raised ValueError."},
+          {"text": "The guarded scorer intercepts an ATG/TGG-only zero denominator and reports exclusions.", "result": "PASS", "note": "CAIScoringError names both excluded codons at indices 0 and 1."},
+          {"text": "The standard-code wrapper preserves the query protein.", "result": "PASS", "note": "Source and optimized sequences translated to MAALDDKG*."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Public thrA and external Nc boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Public table-11 thrA validated and all analyses ran from one state; fresh codonW controls reproduced 30.77 and 47.41; the candidate's false Nc helper and trigger claim are absent.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The public thrA fixture validates under table 11 with its expected length and boundaries.", "result": "PASS", "note": "It contained 2,463 nt / 821 codons, began ATG, ended TGA, and had no discards."},
+          {"text": "Counts, frequencies, RSCU, and GC123 run from the exact public validation state.", "result": "PASS", "note": "The validation objects matched, 821 codons were counted, frequencies summed to one, and all GC percentages were finite."},
+          {"text": "Fresh codonW controls reproduce the retained external Nc values.", "result": "PASS", "note": "codonW 1.4.4 returned 30.77 for the heterogeneous fixture and 47.41 for public thrA."},
+          {"text": "The candidate does not ship or advertise the removed approximation as standard Nc.", "result": "PASS", "note": "No effective_nc implementation or top-level Nc capability claim is present."},
+          {"text": "The cross-study and external-tool boundary is explicit.", "result": "PASS", "note": "The candidate requires a separately validated Wright/codonW-compatible estimator, exact version reporting, and prohibits comparison of the removed quantity."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 58.4,
+    "score": 97,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All runnable surfaces passed independent execution, including deterministic reruns of every shipped entrypoint and the focused 12-test suite.",
+    "The protein-intermediate optimizer respects the selected genetic code end to end and passed all four table-2 sense/stop combinations.",
+    "One shared validator gives strict scientific rejection or exact permissive discard provenance to counts, frequencies, RSCU, and CAI routes.",
+    "Version-specific Biopython 1.85 behavior is pinned by executable tests instead of relying on generalized API prose.",
+    "The former nonstandard Nc approximation is removed, while a reproducible external comparator and honest cross-study boundary remain documented."
+  ],
+  "recommendations": []
+}

@@ -1,0 +1,102 @@
+{
+  "skill_id": "bio-chipseq-allele-specific-binding",
+  "version": "mrsonord2240-optimized-scientific-skills@4768d6d",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "4768d6d40a2ca58b8323aca739c5598b6c5782ff",
+    "path": "skills/bio-chipseq-allele-specific-binding",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/4768d6d40a2ca58b8323aca739c5598b6c5782ff/skills/bio-chipseq-allele-specific-binding"
+  },
+  "candidate": {
+    "identity": "03415aabaa66de0ef1b747e3fc664dae6d2868e42bf52a2c104d990db5e6057f",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane5-chipseq-asb",
+    "content_sha256": "03415aabaa66de0ef1b747e3fc664dae6d2868e42bf52a2c104d990db5e6057f",
+    "path": "F:\\OpenScience\\wt\\opt10-chipseq-asb\\skills\\bio-chipseq-allele-specific-binding",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "5d9b5f43b093462312418abb369e7bd681f1068c737fc9f198bbe0411f843c46",
+        "git_blob": "7fffebeefae6edbafc54dc087419edc0167b688d",
+        "bytes": 11781
+      },
+      {
+        "path": "references/methods-and-commands.md",
+        "sha256": "862dc661967047b39519269923539f837df2901bfa1f19284cd57763e1d35578",
+        "git_blob": "1e6eb15a2a51724df380d43caa0c8777837ac53c",
+        "bytes": 12747
+      },
+      {
+        "path": "references/pitfalls-and-troubleshooting.md",
+        "sha256": "177f4627de9b60985f3d106995d0a96bd7b9e30d6450f8f7176e898f03e1956c",
+        "git_blob": "867683dc9b3e917bb2da0b3ef465af62fde45c05",
+        "bytes": 7731
+      },
+      {
+        "path": "scripts/baalchip_contracts.R",
+        "sha256": "5cdfc904edb4428015420aef51287f28eb0480f19ffbdd796e4adad44d926193",
+        "git_blob": "fd3250a433a765056fe33e0fffe060a9956589ef",
+        "bytes": 8534
+      },
+      {
+        "path": "scripts/baalchip_workflow.R",
+        "sha256": "0a599f1643ec700ba18f152423295396a3a9fd9ad9d2c18a26a834df2c12b85c",
+        "git_blob": "494ba03818f955d6f19d521968b485fb041c920f",
+        "bytes": 9172
+      },
+      {
+        "path": "scripts/rasqual_cohort.py",
+        "sha256": "076d90a6396e7072c6b2c41f0760d0d981dec58eeb96d52c3d550172b537a59a",
+        "git_blob": "fbbce2f853e7fcdfdde9bf2fc20c5d689efbe16f",
+        "bytes": 13941
+      },
+      {
+        "path": "tests/test_baalchip_contracts.R",
+        "sha256": "c4d4ccf95524b34df652d1d7ed80cf172ffec5372370813268050f79c0abd613",
+        "git_blob": "003127d5519ee2eb23858658739decc51e293676",
+        "bytes": 2884
+      },
+      {
+        "path": "tests/test_rasqual_cohort.py",
+        "sha256": "84158118680dd5867f466b591a74c23afaca2764c25f95b3e689a1e679c6deae",
+        "git_blob": "56b77127eabff2016e886125d115cfe22bfefc36",
+        "bytes": 1813
+      }
+    ],
+    "provider_commit": "4768d6d40a2ca58b8323aca739c5598b6c5782ff",
+    "provider_tree": "1541c29f535f97c2558a1ce47fd971c9deb89067"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@03415aabaa66-reaudit2-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 24,
+    "provider_binding": "binding.json"
+  }
+}

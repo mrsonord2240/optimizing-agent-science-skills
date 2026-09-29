@@ -1,0 +1,51 @@
+{
+  "all_nonstdout_files_byte_identical": true,
+  "every_support_row_two_of_two": true,
+  "manifest_counts": {
+    "accepted_rows": 111,
+    "excluded_rows": 0,
+    "replicates": 2,
+    "target_rows": 111
+  },
+  "raw_run_count_per_workflow": 2,
+  "raw_runs": [
+    {
+      "field_counts": [
+        16
+      ],
+      "path": "raw/replicate-1/reaudit3_r1_comp_hOH7_hybrids_ua.hyb",
+      "rows": 111,
+      "sha256": "2534f01d15b1a0b402a6c382b4d72272ebb48c51cc28479c0800befb35ceda0a"
+    },
+    {
+      "field_counts": [
+        16
+      ],
+      "path": "raw/replicate-2/reaudit3_r2_comp_hOH7_hybrids_ua.hyb",
+      "rows": 111,
+      "sha256": "2534f01d15b1a0b402a6c382b4d72272ebb48c51cc28479c0800befb35ceda0a"
+    }
+  ],
+  "repeatability_pass": true,
+  "stdout_logs": [
+    {
+      "first_line_differs": true,
+      "path": "raw/replicate-1/hyb.stdout.log",
+      "same_after_first_timestamp_line": true
+    },
+    {
+      "first_line_differs": true,
+      "path": "raw/replicate-2/hyb.stdout.log",
+      "same_after_first_timestamp_line": true
+    }
+  ],
+  "structured_output_sha256": {
+    "excluded.tsv": "37743b88dd7a98bec4cac128b2c40c6cea638f898cebb59d8f0c9c7767b4a34f",
+    "manifest.json": "a479ba3b2be72279ba4e9da603cb05314df2ebf469b8f52e45740924bf47524b",
+    "sites.tsv": "49e86dab7a4231fcd7d3d79191af365e6a044f42f603a6a1cde0d83a5aa21654",
+    "support.tsv": "21437e02b782afa4157bfb6e053266e14ff90243c01be5ed72c9437e446f5867",
+    "targets.tsv": "6caa53362883a6e655571dc2b7acf70340c1c34d38e631dcb7f259a741203b94"
+  },
+  "support_rows": 111,
+  "workflow_file_count_each": 25
+}

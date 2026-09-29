@@ -1,0 +1,13 @@
+rasqual_rows=166
+feature1_rows=83
+feature2_rows=83
+min_raw_p=2.25847107817e-16
+min_adj_p=3.74906198977e-14
+two_feature_indices=PASS
+finite_probability_range=PASS
+complete_family_bh_recomputation=PASS
+association_summary_sha256=0363890d3049fd995391a7be9b7a0e73e8d82dab18c798ac38a4d9e190ac0aba
+output_reuse_refusal=PASS
+candidate_sha256=275ff0a1b8d9bed7a80e8316f97fe421296cb081c837ed01aaa53a0f96e48ae2
+rasqual_commit=5aa553cf1b6501cf7ecd61a5efb34f7f20d354c6
+real_rasqual_reaudit2=PASS

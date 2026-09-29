@@ -1,0 +1,45 @@
+{
+  "step1_basic_veto": {
+    "T1. Stability": "PASS",
+    "T2. Contract": "PASS",
+    "T3. Determinism": "PASS",
+    "T4. Security": "PASS"
+  },
+  "gate_result": "PASSED Step 1 \u2014 proceed to Steps 2\u20138",
+  "step2_static_metadata": {
+    "name": "bio-atac-seq-allele-specific-accessibility",
+    "description": "Detect allele-specific chromatin accessibility from ATAC-seq using WASP, GATK ASEReadCounter, or RASQUAL. Use when mapping cis-regulatory genetic variants from heterozygous SNPs, validating GWAS variant function with allelic imbalance, building a phased within-peak ASE analysis, or detecting reference-allele mapping bias before downstream analysis.",
+    "description_word_count": 42,
+    "skill_md_lines": 137,
+    "reference_files": 4,
+    "script_files": 2,
+    "section_headers": [
+      "Allele-Specific Accessibility",
+      "Verify the environment",
+      "Choose the analysis",
+      "Run the core workflow",
+      "Enforce the mapping-bias invariant",
+      "Interpret within-peak results",
+      "Report evidence and limitations",
+      "Resource map"
+    ],
+    "has_code_blocks": false,
+    "has_when_to_use_section": false,
+    "has_workflow_section": true
+  },
+  "step3_classification": {
+    "category": "Protocol Design",
+    "execution_mode": "B (CLI/Script)",
+    "category_keyword_scores": {
+      "Evidence Insight": 0,
+      "Protocol Design": 2,
+      "Data Analysis": 2,
+      "Academic Writing": 0
+    }
+  },
+  "step4_complexity": {
+    "level": "Moderate",
+    "n_inputs": 5
+  },
+  "instructions_for_claude": "Structural pre-check complete. Proceed with Steps 2\u20138 using SKILL.md instructions.\n  Category: Protocol Design\n  Execution Mode: B (CLI/Script)\n  Complexity: Moderate \u2192 Generate 5 test inputs in Step 4."
+}

@@ -1,0 +1,12 @@
+test_codeml_wrapper_exposes_codon_and_amino_acid_posteriors (__main__.PamlRstTests.test_codeml_wrapper_exposes_codon_and_amino_acid_posteriors) ... ok
+test_codon_matrix_uses_codon_probability_and_retains_aa_probability (__main__.PamlRstTests.test_codon_matrix_uses_codon_probability_and_retains_aa_probability) ... ok
+test_no_data_and_malformed_rows_remain_explicit (__main__.PamlRstTests.test_no_data_and_malformed_rows_remain_explicit) ... ok
+test_protein_matrix_preserves_legacy_state_and_probability (__main__.PamlRstTests.test_protein_matrix_preserves_legacy_state_and_probability) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+OK
+PASS real CODONML: 7 nodes x 110 sites; 770 codon and amino-acid posteriors match PAML source rows; Node10 sites1-2=[('ATG', 0.669, 'M', 'M', 0.669), ('ACG', 0.1, 'T', 'T', 0.349)]
+PASS real provider-protein: 7 nodes x 110 sites; all parsed states/posteriors match PAML source rows; Node10 sites1-2=[('M', 0.675), ('T', 0.285)]
+PASS real extracted-protein: 7 nodes x 110 sites; all parsed states/posteriors match PAML source rows; Node10 sites1-2=[('M', 0.706), ('T', 0.29)]

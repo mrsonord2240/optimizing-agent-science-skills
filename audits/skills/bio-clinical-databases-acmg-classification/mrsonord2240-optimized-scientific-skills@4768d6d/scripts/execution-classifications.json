@@ -1,0 +1,72 @@
+{
+  "skill": "bio-clinical-databases-acmg-classification",
+  "candidate_identity": "286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571",
+  "surfaces": [
+    {
+      "surface": "scripts/acmg_classify.py compile/import",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/preflight.log"
+    },
+    {
+      "surface": "tests/test_acmg_classify.py (24 tests)",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/unit-tests.log"
+    },
+    {
+      "surface": "scripts/acmg_classify.py standalone demonstration",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/standalone-demo.log"
+    },
+    {
+      "surface": "independent invalid, boundary, PVS1, scoring, and somatic matrix",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/execution.json"
+    },
+    {
+      "surface": "tests/live_interface_smoke.py",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/live-interface-smoke.log"
+    },
+    {
+      "surface": "GeneBe public coordinate endpoint",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/execution.json#live_interfaces.genebe"
+    },
+    {
+      "surface": "ClinGen CSpec versioned-gene endpoint",
+      "classification": "EXECUTED",
+      "status": "PASS",
+      "evidence": "evidence/execution.json#live_interfaces.cspec"
+    },
+    {
+      "surface": "InterVar 2.2+ with ANNOVAR data",
+      "classification": "DOCUMENTED_ONLY",
+      "status": "BLOCKED_RESTRICTED_DATA",
+      "evidence": "TOOLS.md inventory; ANNOVAR registration and large annotation data required"
+    },
+    {
+      "surface": "AutoPVS1 external implementation",
+      "classification": "DOCUMENTED_ONLY",
+      "status": "UNPINNED_NO_SHIPPED_CALLABLE",
+      "evidence": "TOOLS.md inventory"
+    },
+    {
+      "surface": "VarSome, Franklin/Genoox, and ClinGen VCI",
+      "classification": "RESTRICTED_MANUAL",
+      "status": "NOT_EXECUTED",
+      "evidence": "TOOLS.md inventory"
+    },
+    {
+      "surface": "Other named evidence sources and knowledgebases",
+      "classification": "DOCUMENTED_ONLY",
+      "status": "NO_SHIPPED_WRAPPER",
+      "evidence": "TOOLS.md inventory"
+    }
+  ]
+}

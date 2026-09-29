@@ -1,0 +1,18 @@
+{
+  "section": 4,
+  "heading": "4. Promising-zone SSR [DOCUMENTED_ONLY]",
+  "classification": "conceptual-scaffold",
+  "required_package": null,
+  "package_version": null,
+  "candidate_identity": {
+    "sha256": "19824f36846d65aeeb7e5cee1a76114f5e5325529fcc3a0e0e3572bf5851d1aa",
+    "file_count": 9,
+    "manifest_bytes": 867
+  },
+  "status": "DOCUMENTED_ONLY",
+  "elapsed_seconds": 0,
+  "warnings": [],
+  "messages": [],
+  "error": null,
+  "objects_created": []
+}

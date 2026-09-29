@@ -1,0 +1,38 @@
+{
+  "skill": "bio-codon-usage",
+  "category": "Data Analysis",
+  "execution_mode": "B",
+  "complexity": "Moderate",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "Deterministic standard-code shipped surfaces",
+      "prompt": "Run all three supplied standard-code examples twice, execute the focused regression suite twice, and verify the reported CAI result and translated protein."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "Vertebrate-mitochondrial table-2 optimization",
+      "prompt": "Use genetic-code table 2 to optimize all four TGA/TGG sense-codon and AGA/AGG terminal-stop combinations, and prove that every source and result translates to MW*."
+    },
+    {
+      "index": 3,
+      "type": "Edge",
+      "label": "Strict and permissive CDS validation",
+      "prompt": "Exercise empty, partial, shifted, ambiguous, internal-stop, and whitespace inputs under the strict validator; then process an ambiguous-plus-partial input permissively and verify exact discarded offsets and shared analysis state."
+    },
+    {
+      "index": 4,
+      "type": "Variant B",
+      "label": "Biopython 1.85 CAI semantics and guards",
+      "prompt": "Verify indexed-stop contribution, family-normalized pseudocounts, strict and non-strict tie behavior, guarded zero-denominator handling, and standard-code protein preservation under Biopython 1.85."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "Public thrA and external Nc boundary",
+      "prompt": "Validate and analyze the public table-11 E. coli thrA CDS, rerun codonW on heterogeneous and public controls, and confirm that the candidate neither implements nor advertises the removed nonstandard Nc quantity as standard Nc."
+    }
+  ]
+}
