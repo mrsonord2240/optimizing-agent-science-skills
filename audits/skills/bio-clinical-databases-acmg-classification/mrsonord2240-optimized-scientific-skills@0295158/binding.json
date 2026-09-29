@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-clinical-databases-acmg-classification",
+  "candidate_version": "candidate@286df2647ef2-reaudit2-opt10-20260928",
+  "candidate_identity": "286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "029515880c51d55682816327441d7bab373fc175",
+  "provider_path": "skills/bio-clinical-databases-acmg-classification",
+  "provider_tree": "27cead0468ead1245989e572fface8f0e92b56c2",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571",
+  "file_count": 7,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 5978,
+      "sha256": "16006934a2fde977d8aad9a125521d6ca5afc38a4b8223ff95aa78e242a1013d"
+    },
+    {
+      "path": "references/acmg-framework.md",
+      "bytes": 23704,
+      "sha256": "43ba97afc2a91638028660ae983af8b0aab4c992b6fe4a1bdb2c2f537d469a6b"
+    },
+    {
+      "path": "references/provenance.md",
+      "bytes": 623,
+      "sha256": "7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce"
+    },
+    {
+      "path": "scripts/acmg_classify.py",
+      "bytes": 17236,
+      "sha256": "3b6589d873c8247fd7c06b46551267f767da5aa295f9af7e88009d373c14fe48"
+    },
+    {
+      "path": "tests/live_interface_smoke.py",
+      "bytes": 948,
+      "sha256": "33e77fb6a9456f4bde3beae2814909436b1cfbdd3898af7ffc520c4be47f0cbe"
+    },
+    {
+      "path": "tests/test_acmg_classify.py",
+      "bytes": 12225,
+      "sha256": "f74b1e4a0fbe517f23e642cb996346bee3f424fe0eb4788b713bb108cf3c12d7"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

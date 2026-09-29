@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-chipseq-allele-specific-binding",
+  "candidate_version": "candidate@03415aabaa66-reaudit2-opt10-20260928",
+  "candidate_identity": "03415aabaa66de0ef1b747e3fc664dae6d2868e42bf52a2c104d990db5e6057f",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "029515880c51d55682816327441d7bab373fc175",
+  "provider_path": "skills/bio-chipseq-allele-specific-binding",
+  "provider_tree": "1541c29f535f97c2558a1ce47fd971c9deb89067",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "c9260223a587b7eb9fb55bcd5d2fed903ad6314452802aa5a99bda1a08c76010",
+  "file_count": 8,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 11781,
+      "sha256": "5d9b5f43b093462312418abb369e7bd681f1068c737fc9f198bbe0411f843c46"
+    },
+    {
+      "path": "references/methods-and-commands.md",
+      "bytes": 12747,
+      "sha256": "862dc661967047b39519269923539f837df2901bfa1f19284cd57763e1d35578"
+    },
+    {
+      "path": "references/pitfalls-and-troubleshooting.md",
+      "bytes": 7731,
+      "sha256": "177f4627de9b60985f3d106995d0a96bd7b9e30d6450f8f7176e898f03e1956c"
+    },
+    {
+      "path": "scripts/baalchip_contracts.R",
+      "bytes": 8534,
+      "sha256": "5cdfc904edb4428015420aef51287f28eb0480f19ffbdd796e4adad44d926193"
+    },
+    {
+      "path": "scripts/baalchip_workflow.R",
+      "bytes": 9172,
+      "sha256": "0a599f1643ec700ba18f152423295396a3a9fd9ad9d2c18a26a834df2c12b85c"
+    },
+    {
+      "path": "scripts/rasqual_cohort.py",
+      "bytes": 13941,
+      "sha256": "076d90a6396e7072c6b2c41f0760d0d981dec58eeb96d52c3d550172b537a59a"
+    },
+    {
+      "path": "tests/test_baalchip_contracts.R",
+      "bytes": 2884,
+      "sha256": "c4d4ccf95524b34df652d1d7ed80cf172ffec5372370813268050f79c0abd613"
+    },
+    {
+      "path": "tests/test_rasqual_cohort.py",
+      "bytes": 1813,
+      "sha256": "84158118680dd5867f466b591a74c23afaca2764c25f95b3e689a1e679c6deae"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

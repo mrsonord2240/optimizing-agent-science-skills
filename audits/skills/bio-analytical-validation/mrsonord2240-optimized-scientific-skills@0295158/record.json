@@ -1,0 +1,90 @@
+{
+  "skill_id": "bio-analytical-validation",
+  "version": "mrsonord2240-optimized-scientific-skills@0295158",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "029515880c51d55682816327441d7bab373fc175",
+    "path": "skills/bio-analytical-validation",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/029515880c51d55682816327441d7bab373fc175/skills/bio-analytical-validation"
+  },
+  "candidate": {
+    "identity": "bd66239b9133b70a7522d0d99e3bc4ebbed1b8c1291c74fad26367dfa339b2ab",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane1-analytical",
+    "content_sha256": "bd66239b9133b70a7522d0d99e3bc4ebbed1b8c1291c74fad26367dfa339b2ab",
+    "path": "F:\\OpenScience\\wt\\opt10-analytical-validation\\skills\\bio-analytical-validation",
+    "files": [
+      {
+        "path": "examples/detection_limits.py",
+        "sha256": "65f593e6f815df63de9cc69f1847cf813a9a26cc839d870b4c3246ce2ab3425d",
+        "git_blob": "f1856a4bfd61f4b4e9c03e79fb4c3b7265713564",
+        "bytes": 5158
+      },
+      {
+        "path": "scripts/ge_and_poisson.py",
+        "sha256": "97e595319630dbdb9bd9272e6c439b297032fb1315367c7d852026b1c9e33d4e",
+        "git_blob": "b7493ee073aa000b4297d6acc04910d7402bf247",
+        "bytes": 4337
+      },
+      {
+        "path": "scripts/lod95_probit.py",
+        "sha256": "32dfd49aef0040d2eab636e86adb96e0771416b4077335b7b23a7ad2ff50c307",
+        "git_blob": "fe128c01f356c0dd15fc7dee53ffa970a475e9b9",
+        "bytes": 7816
+      },
+      {
+        "path": "scripts/panel_integrated_lod.py",
+        "sha256": "7f2233e25c9ab2f1f6a40a88ad3fe6320117ba7bcfc8ba821bb2d1565ea4bc90",
+        "git_blob": "144b635f6b872e6670c807ddafa560fc5287886c",
+        "bytes": 6006
+      },
+      {
+        "path": "SKILL.md",
+        "sha256": "c7717b94521745a0dbd1d778ae13310795c16bd2fe1dff1783e4733cad39f6d3",
+        "git_blob": "6aec52fd44d44db7ee36d3621028db2e3a5300e9",
+        "bytes": 17053
+      },
+      {
+        "path": "usage-guide.md",
+        "sha256": "e6483a7db26c7ed73c65a81b2b13365fc00ebd14deaf4b992a021109da29d5ff",
+        "git_blob": "13a756ef6e231151c78aed32bf82e12b96ee2df7",
+        "bytes": 2724
+      }
+    ],
+    "provider_commit": "029515880c51d55682816327441d7bab373fc175",
+    "provider_tree": "7e6dd12c0a7594d474d11fea0ff45913554a03bb"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@bd66239b9133-reaudit-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 6,
+    "provider_binding": "binding.json"
+  }
+}
