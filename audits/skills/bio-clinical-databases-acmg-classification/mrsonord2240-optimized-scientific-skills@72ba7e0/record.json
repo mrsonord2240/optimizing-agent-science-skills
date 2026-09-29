@@ -1,0 +1,88 @@
+{
+  "skill_id": "bio-clinical-databases-acmg-classification",
+  "version": "mrsonord2240-optimized-scientific-skills@72ba7e0",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "72ba7e0949bdeb61322a64248c429b378d42f97e",
+    "path": "skills/bio-clinical-databases-acmg-classification",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/72ba7e0949bdeb61322a64248c429b378d42f97e/skills/bio-clinical-databases-acmg-classification"
+  },
+  "candidate": {
+    "identity": "286df2647ef2e418d8302102c7522705f7b5ce4156cfaea6be5c8c36c6d55571",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane3-acmg-classification",
+    "path": "F:\\OpenScience\\wt\\opt10-acmg-classification\\skills\\bio-clinical-databases-acmg-classification",
+    "files": [
+      {
+        "bytes": 1065,
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "bytes": 5978,
+        "path": "SKILL.md",
+        "sha256": "16006934a2fde977d8aad9a125521d6ca5afc38a4b8223ff95aa78e242a1013d"
+      },
+      {
+        "bytes": 23704,
+        "path": "references/acmg-framework.md",
+        "sha256": "43ba97afc2a91638028660ae983af8b0aab4c992b6fe4a1bdb2c2f537d469a6b"
+      },
+      {
+        "bytes": 623,
+        "path": "references/provenance.md",
+        "sha256": "7185e7ff7fd9b5efafa4827e048c42c0618c68c56dae1ade8e1e90679f13a9ce"
+      },
+      {
+        "bytes": 17236,
+        "path": "scripts/acmg_classify.py",
+        "sha256": "3b6589d873c8247fd7c06b46551267f767da5aa295f9af7e88009d373c14fe48"
+      },
+      {
+        "bytes": 948,
+        "path": "tests/live_interface_smoke.py",
+        "sha256": "33e77fb6a9456f4bde3beae2814909436b1cfbdd3898af7ffc520c4be47f0cbe"
+      },
+      {
+        "bytes": 12225,
+        "path": "tests/test_acmg_classify.py",
+        "sha256": "f74b1e4a0fbe517f23e642cb996346bee3f424fe0eb4788b713bb108cf3c12d7"
+      }
+    ],
+    "provider_commit": "72ba7e0949bdeb61322a64248c429b378d42f97e",
+    "provider_tree": "27cead0468ead1245989e572fface8f0e92b56c2"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@286df2647ef2-reaudit2-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 15,
+    "provider_binding": "binding.json"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-cfdna-preprocessing",
+  "candidate_version": "candidate@148b254a3107-reaudit-opt10-20260928",
+  "candidate_identity": "148b254a310719e781dacc9a782cd45f61e6cc8dd508124e1941d589458b47e1",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "72ba7e0949bdeb61322a64248c429b378d42f97e",
+  "provider_path": "skills/bio-cfdna-preprocessing",
+  "provider_tree": "b1efa2a2886cbe4bdd85005cc38c86525d693072",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "c7b0d9f6947a806445eea956d1a55c5b7d3362b7886dabc500c6a880b6be745e",
+  "file_count": 7,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 8615,
+      "sha256": "19370e7f5b8e25726b0440ee192c49fcdce5e3932ce3a5aa242a6de69d23b6bc"
+    },
+    {
+      "path": "references/fgbio-consensus-workflow.md",
+      "bytes": 6005,
+      "sha256": "de070854a1519b315bbf5200d091b7151af22567f1df4a299354eed5693ec1e7"
+    },
+    {
+      "path": "references/method-selection-and-fragment-qc.md",
+      "bytes": 8311,
+      "sha256": "1e683cd87ddf7db04ba66b69c23741f084e21aa872490efa4d1fd606660b6282"
+    },
+    {
+      "path": "references/scientific-references.md",
+      "bytes": 2302,
+      "sha256": "694edd1c2fc51271d77af08b935963be193e05e9ee8b949e1b7e301d3767805b"
+    },
+    {
+      "path": "scripts/preprocess_cfdna.py",
+      "bytes": 13912,
+      "sha256": "7bcb29ee6ddc2f389941690b005be2c51b4b7c93017c99e658af369b691c9dc3"
+    },
+    {
+      "path": "tests/test_preprocess_cfdna.py",
+      "bytes": 6426,
+      "sha256": "f5ae69d4704149919af7e62dfc7b18e28a54a31fcd79cfe44d6b9071e7ede8ac"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 2572,
+      "sha256": "098375710d26fa91a3519e57e31e80dc19787f81e9331f06604f60505cf924de"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

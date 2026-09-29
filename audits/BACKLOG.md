@@ -1438,7 +1438,7 @@ None open.
 
 ### `bio-analytical-validation` — ADV-006: Tighten SEQC2 fragment-size wording
 
-- Skill: 96, Production Ready · candidate `bd66239b9133` from [mrsonord2240/optimized-scientific-skills@0295158](https://github.com/mrsonord2240/optimized-scientific-skills/tree/029515880c51d55682816327441d7bab373fc175/skills/bio-analytical-validation) · [viewer](skills/bio-analytical-validation/mrsonord2240-optimized-scientific-skills@0295158/viewer.md)
+- Skill: 96, Production Ready · candidate `bd66239b9133` from [mrsonord2240/optimized-scientific-skills@72ba7e0](https://github.com/mrsonord2240/optimized-scientific-skills/tree/72ba7e0949bdeb61322a64248c429b378d42f97e/skills/bio-analytical-validation) · [viewer](skills/bio-analytical-validation/mrsonord2240-optimized-scientific-skills@72ba7e0/viewer.md)
 - Observed in inputs: —
 - Problem: The static documentation says Df and Ef were fragmented to 130–170 bp, while the cited primary ctDNA methods describe Pippin size selection from 110 to 190 bp with an average fragment length of about 165 bp.
 - Root cause: A concise characteristic range was written as an exact preparation range without a directly matching citation.
@@ -1478,7 +1478,7 @@ None open.
 
 ### `bio-batch-processing` — BATCH-008: Preserve relative paths in recursive rows
 
-- Skill: 97, Production Ready · candidate `f5558565b7f1` from [mrsonord2240/optimized-scientific-skills@0295158](https://github.com/mrsonord2240/optimized-scientific-skills/tree/029515880c51d55682816327441d7bab373fc175/skills/bio-batch-processing) · [viewer](skills/bio-batch-processing/mrsonord2240-optimized-scientific-skills@0295158/viewer.md)
+- Skill: 97, Production Ready · candidate `f5558565b7f1` from [mrsonord2240/optimized-scientific-skills@72ba7e0](https://github.com/mrsonord2240/optimized-scientific-skills/tree/72ba7e0949bdeb61322a64248c429b378d42f97e/skills/bio-batch-processing) · [viewer](skills/bio-batch-processing/mrsonord2240-optimized-scientific-skills@72ba7e0/viewer.md)
 - Observed in inputs: 5
 - Problem: summarize_files and process_file emit Path.name, so recursively discovered files with the same basename produce stable but visually ambiguous row identifiers.
 - Root cause: The public result schema was designed for flat directories and does not accept or retain a caller root for relative-path labels.

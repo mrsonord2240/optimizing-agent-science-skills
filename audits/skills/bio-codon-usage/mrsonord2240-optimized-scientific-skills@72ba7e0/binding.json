@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-codon-usage",
+  "candidate_version": "candidate@3186a1debc80-reaudit-opt10-20260928",
+  "candidate_identity": "3186a1debc804852b3ea016b9aeabebc4436a04791b84b13dba8669878d7e4dd",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "72ba7e0949bdeb61322a64248c429b378d42f97e",
+  "provider_path": "skills/bio-codon-usage",
+  "provider_tree": "b703fda091fa535183b72c98cbd6c8ae8544887f",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "3186a1debc804852b3ea016b9aeabebc4436a04791b84b13dba8669878d7e4dd",
+  "file_count": 11,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 6646,
+      "sha256": "c31e1ea7861ac0ebb988eb46d14d769c661b5af77879e7e1fa23b672a927b524"
+    },
+    {
+      "path": "references/compatibility-and-errors.md",
+      "bytes": 3176,
+      "sha256": "bee3971d9b32d4d123008f0c325d618715f670e663aa17fd035dc1b228ea0674"
+    },
+    {
+      "path": "references/metrics-and-methods.md",
+      "bytes": 4579,
+      "sha256": "1b43f4bea318b05ecaaeb2f9424932552f9e78111ade304fafb6f5ff31d3bc77"
+    },
+    {
+      "path": "references/optimization-constraints.md",
+      "bytes": 2146,
+      "sha256": "5360aa93b2a865fe8794ea2970d7330101699d9aa9f298ebb0b176d97e72d1cf"
+    },
+    {
+      "path": "references/provenance.md",
+      "bytes": 2435,
+      "sha256": "bb3cb81915bc57fb595d639754de9247755fe4584cc6ca4a1be2293ddf0e02f5"
+    },
+    {
+      "path": "scripts/basic_analysis.py",
+      "bytes": 2035,
+      "sha256": "43325901d4ef2902a49e51def6843b8a5d47a61ddf8b9e03469e86c42c181e16"
+    },
+    {
+      "path": "scripts/cai_optimization.py",
+      "bytes": 3090,
+      "sha256": "bbe89ffc15c4cae9fdd660e5621164178a99b4f14fc89cff14210691aa248bd8"
+    },
+    {
+      "path": "scripts/codon_utils.py",
+      "bytes": 8631,
+      "sha256": "1e9898adc27c21a8e6575201b71956b434da04d93be0986fae436828ce9be92c"
+    },
+    {
+      "path": "scripts/rscu_analysis.py",
+      "bytes": 2785,
+      "sha256": "8bd3e30ffcacc4a7024cda6ce690dd99b81a3dfe3d442361553aed4663c3c43b"
+    },
+    {
+      "path": "tests/test_codon_usage.py",
+      "bytes": 6116,
+      "sha256": "931cd698f954f535b43e233a3fbb909e75e1bcff3d360faca6ad20b2dddbeb43"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}
