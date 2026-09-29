@@ -6,7 +6,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 - Audit coverage: **181 / 561 (32.3%)** in-scope Skills
 - Untouched: **380**
-- Ready on the optimized shelf: **172**
+- Ready on the optimized shelf: **173**
 - Out of scope: **1**
 
 `Audited` includes every in-scope Skill with a published latest audit, including ready Skills. `Ready` means the provider records a score of at least 85 with a Production Ready grade, deployable exact bytes, no open P0, a completed fix pass, and no pending re-audit. Marketplace intake is a separate gate before a run may call newly completed work done.
@@ -17,9 +17,9 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 |---|---:|---:|---:|---:|---:|
 | Evidence Insight | 1 | 1 | 0 | 1 | 0 |
 | Protocol Design | 7 | 7 | 0 | 7 | 0 |
-| Data Analysis | 173 | 173 | 0 | 164 | 0 |
+| Data Analysis | 173 | 173 | 0 | 165 | 0 |
 | Unclassified | 381 | 0 | 380 | 0 | 1 |
-| **Total** | **562** | **181** | **380** | **172** | **1** |
+| **Total** | **562** | **181** | **380** | **173** | **1** |
 
 `Unclassified` contains Skills for which neither the current audit nor the corpus snapshot supplies an authoritative category. This generator does not guess from directory names.
 
@@ -27,7 +27,6 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
-| `bio-atac-seq-consensus-peakset` | Data Analysis | 91 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-atac-seq-consensus-peakset/mrsonord2240-optimized-scientific-skills@5266f50/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-28",
+  "generated": "2026-09-29",
   "source": {
     "upstream": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
     "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
     "provider_ref": "main",
-    "provider_skills_tree": "0ff7624f5ad62ba005fd5c44f61f2ce5e67574d0"
+    "provider_skills_tree": "5ff1503af7465e7fa49865cdbfbb769b27d22021"
   },
   "skills": [
     {
@@ -119,8 +119,8 @@
     {
       "id": "bio-atac-seq-consensus-peakset",
       "upstream_path": "atac-seq/consensus-peakset",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-deep-learning-atac",
