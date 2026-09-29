@@ -515,11 +515,18 @@ def build_metadata(records_repo=REC, provider_repo=OUT, upstream_repo=UPSTREAM,
         )
 
     # Existing rows, including their already-published marketplace disposition, are preserved.
-    # Only an explicit configured hold may tighten one. Recomputing all historical readiness here
-    # would mutate the release state of already-pinned marketplace submissions.
+    # A fix summary may land after the first provider-metadata reconciliation, so allow that
+    # one-way records completion to move ``fix_pass`` from needed to done. Recomputing every
+    # historical row would mutate the release state of already-pinned Marketplace submissions.
     for row in rows:
         hold = holds.get(row["id"])
-        if row["id"] not in added:
+        fix_log = records_repo / "fixes" / f"{row['id']}.md"
+        completed_fix_record = row.get("fix_pass") == "needed" and fix_log.is_file()
+        if completed_fix_record:
+            row["fix_log"] = f"fixes/{row['id']}.md"
+            row["fix_pass"] = "done"
+            messages.append(f"completing fix-pass metadata for {row['id']}")
+        if row["id"] not in added and not completed_fix_record:
             if hold:
                 row["marketplace_ready"] = False
                 row["marketplace_hold"] = copy.deepcopy(hold)
