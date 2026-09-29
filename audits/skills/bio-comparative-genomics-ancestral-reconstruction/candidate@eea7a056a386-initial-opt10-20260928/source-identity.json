@@ -1,0 +1,35 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "comparative-genomics/ancestral-reconstruction",
+    "subtree": "9f7e2256c6b8246e58387a268006a675df9fd866"
+  },
+  "candidate": {
+    "branch": "optimize/ten-20260928-lane3-ancestral-reconstruction",
+    "worktree_commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-ancestral-reconstruction\\skills\\bio-comparative-genomics-ancestral-reconstruction",
+    "identity_scheme": "sha256-manifest-v1",
+    "manifest_sha256": "eea7a056a3861ff085037d0d5ae9ea566c602c831524f6a517acb6fc77b341d6",
+    "manifest_files": 15,
+    "manifest_bytes": 1441,
+    "status_before": "untracked normalized candidate; exact manifest matched expected identity",
+    "status_after_execution": "untracked normalized candidate; exact manifest matched expected identity"
+  },
+  "tooling": {
+    "tools_md_sha256": "ab29fdd0e5df5a27bd2b6ed50d5a01f61d588354454dfab19942c6894f030236",
+    "environment_fingerprint_sha256": "da8b3ef12894f2f41730e89ef09335bfefb7905a8e40963546a76dcee5f6aa08",
+    "environment_lock_sha256": "216277a7a3841fb84bd731034fbfe09ca28a7514289e9bc15c8a8d92e6f4856c",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "environment": {
+    "boundary": "WSL science; private mount namespace; /mnt/openscience only; WSL_INTEROP unset; unprivileged sci user",
+    "python": "3.12.14",
+    "paml": "4.10.10",
+    "iqtree": "2.4.0",
+    "r": "4.4.3",
+    "ouwie": "3.0.3",
+    "corhmm": "2.8",
+    "grasp": "21-Mar-2024 official JAR"
+  }
+}

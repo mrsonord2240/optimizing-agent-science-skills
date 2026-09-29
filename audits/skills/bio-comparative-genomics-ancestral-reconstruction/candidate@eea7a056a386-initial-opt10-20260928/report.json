@@ -1,0 +1,321 @@
+{
+  "meta": {
+    "skill_name": "bio-comparative-genomics-ancestral-reconstruction",
+    "description": "Reconstruct ancestral states at internal phylogenetic nodes for sequences, discrete traits, continuous traits, and gene content; select appropriate ASR methods, quantify uncertainty, test model and rooting sensitivity, and support ancestral protein resurrection design.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "FAIL",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No executed output fabricated experimental results, DOI or PMID identifiers, sample sizes, p-values, or efficacy data; the provider demonstration is clearly simulated and the public protein input has retained accession and response-hash provenance."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The tested outputs remain phylogenetic and comparative-analysis guidance and make no patient-specific diagnostic, treatment, or clinical-performance claim."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "For EB, lambda, kappa, or delta winners, the continuous script reconstructs on the original tree rather than under the fitted selected model. It also presents OU ancestral estimates more firmly than OUwie 3.0.3 permits and cannot provide the uncertainty the skill requires."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "Both PAML parsing routes silently return zero results from real successful PAML 4.10.10 output, the GRASP shell is rejected by the official 2024 CLI, the current OUwie reconstruction call fails, and malformed or empty posterior inputs are not safely handled."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 65,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 6,
+        "max": 12,
+        "note": "The method taxonomy is broad and useful, but three central shipped routes fail and the continuous best-model branch does not implement what it claims."
+      },
+      "reliability": {
+        "score": 4,
+        "max": 12,
+        "note": "Valid IQ-TREE, stochastic-mapping, and BM controls work, but empty results, malformed schemas, taxon mismatch, stale interfaces, and silent zero-record parsing are not handled safely."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The 15-file package uses progressive disclosure and focused scripts; some guidance is duplicated between the usage guide and routed references."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "The decision workflow and deliverables are clear, but hardcoded examples, stale output contracts, and categorical reconciliation language can lead an agent to report invalid results."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Natural prompts and a useful usage guide make the skill discoverable, while recovery from parser and interface failures requires independent provider expertise and code editing."
+      },
+      "security": {
+        "score": 9,
+        "max": 12,
+        "note": "No credentials, destructive commands, sensitive-data retention, raw eval, or remote bypass are present; biological schemas and shell arguments nevertheless lack a shared validation boundary."
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "Responsibilities are separated into concise files with clear provenance, but no regression suite protects version-sensitive parsers, commands, models, or documented output filenames."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Trigger precision, resource routing, scope, and high-level escape hatches are strong; executable interfaces are hardcoded, stochastic seed management is absent, and machine-readable result contracts are weak."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 48.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 15,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "PAML protein ASR and shipped parsers",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Both control writers run PAML 4.10.10 successfully, but both shipped parsing routes return zero ancestors and zero posterior records from the real rst files.",
+        "basic": 17,
+        "specialized": 19,
+        "total": 36,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Both packaged control writers produce successful PAML runs with nonempty rst and mlc artifacts.", "result": "PASS", "note": "Both runs exit zero and write 17-kB rst files containing 110-site, seven-node reconstructions."},
+          {"text": "The provider parser returns at least one ancestral sequence from current real PAML output.", "result": "FAIL", "note": "parse_rst_ancestors returned an empty mapping."},
+          {"text": "The provider probability parser returns per-site posterior records from current real PAML output.", "result": "FAIL", "note": "extract_site_probabilities returned an empty list."},
+          {"text": "The extracted codeml parser returns nonempty per-node posterior records from current real PAML output.", "result": "FAIL", "note": "parse_rst_posteriors returned no nodes because current output lacks the expected per-node block headers."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "IQ-TREE marginal protein ASR",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact IQ-TREE shell and parser work on the rooted public protein fixture; posterior structure and numerical relationships validate.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The exact packaged shell exits successfully on the declared rooted input.", "result": "PASS", "note": "IQ-TREE 2.4.0 completed and emitted a nonempty state table."},
+          {"text": "The state table contains node, site, state, and 20 posterior columns.", "result": "PASS", "note": "Observed 660 rows, 6 nodes, 110 sites, and all expected protein posterior fields."},
+          {"text": "Every posterior row is finite and sums to approximately one.", "result": "PASS", "note": "The maximum absolute row-sum error is 3e-5."},
+          {"text": "The reported state equals the maximum-posterior residue and the packaged parser preserves all rows.", "result": "PASS", "note": "All argmax checks pass and regrouping retains 660 rows."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Discrete trait stochastic mapping and hidden rates",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact script selects ARD, creates 1,000 stochastic maps, and returns marginal hidden-rate states on a matched 30-tip fixture; reproducibility still depends on caller-managed seed state.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "ER, SYM, and ARD fits are compared and one model is selected by AIC.", "result": "PASS", "note": "ARD is selected on the retained deterministic fixture."},
+          {"text": "The exact script produces the promised 1,000 stochastic maps.", "result": "PASS", "note": "The retained map list has length 1,000."},
+          {"text": "Node posterior output covers the tree's internal nodes.", "result": "PASS", "note": "The stochastic summary has 59 rows and corHMM returns 29 marginal node rows for a 30-tip tree."},
+          {"text": "The exact current corHMM call executes on the installed package.", "result": "PASS", "note": "corHMM 2.8 completes with rate.cat=2, ARD, and marginal node states."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Continuous-trait model selection including OU",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Six finite model fits and the BM branch work, but the advertised OU branch uses a rejected interface and other non-BM winners are not reconstructed under their fitted models.",
+        "basic": 14,
+        "specialized": 17,
+        "total": 31,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "All six model fits return finite AIC values and phylogenetic-signal statistics.", "result": "PASS", "note": "BM, OU, EB, lambda, kappa, and delta are finite; lambda and K are finite."},
+          {"text": "The packaged OU branch fits and reconstructs with OUwie 3.0.3.", "result": "FAIL", "note": "The candidate fit probe errors and OUwie.anc rejects the data argument as unused."},
+          {"text": "The selected EB, lambda, kappa, or delta model is actually applied to ancestral reconstruction.", "result": "FAIL", "note": "The else branch calls contMap on the original tree and never uses the corresponding fitted transformation."},
+          {"text": "Every reported OU ancestral state includes uncertainty suitable for the required deliverable.", "result": "FAIL", "note": "Current OUwie.anc explicitly provides no uncertainty and warns against firm historical use."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "GRASP indel-aware official CLI",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "The official current control succeeds, but the exact candidate shell exits 5 on its first stale option and promises filenames the provider does not emit.",
+        "basic": 6,
+        "specialized": 8,
+        "total": 14,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The official current GRASP CLI can reconstruct the retained alignment and tree.", "result": "PASS", "note": "The valid control emits 7 ancestor sequences over 110 columns, an 8-tip tree, and valid ASR JSON."},
+          {"text": "The exact candidate command is accepted by the official 21-Mar-2024 CLI.", "result": "FAIL", "note": "The CLI rejects -aln with exit 5; the current short option is -a."},
+          {"text": "The candidate uses current tree, output-folder, inference, and thread options.", "result": "FAIL", "note": "The candidate uses stale -tree, -out, --inference, and --threads forms."},
+          {"text": "The documented output filenames match current emitted artifacts.", "result": "FAIL", "note": "Current output is alignment_ancestors.fa, alignment_ancestors.nwk, and ASR.json, not the promised paths."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Empty and malformed posterior contracts",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "A valid IQ-TREE mini-table parses, but empty PAML summaries crash and a table with no posterior columns is silently accepted as NaN confidence.",
+        "basic": 12,
+        "specialized": 14,
+        "total": 26,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "A valid IQ-TREE state fixture returns the correct maximum posteriors.", "result": "PASS", "note": "The valid rows return 0.97 and 0.70."},
+          {"text": "An empty PAML posterior set produces a complete explicit no-result summary.", "result": "FAIL", "note": "The assessor returns a short unknown object that its own summarizer dereferences, raising KeyError total_sites."},
+          {"text": "An IQ-TREE table without p_X columns is rejected.", "result": "FAIL", "note": "The parser accepts the table and creates NaN max_post."},
+          {"text": "Malformed posterior input cannot be mistaken for a completed reconstruction.", "result": "FAIL", "note": "No schema exception or structured failure is produced for the missing-probability table."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Taxon and outgroup mismatches",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Both mismatches are rejected before an accepted reconstruction, but the stochastic-mapping mismatch surfaces only a raw subscript error.",
+        "basic": 25,
+        "specialized": 30,
+        "total": 55,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "An absent IQ-TREE outgroup yields a nonzero exit.", "result": "PASS", "note": "The exact negative control exits 2."},
+          {"text": "No absent-outgroup reconstruction is accepted as valid.", "result": "PASS", "note": "The negative control does not reach the validated output path."},
+          {"text": "A missing trait row is rejected before stochastic-map results are accepted.", "result": "PASS", "note": "The exact candidate path errors before producing an accepted map result."},
+          {"text": "The taxon mismatch error names the missing or extra taxa and explains recovery.", "result": "FAIL", "note": "The user receives only subscript out of bounds."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.0,
+    "dynamic_weighted": 29.0,
+    "score": 55,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The normalized package has exact MIT provenance, a compact entrypoint, and well-routed method, failure, and reporting references.",
+    "The IQ-TREE sequence surface executes on a real public protein alignment and its 660 posterior rows pass structural and numerical validation.",
+    "The discrete-trait path executes 1,000 stochastic maps plus a hidden-rate corHMM comparison on a matched 30-tip fixture.",
+    "The top-level guidance repeatedly emphasizes uncertainty, model comparison, rooting sensitivity, and alternative constructs rather than a single unqualified ancestral sequence.",
+    "Prepared tooling is pinned by an offline-rebuildable 171-package lock and a restricted unprivileged execution boundary."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "TOOL-ASR-001: Replace both PAML parsers",
+      "observed_in": [1, 6],
+      "problem": "Both advertised parsing routes return zero ancestors and zero posteriors from successful real PAML 4.10.10 rst output, so the required deliverables silently disappear.",
+      "root_cause": "The parsers target per-node blocks and bare node sequence lines that are absent from the current matrix-oriented output.",
+      "fix": "Parse and regression-test current protein and codon rst structures, validate expected node/site counts, and fail closed when no records are recovered."
+    },
+    {
+      "priority": "P0",
+      "title": "TOOL-ASR-002: Update the GRASP CLI contract",
+      "observed_in": [5],
+      "problem": "The exact shell is rejected by the official 2024 CLI and documents output filenames that the valid provider control does not emit.",
+      "root_cause": "The wrapper preserves an older long-option and artifact contract without testing it against the provider JAR.",
+      "fix": "Use the current -a, -n, -o, -j, and -t interface, select explicit save formats, and verify the actual ancestor FASTA, tree, and ASR JSON before success."
+    },
+    {
+      "priority": "P0",
+      "title": "TOOL-ASR-003: Correct and bound OUwie ASR",
+      "observed_in": [4],
+      "problem": "The packaged OU call fails on OUwie 3.0.3, and the surrounding guidance treats a visualization-only point reconstruction as stronger evidence than the provider permits.",
+      "root_cause": "The script uses a stale data argument and omits the current fitted-object, knowledge acknowledgement, and uncertainty limitations.",
+      "fix": "Call OUwie.anc only with a validated fitted object and knowledge=TRUE, preserve the provider warning, and refuse any deliverable that claims absent uncertainty or treats estimates as observed data."
+    },
+    {
+      "priority": "P0",
+      "title": "ASR-007: Reconstruct under the selected model",
+      "observed_in": [4],
+      "problem": "When EB, lambda, kappa, or delta wins, the script calls contMap on the unmodified original tree and therefore does not reconstruct under the selected fit.",
+      "root_cause": "The model-selection table and reconstruction branch are disconnected; the chosen fit is never converted into the transformation used for ASR.",
+      "fix": "Implement and test a mathematically valid reconstruction for each supported winner using its fitted transformation, or stop and route unsupported winners instead of returning mislabeled fastAnc output."
+    },
+    {
+      "priority": "P1",
+      "title": "TOOL-ASR-004: Make empty summaries total",
+      "observed_in": [6],
+      "problem": "The empty assessor returns only quality and message fields, while its own summarizer unconditionally dereferences total_sites and crashes.",
+      "root_cause": "The no-result and populated result shapes are inconsistent and no explicit failed-status contract exists.",
+      "fix": "Return one complete typed result shape for all paths, propagate an explicit failed/no-data status, and regression-test empty and zero-record parser results."
+    },
+    {
+      "priority": "P1",
+      "title": "TOOL-ASR-005: Validate IQ-TREE schemas",
+      "observed_in": [2, 6],
+      "problem": "A table with Node, Site, and State but no posterior columns is accepted and assigned NaN maximum confidence.",
+      "root_cause": "The parser computes a row maximum over an unchecked empty column selection.",
+      "fix": "Require identifiers and at least one finite p_X column, validate bounds and posterior sums, verify State equals argmax, and reject empty or malformed tables with stable errors."
+    },
+    {
+      "priority": "P1",
+      "title": "ASR-008: Add seed and taxon contracts",
+      "observed_in": [3, 7],
+      "problem": "The stochastic script relies on caller RNG state and a missing trait row produces only a raw subscript error.",
+      "root_cause": "No executable preflight reconciles taxa and states, and no script argument or metadata field records the stochastic seed.",
+      "fix": "Validate exact tree/data taxon sets and allowed states before fitting, accept or set an explicit seed, and emit the seed and stable mismatch details with every result."
+    },
+    {
+      "priority": "P1",
+      "title": "ASR-009: Remove categorical model claims",
+      "observed_in": [],
+      "problem": "Routed tables say to trust one method or call one model correct when methods disagree, despite the skill's stronger top-level caveats and provider warnings.",
+      "root_cause": "Heuristic reconciliation guidance was compressed into categorical rules without carrying model-adequacy, extinction, uncertainty, and sensitivity conditions.",
+      "fix": "Rewrite these entries as conditional evidence-weighting guidance, retain competing estimates and uncertainty, and prohibit treating reconstructed states as observed data."
+    },
+    {
+      "priority": "P2",
+      "title": "TOOL-ASR-006: Pin the corHMM version source",
+      "observed_in": [3],
+      "problem": "The skill advertises corHMM 2.9+, while current CRAN is 2.8 and provider GitHub is 2.10.5 with a changed dependency surface.",
+      "root_cause": "The version floor names neither an installation source nor a tested version matrix.",
+      "fix": "Document CRAN 2.8 and a pinned tested GitHub revision separately, include installation provenance, and test each supported interface rather than inferring compatibility across the missing 2.9 boundary."
+    }
+  ]
+}

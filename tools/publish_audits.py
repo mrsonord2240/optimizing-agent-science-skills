@@ -275,6 +275,7 @@ def _modular_candidate(identity, where):
         raise SystemExit(f"{where}: source-identity.json has no candidate object")
     value = (
         raw.get("content_sha256")
+        or raw.get("manifest_sha256")
         or raw.get("sha256")
         or raw.get("digest")
         or raw.get("identity")

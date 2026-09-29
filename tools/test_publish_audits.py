@@ -121,6 +121,22 @@ class ModularPublicationTests(unittest.TestCase):
 
             self.assertEqual(version, "candidate@333333333333-initial-opt10")
 
+    def test_modular_run_accepts_manifest_sha256_field(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            run = self.make_run(root)
+            identity_path = run / "source-identity.json"
+            identity = json.loads(identity_path.read_text(encoding="utf-8"))
+            digest = identity["candidate"].pop("content_sha256")
+            identity["candidate"]["manifest_sha256"] = digest
+            write_json(identity_path, identity)
+
+            version, _ = publish.publish_modular(
+                str(root / "records"), "sample-skill", str(run), []
+            )
+
+            self.assertEqual(version, "candidate@333333333333-initial-opt10")
+
 
 if __name__ == "__main__":
     unittest.main()

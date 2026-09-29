@@ -1,0 +1,10 @@
+taxon	uniprot_accession	role
+Homo_sapiens	P99999	ingroup
+Mus_musculus	P62897	ingroup
+Rattus_norvegicus	P62898	ingroup
+Bos_taurus	P62894	ingroup
+Equus_caballus	P00004	ingroup
+Gallus_gallus	P00030	ingroup
+Sus_scrofa	P00011	ingroup
+outgroup_taxon	P00044	outgroup
+
