@@ -1,62 +1,48 @@
-# Handoff: bio-atac-seq-consensus-peakset / initial audit
+# Handoff: bio-atac-seq-consensus-peakset / final independent re-audit
 
-- Updated: 2026-09-28
-- Lane: 1
-- Status: ready-for-local-record-publication-and-fix
-- Owner leaving: audit-scientific-skill
-- Next role: fix-scientific-skill
+## 1. State
 
-## Source identity
+- Updated: 2026-09-29; lane 1.
+- Status: candidate-ready for the exact fixed identity below.
+- Owner leaving: `reaudit-scientific-skill`.
+- Next role: orchestrator for candidate commit and intake; audit agent performed no commit or publication.
 
-- Origin: `GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:atac-seq/consensus-peakset`; origin checkout remained clean and read-only.
-- Candidate: `F:\OpenScience\wt\mercury-pilot-consensus-peakset\skills\bio-atac-seq-consensus-peakset` at base `4cc6cabc39ee01dcf3e828e3f8a164b7e155f4fb`, branch `optimize/mercury-pilot-consensus-peakset`.
-- Exact canonical content identity: SHA-256 `238e6dfd2a0a5da05cf1c37ceba3de899a1f298927e49ddc5c9bb668eb8eda5c` (5 files; 27,093 bytes; sorted POSIX-path/byte-count/file-SHA manifest, LF-separated, no trailing LF). See [source-identity.json](F:/OpenScience/audits/bio-atac-seq-consensus-peakset/initial-mercury-pilot-20260928/source-identity.json).
-- The tooling handoff's prior expected digest `4778d035fcabb3f8e9f94760a80eb65228ec3482593058455597dfc8f0aab11e` used a noncanonical path-and-file-hash recipe with a trailing LF. The canonical manifest supersedes that digest; candidate bytes did not change.
+## 2. Candidate identity
 
-## Completed this phase
+- Candidate: `F:\OpenScience\wt\mercury-pilot-consensus-peakset\skills\bio-atac-seq-consensus-peakset`.
+- Branch/base: `optimize/mercury-pilot-consensus-peakset` / `4cc6cabc39ee01dcf3e828e3f8a164b7e155f4fb`.
+- Certified identity: `sha256-manifest-v1 f370a4b24019a815c46f0ed9f0b2171d45a382ed277fc113a4aa77ebec2ba808` (5 files; 29,569 bytes; 453-byte canonical manifest). Identity was checked before and after independent guard testing.
+- Full manifest and origin provenance: `F:\OpenScience\audits\bio-atac-seq-consensus-peakset\final2-mercury-pilot-20260929\source-identity.json`.
+- The prior `87fb708bbca9ff4b4d07e1158e42be3585c1a50605888dbede3ad07332d0964e` identity is superseded; its prior Reject does not describe these bytes.
 
-- Read the complete audit contract, tooling inventory, and candidate tree; verified the candidate remained unmodified.
-- Direct Linux Bash invocation fails on CRLF (`$'\r': command not found`; `pipefail\r: invalid option name`). A disposable LF-normalized copy completed the public hg19 fixture workflow: 3,000 inputs, 2,927 after greedy overlap, 2,886 after blacklist; all final intervals were 501 bp, and SAF coordinates matched BED across all 2,886 rows.
-- A distinct two-file case pooled 400 public narrowPeak rows, retained 393 after greedy overlap and 388 after blacklist.
-- A targeted 9-column case silently completed with an absent summit offset and emitted a start-centered interval. Official rtracklayer source confirms NarrowPeak import metadata uses `peak` for column 10; the installed environment did not contain rtracklayer for execution.
-- Produced a schema-valid report, viewer, identity, two-item ordered finding ledger, evidence, saved audit runner, and bounded inputs under [raw audit root](F:/OpenScience/audits/bio-atac-seq-consensus-peakset/initial-mercury-pilot-20260928).
-- No audit-local repair was made. Report: [report.json](F:/OpenScience/audits/bio-atac-seq-consensus-peakset/initial-mercury-pilot-20260928/report.json); validation: [schema-validation.json](F:/OpenScience/audits/bio-atac-seq-consensus-peakset/initial-mercury-pilot-20260928/evidence/schema-validation.json); ledger: [finding-ledger.md](F:/OpenScience/audits/bio-atac-seq-consensus-peakset/initial-mercury-pilot-20260928/finding-ledger.md).
+## 3. Verdict and readiness metrics
 
-## Required next actions
+- Verdict: **candidate-ready**, score 91/100, Production Ready.
+- Static: 85/100; dynamic average: 94.3/100; Layer 1: 38/40; Layer 2: 56/60; assertions: 15/15 (100%); veto gates: none; open P0: none.
+- BAP-003 is resolved on the current bytes. Exact R and connected Python guard fragments were independently tested before summit arithmetic/output construction. Prior BAP-001/BAP-002 shell evidence was reused only after matching script bytes, runtime fingerprint, and cached inputs.
+- No remaining finding IDs.
 
-1. Complete local records publication for the raw audit and regenerate/check the records index and status outputs before dispatching the fixer.
-2. Route `BAP-001` and `BAP-002` to `fix-scientific-skill`; preserve the exact candidate identity and do not treat normalized-copy success as validation of the shipped bytes.
-3. After fixes, rerun the exact Bash launch, the 3,000-row matched hg19 workflow, the two-file case, and the focused missing-summit regression.
+## 4. Report and evidence paths
 
-## Open findings and blockers
+- Raw audit root: `F:\OpenScience\audits\bio-atac-seq-consensus-peakset\final2-mercury-pilot-20260929`.
+- Strict schema report: `...\report.json`; readable view: `...\viewer.md`; identity/provenance: `...\source-identity.json`.
+- Guard evidence: `...\evidence\r-guard.log`, `...\evidence\python-guard.log`, with reproducible harnesses in the same directory.
+- Reuse rationale, hashes, output counts, and shell invalid-case disposition: `...\evidence\shell-evidence-reuse.md`.
+- Required core public output: 3,000 pooled → 2,927 iterative → 2,886 fixed-width final BED and matching SAF. Two-file mode: 400 pooled → 393 iterative → 388 final BED and SAF. Recorded output checks cover schemas, width, bounds, sorting, non-overlap, blacklist filtering, and BED/SAF correspondence.
 
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| BAP-001 | P0 | open | Input 3; `evidence/9col-rerun.txt`; `inputs/adversarial-9col.bed` | Validate narrowPeak row width and summit offset before arithmetic; reject malformed rows with filename/line context and handle `-1` explicitly. |
-| BAP-002 | P0 | open | Input 1; `evidence/direct-crlf-rerun.txt`; candidate shell script | Normalize the shipped Bash script to LF and verify direct execution under the prepared Linux runtime. |
+## 5. Failed or blocked surfaces and exact after-action
 
-- The research veto fails on Methodological Ground and Code Usability; diagnostic final score is 60/100 with veto override, grade Reject.
-- Assembly mismatch was reviewed but not raised as a separate finding: the Skill explicitly requires matching assembly/chromosome naming, and the tested fixture used matching hg19 references. Same-named assembly provenance cannot be reliably inferred from coordinates alone.
-- DiffBind, pybedtools, IDR, liftOver, and featureCounts downstream surfaces remain static-only or blocked by unavailable packages/assets and lack of BAM inputs. No optional packages were installed.
+- No failed required surface and no unresolved blocker to candidate readiness.
+- Full optional dependency-backed R and pybedtools workflows were not run because `GenomicRanges`, `rtracklayer`, and `pybedtools` are unavailable. They are explicitly not counted as executed. If those optional runtimes are enabled later, run valid and invalid summit-offset cases end-to-end and inspect resulting range/BED outputs; no packages were installed in this audit.
+- Mercury's post-fix `set -e` claim was advisory, not accepted as a finding: saved direct shell evidence was checked; both malformed-nine-column and negative-summit inputs exit 1, issue one file/line diagnostic, and create no output directory.
 
-## Environment and evidence
+## 6. Worktree and scope
 
-- Prepared environment: WSL2 `science`, user `sci`; Bash 5.3.9; Python 3.12.14; bedtools 2.31.1; R 4.4.1. Interop is disabled; execution and public fixture reads used `/mnt/openscience`.
-- Tool inventory: `F:\OpenScience\audit-envs\bio-atac-seq-consensus-peakset\TOOLS.md`, SHA-256 `0895f658996fcf5dd5fafc16e63083f21619e94c809205ec836db898fb761a81`. Rubric: current `skill-auditor.zip`, SHA-256 `e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de`.
-- Public fixture: GEO GSM7854725, GM12878 ATAC-seq replicate 1, hg19; matching UCSC hg19 chromosome sizes and Boyle-Lab hg19 blacklist v2 were already cached.
-- Environment limitation: `rtracklayer` and `GenomicRanges` are unavailable; no package was installed.
-- No restricted-access blocker. No product commit, push, pull request, release, or remote publication occurred.
+- Worktree remains at base commit with only the pre-existing untracked Skill subtree; no candidate bytes changed, no files staged or committed.
+- Origin checkout remained read-only. No product/control commit, push, release, publication, or Marketplace action occurred.
+- Audit artifacts are confined to the lane-1 raw final root; the exact content identity was checked before/after.
 
-## Worktree safety
+## 7. Next role
 
-- Candidate status remained the run-owned untracked Skill subtree only at the recorded base; all five candidate file hashes are in `source-identity.json`.
-- Candidate files and origin checkout were not edited. Audit artifacts were written only under the raw audit root, except this canonical handoff.
-- Audit-local repair details: none. Local records publication remains the next operational action; no remote state was changed.
-
-## Transition assertion
-
-- Exact candidate bytes are pinned to `238e6dfd2a0a5da05cf1c37ceba3de899a1f298927e49ddc5c9bb668eb8eda5c`: yes.
-- Evidence and report schema validation complete: yes; validator result is in `evidence/schema-validation.json`.
-- Open findings routed in priority order to `fix-scientific-skill`: yes; `BAP-001`, `BAP-002`.
-- Deferred surfaces and environment limitations recorded: yes.
-- Next phase: local records publication, then `fix-scientific-skill`.
+- Route exact identity `f370a4b24019a815c46f0ed9f0b2171d45a382ed277fc113a4aa77ebec2ba808` to the orchestrator as **candidate-ready** for commit and intake. This is not yet `ready` or `done`; those states require the orchestrator's commit and intake process.
+- Report: `F:\OpenScience\audits\bio-atac-seq-consensus-peakset\final2-mercury-pilot-20260929\report.json`.

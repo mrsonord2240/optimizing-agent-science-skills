@@ -1,0 +1,64 @@
+{
+  "skill_id": "bio-atac-seq-consensus-peakset",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/consensus-peakset",
+    "subtree": "3a5a7057771a3154ad411dfe616a3a92f599d46e",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "verified_commit": true
+  },
+  "candidate": {
+    "identity": "f370a4b24019a815c46f0ed9f0b2171d45a382ed277fc113a4aa77ebec2ba808",
+    "identity_kind": "sha256-manifest-v1",
+    "path": "F:\\OpenScience\\wt\\mercury-pilot-consensus-peakset\\skills\\bio-atac-seq-consensus-peakset",
+    "branch": "optimize/mercury-pilot-consensus-peakset",
+    "base_commit": "4cc6cabc39ee01dcf3e828e3f8a164b7e155f4fb",
+    "file_count": 5,
+    "total_file_bytes": 29569,
+    "candidate_files_modified_by_auditor": false
+  },
+  "candidate_path": "F:\\OpenScience\\wt\\mercury-pilot-consensus-peakset\\skills\\bio-atac-seq-consensus-peakset",
+  "candidate_identity": {
+    "scheme": "sha256-manifest-v1",
+    "sha256": "f370a4b24019a815c46f0ed9f0b2171d45a382ed277fc113a4aa77ebec2ba808",
+    "file_count": 5,
+    "total_file_bytes": 29569,
+    "manifest_bytes": 453,
+    "manifest_recipe": "Ordinal UTF-8 POSIX-relative path order; each line is path<TAB>byte-count<TAB>lowercase-sha256; LF joins; no trailing LF.",
+    "manifest": [
+      {"path": "LICENSE", "bytes": 1065, "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"},
+      {"path": "SKILL.md", "bytes": 3286, "sha256": "8e5bd805d02ca6a8dcff01d1ec55ccb7a99d4e641ecb8691c6053098a07782c3"},
+      {"path": "references/method-reference.md", "bytes": 19422, "sha256": "0c182e6dcc1b675bc957df6b96631b6eba717e938b8de6c847c8a562ff9321ee"},
+      {"path": "references/usage-guide.md", "bytes": 1062, "sha256": "72a30391693a09dbab81fa1c4f4f71871426ff1161a96a306a42a423074a639c"},
+      {"path": "scripts/iterative_overlap.sh", "bytes": 4734, "sha256": "669e6ef57023742f85ee0c4f9f64c61489db747d5fd2375417e818292b411ad4"}
+    ]
+  },
+  "provenance": {
+    "origin_repository": "F:\\optimizing-agent-science-skills",
+    "origin_commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "origin_skill_subtree": "3a5a7057771a3154ad411dfe616a3a92f599d46e",
+    "candidate_branch": "optimize/mercury-pilot-consensus-peakset",
+    "candidate_base_commit": "4cc6cabc39ee01dcf3e828e3f8a164b7e155f4fb",
+    "worktree_state": "At base commit with only pre-existing untracked candidate Skill subtree; no files staged or committed.",
+    "candidate_identity_checked_before_and_after": true,
+    "audit_lane": 1,
+    "raw_audit_root": "F:\\OpenScience\\audits\\bio-atac-seq-consensus-peakset\\final2-mercury-pilot-20260929"
+  },
+  "audit_method": {
+    "contract": "F:\\optimizing-agent-science-skills\\.claude\\skills\\reaudit-scientific-skill\\SKILL.md",
+    "tool_inventory": "F:\\OpenScience\\audit-envs\\bio-atac-seq-consensus-peakset\\TOOLS.md",
+    "tool_inventory_sha256": "09b8b3dd2536e8c92dfd28c7d15df5bd756a0a64e3167fd0e8b530ba0fcd3b17",
+    "auditor_rubric_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "runtime_fingerprint_sha256": "b781ca8a648dc74b0a2e0f410c215c90c3af274c808ad42cd249507cd7bd4514",
+    "input_sha256": {
+      "public_narrowpeak": "f871f40c26bdea3817c41c8ed67453a396591f1d9b99e6e51d602dc0c1810e05",
+      "hg19_chrom_sizes": "b404927655a4aada254ea94ad4da0c8901ed0737e67a0dcabedf673354b1f505",
+      "blacklist": "1a4ba636f791936ab8952cb068f496ccbd55ec4753539547c5d3d055ed00642a"
+    },
+    "reused_shell_script_sha256": "669e6ef57023742f85ee0c4f9f64c61489db747d5fd2375417e818292b411ad4",
+    "previous_candidate_identity": "87fb708bbca9ff4b4d07e1158e42be3585c1a50605888dbede3ad07332d0964e",
+    "previous_identity_disposition": "Superseded because candidate bytes changed; the current audit is independently pinned to the f370... identity above."
+  }
+}

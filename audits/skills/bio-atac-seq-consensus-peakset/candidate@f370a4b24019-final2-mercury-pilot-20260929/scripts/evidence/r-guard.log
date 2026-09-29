@@ -1,0 +1,27 @@
+expression(library(GenomicRanges), library(rtracklayer), peaks <- import("peaks.narrowPeak"), 
+    peak_offset <- peaks$peak, if (is.null(peak_offset) || length(peak_offset) != 
+        length(peaks) || anyNA(peak_offset) || any(peak_offset < 
+        0L) || any(peak_offset >= width(peaks))) {
+        stop("narrowPeak summit offsets must be present and within each interval; -1 means no summit was called", 
+            call. = FALSE)
+    }, chrom_sizes <- read.table("hg38.chrom.sizes", col.names = c("chrom", 
+        "len")), seqlengths(peaks) <- setNames(chrom_sizes$len, 
+        chrom_sizes$chrom)[seqlevels(peaks)], peaks_summit <- peaks, 
+    start(peaks_summit) <- start(peaks) + peak_offset, end(peaks_summit) <- start(peaks_summit), 
+    peaks_fixed <- resize(peaks_summit, width = 501, fix = "center"), 
+    peaks_fixed <- trim(peaks_fixed), peaks_sorted <- peaks_fixed[order(-peaks_fixed$signalValue)], 
+    kept <- logical(length(peaks_sorted)), already_used <- GRanges(), 
+    for (i in seq_along(peaks_sorted)) {
+        if (!any(overlapsAny(peaks_sorted[i], already_used))) {
+            kept[i] <- TRUE
+            already_used <- c(already_used, peaks_sorted[i])
+        }
+    }, consensus <- peaks_sorted[kept], export(consensus, "consensus_iterative.bed"))
+ACCEPT lower and upper valid offsets: 0, 99
+REJECT -1 sentinel 
+REJECT other negative offset 
+REJECT missing offset 
+REJECT offset equal to interval width 
+REJECT offset/feature count mismatch 
+REJECT absent offset field 
+R guard checks passed; the exact guard expression runs before the example's start-coordinate assignment.

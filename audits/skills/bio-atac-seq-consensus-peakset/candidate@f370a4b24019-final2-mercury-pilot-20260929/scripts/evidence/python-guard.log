@@ -1,0 +1,7 @@
+ACCEPT rows=[['chr1', '750', '1251', 'peak', '5.5', '+'], ['chr1', '849', '1350', 'peak', '5.5', '+']]
+REJECT expected 10 narrowPeak columns: /tmp/tmpr624lt19/fixture.narrowPeak line 1: expected 10 narrowPeak columns
+REJECT summit offset -1 means no summit was called: /tmp/tmpkowo_kqd/fixture.narrowPeak line 1: summit offset -1 means no summit was called
+REJECT summit offset must be within the narrowPeak interval: /tmp/tmp1g_eozhp/fixture.narrowPeak line 1: summit offset must be within the narrowPeak interval
+REJECT summit offset must be within the narrowPeak interval: /tmp/tmp3vv5c6o8/fixture.narrowPeak line 1: summit offset must be within the narrowPeak interval
+REJECT fixture.narrowPeak line 2: /tmp/tmpdqe2hq1_/fixture.narrowPeak line 2: summit offset -1 means no summit was called
+Python guard checks passed; invalid inputs failed before BedTool construction.
