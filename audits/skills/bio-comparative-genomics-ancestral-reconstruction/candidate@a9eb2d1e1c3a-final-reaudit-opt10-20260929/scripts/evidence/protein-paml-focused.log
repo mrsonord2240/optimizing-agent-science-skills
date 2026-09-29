@@ -1,0 +1,46 @@
+[
+  {
+    "route": "provider",
+    "status": "PASS_FRESH_PROTEIN_CODeml_4_10_10",
+    "returncode": 0,
+    "rst_bytes": 17021,
+    "rst_sha256": "7b16423850479ccfa762075ebc3a05d873c799a14af4b521d8708d7e6523f164",
+    "alignment_sha256": "54252aad18329baf392d5bad19a674b078f241e605009f04bb7338e32473e377",
+    "tree_sha256": "e73b87c216ae436e9372b339f7fdf00999d67489b555157de4af67bb9845fd2f",
+    "nodes": 7,
+    "sites_per_node": 110,
+    "posterior_records": 770,
+    "Node10_sites_1_2": [
+      [
+        "M",
+        0.674
+      ],
+      [
+        "T",
+        0.282
+      ]
+    ]
+  },
+  {
+    "route": "extracted",
+    "status": "PASS_FRESH_PROTEIN_CODeml_4_10_10",
+    "returncode": 0,
+    "rst_bytes": 17081,
+    "rst_sha256": "9e591bd672f8d47e8901be06a118a0a65bd746dfef6c03dd15ed1d75b0d39b1e",
+    "alignment_sha256": "54252aad18329baf392d5bad19a674b078f241e605009f04bb7338e32473e377",
+    "tree_sha256": "e73b87c216ae436e9372b339f7fdf00999d67489b555157de4af67bb9845fd2f",
+    "nodes": 7,
+    "sites_per_node": 110,
+    "posterior_records": 770,
+    "Node10_sites_1_2": [
+      [
+        "M",
+        0.717
+      ],
+      [
+        "T",
+        0.315
+      ]
+    ]
+  }
+]

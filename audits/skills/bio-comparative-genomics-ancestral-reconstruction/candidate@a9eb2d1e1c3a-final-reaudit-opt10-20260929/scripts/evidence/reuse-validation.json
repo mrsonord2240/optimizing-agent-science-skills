@@ -1,0 +1,66 @@
+{
+  "schema": "asr-immutable-evidence-reuse-v1",
+  "current_candidate_identity": "sha256-manifest-v1:a9eb2d1e1c3ac7f89d63f11deb7a436c14ab0c78a6469911812aa510eeb93e07",
+  "candidate_manifest_sha256": "a9eb2d1e1c3ac7f89d63f11deb7a436c14ab0c78a6469911812aa510eeb93e07",
+  "candidate_file_count": 17,
+  "candidate_manifest_bytes": 1628,
+  "all_candidate_bytes_match_fix_manifest": true,
+  "verified_unaffected_candidate_files": {
+    "scripts/iqtree_ancestral.sh": {
+      "bytes": 243,
+      "sha256": "acbf841363a53e2c1dec540e2ed26505d9313f6cf6ab584c9b58618e0a7ec8cb"
+    },
+    "scripts/iqtree_state.py": {
+      "bytes": 2790,
+      "sha256": "5f1703116774786016193bbe90b9671632ca6bb7082ddad246f06e3d701029f3"
+    },
+    "scripts/grasp_asr.sh": {
+      "bytes": 1990,
+      "sha256": "d380f8773fd5dbf7bb3e3d020a7a8c4c6e44e9d12b1f61b807f3659d5d08af76"
+    },
+    "scripts/stochastic_mapping.R": {
+      "bytes": 2823,
+      "sha256": "8fd75696b1d7e744127487031aa4a139344e5a9dfe4657274a978f6dbb7fd593"
+    },
+    "scripts/continuous_trait_asr.R": {
+      "bytes": 4335,
+      "sha256": "8be2a16f29f695e6c639dc9e13703227954ca3355515b838282da6e73584f6b4"
+    },
+    "scripts/ancestral_reconstruction.py": {
+      "bytes": 6710,
+      "sha256": "74923f429a1c293b07af28ca2f79303b586d54749f1ca5e0ad4afc02db6139d2"
+    }
+  },
+  "environment_lock_sha256": "216277a7a3841fb84bd731034fbfe09ca28a7514289e9bc15c8a8d92e6f4856c",
+  "environment_lock_unchanged_from_fingerprint": true,
+  "runtime_probe_sha256": "f66c8631253bbfa2095db27fa50c73351b8a63f3b38a0e5dc26d91a46812fdce",
+  "runtime_versions_and_boundary_match": true,
+  "reused_evidence_sha256": {
+    "iqtree_results": "acaad68191cfba3b4619cef48e5d45062e48b07c8f789f3b6458d6d9686bfcc2",
+    "iqtree_state": "733c767357b342c7602f7c7e99dc80d85496aa5a124ce7572e0cc07d2aa01c7c",
+    "grasp_validation": "abaa1d888e51c88eb1f0c78cf2a502a5190b2100b5e50233e135ee48771be2b3",
+    "grasp_wrapper_log": "f90d778a1606d999d23e94e98b9012563e18880d9e76bcbbe0613db9b8222b57",
+    "grasp_alignment": "e14127d7fa50c796ca0ad8b7cf7a0ac7e5a17e4d6510b6c78292ac4cec840f31",
+    "grasp_tree": "ecb89bb4f935d278acc58481fbc18963028288631e7faceab5a159e5bf209801",
+    "r_session_info": "8b0c36c5ca3a67b5a90ad60b5ca826c8181d173bafefd3354e0d50ade1915eee",
+    "r_retest_script": "3995547e2340e0aff31b1b80dde4c87d549a09b96b343d76042f1b56df20598a",
+    "r_traits": "e6e147a99c1d1b78ca593b618cd7aa25be9afe9dcea26fc5ff0803bb0381071a",
+    "r_tree": "644c2ec5e6be5af68b1b209f4f27e012adedc000d808ee1610fbd7accc226630",
+    "python_results": "0704b61db55f8f323f72ba81e96c78194fa2fbdf75578e1ed96f458e745433c0"
+  },
+  "decision": "Reusable IQ-TREE, GRASP, R/corHMM/OUwie, and no-data evidence remains applicable; candidate bytes, runtime, interfaces, fixtures, and analysis assumptions match the recorded fixed run.",
+  "newly_rerun_surfaces": [
+    "PAML CODONML codon writer/parser",
+    "PAML provider protein writer/parser",
+    "PAML extracted protein writer/parser"
+  ],
+  "unexecuted_optional_surfaces": [
+    "FastML",
+    "RevBayes",
+    "BayesTraits",
+    "MrBayes",
+    "BEAST2",
+    "RPANDA",
+    "GRASP web service"
+  ]
+}
