@@ -205,15 +205,22 @@ Treat one invocation as one product batch:
 
 1. Create one unpublished optimized-shelf commit containing all and only this
    run's candidate-ready Skills and required shared metadata.
-2. Refresh the corpus snapshot with `npm run audits:inventory`; this updates
-   `audits/CORPUS.json` and all four generated audit views.
+2. Immediately after every commit, amendment, or replacement commit that
+   changes a Skill or its provider metadata in `optimized-scientific-skills`,
+   run `npm run audits:inventory` from the records repository, followed by
+   `npm run audits:check`. The inventory command refreshes
+   `audits/CORPUS.json` from the optimized shelf and regenerates all four audit
+   views. A plain `npm run audits:index` is not a substitute because it reuses
+   the saved corpus snapshot. Do not treat the product commit as reconciled
+   until both commands pass.
 3. Run the Marketplace's local intake gate against that full commit.
 4. Resolve failures according to the gate. A Skill-byte change returns through
    fix and fresh re-audit; a manifest-only change does not.
 5. Exclude unresolved Skills and amend or recreate the unpublished commit.
-   Refresh the corpus snapshot and rerun intake whenever the product commit
-   changes. Stop only when intake has accepted the exact final commit and final
-   product history contains one run-closing optimized commit.
+   Repeat the mandatory post-commit inventory refresh and rerun intake whenever
+   the product commit changes. Stop only when intake has accepted the exact
+   final commit and final product history contains one run-closing optimized
+   commit.
 6. For accepted bio-derived Skills, prepare at most one corresponding
    bioSkills-Improved batch commit from the exact canonical bytes.
 7. Commit resumable state for unfinished lanes in the records repository when

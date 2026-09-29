@@ -67,7 +67,28 @@ includes ready Skills. Derive:
 - untouched as in-scope known Skills with no published audit.
 
 Never edit counts by hand. Run `npm run audits:index` after every published
-audit. Run `npm run audits:inventory` after provider inventory, readiness, or
-source metadata changes; it refreshes `audits/CORPUS.json` from the canonical
-optimized provider and regenerates every audit view. If either generator
-fails, resolve or report the concrete blocker before accepting the transition.
+audit.
+
+Treat provider inventory refresh as a mandatory post-commit invariant. After
+every commit, amendment, or replacement commit that adds, changes, or removes a
+Skill or its provider metadata in `optimized-scientific-skills`, run these from
+the records repository before continuing:
+
+```powershell
+npm run audits:inventory
+npm run audits:check
+```
+
+`audits:inventory` is the repository alias for refreshing `audits/CORPUS.json`
+from the canonical optimized provider and regenerating every audit view. Its
+expanded local form is:
+
+```powershell
+npm run audits:index -- --refresh-inventory --provider F:\optimized-scientific-skills
+```
+
+A plain `npm run audits:index` only regenerates views from the saved corpus and
+does not satisfy this post-commit requirement. Do not accept the product commit
+as reconciled until inventory refresh and consistency check both pass. If either
+command fails, resolve or report the concrete blocker before accepting the
+transition.
