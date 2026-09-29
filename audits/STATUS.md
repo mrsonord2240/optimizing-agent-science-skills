@@ -34,7 +34,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-chipseq-allele-specific-binding` | Data Analysis | 95 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-chipseq-allele-specific-binding/candidate@03415aabaa66-reaudit2-opt10-20260928/viewer.md) |
 | `bio-clinical-biostatistics-adaptive-designs` | Protocol Design | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-biostatistics-adaptive-designs/candidate@19824f36846d-reaudit-opt10-20260928/viewer.md) |
 | `bio-clinical-databases-acmg-classification` | Data Analysis | 96 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-clinical-databases-acmg-classification/candidate@286df2647ef2-reaudit2-opt10-20260928/viewer.md) |
-| `bio-clip-seq-ago-clip-mirna-targets` | Data Analysis | 87 | Reject | 1 / 1 / 0 | [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/candidate@21c6ba09ec35-reaudit-opt10-20260928/viewer.md) |
+| `bio-clip-seq-ago-clip-mirna-targets` | Data Analysis | 92 | Reject | 1 / 0 / 0 | [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/candidate@a89a7ecad19a-reaudit2-opt10-20260928/viewer.md) |
 | `bio-codon-usage` | Data Analysis | 97 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-codon-usage/candidate@3186a1debc80-reaudit-opt10-20260928/viewer.md) |
 | `bio-comparative-genomics-ancestral-reconstruction` | Data Analysis | 55 | Reject | 4 / 4 / 1 | [viewer](skills/bio-comparative-genomics-ancestral-reconstruction/candidate@eea7a056a386-initial-opt10-20260928/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |

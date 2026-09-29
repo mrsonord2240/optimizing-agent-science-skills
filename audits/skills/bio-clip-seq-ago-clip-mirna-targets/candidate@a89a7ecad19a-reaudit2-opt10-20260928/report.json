@@ -1,0 +1,404 @@
+{
+  "meta": {
+    "skill_name": "bio-clip-seq-ago-clip-mirna-targets",
+    "description": "Identify direct miRNA-target interactions from AGO HITS-CLIP, AGO-CLEAR-CLIP, HEAP, chimeric eCLIP / miR-eCLIP, or CLASH, and reconcile direct chimeras with computational predictions.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No DOI, PMID, biological result, study size, p-value, or execution state was fabricated in the evaluated outputs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill remains a research-analysis workflow and provides no patient-specific diagnosis or treatment recommendation."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "The expression filter accepts non-finite NaN as a valid expression measurement; under a threshold of 100, the comparison evaluates false and admits that read into the direct-target result."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped scripts and tested accessible commands executed in the prepared environment; the defect is incorrect input acceptance rather than inability to run."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "The core direct-chimera, indirect-assignment, coordinate, and explicit UMI workflows are implemented; non-finite expression values bypass the optional expression threshold."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Strong validation, atomic publication, failure propagation, consensus support, and reproducibility controls are shipped; expression-value validation has a reproducible edge defect."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Progressive disclosure and scoped workflow routing avoid unnecessary full-pipeline execution."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Method branches, required provenance, output schemas, and stop conditions are explicit; finite expression requirements are not enforced."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Trigger language and workflow interpretation are clear, with a remaining edge in expression filtering."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No secrets or arbitrary code execution paths found; paths and output replacement are validated and controlled."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Documentation, scripts, and regression tests are modular and traceable to pinned sources."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Clear routing and auditable output contracts; several biological and remote surfaces still depend on external inputs or service availability."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 33,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Pinned Hyb workflow-level repeatability",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 39,
+        "specialized": 58,
+        "note": "Two independent complete two-replicate workflows on official Hyb test reads each retained 111 assignments; raw and structured results matched across workflows.",
+        "assertions": [
+          {
+            "text": "Both fresh workflow pairs produce identical sites, targets, support, exclusions, and manifest bytes",
+            "result": "PASS",
+            "note": "All five structured output SHA-256 values matched across the two separately published workflows."
+          },
+          {
+            "text": "Every raw Hyb run contains 111 rows with the expected 16-field schema",
+            "result": "PASS",
+            "note": "Four raw outputs were inspected; all had 111 rows and only 16-field rows."
+          },
+          {
+            "text": "Every accepted read has identical assignment support in both replicates",
+            "result": "PASS",
+            "note": "All 111 support records show two of two runs, supporting indices 1,2, and accepted=true."
+          },
+          {
+            "text": "Manifest counts reconcile with emitted sites and targets",
+            "result": "PASS",
+            "note": "Each manifest reports 111 accepted, 0 excluded, two replicates, and 111 target rows."
+          },
+          {
+            "text": "The reproducibility comparison accounts for timestamped stdout",
+            "result": "PASS",
+            "note": "Stdout is intentionally not byte-identical: only its first wall-clock timestamp line differs; subsequent lines match."
+          }
+        ],
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Wrapper path, failure, and publication boundaries",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 39,
+        "specialized": 58,
+        "note": "The independent wrapper harness passed literal-path handling, overwrite refusal, error propagation, replacement preservation, and stage cleanup.",
+        "assertions": [
+          {
+            "text": "Paths containing spaces and literal wildcard characters remain literal",
+            "result": "PASS",
+            "note": "The wrapper completed with the spaced and literal-star input/tool/output paths."
+          },
+          {
+            "text": "Existing results are protected without an explicit replace option",
+            "result": "PASS",
+            "note": "The second run returned 73 and preserved the completed result."
+          },
+          {
+            "text": "A failing Hyb status is propagated to the caller",
+            "result": "PASS",
+            "note": "The controlled subprocess status 42 was returned."
+          },
+          {
+            "text": "A failed replacement preserves the prior final output",
+            "result": "PASS",
+            "note": "The sentinel remained unchanged after the failed replacement attempt."
+          },
+          {
+            "text": "Failed runs clean the staging directory",
+            "result": "PASS",
+            "note": "No matching temporary stage directory remained."
+          }
+        ],
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Consensus parser orientation and input contracts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 39,
+        "specialized": 58,
+        "note": "Synthetic parser fixtures and strict failure controls passed; the separately tested NaN expression case is reported in Input 6.",
+        "assertions": [
+          {
+            "text": "Both segment orientations normalize to the correct miRNA and target fields",
+            "result": "PASS",
+            "note": "Mirna-first and target-first fixtures produced the expected normalized fields."
+          },
+          {
+            "text": "Expression values, units, and source are retained in accepted rows",
+            "result": "PASS",
+            "note": "The 150 TPM fixture and matched-small-RNA source were preserved."
+          },
+          {
+            "text": "Missing and discordant replicate assignments receive distinct reasons",
+            "result": "PASS",
+            "note": "The parser emitted missing_from_replicate and unstable_assignment separately."
+          },
+          {
+            "text": "Malformed Hyb field count fails before valid output publication",
+            "result": "PASS",
+            "note": "A three-field row failed with an expected-16 diagnostic."
+          },
+          {
+            "text": "Malformed expression header fails closed",
+            "result": "PASS",
+            "note": "The reduced header was rejected before a result was emitted."
+          }
+        ],
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "TargetScan spliced-coordinate projection",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 39,
+        "specialized": 58,
+        "note": "Plus/minus exon-spanning fixtures projected to BED12, and strand-aware overlap and release/range guards behaved as documented.",
+        "assertions": [
+          {
+            "text": "UTR-relative plus and minus sites project to multi-block BED12",
+            "result": "PASS",
+            "note": "Both one-based inclusive spliced sites became two-block genomic BED12 rows."
+          },
+          {
+            "text": "Strand-aware block overlap excludes the opposite-strand peak",
+            "result": "PASS",
+            "note": "The plus-good and minus-good peaks overlapped; plus-wrong-strand did not."
+          },
+          {
+            "text": "A TargetScan release mismatch is rejected",
+            "result": "PASS",
+            "note": "The converter returned nonzero with a release-metadata diagnostic."
+          },
+          {
+            "text": "A site outside its mapped UTR fails closed",
+            "result": "PASS",
+            "note": "The converter returned nonzero rather than truncating the input site."
+          },
+          {
+            "text": "Output manifest preserves assembly and annotation release",
+            "result": "PASS",
+            "note": "Manifest identifies GRCh38, GENCODEv49, and TargetScan 8.0."
+          }
+        ],
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Targeted-Yeo protocol-declared UMI contract",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 39,
+        "specialized": 58,
+        "note": "Independent synthetic FASTQ fixtures confirmed explicit 9- and 10-nt extraction and rejected omitted, invalid, blank, and too-long declarations without outputs.",
+        "assertions": [
+          {
+            "text": "A declared 9-nt UMI extracts exactly nine R2-prefix bases",
+            "result": "PASS",
+            "note": "The result header contained ACGTACGTA."
+          },
+          {
+            "text": "A declared 10-nt UMI extracts exactly ten R2-prefix bases",
+            "result": "PASS",
+            "note": "The result header contained ACGTACGTAC."
+          },
+          {
+            "text": "The manifest binds the explicit length to library and protocol provenance",
+            "result": "PASS",
+            "note": "Both success manifests recorded length, library id, protocol source, and hashes."
+          },
+          {
+            "text": "An omitted or invalid UMI declaration is rejected without outputs",
+            "result": "PASS",
+            "note": "Missing, zero, non-integer, blank-library, and blank-protocol cases returned nonzero and left no outputs."
+          },
+          {
+            "text": "R2 shorter than the declared UMI fails closed",
+            "result": "PASS",
+            "note": "The 13-nt request against a 12-nt R2 failed without output files."
+          }
+        ],
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "Non-finite matched-expression threshold input",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "basic": 26,
+        "specialized": 38,
+        "note": "A bounded parser fixture with expression_value=NaN and threshold 100 returned a complete result and accepted the read, bypassing the expression gate.",
+        "assertions": [
+          {
+            "text": "The parser rejects non-finite expression measurements",
+            "result": "FAIL",
+            "note": "A NaN expression value was accepted and published."
+          },
+          {
+            "text": "A value that cannot satisfy a threshold of 100 is not accepted",
+            "result": "FAIL",
+            "note": "The NaN row passed the 100 threshold and appeared in accepted sites."
+          },
+          {
+            "text": "The result retains the supplied expression provenance",
+            "result": "PASS",
+            "note": "The emitted row retained the value, TPM unit, and matched-small-RNA source."
+          },
+          {
+            "text": "The manifest and structured outputs reconcile for the observed behavior",
+            "result": "PASS",
+            "note": "The complete manifest reported one accepted row, matching sites.tsv."
+          },
+          {
+            "text": "The fixture remains within the documented computational-assignment scope",
+            "result": "PASS",
+            "note": "The test uses only bounded synthetic Hyb and expression inputs."
+          }
+        ],
+        "total": 64,
+        "assertions_passed": 3,
+        "assertions_total": 5
+      },
+      {
+        "index": 7,
+        "type": "Stress",
+        "label": "Total-Yeo UMI, paired trimming, and soft-clip diagnostic",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 38,
+        "specialized": 56,
+        "note": "Bounded synthetic tests confirmed the documented ten-base read-1 UMI route, paired adapter trimming, and a diagnostic-only soft-clip count.",
+        "assertions": [
+          {
+            "text": "The total-Yeo route extracts the documented ten-base read-1 UMI",
+            "result": "PASS",
+            "note": "UMI-tools added the expected 10-nt prefix to the read identifier."
+          },
+          {
+            "text": "Paired adapter trimming retains the expected fixture inserts",
+            "result": "PASS",
+            "note": "Both trimmed reads had length 20 after adapter removal."
+          },
+          {
+            "text": "The soft-clip diagnostic counts clipped alignments correctly",
+            "result": "PASS",
+            "note": "One 5M5S record was counted and the 10M record was not."
+          },
+          {
+            "text": "The diagnostic is not described as a chimera call",
+            "result": "PASS",
+            "note": "Candidate documentation labels it as a candidate-pool diagnostic only."
+          },
+          {
+            "text": "Synthetic checks remain distinguished from unavailable biological workflows",
+            "result": "PASS",
+            "note": "The full Yeo and wet-lab HEAP paths remain explicitly deferred."
+          }
+        ],
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 55.1,
+    "score": 92,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Fresh pinned Hyb reruns produced identical cross-workflow assignments, structured outputs, and manifests.",
+    "The wrapper and parser preserve atomic publication, explicit error handling, schema validation, and per-read support evidence.",
+    "TargetScan spliced-coordinate projection, strand-aware overlap, and protocol-declared targeted UMI extraction passed focused execution checks."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Reject non-finite expression values before thresholding",
+      "observed_in": [
+        6
+      ],
+      "problem": "A matched-expression row with `expression_value=NaN` is converted by `float()` and accepted at a threshold of 100 because NaN compares false to `< 100`. The generated direct-target table therefore includes a read whose expression does not meet a numeric threshold.",
+      "root_cause": "The expression parser validates float syntax but does not require a finite value before the threshold comparison.",
+      "fix": "Require `math.isfinite(expression_value)` before storing each expression row and fail closed with the line number and field name. Add NaN, positive infinity, and negative infinity regression cases, and verify that no consensus result is published for those inputs."
+    }
+  ]
+}

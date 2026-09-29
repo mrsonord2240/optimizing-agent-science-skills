@@ -1,0 +1,58 @@
+{
+  "assertions_passed": 8,
+  "fail_closed": true,
+  "failures": [
+    {
+      "case": "missing-length",
+      "diagnostic": "--umi-length",
+      "outputs_absent": true,
+      "returncode": 2
+    },
+    {
+      "case": "zero-length",
+      "diagnostic": "between 1 and 64",
+      "outputs_absent": true,
+      "returncode": 2
+    },
+    {
+      "case": "noninteger-length",
+      "diagnostic": "invalid int value",
+      "outputs_absent": true,
+      "returncode": 2
+    },
+    {
+      "case": "blank-library",
+      "diagnostic": "must be non-empty",
+      "outputs_absent": true,
+      "returncode": 2
+    },
+    {
+      "case": "blank-protocol",
+      "diagnostic": "must be non-empty",
+      "outputs_absent": true,
+      "returncode": 2
+    },
+    {
+      "case": "short-r2",
+      "diagnostic": "shorter than declared UMI length 13",
+      "outputs_absent": true,
+      "returncode": 1
+    }
+  ],
+  "successes": [
+    {
+      "expected_umi": "ACGTACGTA",
+      "header": "@read1_ACGTACGTA description",
+      "length": 9,
+      "manifest_sha256": "64dede310dc06869495c1658fd8ed2c4b12062b5d27917cab47d21b2d7c6e7b4",
+      "output_sha256": "8a934f334be86be4cfbfca3c606ddb7fbb1eef872b6e2a1d6298a53ed12c3b3b"
+    },
+    {
+      "expected_umi": "ACGTACGTAC",
+      "header": "@read1_ACGTACGTAC description",
+      "length": 10,
+      "manifest_sha256": "867e696269b39784a270c5b42ff84ce2c1457efbbd5aceae18c6bc09dd934e47",
+      "output_sha256": "1cf2cf5674c7eedf9799a9839a61c7adf0496ef0dfa15c7b66c687fdf9ce842d"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "accepted_rows": 1,
+  "expression_value": "NaN",
+  "nan_bypasses_threshold": true,
+  "returncode": 0,
+  "site_expression_value": "nan",
+  "stderr": "",
+  "threshold": 100
+}

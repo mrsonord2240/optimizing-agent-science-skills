@@ -38,15 +38,15 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The model-selection table and reconstruction branch are disconnected; the chosen fit is never converted into the transformation used for ASR.
 - Fix: Implement and test a mathematically valid reconstruction for each supported winner using its fitted transformation, or stop and route unsupported winners instead of returning mislabeled fastAnc output.
 
-### `bio-clip-seq-ago-clip-mirna-targets` — AGO-004 — Make direct-target consensus workflow-level deterministic
+### `bio-clip-seq-ago-clip-mirna-targets` — Reject non-finite expression values before thresholding
 
-- Skill: 87, Reject · candidate `21c6ba09ec35` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/clip-seq/ago-clip-mirna-targets) · [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/candidate@21c6ba09ec35-reaudit-opt10-20260928/viewer.md)
-- Observed in inputs: 1
-- Problem: Two separate two-run batches on identical pinned input each retained 94 and excluded 17, yet seven accepted ids changed on each side and four shared ids changed assignment.
-- Root cause: Agreement inside one pair does not establish stability when Hyb tie or multi-hit selection can coincidentally agree twice on different assignments across batches.
-- Fix: Adopt and validate a workflow-level ambiguity policy across a prospectively fixed larger replicate panel or deterministic upstream selection rule; emit per-read cross-run support and require exact end-to-end repeatability before labeling direct targets stable.
+- Skill: 92, Reject · candidate `a89a7ecad19a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/clip-seq/ago-clip-mirna-targets) · [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/candidate@a89a7ecad19a-reaudit2-opt10-20260928/viewer.md)
+- Observed in inputs: 6
+- Problem: A matched-expression row with `expression_value=NaN` is converted by `float()` and accepted at a threshold of 100 because NaN compares false to `< 100`. The generated direct-target table therefore includes a read whose expression does not meet a numeric threshold.
+- Root cause: The expression parser validates float syntax but does not require a finite value before the threshold comparison.
+- Fix: Require `math.isfinite(expression_value)` before storing each expression row and fail closed with the line number and field name. Add NaN, positive infinity, and negative infinity regression cases, and verify that no consensus result is published for those inputs.
 
-## P1 (55)
+## P1 (54)
 
 ### `bio-comparative-genomics-ancestral-reconstruction` — TOOL-ASR-004: Make empty summaries total
 
@@ -191,14 +191,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
-
-### `bio-clip-seq-ago-clip-mirna-targets` — AGO-005 — Resolve the targeted-Yeo UMI-length contract
-
-- Skill: 87, Reject · candidate `21c6ba09ec35` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/clip-seq/ago-clip-mirna-targets) · [viewer](skills/bio-clip-seq-ago-clip-mirna-targets/candidate@21c6ba09ec35-reaudit-opt10-20260928/viewer.md)
-- Observed in inputs: 5
-- Problem: The candidate says the pinned targeted route takes a 9-nt R2 UMI, but targeted_miR_umi.py defaults to 10, the CWL does not pass umi_length, and the live default extracts ten bases.
-- Root cause: The candidate treats a stale CWL comment as the executable contract without reconciling it with the bound command or the experimental library specification.
-- Fix: Do not state an exact targeted UMI length until the protocol is resolved. Require a declared library UMI length and a pinned route that passes it explicitly, then add 9-nt and 10-nt regression fixtures tied to protocol provenance.
 
 ### `bio-single-cell-perturb-seq` — Verify the primary optax mixture backend
 

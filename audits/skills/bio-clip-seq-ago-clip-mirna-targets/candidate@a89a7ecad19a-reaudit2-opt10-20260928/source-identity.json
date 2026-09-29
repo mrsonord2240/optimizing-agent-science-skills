@@ -1,0 +1,48 @@
+{
+  "schema": "scientific-skill-audit-source-identity-v1",
+  "phase": "independent final re-audit",
+  "skill_id": "bio-clip-seq-ago-clip-mirna-targets",
+  "independent_auditor": true,
+  "independence_basis": "Fresh final-audit assignment; this auditor did not perform the initial audit or candidate fixes.",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "clip-seq/ago-clip-mirna-targets",
+    "subtree": "6326a423789826240d0840be6897ddd69b21d940",
+    "license": "MIT"
+  },
+  "candidate": {
+    "root": "F:\\OpenScience\\wt\\opt10-ago-clip\\skills\\bio-clip-seq-ago-clip-mirna-targets",
+    "worktree": "F:\\OpenScience\\wt\\opt10-ago-clip",
+    "branch": "optimize/ten-20260928-lane4-ago-clip",
+    "product_head": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "identity_scheme": "sha256-manifest-v1",
+    "content_sha256": "a89a7ecad19a3cc207ab6b82bc0910b126b663e32e7c74c3c2b74dc105d780fa",
+    "manifest_bytes": 989,
+    "file_count": 10,
+    "manifest_recipe": "Ordinal POSIX relative paths; each UTF-8 line is path, TAB, byte count, TAB, lowercase file SHA-256; lines joined by LF without a trailing LF; SHA-256 over the manifest bytes.",
+    "manifest_path": "candidate-manifest.tsv",
+    "identity_before": "a89a7ecad19a3cc207ab6b82bc0910b126b663e32e7c74c3c2b74dc105d780fa",
+    "identity_after": "a89a7ecad19a3cc207ab6b82bc0910b126b663e32e7c74c3c2b74dc105d780fa",
+    "tree_status": "Candidate skill directory is untracked in the disposable product worktree; no candidate bytes were modified by this audit."
+  },
+  "prior_evidence": {
+    "rejected_audit_report": "F:\\OpenScience\\audits\\bio-clip-seq-ago-clip-mirna-targets\\reaudit-opt10-20260928\\report.json",
+    "rejected_audit_sha256": "00f55371ad11cdac36c64fca764cff9fa991baa449074fb0a031efbe45426bde",
+    "final_fix_verification": "F:\\OpenScience\\audits\\bio-clip-seq-ago-clip-mirna-targets\\fix-opt10-20260928\\evidence\\fix-verification.json",
+    "final_fix_verification_sha256": "388bfdebfa57b185ae5c7af58d169699476649d1b0be43f056b8e18b94b25551",
+    "tooling_delta": "F:\\OpenScience\\audits\\bio-clip-seq-ago-clip-mirna-targets\\tooling-delta-opt10-20260928\\evidence\\delta-workflows.json",
+    "tooling_delta_sha256": "b569480550597df4c1190ae24e0020fded1bede9d90868a195be05b39ddd62a7",
+    "live_tools_record": "F:\\OpenScience\\audit-envs\\bio-clip-seq-ago-clip-mirna-targets\\TOOLS.md",
+    "live_tools_sha256": "a1cb55f6384dcd9f10dd37e971f539cf65fe461a20490ecc4cc39f0642858d86"
+  },
+  "audit": {
+    "root": "F:\\OpenScience\\audits\\bio-clip-seq-ago-clip-mirna-targets\\reaudit2-opt10-20260928",
+    "rubric_archive": "F:\\optimizing-agent-science-skills\\skill-auditor.zip",
+    "rubric_archive_sha256": "e54e9ff8b0c3677abcf657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "candidate_ready": false,
+    "verdict": "Reject",
+    "open_findings": ["AGO-009"],
+    "closed_findings": ["AGO-004", "AGO-005"]
+  }
+}

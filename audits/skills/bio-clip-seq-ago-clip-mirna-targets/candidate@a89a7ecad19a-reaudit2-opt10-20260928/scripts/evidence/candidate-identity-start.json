@@ -1,0 +1,57 @@
+{
+  "file_count": 10,
+  "files": [
+    {
+      "bytes": 8805,
+      "path": "SKILL.md",
+      "sha256": "3376496f3c0e3b962b6bcbece13dfd0121dce74de72890d7ab0d6df446539500"
+    },
+    {
+      "bytes": 5571,
+      "path": "references/failure-modes.md",
+      "sha256": "c042ad22c3fc262809998ce582f690746efb8f0ca7443439749902aefba7288e"
+    },
+    {
+      "bytes": 6094,
+      "path": "references/method-selection-and-pairing.md",
+      "sha256": "2540d012f97b4fd56b9d96e15ae4e0df71b70db2525dc144ed16bc56dbe7dd92"
+    },
+    {
+      "bytes": 2519,
+      "path": "references/provenance.md",
+      "sha256": "f529183737de0ddfe47f0e33597fdd65360bcaaaaea2386bfec8052f2a239404"
+    },
+    {
+      "bytes": 7593,
+      "path": "references/workflows-and-commands.md",
+      "sha256": "1dd43414b787940236977b782afbbe273218548dc4fb1da8b0d4066aece11263"
+    },
+    {
+      "bytes": 12944,
+      "path": "scripts/consensus_hyb.py",
+      "sha256": "43ef16231bf54d5abc73b3660357c83b233257746651bc50ad17f553cdfed613"
+    },
+    {
+      "bytes": 6562,
+      "path": "scripts/extract_targeted_umi.py",
+      "sha256": "8da720c6172d35158f8ff835261053e7508568763e2dcb73071539761f91dea0"
+    },
+    {
+      "bytes": 6459,
+      "path": "scripts/run_chimeric_eclip.sh",
+      "sha256": "535985c8bb2d2881dd96d4a3b47c2d6248da7c6d2067b0a35888e59a0f89a8b8"
+    },
+    {
+      "bytes": 6245,
+      "path": "scripts/targetscan_sites_to_bed12.py",
+      "sha256": "4c64f7158915cef30a538b9fd4ef3abfb843b29b80900d7dbca0c03850f9b034"
+    },
+    {
+      "bytes": 12350,
+      "path": "tests/test_scripts.py",
+      "sha256": "861b3bdb6f522ca23c84469fd1a42375e6a7cccdf0e2241aef2280d1cac73c4c"
+    }
+  ],
+  "identity": "a89a7ecad19a3cc207ab6b82bc0910b126b663e32e7c74c3c2b74dc105d780fa",
+  "manifest_bytes": 989
+}

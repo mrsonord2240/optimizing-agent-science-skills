@@ -1,0 +1,19 @@
+user=sci
+WSL_INTEROP=unset
+
+/mounts:
+/mnt/openscience F:\x5cOpenScience 9p rw,relatime,aname=drvfs;path=F:\x5cOpenScience;metadata;uid=1000;gid=1000;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=3,wfd=3
+/mnt/f=unmounted
+
+versions:
+Python 3.12.14
+/mnt/openscience/audit-envs/bio-clip-seq-ago-clip-mirna-targets/conda-env/bin/bowtie2-align-s version 2.5.4
+samtools 1.21
+bedtools v2.31.1
+UMI-tools version: 1.1.6
+5.1
+Perl v5.32.1
+GNU Make 4.4.1
+hyb_commit=028ab6371ce793ca5e86f475fce1f2cc6ad3c677
+lock_sha256=ba5f355bb2d907197f723c7424742517b0e4fb4839a4273382d2293c5b2f3340
+fingerprint_sha256=fcd7556256ce1a32f3473718ad2f0fa3d1821039dc4994ecf4aa626fe97d7e5c
