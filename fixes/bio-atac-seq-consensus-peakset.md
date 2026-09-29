@@ -12,9 +12,9 @@ re-audited the exact final candidate bytes.
   offsets before coordinate arithmetic; focused base-language guard harnesses
   cover valid boundaries and invalid sentinel/missing/out-of-range cases.
 
-- Final candidate audit: `audits/skills/bio-atac-seq-consensus-peakset/candidate@f370a4b24019-final2-mercury-pilot-20260929`
+- Final candidate audit: `audits/skills/bio-atac-seq-consensus-peakset/candidate@95aec81162f6-final3-commit-bytes-20260929`
 - Result: **91/100, Production Ready**; **15/15 assertions pass**; both vetoes pass; no open P0 or required recommendation.
-- Candidate identity: `f370a4b24019a815c46f0ed9f0b2171d45a382ed277fc113a4aa77ebec2ba808`.
+- Candidate identity: `95aec81162f6948184a6645892e40554840d8ebb5eded0ac5ec354366b7745d2`.
 
 The provider binding record will be the canonical proof that the committed
 shelf bytes match this independently audited candidate.

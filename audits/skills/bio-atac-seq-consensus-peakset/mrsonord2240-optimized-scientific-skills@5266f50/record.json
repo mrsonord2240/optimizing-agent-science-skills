@@ -1,0 +1,51 @@
+{
+  "skill_id": "bio-atac-seq-consensus-peakset",
+  "version": "mrsonord2240-optimized-scientific-skills@5266f50",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "5266f50978572b5379ce4ea1b9f2869048cff6c6",
+    "path": "skills/bio-atac-seq-consensus-peakset",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/5266f50978572b5379ce4ea1b9f2869048cff6c6/skills/bio-atac-seq-consensus-peakset"
+  },
+  "candidate": {
+    "identity": "95aec81162f6948184a6645892e40554840d8ebb5eded0ac5ec354366b7745d2",
+    "identity_kind": "sha256-manifest",
+    "branch": "detached at 5266f50978572b5379ce4ea1b9f2869048cff6c6",
+    "path": "F:\\OpenScience\\wt\\mercury-pilot-consensus-peakset-committed\\skills\\bio-atac-seq-consensus-peakset",
+    "provider_commit": "5266f50978572b5379ce4ea1b9f2869048cff6c6",
+    "provider_tree": "0be5eedd2e5f1f4e261317d14b6d06501cee85b8"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-29",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@95aec81162f6-final3-commit-bytes-20260929",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 4,
+    "provider_binding": "binding.json"
+  }
+}

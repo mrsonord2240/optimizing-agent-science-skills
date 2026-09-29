@@ -1,0 +1,49 @@
+{
+  "skill_id": "bio-atac-seq-consensus-peakset",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/consensus-peakset",
+    "subtree": "3a5a7057771a3154ad411dfe616a3a92f599d46e",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "verified_commit": true
+  },
+  "candidate": {
+    "identity": "95aec81162f6948184a6645892e40554840d8ebb5eded0ac5ec354366b7745d2",
+    "identity_kind": "sha256-manifest-v1",
+    "path": "F:\\OpenScience\\wt\\mercury-pilot-consensus-peakset-committed\\skills\\bio-atac-seq-consensus-peakset",
+    "branch": "detached at 5266f50978572b5379ce4ea1b9f2869048cff6c6",
+    "base_commit": "5266f50978572b5379ce4ea1b9f2869048cff6c6",
+    "file_count": 5,
+    "total_file_bytes": 29267,
+    "candidate_files_modified_by_auditor": false,
+    "worktree_status": "Clean detached worktree."
+  },
+  "candidate_path": "F:\\OpenScience\\wt\\mercury-pilot-consensus-peakset-committed\\skills\\bio-atac-seq-consensus-peakset",
+  "candidate_identity": {
+    "scheme": "sha256-manifest-v1",
+    "sha256": "95aec81162f6948184a6645892e40554840d8ebb5eded0ac5ec354366b7745d2",
+    "file_count": 5,
+    "total_file_bytes": 29267,
+    "manifest_bytes": 453,
+    "manifest_recipe": "Ordinal UTF-8 POSIX-relative path order; each line is path<TAB>byte-count<TAB>lowercase-sha256; LF joins; no trailing LF.",
+    "manifest": [
+      {"path": "LICENSE", "bytes": 1065, "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"},
+      {"path": "SKILL.md", "bytes": 3286, "sha256": "8e5bd805d02ca6a8dcff01d1ec55ccb7a99d4e641ecb8691c6053098a07782c3"},
+      {"path": "references/method-reference.md", "bytes": 19120, "sha256": "4e7f25790a61bf0bd16f34e8c91b1c2f56b079ee54a422b84369e4c815571151"},
+      {"path": "references/usage-guide.md", "bytes": 1062, "sha256": "72a30391693a09dbab81fa1c4f4f71871426ff1161a96a306a42a423074a639c"},
+      {"path": "scripts/iterative_overlap.sh", "bytes": 4734, "sha256": "669e6ef57023742f85ee0c4f9f64c61489db747d5fd2375417e818292b411ad4"}
+    ]
+  },
+  "delta_audit": {
+    "previous_semantic_candidate_identity": "f370a4b24019a815c46f0ed9f0b2171d45a382ed277fc113a4aa77ebec2ba808",
+    "commit": "5266f50978572b5379ce4ea1b9f2869048cff6c6",
+    "change_disposition": "The repository normalized only references/method-reference.md line endings from CRLF to LF. Its old and new text are byte-identical after LF normalization; 302 CRLF pairs became LF. Other four files have identical SHA-256 values and sizes.",
+    "identity_checked_before_and_after_guard_harnesses": true,
+    "shell_script_sha256": "669e6ef57023742f85ee0c4f9f64c61489db747d5fd2375417e818292b411ad4",
+    "runtime_fingerprint_sha256": "b781ca8a648dc74b0a2e0f410c215c90c3af274c808ad42cd249507cd7bd4514",
+    "auditor_rubric_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "audit_root": "F:\\OpenScience\\audits\\bio-atac-seq-consensus-peakset\\final3-commit-bytes-20260929"
+}
