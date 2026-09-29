@@ -1,0 +1,29 @@
+{
+  "schema": "sha256-manifest-v1",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "comparative-genomics/ancestral-reconstruction",
+    "subtree": "9f7e2256c6b8246e58387a268006a675df9fd866"
+  },
+  "candidate": {
+    "name": "bio-comparative-genomics-ancestral-reconstruction",
+    "branch": "optimize/ten-20260928-lane3-ancestral-reconstruction",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-ancestral-reconstruction\\skills\\bio-comparative-genomics-ancestral-reconstruction",
+    "identity_scheme": "sha256-manifest-v1",
+    "manifest_sha256": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+    "expected_manifest_sha256": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+    "before_manifest_sha256": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+    "after_manifest_sha256": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+    "manifest_files": 16,
+    "manifest_bytes": 1535,
+    "status_before": "Fresh re-audit candidate; exact manifest matched expected immutable identity.",
+    "status_after_execution": "Exact manifest remains equal to before/expected after all audit runs.",
+    "before_manifest": "candidate-manifest-before.tsv",
+    "after_manifest": "candidate-manifest-after.tsv"
+  },
+  "worktree": "F:\\OpenScience\\wt\\opt10-ancestral-reconstruction",
+  "independence": "Fresh auditor; did not author the fix or initial audit. Earlier reports were treated as hypotheses and retested.",
+  "safety_note": "Audit generated one candidate Python bytecode cache during testing. The exact cache was removed; before and after manifests match the expected immutable identity. No candidate source file was edited."
+}

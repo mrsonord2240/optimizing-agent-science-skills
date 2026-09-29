@@ -1,0 +1,98 @@
+[
+  {
+    "surface": "real_paml_provider_protein_rst",
+    "nodes": 7,
+    "sites_per_node": 110,
+    "probability_records": 770,
+    "status": "PASS"
+  },
+  {
+    "surface": "real_paml_extracted_protein_rst",
+    "nodes": 7,
+    "sites_per_node": 110,
+    "probability_records": 770,
+    "status": "PASS"
+  },
+  {
+    "surface": "empty_no_data_summary",
+    "status": "PASS",
+    "quality": {
+      "status": "no_data",
+      "total_sites": 0,
+      "total_nodes": 0,
+      "total_node_site_estimates": 0,
+      "high_confidence": 0,
+      "moderate_confidence": 0,
+      "low_confidence": 0,
+      "mean_probability": null,
+      "high_conf_fraction": null,
+      "quality": "unknown",
+      "message": "No probability data found; reconstruction was not assessed."
+    },
+    "summary": null
+  },
+  {
+    "surface": "real_iqtree_state",
+    "status": "PASS",
+    "rows": 660,
+    "nodes": 6,
+    "columns": [
+      "Node",
+      "Site",
+      "State",
+      "p_A",
+      "p_R",
+      "p_N",
+      "p_D",
+      "p_C",
+      "p_Q",
+      "p_E",
+      "p_G",
+      "p_H",
+      "p_I",
+      "p_L",
+      "p_K",
+      "p_M",
+      "p_F",
+      "p_P",
+      "p_S",
+      "p_T",
+      "p_W",
+      "p_Y",
+      "p_V",
+      "max_post"
+    ]
+  },
+  {
+    "surface": "iqtree_reject_missing_columns",
+    "status": "PASS",
+    "error": "IQ-TREE state table requires at least one p_<state> posterior column"
+  },
+  {
+    "surface": "iqtree_reject_empty",
+    "status": "PASS",
+    "error": "IQ-TREE state table contains no reconstruction rows"
+  },
+  {
+    "surface": "iqtree_reject_bad_sum",
+    "status": "PASS",
+    "error": "IQ-TREE posterior probabilities do not sum to 1 at data row 1"
+  },
+  {
+    "surface": "iqtree_reject_bad_argmax",
+    "status": "PASS",
+    "error": "IQ-TREE State must be a maximum-posterior state in each row"
+  },
+  {
+    "surface": "iqtree_reject_nan",
+    "status": "PASS",
+    "error": "IQ-TREE state table contains non-finite Site or posterior values"
+  },
+  {
+    "surface": "shipped_python_demo",
+    "status": "PASS",
+    "returncode": 0,
+    "simulated_demo_output": "Ancestral Sequence Reconstruction\n==================================================\nAncestral Sequence Reconstruction Results\n==================================================\n\nReconstructed 3 ancestral nodes\n  Node6: MKFLILLFNILCLFPVLAADYKDDDDKGENLYFQG\n  Node7: MKFLILLFNILCLFPVLAADYKDDDDKGENLYFQG\n  Node8: MKFLVLLFNILCLFPVLAADYKDDDDKGDNLYFQG\n\nReconstruction status: complete\nReconstruction Quality: POOR\n  Nodes: None; site-node estimates: 6\n  Total sites: 6\n  High confidence (P>0.95): 2 (33.3%)\n  Low confidence (P<0.80): 2\n  Mean probability: 0.852\n\nAmbiguous sites requiring attention: 2\n  Site 4: L (P=0.756)\n  Site 6: L (P=0.634)\n\n\nTo run on real data:\n1. Prepare protein MSA (PHYLIP format)\n2. Generate phylogenetic tree\n3. ctl = write_asr_control(aln, tree, \"asr.mlc\")\n4. subprocess.run([\"codeml\", ctl])\n5. ancestors = parse_rst_ancestors(\"rst\")\n6. probs = extract_site_probabilities(\"rst\")\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "schema": "skill-auditor-report-v4.0",
+  "validator": "validate_report.py",
+  "valid": true,
+  "input_count": 7,
+  "assertions_passed": 27,
+  "assertions_total": 29,
+  "execution_average": 79.9,
+  "static_subtotal": 81,
+  "diagnostic_score": 80,
+  "research_veto": "FAIL",
+  "deployable": false
+}

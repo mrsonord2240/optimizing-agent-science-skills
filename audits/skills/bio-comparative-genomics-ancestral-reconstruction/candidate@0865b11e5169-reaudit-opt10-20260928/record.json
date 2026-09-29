@@ -1,0 +1,45 @@
+{
+  "skill_id": "bio-comparative-genomics-ancestral-reconstruction",
+  "version": "candidate@0865b11e5169-reaudit-opt10-20260928",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "comparative-genomics/ancestral-reconstruction",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/comparative-genomics/ancestral-reconstruction",
+    "subtree": "9f7e2256c6b8246e58387a268006a675df9fd866"
+  },
+  "candidate": {
+    "identity": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+    "identity_kind": "sha256-manifest",
+    "branch": "optimize/ten-20260928-lane3-ancestral-reconstruction",
+    "commit": "0bc0b31fc52742dbec1034f698103434cc9460c3",
+    "path": "F:\\OpenScience\\wt\\opt10-ancestral-reconstruction\\skills\\bio-comparative-genomics-ancestral-reconstruction"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-28",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@eea7a056a386-initial-opt10-20260928",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 32
+  }
+}

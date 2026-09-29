@@ -1,0 +1,18 @@
+{
+  "real_iqtree": {
+    "status": "PASS",
+    "rows": 660,
+    "nodes": 6,
+    "sites": 110,
+    "posterior_columns": 20,
+    "max_sum_error": 3.0000000000196536e-05,
+    "all_argmax_match": true
+  },
+  "invalid_state_rows": {
+    "missing_columns": "PASS",
+    "empty": "PASS",
+    "bad_sum": "PASS",
+    "bad_argmax": "PASS",
+    "nonfinite": "PASS"
+  }
+}

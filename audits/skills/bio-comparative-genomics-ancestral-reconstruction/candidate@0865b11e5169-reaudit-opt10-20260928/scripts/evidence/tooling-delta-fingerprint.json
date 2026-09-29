@@ -1,0 +1,79 @@
+{
+  "schema": "scientific-tooling-fingerprint-v1",
+  "mode": "delta",
+  "prepared_utc": "2026-09-29T01:24:49Z",
+  "candidate_identity": "sha256-manifest-v1:0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+  "candidate_file_count": 16,
+  "candidate_manifest_bytes": 1535,
+  "candidate_manifest_sha256_before": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+  "candidate_manifest_sha256_after": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+  "origin": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:comparative-genomics/ancestral-reconstruction",
+  "origin_subtree": "9f7e2256c6b8246e58387a268006a675df9fd866",
+  "base_environment": {
+    "root": "F:\\OpenScience\\audit-envs\\bio-comparative-genomics-ancestral-reconstruction",
+    "lock_sha256": "216277a7a3841fb84bd731034fbfe09ca28a7514289e9bc15c8a8d92e6f4856c",
+    "fingerprint_sha256": "da8b3ef12894f2f41730e89ef09335bfefb7905a8e40963546a76dcee5f6aa08",
+    "environment_changed": false
+  },
+  "execution_boundary": {
+    "wsl_distribution": "science",
+    "os": "Ubuntu 26.04.1",
+    "user": "sci",
+    "windows_interop": "disabled",
+    "windows_mounts": ["/mnt/openscience"],
+    "wrapper": "/mnt/openscience/audit-envs/bio-comparative-genomics-ancestral-reconstruction/tools/wsl_isolated_exec.sh",
+    "evidence": "evidence/execution-boundary.log"
+  },
+  "versions_verified_live": {
+    "python": "3.12.14",
+    "biopython": "1.88",
+    "pandas": "3.0.6",
+    "PAML": "4.10.10 (retained real protein rst outputs; no new codeml run required for parser delta)",
+    "IQ-TREE": "2.4.0",
+    "OpenJDK": "21.0.10",
+    "GRASP": "21-Mar-2024",
+    "R": "4.4.3",
+    "ape": "5.8-1",
+    "phytools": "2.5-2",
+    "geiger": "2.0.12",
+    "corHMM": "2.8",
+    "OUwie": "3.0.3"
+  },
+  "verified_surfaces": {
+    "PAML_current_protein_rst_parser": "PASS: provider and extracted rst parse 7 nodes x 110 sites, 770 probability records",
+    "empty_summary": "PASS: no_data complete summary and no exception",
+    "IQ_TREE_state_parser": "PASS: real table plus missing-column, empty, bad-sum, wrong-argmax rejection",
+    "GRASP_cli_and_candidate_wrapper": "PASS: official CLI help, direct CLI run, candidate wrapper, FASTA/tree/JSON validation",
+    "stochastic_mapping": "PASS: explicit seed 20260928, 1000 maps, taxon mismatch rejects with stable named guidance",
+    "continuous_BM": "PASS: 34 estimates and 34 fastAnc 95% intervals",
+    "continuous_OU": "PASS_EXPLORATORY_ONLY: fitted OUwie object, knowledge=TRUE, 29 points, no uncertainty",
+    "OUwie_single_regime_diagnostic": "PASS_DIAGNOSTIC_CAPTURED: default check.identify errors; bounded check.identify=FALSE route succeeds after validation",
+    "transformed_winners": "PASS_STOPPED: EB, lambda, kappa, delta do not emit original-tree BM output"
+  },
+  "unchanged_surfaces": [
+    "Python demo and PAML writer",
+    "IQ-TREE shell writer and outgroup negative case",
+    "documented-only tools and public cytochrome-c inputs"
+  ],
+  "limitations": [
+    "No prepared real codon rst fixture; codon execution is not validated.",
+    "GitHub corHMM 2.10.5 commit 3ae10b22cfb519245b75777342812a0023ac0d43 remains uninstalled, untested, and unsupported.",
+    "OUwie 3.0.3 single-regime default identifiability diagnostic still raises missing value where TRUE/FALSE needed; the candidate's bounded route uses check.identify=FALSE only after setup/taxon and finite-AICc checks, and output has no uncertainty.",
+    "Documented-only and unavailable optional tools remain outside executable evidence."
+  ],
+  "evidence_sha256": {
+    "candidate-manifest-before.tsv": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+    "candidate-manifest-after.tsv": "0865b11e5169758a84e241ca9ab4e59ecf855add0b46c6a38153808788a85871",
+    "evidence/python-delta-results.json": "b071e873a632c3443d54879c4f7a5e7c7ff2b191453a1cb6d794311bd97c476b",
+    "evidence/r-delta-results.json": "bfb3378866ecd88f81ae05c9fa013aa93706885cec292e97e2a5e5379f06a54a",
+    "evidence/edge-case-results.json": "2abf01c42b789bbe830c30d6b40efe7566af24b3206bbaa4c09754584e44313a",
+    "evidence/grasp-validation.txt": "abaa1d888e51c88eb1f0c78cf2a502a5190b2100b5e50233e135ee48771be2b3",
+    "evidence/grasp-candidate-wrapper.log": "f90d778a1606d999d23e94e98b9012563e18880d9e76bcbbeb0613db9b8222b57",
+    "evidence/environment-versions.log": "803d0cf4ec465ee3cbfcaa0c9ee5569594975025aebb6d58dd0a54cdc0b7fb18",
+    "evidence/python-delta.log": "cdf44f6985cbb8f7da1e3373b3d69a43705db2cf20daf324163a4e5edc155692",
+    "evidence/r-delta.log": "221b4d43358e59d81070f06237b16a02ca76416393a48d3b9f801c3b0d32cfcb",
+    "evidence/edge-case-test.log": "0a84ca5c9d599bdc550a6e9539bfca1a43fa28b975c7afd3c9ac496e382a2dd9",
+    "evidence/grasp-help.log": "d9479539cf481d9beb36a5250dc198faa5003788d99a779dd946bc60f2619251",
+    "evidence/seed-required.log": "bfa0ce797ba4e5f50dc69e3160f3b80e4f2548244fb8fd593a102e7783a9eac0"
+  }
+}

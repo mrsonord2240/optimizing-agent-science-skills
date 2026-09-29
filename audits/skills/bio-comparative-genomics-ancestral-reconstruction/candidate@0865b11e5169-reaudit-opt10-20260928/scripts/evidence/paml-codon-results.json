@@ -1,0 +1,10 @@
+{
+  "status": "FAIL_REAL_CODON_RST_PARSER",
+  "paml_version": "4.10.10",
+  "codeml_returncode": 0,
+  "rst_bytes": 179896,
+  "parser_error": "ValueError: PAML rst contains no marginal site rows",
+  "first_codon_marginal_row": "   1      1   --- (-) --- (-) --- (-) --- (-) --- (-) --- (-) --- (-) ATG (M) :  ATG M 0.668 (M 0.668) ATG M 0.454 (M 0.454) ATG M 0.346 (M 0.346) ATG M 0.345 (M 0.345) ATG M 0.344 (M 0.344) ATG M 0.331 (M 0.331) ATG M 0.346 (M 0.346)",
+  "stdout": "CODONML in paml version 4.10.10, 29 Jan 2026\n1 ambiguous codons are seen in the data:\n ---\n\n\n      224 bytes for distance\n    84912 bytes for conP\n        0 bytes for fhK\n  5000000 bytes for space\n\nTREE #  1\n(((((7, (4, 5)), 1), (2, 3)), 6), 8);   MP score: -1\nThis is a rooted tree, without clock.  Check.\n\n   297192 bytes for conP, adjusted\n\nntime & nrate & np:    14     2    16\nOut..\nlnL  = -1622.598772\n2107 lfun, 2107 eigenQcodon, 29498 P(t)\nCalculating SE's\n\nWarning: Hessian matrix may be unreliable for zero branch lengths\n\n  1188768 bytes for conP, adjusted\n\nTime used:  0:10\n",
+  "stderr": ""
+}

@@ -1,0 +1,49 @@
+{
+  "complexity": "Complex",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "inputs": [
+    {
+      "index": 1,
+      "type": "Canonical",
+      "label": "PAML protein ASR and shipped parsers",
+      "prompt": "Reconstruct the public eight-taxon cytochrome-c ancestor with the packaged PAML workflow and return ancestral sequences plus per-site posterior confidence."
+    },
+    {
+      "index": 2,
+      "type": "Variant A",
+      "label": "IQ-TREE marginal protein ASR",
+      "prompt": "Run the packaged IQ-TREE ancestral workflow on the same rooted protein alignment and validate every posterior row."
+    },
+    {
+      "index": 3,
+      "type": "Edge",
+      "label": "Discrete trait stochastic mapping and hidden rates",
+      "prompt": "Fit ER, SYM, and ARD to a deterministic 30-tip binary trait fixture, run 1,000 stochastic maps, and fit the packaged corHMM hidden-rate comparison."
+    },
+    {
+      "index": 4,
+      "type": "Variant B",
+      "label": "Continuous-trait model selection including OU",
+      "prompt": "Compare BM, OU, EB, lambda, kappa, and delta on a 35-tip continuous-trait fixture and reconstruct under the selected model, including the OU route."
+    },
+    {
+      "index": 5,
+      "type": "Stress",
+      "label": "GRASP indel-aware official CLI",
+      "prompt": "Run the packaged GRASP shell against the current official 2024 command-line JAR and validate all promised output artifacts."
+    },
+    {
+      "index": 6,
+      "type": "Scope Boundary",
+      "label": "Empty and malformed posterior contracts",
+      "prompt": "Exercise the packaged summary on an empty PAML probability set and parse an IQ-TREE state table that lacks all posterior columns."
+    },
+    {
+      "index": 7,
+      "type": "Adversarial",
+      "label": "Taxon and outgroup mismatches",
+      "prompt": "Supply an absent IQ-TREE outgroup and a discrete-trait table missing one tree taxon; ensure both are rejected before any reconstruction is accepted."
+    }
+  ]
+}
