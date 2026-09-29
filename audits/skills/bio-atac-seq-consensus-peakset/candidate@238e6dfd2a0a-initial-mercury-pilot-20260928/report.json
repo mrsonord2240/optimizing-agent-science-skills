@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-consensus-peakset",
+    "description": "Build a differential-ready consensus peakset from per-replicate ATAC-seq peaks using iterative overlap removal, fixed-width re-centering, and majority-rule overlap. Use when generating a stable peak coordinate system for downstream differential accessibility, ML feature engineering, cross-sample comparison, or fixed-width peak counts; covers Corces 2018 iterative overlap (501 bp), DiffBind summit re-centering, and ENCODE consistency rules.",
+    "evaluated_on": "2026-09-28",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 3
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {"result":"PASS","detail":"No scientific result, statistic, or citation was fabricated in the tested workflows."},
+      "practice_boundaries": {"result":"PASS","detail":"The Skill remains within research analysis and makes no clinical or prescriptive claims."},
+      "methodological_ground": {"result":"FAIL","detail":"A 9-column BED-like peak record is silently treated as narrowPeak; the missing summit offset becomes zero and shifts the emitted feature to the input start."},
+      "code_usability": {"result":"FAIL","detail":"The exact shipped Bash script cannot launch under the prepared Linux Bash environment because CRLF characters corrupt the shebang and `set -euo pipefail`; an LF-normalized copy completes the primary workflow."}
+    }
+  },
+  "static_score": {
+    "subtotal": 66,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score":6,"max":12,"note":"The principal iterative-overlap workflow is documented and works after line-ending normalization, but the shipped runner fails directly and accepts missing summit fields silently."},
+      "reliability": {"score":6,"max":12,"note":"`set -euo pipefail` and tool errors help stop failed stages, but file-format and summit values are not validated and output directories can retain stale intermediates."},
+      "performance_context": {"score":6,"max":8,"note":"The short Skill routes detailed methods and code to references; the greedy Python overlap loop can become expensive for large peak sets, with a scale caveat in the reference."},
+      "agent_usability": {"score":12,"max":16,"note":"Workflow choices and requested inputs are clear, with a missing guard at the executable file-format boundary and line-ending compatibility detail."},
+      "human_usability": {"score":6,"max":8,"note":"Request examples and method comparisons are discoverable; users may not know that the shell implementation assumes ten-column narrowPeak rows."},
+      "security": {"score":9,"max":12,"note":"No credential or destructive behavior was found; script path expansions are unquoted and data columns are not validated."},
+      "maintainability": {"score":7,"max":12,"note":"Concise routing separates the Skill, method reference, and script, but examples duplicate implementation logic and there is no shipped validation or regression fixture."},
+      "agent_specific": {"score":14,"max":20,"note":"Triggering, progressive disclosure, and method selection are strong; the runner lacks explicit preconditions, format enforcement, and compatibility guidance for CRLF."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 56.3,
+    "max": 100,
+    "assertion_pass_rate": {"passed":8,"total":12},
+    "inputs": [
+      {
+        "index":1,"type":"Canonical","label":"Public 3,000-row hg19 narrowPeak workflow","status":"PARTIAL","status_flag":"❌","note":"Exact candidate launch fails on CRLF; an LF-normalized disposable copy completes with checked BED and SAF outputs.","basic":28,"specialized":38,"total":66,"assertions_passed":3,"assertions_total":4,
+        "assertions":[
+          {"text":"The exact shipped runner launches in the prepared Bash environment","result":"FAIL","note":"Bash reports `$'\\r': command not found` and `pipefail\\r: invalid option name`."},
+          {"text":"The normalized runner pools all 3,000 input peaks and emits 2,927 greedy non-overlapping windows","result":"PASS","note":"The parsed pooled and iterative BED row counts are 3,000 and 2,927."},
+          {"text":"The blacklist-filtered BED contains only 501 bp windows","result":"PASS","note":"All 2,886 final BED intervals have width 501 bp."},
+          {"text":"The SAF header, unique identifiers, and 1-based inclusive coordinates match the final BED","result":"PASS","note":"All 2,886 SAF data rows matched BED coordinates with Start incremented by one."}
+        ]
+      },
+      {
+        "index":2,"type":"Variant A","label":"Two-file per-replicate glob","status":"COMPLETED","status_flag":"✅","note":"Two narrowPeak files were pooled through the documented runner; outputs were parsed and counts checked.","basic":34,"specialized":45,"total":79,"assertions_passed":4,"assertions_total":4,
+        "assertions":[
+          {"text":"The runner expands and accepts two separate narrowPeak input files","result":"PASS","note":"Both files were consumed through the quoted `*.narrowPeak` argument."},
+          {"text":"The two files contribute 400 pooled records","result":"PASS","note":"The parsed pooled BED contains 400 rows from 200 rows per file."},
+          {"text":"Greedy output removes overlaps and retains a nonempty subset","result":"PASS","note":"393 intervals remained after iterative overlap and 388 after blacklist filtering."},
+          {"text":"The multi-file output contract completes with SAF output","result":"PASS","note":"The workflow completed and emitted BED and SAF output families."}
+        ]
+      },
+      {
+        "index":3,"type":"Edge","label":"Missing narrowPeak summit column","status":"COMPLETED","status_flag":"❌","note":"A 9-column record completed without warning and was centered on its start because column 10 was absent.","basic":16,"specialized":8,"total":24,"assertions_passed":1,"assertions_total":4,
+        "assertions":[
+          {"text":"The runner rejects or clearly warns when the summit-offset column is absent","result":"FAIL","note":"No format check or warning occurs for a 9-column record."},
+          {"text":"The output coordinate is derived from a valid summit offset","result":"FAIL","note":"The output is chr1:29,999,750-30,000,251, centered on the input start rather than a summit."},
+          {"text":"The runner prevents a plausible but scientifically shifted peak from appearing successful","result":"FAIL","note":"The command exits successfully and reports one final peak despite missing column 10."},
+          {"text":"The resulting interval width remains the configured 501 bp","result":"PASS","note":"The interval is 501 bp, but its center is wrong; width alone does not establish validity."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted":26.4,
+    "dynamic_weighted":33.8,
+    "score":60,
+    "max":100,
+    "grade":"Reject",
+    "grade_symbol":"❌",
+    "deployable":false,
+    "veto_override":true
+  },
+  "key_strengths": [
+    "The Skill presents distinct consensus strategies with clear use cases and failure modes.",
+    "The matched hg19 workflow yields fixed-width, non-overlapping output and a correctly converted SAF table after line-ending normalization.",
+    "The R-native example uses `peaks$peak`, which matches the `rtracklayer` NarrowPeak import metadata field; package execution was unavailable in the prepared environment."
+  ],
+  "recommendations": [
+    {
+      "priority":"P0","title":"Reject missing narrowPeak summit fields","observed_in":[3],
+      "problem":"The shell runner silently treats a missing column 10 as summit offset zero, producing a plausible fixed-width peak centered at the source interval start. This can shift coordinates while still returning success.",
+      "root_cause":"The runner assumes the `.narrowPeak` suffix guarantees a valid ten-column narrowPeak record and does not validate fields before coordinate arithmetic.",
+      "fix":"Validate every non-comment input row has the required narrowPeak columns and a valid summit offset before pooling. Fail with the filename and line number when the file shape or summit value is invalid; explicitly handle the narrowPeak `-1` no-summit sentinel."
+    },
+    {
+      "priority":"P0","title":"Make the Bash runner launch from a clean checkout","observed_in":[1],
+      "problem":"The exact shipped script fails under the prepared Linux Bash runtime because CRLF endings leave carriage returns in the shebang and `set -euo pipefail`. The primary workflow only ran after a disposable LF normalization.",
+      "root_cause":"The externalized shell script is stored with CRLF line endings while its documented execution surface is Bash in the Linux science environment.",
+      "fix":"Store the script with LF line endings and rerun its documented direct invocation from the intended shell. Add a lightweight line-ending or launch check to the workflow evidence."
+    }
+  ]
+}

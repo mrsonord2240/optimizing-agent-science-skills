@@ -1,0 +1,45 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/consensus-peakset",
+    "subtree": "3a5a7057771a3154ad411dfe616a3a92f599d46e",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "files": [
+      {"path":"SKILL.md","git_blob":"c30b52e0e7bd9ecbe037853532fd77410bea078d"},
+      {"path":"examples/iterative_overlap.sh","git_blob":"cee27a0be33588a1a2e5ed0e24337d15713fdad3"},
+      {"path":"usage-guide.md","git_blob":"fb16a025d9f960126367ef5fba1023bae8b3704b"}
+    ],
+    "normalization_note":"The audited normalized tree includes references/method-reference.md and the externalized scripts/iterative_overlap.sh; these are not direct upstream paths. Origin identifies the source Skill subtree rather than claiming a one-to-one file mapping."
+  },
+  "candidate": {
+    "branch": "optimize/mercury-pilot-consensus-peakset",
+    "commit": "4cc6cabc39ee01dcf3e828e3f8a164b7e155f4fb",
+    "path": "F:\\OpenScience\\wt\\mercury-pilot-consensus-peakset\\skills\\bio-atac-seq-consensus-peakset",
+    "status_before": "untracked Skill subtree only",
+    "status_after_execution": "untracked Skill subtree only; candidate files unchanged",
+    "content_sha256": "238e6dfd2a0a5da05cf1c37ceba3de899a1f298927e49ddc5c9bb668eb8eda5c",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 27093,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted with StringComparer.Ordinal and separated by LF; no trailing LF",
+      "manifest_bytes": 453,
+      "prior_expected_identity": "4778d035fcabb3f8e9f94760a80eb65228ec3482593058455597dfc8f0aab11e",
+      "identity_note": "The prior expected digest used a noncanonical path-and-file-hash recipe with a trailing LF. This canonical audit manifest supersedes that digest; candidate bytes did not change."
+    },
+    "files": [
+      {"path":"LICENSE","bytes":1065,"sha256":"b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"},
+      {"path":"SKILL.md","bytes":3050,"sha256":"8a0118b2cb0e8663d3436b1e03ae6ee5d630c81c5ef540c0a6dfa17e0d87b3d8"},
+      {"path":"references/method-reference.md","bytes":19188,"sha256":"bde1e65e706b5a86a77fe38c057d976bc37f1c09870dfa4866465f4668e026be"},
+      {"path":"references/usage-guide.md","bytes":1062,"sha256":"72a30391693a09dbab81fa1c4f4f71871426ff1161a96a306a42a423074a639c"},
+      {"path":"scripts/iterative_overlap.sh","bytes":2728,"sha256":"6ec4ad4b067bacf153ca63bf37937ab15f0abcf4054625389a6be47753570b47"}
+    ]
+  },
+  "tooling": {
+    "tools_md_sha256":"0895f658996fcf5dd5fafc16e63083f21619e94c809205ec836db898fb761a81",
+    "rubric_zip_sha256":"e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "environment":"WSL2 science, /mnt/openscience-only fixture and run paths, interop disabled; Bash 5.3.9; Python 3.12.14; bedtools 2.31.1; R 4.4.1; rtracklayer and GenomicRanges unavailable"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}
