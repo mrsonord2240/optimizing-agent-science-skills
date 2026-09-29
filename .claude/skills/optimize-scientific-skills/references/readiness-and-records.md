@@ -7,15 +7,18 @@ when it is not already installed.
 Unless the current rubric is stricter, `Production Ready` requires final score
 at least 85, static score at least 80, execution average at least 85, Layer 1
 at least 32, Layer 2 at least 48, assertion pass rate at least 90 percent, no
-veto, no open P0, and no required accessible runnable surface left unexecuted
-in final audit.
+veto, no open P0, and representative inspected execution for every materially
+distinct required workflow and output family. Exact-identity reusable evidence
+may satisfy unchanged surfaces under the re-audit contract.
 
 Use these states:
 
 - `untouched`: no usable audit for the relevant source;
 - `audited`: audit exists but final certification is incomplete;
-- `candidate-ready`: exhaustive independent final audit passes for exact
-  working bytes, but they have not entered the run-closing product commit;
+- `candidate-ready`: independent risk-based final audit passes for exact
+  working bytes with representative coverage of every materially distinct
+  required workflow and output family, but they have not entered the
+  run-closing product commit;
 - `ready`: exact audited bytes are committed on the optimized shelf with
   reconciled provider metadata;
 - `done`: Marketplace intake accepted the exact optimized commit and path.
@@ -25,8 +28,10 @@ saved run scripts and inputs, command/output evidence, source identity, and
 explicit execution classifications. Do not claim evidence that exists only in
 chat.
 
-After every audit, publish with the repository tooling. Legacy flat audit roots
-remain supported:
+Publish the initial baseline and accepted final audit with the repository
+tooling. Rejected intermediate runs may remain in durable local evidence unless
+publication is needed to preserve a blocker, explain an identity transition, or
+satisfy the records schema. Legacy flat audit roots remain supported:
 
 ```powershell
 python tools/publish_audits.py --repo <provider-root> --skill <skill-id>

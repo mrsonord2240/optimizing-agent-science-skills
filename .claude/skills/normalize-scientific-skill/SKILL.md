@@ -1,6 +1,6 @@
 ---
 name: normalize-scientific-skill
-description: Normalize one scientific agent Skill before audit by removing instruction redundancy and migrating reusable code and conditional detail into routed resource directories. Use when an optimization relay assigns the normalization phase for an exact Skill.
+description: Normalize one scientific agent Skill before audit by resolving safe software-version drift, removing instruction redundancy, and migrating reusable code and conditional detail into routed resource directories. Use when an optimization relay assigns the normalization phase for an exact Skill.
 ---
 
 # Normalize Scientific Skill
@@ -30,6 +30,11 @@ Read the entire Skill tree. Map:
 - licenses, attribution, author information, and provider provenance;
 - advertised runnable surfaces and dependency clues for the tooling worker.
 
+Also compare software names, commands, APIs, formats, and version constraints
+across the entire tree with the currently supported software. Treat a mismatch
+caused by an ordinary software update as normalization work rather than waiting
+for audit to rediscover it.
+
 Do not infer redundancy from similar headings alone. Preserve distinct
 conditions, caveats, and scientific meaning.
 
@@ -46,10 +51,17 @@ conditions, caveats, and scientific meaning.
 - Preserve the frontmatter name, license obligations, attribution, provenance,
   public behavior, and advertised scope unless an unambiguous structural
   correction requires otherwise.
+- Resolve version discrepancies throughout `SKILL.md`, routed references,
+  scripts, examples, and dependency metadata. Default to the newer supported
+  software version when live documentation or tooling confirms it and the
+  update causes no evident breakage, dependency conflict, format incompatibility,
+  or change in scientific meaning. Update connected commands and claims
+  together. Record a genuinely ambiguous or breaking migration for audit or
+  user decision instead of guessing.
 
 Do not redesign scientific methods, change analytical defaults, add features,
-install tooling, or resolve behavioral findings in this phase. Record such
-issues for audit.
+install tooling, or resolve behavioral findings unrelated to safe version
+normalization in this phase. Record such issues for audit.
 
 ## Verify the normalized tree
 

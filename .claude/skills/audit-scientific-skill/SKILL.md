@@ -6,7 +6,8 @@ description: Conduct a bounded diagnostic audit of one normalized scientific age
 # Audit Scientific Skill
 
 Audit one exact normalized candidate to identify and prioritize work. This is a
-diagnostic pass; exhaustive execution may be deferred to independent re-audit.
+comprehensive but bounded diagnostic pass; independent re-audit later focuses
+on corrections, affected regressions, and representative core workflows.
 
 ## Load context and method
 
@@ -35,20 +36,33 @@ and correspondence between documented and shipped runnable surfaces.
 Treat normalization as already complete. Report missed structural problems;
 do not restart a broad migration inside the audit.
 
-## Execute a bounded diagnostic sample
+## Execute representative end-to-end workflows
 
-Use the prepared environment without installing a new stack. At minimum,
-execute a representative public canonical path for each distinct runtime and
-any migrated executable whose preservation is uncertain. Prefer inputs likely
-to expose scientific or integration faults. Save commands, inputs, versions,
-outputs, and assertions. Parse structured output and meaningful values; inspect
-scientific relationships and rendered readability where applicable. Syntax,
-imports, file existence, and exit code zero are preflight only.
+Use the prepared environment without installing a new stack. Run the most
+common public workflow end to end, from realistic input through inspected
+scientific output. Run a second end-to-end workflow when it exercises a
+materially different supported mode, runtime, algorithm, or integration and a
+bounded case is available. When a program produces multiple materially
+different output families, generate and inspect one representative of each
+within reason. Execute any migrated executable whose preservation is uncertain.
 
-You may defer exhaustive matrices, expensive secondary examples, and complete
-surface coverage, but mark each deferred item `static-only` or `blocked` and
-state that it cannot support final readiness. Do not score documentation or
-source inspection as execution.
+Save commands, inputs, versions, outputs, and assertions. Parse structured
+output and meaningful values; inspect scientific relationships and rendered
+readability where applicable. Syntax, imports, file existence, and exit code
+zero are preflight only.
+
+Do not mechanically enumerate unacceptable user inputs or reproduce validation
+rules already maintained in the upstream software's documentation. Exercise an
+adversarial or invalid input only when silent acceptance could plausibly corrupt
+a scientific conclusion, report false success, cross a security or destructive
+boundary, or corrupt a public output contract. Ordinary input mistakes are not
+a required test matrix.
+
+You may defer expensive secondary examples and redundant permutations. Mark a
+materially distinct advertised workflow that lacks representative evidence as
+`static-only` or `blocked`; do not treat a combinatorial parameter or invalid-
+input matrix as a separate workflow. Do not score documentation or source
+inspection as execution.
 
 If missing tooling prevents meaningful diagnosis, stop that surface and route
 the lane to `prepare-scientific-skill-tooling`; do not install dependencies

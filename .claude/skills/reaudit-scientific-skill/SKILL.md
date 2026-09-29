@@ -1,6 +1,6 @@
 ---
 name: reaudit-scientific-skill
-description: Independently and exhaustively re-audit one fixed scientific agent Skill, executing every accessible advertised surface and deciding candidate readiness for exact bytes. Use only for the relay's final certification phase with a fresh auditor.
+description: Independently re-audit one fixed scientific agent Skill with risk-based executable coverage and decide candidate readiness for exact bytes. Use only for the relay's final certification phase with a fresh auditor.
 ---
 
 # Re-audit Scientific Skill
@@ -32,18 +32,32 @@ prior finding's disposition, search for regressions and newly introduced
 conflicts, and reconcile documentation, resources, provenance, licensing,
 scientific claims, and shipped runnable surfaces.
 
-## Execute exhaustively
+## Execute a focused independent certification
 
-Inventory every expected runnable file, command path, material example, and
-advertised public workflow. Execute all accessible surfaces in the supported
-environment. Rerun every prior failing and passing audit input plus focused
-regressions and fresh inputs sufficient to test generality; use at least two
-fresh cases for each material workflow when suitable bounded inputs exist.
+Inventory expected runnable files, command paths, material examples, and
+advertised public workflows. Independently rerun every corrected finding and
+the regressions most likely to be affected, then run at least one canonical
+end-to-end smoke of an untouched core workflow. Run a second end-to-end path
+when it represents a materially different supported mode and is applicable.
+When a program has materially different output families, ensure the combined
+current evidence contains one inspected representative of each within reason.
+
+Do not rerun every prior passing input merely because it exists. Earlier saved
+execution may remain part of the certification record when the auditor verifies
+that the relevant Skill bytes, dependencies/runtime fingerprint, interface,
+input provenance, and upstream assumptions are unchanged. Re-execute whenever
+that identity is uncertain, the fix affected a shared abstraction, or earlier
+evidence did not inspect meaningful output.
 
 Inspect every result under the evidence standard. Include schemas, meaningful
 values, scientific relationships, failure guards, and rendered readability as
 applicable. Parsing, compilation, imports, `--help`, file existence, and exit
 status never substitute for the execution and output assertions.
+
+Do not mechanically enumerate unacceptable user inputs or duplicate upstream
+validation documentation. Test an invalid or adversarial value only when silent
+acceptance could plausibly corrupt scientific results, report false success,
+cross a security or destructive boundary, or corrupt a public output contract.
 
 Do not install missing tooling. Route an invalidated environment back to a
 tooling-delta pass. For a paid, private, authenticated, licensed,
@@ -64,8 +78,9 @@ Produce the complete schema-valid audit record and apply the canonical
 readiness gate. Unless the current rubric is stricter, require final score at
 least 85, static score at least 80, execution average at least 85, Layer 1 at
 least 32, Layer 2 at least 48, assertion pass rate at least 90 percent, no veto
-or open P0, and every required accessible surface executed with inspected
-passing output. This result makes the exact working bytes `candidate-ready`;
+or open P0, and representative inspected execution for every materially
+distinct required workflow or output family, using verified reusable evidence
+where allowed above. This result makes the exact working bytes `candidate-ready`;
 the orchestrator must still commit them to make them `ready` and pass intake to
 make them `done`.
 

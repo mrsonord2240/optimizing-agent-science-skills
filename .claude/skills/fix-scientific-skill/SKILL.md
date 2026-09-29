@@ -43,6 +43,12 @@ scientific intent. Do not mask failures, weaken assertions, narrow advertised
 scope without evidence, fabricate outputs, or substitute a materially
 different workflow merely to obtain a pass.
 
+Whenever a claim is corrected, use `rg` across the complete Skill tree for the
+old wording, close variants, duplicated examples, and connected statements
+whose validity depended on it. Correct the whole invalidated claim family in
+the same pass or record each intentional survivor with evidence. Do not stop at
+the line named by the finding.
+
 Use the prepared tooling. If the fix needs a new dependency, runtime, version,
 wrapper, model, dataset, service, or executable path, record that fact and do
 only the minimum safe implementation work needed; environment installation and
@@ -55,9 +61,11 @@ behavior with meaningful inputs. Save commands and versions; parse structured
 outputs, check meaningful scientific values and relationships, and inspect
 rendered readability where applicable. Exit code zero or file existence alone
 is insufficient. Rerun focused regressions for adjacent behavior affected by
-the change. A fix may remain blocked when access is unavailable, but it must
-not be marked verified. Do not bypass authentication, payment, licenses, or
-registration.
+the change. Reuse immutable evidence for an unchanged surface when its bytes,
+dependency/runtime fingerprint, interface, and relevant upstream assumptions
+still match; do not replay expensive unrelated workflows ceremonially. A fix
+may remain blocked when access is unavailable, but it must not be marked
+verified. Do not bypass authentication, payment, licenses, or registration.
 
 Long phases must update the same finding ledger and canonical handoff after
 each coherent milestone. Keep evidence in files and replace current-state

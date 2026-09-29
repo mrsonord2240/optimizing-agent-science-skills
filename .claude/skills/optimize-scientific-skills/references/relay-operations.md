@@ -2,7 +2,7 @@
 
 ## Capacity and independence
 
-Run up to five worker lanes plus one orchestrator. Five is the default when
+Run up to five worker lanes plus one orchestrator. Use the cheapest model capable of completing the task. Luna for Codex Haiku for Claude. If the work is not satisfactory -> Sonnet | Terra. Five is the default when
 eligible work exists; an explicit invocation-level lane, worker, or Skill cap
 is a lower hard boundary. A lane carries one Skill at a time. A worker carries
 one phase only. When a phase finishes, accept its handoff, retire it, and
@@ -26,10 +26,25 @@ verify that no other live worker owns the same Skill, path, environment
 mutation, or audit output. Serialize shared-environment changes; independent
 read-only executions may proceed concurrently when resource limits permit.
 
+Every phase brief must include the absolute path to the selected worker
+`SKILL.md`, the Skill ID, source and candidate identity, canonical handoff path,
+allowed phase, and classified pre-existing changes. Tell the worker to read the
+entire contract before any repository exploration or mutation. Treat a missing
+or unreadable contract as a blocked dispatch. The worker must not search the
+specialists repository, another project, or the web for a replacement role and
+must not reconstruct the contract from the phase name.
+
 Choose the earliest incomplete phase from durable evidence. Do not replay a
 phase merely for ceremonial sequence. Do not skip normalization. Reuse tooling
 or audit work only under the exact identity and freshness rules in the
 orchestrator Skill.
+
+Budget audit effort by scientific and operational risk. Spend new execution on
+changed findings, shared abstractions, common end-to-end workflows, materially
+different modes or output families, and silent high-consequence failures. Reuse
+identity-matched evidence for untouched surfaces. Do not spend a lane on an
+exhaustive invalid-input catalog, redundant parameter permutations, or a full
+expensive replay after a localized repair.
 
 ## Transition review
 

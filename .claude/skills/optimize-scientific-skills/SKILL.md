@@ -42,6 +42,15 @@ Use the following worker Skills by exact name:
 | Fix | `fix-scientific-skill` | finding dispositions and tooling impact |
 | Final re-audit | `reaudit-scientific-skill` | candidate-ready decision for exact bytes |
 
+Worker-contract delivery is part of dispatch. Resolve the selected worker
+Skill's actual `SKILL.md` as a sibling of this orchestrator Skill and include
+that absolute path in the worker brief. The worker's first action must be to
+read the complete file successfully. Merely naming the Skill is insufficient:
+a fresh agent may start from a repository that does not expose the orchestrator's
+Skill registry. If the contract cannot be read, the worker must report that
+blocker and stop without searching other repositories for a substitute role or
+improvising the phase.
+
 Dispatch a fresh agent for every phase. A worker owns one Skill and one phase,
 then retires after writing the canonical handoff. The orchestrator must not
 invoke a worker Skill in its own context or perform worker-phase tasks. It may
@@ -153,7 +162,10 @@ before an initial audit or, when a usable initial audit is reused, before a fix.
 
 ### 4. Audit, fix, and certify
 
-Run `audit-scientific-skill` when no usable initial audit exists. Dispatch
+Run one comprehensive but bounded `audit-scientific-skill` pass when no usable
+initial audit exists. Its minimum dynamic scope is the common workflow end to
+end, a second materially distinct workflow when applicable, and one inspected
+example of each materially different output family within reason. Dispatch
 `fix-scientific-skill` for open findings, known P0s, readiness blockers, wrong
 outputs, and safely bounded lower-priority defects. A truly clean diagnostic
 audit may proceed directly to final re-audit.
@@ -164,13 +176,21 @@ After every fix, inspect its tooling impact:
 - `changed`: run a tooling-delta pass for affected surfaces;
 - `uncertain`: treat as changed until a tooling worker resolves it.
 
-Then dispatch `reaudit-scientific-skill`. A failure returns to a fresh fixer,
-then any required tooling delta, then a fresh re-auditor. A user-action blocker
-may be parked without occupying a worker slot once its exact state is durable.
+Then dispatch a fresh independent `reaudit-scientific-skill` worker. The final
+pass retests corrected findings and affected regressions, confirms a canonical
+core smoke, and reuses identity-matched immutable evidence for untouched
+surfaces. A failure returns to a fresh fixer for one focused repair loop, then
+any required tooling delta, then a fresh re-auditor. Restart broad audit only
+when the failure affects shared architecture, invalidates the environment or
+evidence identity, or materially changes the advertised workflow set. A
+user-action blocker may be parked without occupying a worker slot once its
+exact state is durable.
 
-After every audit pass, publish its records and regenerate the canonical audit
-index, backlog, Markdown status, and HTML dashboard. Keep each freed lane filled
-while eligible work remains.
+Publish the initial baseline and accepted final audit. Keep rejected
+intermediate runs as durable local evidence and publish them only when needed
+to preserve a blocker, explain a candidate-identity transition, or satisfy the
+records schema. Regenerate canonical views after each published audit. Keep
+each freed lane filled while eligible work remains.
 
 ### 5. Stage candidate-ready Skills
 

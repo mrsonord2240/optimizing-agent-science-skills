@@ -24,3 +24,29 @@ Worktree `F:\OpenScience\external\bioSkills-wt-p1`, branch `fix/backlog-p1`. Run
 | BEAST2/RevBayes named only, no commands | P2 | Added "Minimal BEAST2 Run" subsection (`beast -seed <n> -overwrite <xml>` + BEAUti/Tracer/TreeAnnotator/LogCombiner workflow); RevBayes left without a fabricated command, with an explicit routing note (rb not installed; model is bespoke by definition of choosing RevBayes) | ran: BEAST 2.7.7 via bundled launcher on example XML `bitflip.xml`, exit 0, `-seed`+`-overwrite` both honored | commit 9a30d0d. RevBayes (`rb`) confirmed absent on this machine (checked `tools/` recursively); no command fabricated per brief's "delete the claim when absent" rule |
 
 Unfixed: none in this slice.
+
+# bio-phylo-bayesian-inference — Phase 2 final pass
+
+Date: 2026-09-24  
+Source commit: `4850b2c8c03bbbe86bf7fe5561bbb0a9df3c55c0`
+
+## Fix
+
+Hardened `examples/bayesian_convergence.py` so it rejects malformed MrBayes
+`.p` files, chains with different parameter headers, invalid burn-in fractions,
+and excess arguments before computing ESS or PSRF. Previously the helper used
+only the overlap of two headers, which could silently omit a parameter from a
+misconfigured second run and produce a false convergence result.
+
+## Validation
+
+Exact-commit evidence: `F:/OpenScience/audits/bio-phylo-bayesian-inference/runs/exact-commit-4850b2c/`.
+
+- 12/12 exact-commit checks passed.
+- Focused executable suite: 10/10 passed, including real matching traces,
+  explicit self-test, one-file rejection, header mismatch, malformed header,
+  malformed row, invalid burn-in, and excess-argument rejection.
+- `git diff --check HEAD^..HEAD` passed.
+
+`quick_validate.py` rejects pre-existing shelf frontmatter keys (`author`,
+`primary_tool`, `tool_type`); this pass did not alter those inherited keys.
