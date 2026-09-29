@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-27",
+  "generated": "2026-09-28",
   "source": {
     "upstream": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
     "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
     "provider_ref": "main",
-    "provider_skills_tree": "f6f667d061dc2ac8eab9ee261b97301c5eb873d2"
+    "provider_skills_tree": "0ff7624f5ad62ba005fd5c44f61f2ce5e67574d0"
   },
   "skills": [
     {
@@ -89,14 +89,14 @@
     {
       "id": "bio-analytical-validation",
       "upstream_path": "liquid-biopsy/analytical-validation",
-      "category": null,
-      "state": "remaining"
+      "category": "Protocol Design",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-allele-specific-accessibility",
       "upstream_path": "atac-seq/allele-specific-accessibility",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-atac-peak-calling",
@@ -179,8 +179,8 @@
     {
       "id": "bio-batch-processing",
       "upstream_path": "sequence-io/batch-processing",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-biomart-queries",
@@ -263,14 +263,14 @@
     {
       "id": "bio-cfdna-preprocessing",
       "upstream_path": "liquid-biopsy/cfdna-preprocessing",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-chipseq-allele-specific-binding",
       "upstream_path": "chip-seq/allele-specific-binding",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-chipseq-chip-deep-learning",
@@ -341,8 +341,8 @@
     {
       "id": "bio-clinical-biostatistics-adaptive-designs",
       "upstream_path": "clinical-biostatistics/adaptive-designs",
-      "category": null,
-      "state": "remaining"
+      "category": "Protocol Design",
+      "state": "ready"
     },
     {
       "id": "bio-clinical-biostatistics-bayesian-trials",
@@ -413,8 +413,8 @@
     {
       "id": "bio-clinical-databases-acmg-classification",
       "upstream_path": "clinical-databases/acmg-classification",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-clinical-databases-clinvar-lookup",
@@ -485,8 +485,8 @@
     {
       "id": "bio-clip-seq-ago-clip-mirna-targets",
       "upstream_path": "clip-seq/ago-clip-mirna-targets",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-clip-seq-binding-site-annotation",
@@ -557,14 +557,14 @@
     {
       "id": "bio-codon-usage",
       "upstream_path": "sequence-manipulation/codon-usage",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-comparative-genomics-ancestral-reconstruction",
       "upstream_path": "comparative-genomics/ancestral-reconstruction",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-comparative-genomics-comparative-annotation-projection",
