@@ -33,7 +33,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-atac-seq-deep-learning-atac` | Data Analysis | 88 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-atac-seq-deep-learning-atac/candidate@3a9d1b4cab32-reaudit-run/viewer.md) |
 | `bio-atac-seq-differential-accessibility` | Data Analysis | 86 | Production Ready | 0 / 0 / 4 | [viewer](skills/bio-atac-seq-differential-accessibility/candidate@dd1e7bda67b8-reaudit-run/viewer.md) |
 | `bio-atac-seq-enhancer-gene-linking` | Data Analysis | 88 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-atac-seq-enhancer-gene-linking/candidate@44385431f019-reaudit-run/viewer.md) |
-| `bio-atac-seq-footprinting` | Data Analysis | 70 | Beta Only | 0 / 3 / 3 | [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md) |
+| `bio-atac-seq-footprinting` | Data Analysis | 86 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-footprinting/candidate@a71e561087bc-reaudit-run/viewer.md) |
 | `bio-atac-seq-motif-deviation` | Data Analysis | 86 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-atac-seq-motif-deviation/candidate@fb58807b04cb-reaudit-run/viewer.md) |
 | `bio-atac-seq-nucleosome-positioning` | Data Analysis | 85 | Production Ready | 0 / 0 / 4 | [viewer](skills/bio-atac-seq-nucleosome-positioning/candidate@2192c9d1500c-reaudit-run/viewer.md) |
 | `bio-atac-seq-single-cell-atac` | Data Analysis | 71 | Reject | 1 / 2 / 3 | [viewer](skills/bio-atac-seq-single-cell-atac/candidate@da2da9c8bbaf-initial-audit-20260930/viewer.md) |

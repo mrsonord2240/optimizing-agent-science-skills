@@ -14,31 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: EnsDb annotation is Ensembl-style with no genome while the object is hg38/UCSC.
 - Fix: Convert annotation with seqlevelsStyle(ann) <- 'UCSC' and genome(ann) <- 'hg38' before CreateChromatinAssay and rerun end to end (SCATAC-001).
 
-## P1 (55)
-
-### `bio-atac-seq-footprinting` — CTCF validation silently skipped without a CTCF motif
-
-- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
-- Observed in inputs: 3
-- Problem: With a motif file lacking CTCF, run_tobias.sh exits 0 with an empty validation directory and no message.
-- Root cause: The if [ -f ... ] guard has no else branch.
-- Fix: Warn or fail when no CTCF bound bed is found and document alternative controls (FOOT-001).
-
-### `bio-atac-seq-footprinting` — scPrinter route not runnable as documented
-
-- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
-- Observed in inputs: 5
-- Problem: The clone-install line breaks without tangermeme 0.4.4 and snapatac2 2.8.0 and the bundle has no scPrinter procedure although requests advertise scATAC work.
-- Root cause: The tool is named without a tested recipe or version pins.
-- Fix: Ship a tested pinned recipe or narrow the claims; update the stale 0.1+ floor (FOOT-002, FOOT-012).
-
-### `bio-atac-seq-footprinting` — One-line install resolves TOBIAS 0.13.3 on Python 3.7
-
-- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
-- Observed in inputs: —
-- Problem: The documented conda line installs versions below the stated floors; bioconda-only is unsolvable.
-- Root cause: rgt and pydnase pin Python 3.7 in the same environment.
-- Fix: Use separate environments and state channels (FOOT-003).
+## P1 (52)
 
 ### `bio-atac-seq-single-cell-atac` — SnapATAC2 block errors twice on 2.10.0
 
@@ -458,30 +434,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ## P2 (163)
 
-### `bio-atac-seq-footprinting` — JASPAR URL 404; stale HINT-ATAC and Wellington guidance
-
-- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
-- Observed in inputs: 4
-- Problem: The wget URL is 404, rgt-hint needs undocumented data, the Wellington crash claim is contradicted and -A is omitted, the stranded-mode claim is absent from 1.0.2.
-- Root cause: Claims and commands were not executed against current tool versions.
-- Fix: Correct the URL and give tested HINT-ATAC and Wellington commands (FOOT-004, FOOT-005, FOOT-010, FOOT-011).
-
-### `bio-atac-seq-footprinting` — run_tobias.sh summary order, quoting and QC gate
-
-- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: The summary is sorted by p-value though labelled by \|change\|, unquoted variables break on spaces, and the CTCF dip gate is met even without bias correction.
-- Root cause: Script logic was condensed without checking labels, quoting or the discrimination of the QC.
-- Fix: Fix ranking, quote variables and validate the gate at unselected or ChIP-anchored sites (FOOT-006, FOOT-007, FOOT-008).
-
-### `bio-atac-seq-footprinting` — Two-tool concordance rule undefined and unmet on real data
-
-- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
-- Observed in inputs: 4
-- Problem: The >50% overlap rule has no stated denominator; measured values are 40.6% or 15.1% for HINT and 6.3-11.2% for Wellington.
-- Root cause: Threshold carried over without calibration.
-- Fix: Define the statistic and give an empirical expectation (FOOT-009).
-
 ### `bio-atac-seq-single-cell-atac` — AMULET route: no command, numpy pin, depth default
 
 - Skill: 71, Reject · candidate `da2da9c8bbaf` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/single-cell-atac) · [viewer](skills/bio-atac-seq-single-cell-atac/candidate@da2da9c8bbaf-initial-audit-20260930/viewer.md)
@@ -785,6 +737,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: --txdb=<package> was executed only for none because no non-human TxDb was installed; the 4-sample SVA yields 1 SV correlated 0.53 with Condition and no caution says it may absorb real signal.
 - Root cause: Only hg38 annotation packages were installed in the audit environment; no guidance on SVA validity for 2 vs 2 designs.
 - Fix: Add a short SKILL.md caution about SVA on very small designs and validate one non-model-organism TxDb when available.
+
+### `bio-atac-seq-footprinting` — CTCF control cannot detect absent bias correction
+
+- Skill: 86, Production Ready · candidate `a71e561087bc` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@a71e561087bc-reaudit-run/viewer.md)
+- Observed in inputs: 3
+- Problem: With corrected signal replaced by uncorrected signal the script exits 0 with no warning and the bound-site dip stays deep (7.14 vs 6.67); the guard only tests that a CTCF motif exists.
+- Root cause: The positive control is evaluated on sites selected by the same footprint score and gives no numeric corrected-versus-uncorrected criterion.
+- Fix: Compare corrected against uncorrected at all CTCF sites and warn when the corrected flank-minus-core gain is absent, or state the expected contrast (about 2.5 uncorrected and 3.0 corrected at all sites in the chr1 test) beside the panel description.
+
+### `bio-atac-seq-footprinting` — scPrinter recipe lines do not name the environment
+
+- Skill: 86, Production Ready · candidate `a71e561087bc` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@a71e561087bc-reaudit-run/viewer.md)
+- Observed in inputs: 6
+- Problem: The scPrinter block runs bare pip install lines after micromamba create, so a reader can install torch and scPrinter into the wrong active environment.
+- Root cause: The TOBIAS line uses micromamba run -n but the scPrinter lines rely on an implied activation.
+- Fix: Prefix the two scPrinter pip lines with micromamba run -n footprint-scprinter or add an explicit activation line.
+
+### `bio-atac-seq-footprinting` — scprinter_footprint.py fails with a raw traceback on a missing input
+
+- Skill: 86, Production Ready · candidate `a71e561087bc` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@a71e561087bc-reaudit-run/viewer.md)
+- Observed in inputs: 5
+- Problem: A missing fragment file exits rc 1 through a FileNotFoundError deep in scPrinter rather than a one-line message.
+- Root cause: Arguments are not checked before importing and calling scPrinter.
+- Fix: Check that --fragments, --fasta, --gtf, --blacklist and --regions exist and exit 2 with a named message, as run_tobias.sh does.
 
 ### `bio-atac-seq-motif-deviation` — Correct the 'top motifs exceeded 9' z-score statement
 
