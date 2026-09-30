@@ -1,0 +1,77 @@
+{
+  "skill_id": "bio-atac-seq-atac-peak-calling",
+  "version": "candidate@e8bc49ba345f-initial-audit-20260930",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/atac-peak-calling",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling",
+    "subtree": "821b1f00393b73c7b940de82e7f57b2555c3fb5a"
+  },
+  "candidate": {
+    "identity": "e8bc49ba345f27792466c23bfee96faa4898937641d32bd266c7e58f0f3a7658",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-atac-peak-calling",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "path": "F:\\OpenScience\\wt\\atac-atac-peak-calling\\skills\\bio-atac-seq-atac-peak-calling",
+    "files": [
+      {
+        "path": "LICENSE",
+        "git_blob": "87da87fcf00d56ea67be30ed0f0ec07045f1263a",
+        "sha256": "baacaab2d3f82cc6f6d1b0fbfba347c6be171c25a0b1f58ba935a5d2d43de2c5",
+        "bytes": 1088
+      },
+      {
+        "path": "SKILL.md",
+        "git_blob": "49e0bdfc3fda49ec3d2f891ca1e454686fa80828",
+        "sha256": "469f7bf6beb943e8781e817456d8204782c61680f40f74842e9e620fd14c6022",
+        "bytes": 3338
+      },
+      {
+        "path": "references/method-reference.md",
+        "git_blob": "72e134047ab18ee5567bcf0406990c8343983366",
+        "sha256": "dd7c092718dedd473d1536f92daa34e589fc5716a44ba4570155eb87b763378a",
+        "bytes": 18840
+      },
+      {
+        "path": "references/usage-guide.md",
+        "git_blob": "1db550b87efd54026aedc7ea2743a573d8bb19cf",
+        "sha256": "b3980f975edb7cc25895f90db4c69cdd3f44aca29a173a36d108ed6772064a06",
+        "bytes": 6704
+      },
+      {
+        "path": "scripts/call_atac_peaks.sh",
+        "git_blob": "e3460d14a106c04cd58b89a99ac4466409b40e84",
+        "sha256": "1ecf087afba6ec3cf16d31e1b502cf7fc3ef162bbe61b554ca73055c56be5e49",
+        "bytes": 3282
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 7
+  }
+}

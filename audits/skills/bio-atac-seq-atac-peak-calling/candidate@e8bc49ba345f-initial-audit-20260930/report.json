@@ -1,0 +1,375 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-atac-peak-calling",
+    "description": "Call accessible chromatin regions from ATAC-seq BAM files using MACS3, MACS2, Genrich, or HMMRATAC. Use when identifying open chromatin from aligned ATAC-seq, choosing between point-source vs HMM peak callers, applying ENCODE-style pseudoreplicate IDR, removing blacklist regions, or fixing 501bp consensus peaks for downstream differential analysis.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; checked figures (effective genome sizes, MACS behaviours) are traceable; uncited depth and runtime claims are noted in ATACPC-009"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-only genomics skill with no clinical conclusions"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The self-consistency implementation departs from ENCODE (ATACPC-001, ATACPC-002) and flags a passing library, but the script discloses approximate pseudoreplicates and the method is not fabricated or causally invalid; scored down in Layer 2 and filed P1"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "call_atac_peaks.sh ran to completion on real ENCODE BAMs; install and macs2 import problems are environment issues filed as ATACPC-003 and ATACPC-004"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 75,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Broad, mostly accurate caller coverage; QC ratio logic and install instructions wrong"
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Script has no input validation and depends on a macs2 build that fails to import; no IDR environment guard"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is short with routed references; method-reference.md is long but sectioned"
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Clear workflow and routing; Genrich, hmmratac and NFR lack tested invocations in the Skill"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Quick-start prompts and decision tables help; single-sample and reconciliation advice inconsistent"
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials or destructive operations; unquoted variables and blacklist download without checksum"
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "License and provenance preserved, references organized; unpinned versions and stale claims"
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger-rich description; ENCODE-exact and script-validation claims overstated"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 76.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 14,
+      "total": 21
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "ENCODE-4 script on GM12878 rep1/rep2 chr1:1-30Mb",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs to completion; pseudoreplicates overlap and Nself/ratio differ from ENCODE definition (ratio 2.066 vs 1.09-1.16 disjoint)",
+        "basic": 28,
+        "specialized": 36,
+        "total": 64,
+        "assertions": [
+          {
+            "text": "Script exits 0 and writes per-rep, pooled, pseudorep, IDR, plot and blacklist outputs",
+            "result": "PASS",
+            "note": "All files present and parsed: 4803/4366/4310 peaks, IDR 1197 and 2473 rows, both PNGs"
+          },
+          {
+            "text": "Reported Nt equals the count of IDR rows at the threshold",
+            "result": "PASS",
+            "note": "Nt=1197 equals true_reps.idr row count"
+          },
+          {
+            "text": "The two pseudoreplicates are disjoint halves of the BAM",
+            "result": "FAIL",
+            "note": "131,281 of about 262k read names shared between halves"
+          },
+          {
+            "text": "Reported ratios agree with ENCODE rescue and self-consistency ratios on the same data",
+            "result": "FAIL",
+            "note": "Script 2.066 (fail); disjoint pseudoreplicates give rescue 1.155, self 1.093"
+          },
+          {
+            "text": "All called peak sets (pooled, rep2 pseudoreps) feed the final QC decision",
+            "result": "FAIL",
+            "note": "Pooled peaks and rep2 pseudorep BAMs are never used"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "MACS3/MACS2 callpeak, shift-extend vs BAMPE, planted and real",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Method-reference claims confirmed; macs2 import needs a shim",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions": [
+          {
+            "text": "MACS3 -f BAMPE recovers the 20 planted regions",
+            "result": "PASS",
+            "note": "24 peaks, 20/20 truth, median width 373"
+          },
+          {
+            "text": "MACS3/MACS2 -f BAM --shift -75 --extsize 150 recover planted regions at width 150",
+            "result": "PASS",
+            "note": "391 peaks each, 20/20, width 150"
+          },
+          {
+            "text": "-f BAMPE ignores --shift/--extsize as documented",
+            "result": "PASS",
+            "note": "Identical 24 peaks and widths with and without the flags"
+          },
+          {
+            "text": "MACS3 ENCODE-pattern peaks on GM12878 rep1 recover ENCODE IDR peaks",
+            "result": "PASS",
+            "note": "4,803 peaks; 2,087 of 2,088 ENCODE peaks overlapped"
+          },
+          {
+            "text": "Documented macs2 callpeak runs in a fresh install",
+            "result": "FAIL",
+            "note": "ImportError undefined symbol __log_finite without shim"
+          }
+        ],
+        "assertions_passed": 4,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Genrich joint mode with chrM exclusion and blacklist",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Works on name-sorted input; requirement and q-cutoff advice not in Skill",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions": [
+          {
+            "text": "Genrich recovers 20 planted regions",
+            "result": "PASS",
+            "note": "20/20 (2,327 peaks, noisy on tiny fixture)"
+          },
+          {
+            "text": "Genrich joint on GM12878 reps recovers ENCODE IDR peaks",
+            "result": "PASS",
+            "note": "14,498 peaks, 2,085 of 2,088 recovered"
+          },
+          {
+            "text": "Genrich accepts the coordinate-sorted BAMs the Skill assumes",
+            "result": "FAIL",
+            "note": "Error: not sorted by queryname (samtools sort -n)"
+          },
+          {
+            "text": "Skill advice -q 0.01 brings Genrich closer to MACS peak counts",
+            "result": "FAIL",
+            "note": "14,328 peaks at 0.05 rose to 22,936 at 0.01"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 4
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "macs3 hmmratac on GM12878 rep1",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Produces sensible accessible regions; no invocation or output names in Skill",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions": [
+          {
+            "text": "hmmratac completes and writes parseable regions and model",
+            "result": "PASS",
+            "note": "2,064 regions narrowPeak, model json, cutoff table"
+          },
+          {
+            "text": "hmmratac regions recover ENCODE IDR peaks",
+            "result": "PASS",
+            "note": "2,072 of 2,088 overlapped"
+          },
+          {
+            "text": "Documented output description matches actual outputs",
+            "result": "FAIL",
+            "note": "Skill says BED; tool writes *_accessible_regions.narrowPeak"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 3
+      },
+      {
+        "index": 5,
+        "type": "Edge",
+        "label": "NFR-only recipe, blacklist filter, bigWig, grep -v chrM",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Recipes run and give sensible output; bigWig checked structurally only",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions": [
+          {
+            "text": "NFR-only recipe calls peaks that recover ENCODE peaks",
+            "result": "PASS",
+            "note": "10,951 peaks; 2,078 of 2,088 recovered"
+          },
+          {
+            "text": "Blacklist intersect -v removes blacklisted peaks only",
+            "result": "PASS",
+            "note": "4,803 to 4,753 with the 636-region v2 list"
+          },
+          {
+            "text": "bedGraph to bigWig recipe produces a valid bigWig",
+            "result": "PASS",
+            "note": "3.2 MB file, magic 0x888FFC26 (signal values not read back)"
+          },
+          {
+            "text": "grep -v chrM snippet removes chrM reads and their chr1 mates cleanly",
+            "result": "PASS",
+            "note": "Synthetic pair with mate on chrM: both records and chrM @SQ removed"
+          }
+        ],
+        "assertions_passed": 4,
+        "assertions_total": 4
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.0,
+    "dynamic_weighted": 45.8,
+    "score": 76,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Caller coverage (MACS3/MACS2 shift-extend and BAMPE, Genrich joint, hmmratac, NFR-only) recovered planted truth and 2,072-2,087 of 2,088 ENCODE IDR peaks on real GM12878 data",
+    "The claim that -f BAMPE ignores --shift/--extsize is correct and shown by identical outputs",
+    "Effective genome size tables match deepTools values; license and provenance are preserved",
+    "Routed structure keeps SKILL.md short and sends detail to references and a runnable script"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Use disjoint pseudoreplicates in the ENCODE script",
+      "observed_in": [
+        1
+      ],
+      "problem": "The two pseudoreplicates share 50% of their reads and Nself is inflated (2,473 vs 1,234 with disjoint halves), giving a false ratio of 2.066.",
+      "root_cause": "samtools view -s with two seeds draws independent subsamples.",
+      "fix": "Split each BAM with -s SEED.5 -o a.bam -U b.bam and correct the method-reference wording. (ATACPC-001)"
+    },
+    {
+      "priority": "P1",
+      "title": "Implement ENCODE rescue and self-consistency ratios",
+      "observed_in": [
+        1
+      ],
+      "problem": "One Nt/Nself ratio from rep1 only is reported; pooled and rep2 pseudoreplicates are built or ignored, and thresholds differ (0.05 vs 0.10).",
+      "root_cause": "The ENCODE rule was condensed and the pipeline stops early.",
+      "fix": "Compute N1, N2, Np, Nt at one IDR threshold and report rescue and self ratios with pass/borderline/fail; align all three files. (ATACPC-002)"
+    },
+    {
+      "priority": "P1",
+      "title": "Fix the install line and the idr numpy incompatibility",
+      "observed_in": [
+        1
+      ],
+      "problem": "The documented conda line does not solve on bioconda alone and yields an idr that crashes on numpy>=1.24.",
+      "root_cause": "Install line and tested-version claim were never executed.",
+      "fix": "Document a solving install with idr isolated or numpy<1.24 and correct the tested-versions statement. (ATACPC-003)"
+    },
+    {
+      "priority": "P2",
+      "title": "Prefer macs3 callpeak; macs2 import fails on new glibc",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "macs2 2.2.9.1 fails at import with __log_finite and the script hardcodes macs2.",
+      "root_cause": "Build depends on removed glibc symbols.",
+      "fix": "Make the binary a variable defaulting to macs3 callpeak. (ATACPC-004)"
+    },
+    {
+      "priority": "P2",
+      "title": "Reconcile genome-size default and comment with the tables",
+      "observed_in": [
+        1
+      ],
+      "problem": "Script defaults to -g hs and labels 2.701e9 as 100 bp while the Skill table says 2.806e9.",
+      "root_cause": "Unreconciled defaults.",
+      "fix": "Require the size or default to a stated value and correct the comment. (ATACPC-005)"
+    },
+    {
+      "priority": "P2",
+      "title": "Align script claims with behaviour",
+      "observed_in": [
+        1
+      ],
+      "problem": "The script does not validate BAMs, filters only the IDR true-rep set, yields no final peak set or bigWig, and is called exact ENCODE without --call-summits or tagAlign.",
+      "root_cause": "Documentation describes intended rather than implemented behaviour.",
+      "fix": "Add minimal checks and the missing outputs or narrow the claims. (ATACPC-006, ATACPC-007, ATACPC-010)"
+    },
+    {
+      "priority": "P2",
+      "title": "Add tested Genrich and hmmratac commands",
+      "observed_in": [
+        3,
+        4
+      ],
+      "problem": "Genrich needs name-sorted BAMs and the q-cutoff parity advice is wrong; hmmratac has no command and writes narrowPeak, not BED.",
+      "root_cause": "Sections are descriptive and were untested.",
+      "fix": "Add executed commands and correct the reconciliation and output descriptions. (ATACPC-008, ATACPC-009)"
+    },
+    {
+      "priority": "P2",
+      "title": "Resolve single-sample guidance and uncited methods",
+      "observed_in": [],
+      "problem": "Single-sample -q differs between files, the rotation-permutation proxy has no source or test, and the ROSE snippet lacks a GFF step.",
+      "root_cause": "Sections written independently.",
+      "fix": "Choose one setting, cite or remove the proxy, fix or mark the ROSE snippet. (ATACPC-011, ATACPC-012, ATACPC-013)"
+    }
+  ]
+}
