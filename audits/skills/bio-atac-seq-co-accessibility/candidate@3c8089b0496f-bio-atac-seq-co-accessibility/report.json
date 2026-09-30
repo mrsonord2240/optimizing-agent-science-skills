@@ -1,0 +1,402 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-co-accessibility",
+    "description": "Infer cis-regulatory connections (peak-to-peak co-accessibility) from scATAC-seq using Cicero, ArchR getCoAccessibility, or SCENIC+, and map them to enhancer-gene candidates.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; enhancer column defect (COACC-002) is a coding error, and unsupported ranges are filed as P3 COACC-011"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research analysis guidance; no clinical claims"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Co-accessibility is explicitly framed as a hypothesis generator, not 3D contact; permutation control behaves as documented"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The function ran to completion with a chr1-only genome_df and integer-format matrices load; CLI failure on pattern .mtx and the 25 min unmodified timeout are P1/P2 defects (COACC-001, COACC-003), not unrunnable code"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 68,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "Sound method coverage and a working core pipeline, but the shipped CLI fails on the natural input, the enhancer-gene output is wrong, and routes beyond Cicero ship no code"
+      },
+      "reliability": {
+        "score": 6,
+        "max": 12,
+        "note": "No input validation; missing TSS BED silently skipped; unmodified function did not finish in 25 min; no seed"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is 68 lines with routed references; runtime cost of the full-genome default is not disclosed"
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Clear tool-selection tables and workflow; contradictory version guidance and non-existent parameter names reduce reliability"
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Quick reference tables are readable; error recovery for the CLI, plotting, and dependency installs is thin"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no execution of user strings; unchecked file arguments only"
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "One script mixes CLI parsing, pipeline, and mapping; no tests; version claims drift between files"
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Precise trigger description and good progressive disclosure; composability weakened by routes without code and wrong install claim"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 60.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 14,
+      "total": 24
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Shipped Cicero function on real PBMC 5k chr1 slice (genome_df limited to chr1)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Completes in 8.5 min; enhancer column defective; counts doubled",
+        "basic": 27,
+        "specialized": 36,
+        "total": 63,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Function completes and writes connection TSV and enhancer-gene CSV",
+            "result": "PASS",
+            "note": "exit 0; 99,284 rows, 12,252 strong"
+          },
+          {
+            "text": "Scores show distance decay and are within the window",
+            "result": "PASS",
+            "note": "mean 0.068 (<50 kb) vs 0.015 (>300 kb); max span 497 kb"
+          },
+          {
+            "text": "enhancer column holds peak names",
+            "result": "FAIL",
+            "note": "50 percent factor integer codes (COACC-002)"
+          },
+          {
+            "text": "Reported connection counts equal unique peak pairs",
+            "result": "FAIL",
+            "note": "12,252 strong rows = 6,126 unique pairs (COACC-005)"
+          },
+          {
+            "text": "Run-to-run result is stable without a seed",
+            "result": "PASS",
+            "note": "second unseeded run identical: 99,284 rows, strong-set Jaccard 1.0"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "ArchR addCoAccessibility/getCoAccessibility as documented",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Works; returnLoops returns SimpleList not GRanges",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "addCoAccessibility and getCoAccessibility run with documented arguments",
+            "result": "PASS",
+            "note": "835 cells, k=100, knnIteration=500, maxDist=250 kb"
+          },
+          {
+            "text": "Correlations respect corCutOff and maxDist",
+            "result": "PASS",
+            "note": "0.50-0.96; max 249,998 bp"
+          },
+          {
+            "text": "Returned loops object matches the Skill's stated class",
+            "result": "FAIL",
+            "note": "SimpleList, loops in element 1 (COACC-010)"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Signac LinkPeaks on public 3k PBMC Multiome (tooling-phase run, log inspected)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Bounded to 150 genes; Skill ships no code or runtime guidance",
+        "basic": 26,
+        "specialized": 38,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "LinkPeaks returns links with finite scores and p-values",
+            "result": "PASS",
+            "note": "399 links; score -0.33..0.41"
+          },
+          {
+            "text": "Most links positive and within 500 kb of TSS",
+            "result": "PASS",
+            "note": "77 percent positive; median span 181 kb"
+          },
+          {
+            "text": "All chr1 genes finish in a practical time",
+            "result": "FAIL",
+            "note": "1,530 genes did not finish in >25 min; bounded to 150 (COACC-013)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Documented CLI on a binarized peak matrix exported with writeMM",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Exit 1 in 35 s, expression_data must be a matrix",
+        "basic": 12,
+        "specialized": 22,
+        "total": 34,
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "CLI completes on the documented three-file input",
+            "result": "FAIL",
+            "note": "readMM gives ngTMatrix; monocle3 rejects it (COACC-001)"
+          },
+          {
+            "text": "Failure message tells the user what to change",
+            "result": "FAIL",
+            "note": "raw monocle3 error; no input validation"
+          },
+          {
+            "text": "Integer-format mtx passes the same call",
+            "result": "PASS",
+            "note": "dgTMatrix accepted in runs/cli2.log"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Shipped function unmodified on the same 1,726-peak chr1 input",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Killed at 25 min timeout after metacell construction",
+        "basic": 12,
+        "specialized": 23,
+        "total": 35,
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Function finishes within 25 min on a chr1-only input",
+            "result": "FAIL",
+            "note": "EXIT 124 (bounded, larger budget untested; COACC-003)"
+          },
+          {
+            "text": "Runtime scaling or genome argument is documented",
+            "result": "FAIL",
+            "note": "hg38 all-chromosome genome_df hard-coded"
+          },
+          {
+            "text": "Metacell construction and Cicero setup complete before the stall",
+            "result": "PASS",
+            "note": "log reaches 'Running models'; stall is in per-window modelling"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Downstream snippets: Visualizing Connections and Hi-C concordance on real Cicero output",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Bare plot call errors; concordance snippet recovers planted loops",
+        "basic": 27,
+        "specialized": 37,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "plotTracks(track) runs exactly as documented",
+            "result": "FAIL",
+            "note": "needs chromosome/from/to (COACC-008)"
+          },
+          {
+            "text": "Locus-restricted arc plot is legible with a genome axis",
+            "result": "PASS",
+            "note": "400 kb window, >0.5, 140 arcs; inspected PNG"
+          },
+          {
+            "text": "Hi-C concordance snippet runs and recovers planted truth",
+            "result": "PASS",
+            "note": "300/300 planted true pairs recovered by countOverlaps"
+          },
+          {
+            "text": "Concordance is computed on unique pairs",
+            "result": "FAIL",
+            "note": "per symmetric row (COACC-005)"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Alpha block and permutation negative control (documented null)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real 11,794 strong vs 36 after per-peak cell shuffle",
+        "basic": 33,
+        "specialized": 51,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "estimate_distance_parameter returns finite positive values",
+            "result": "PASS",
+            "note": "20 windows, 1.0-3.7, mean 2.34"
+          },
+          {
+            "text": "Permutation control yields far fewer strong connections",
+            "result": "PASS",
+            "note": "36 vs 11,794"
+          },
+          {
+            "text": "Skill's 'expect ~0' outcome is met exactly",
+            "result": "PASS",
+            "note": "0.3 percent residual, effectively null"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 27.2,
+    "dynamic_weighted": 36.2,
+    "score": 63,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Correct scientific framing: co-accessibility is a hypothesis generator, with explicit validation routes and an ABC/Hi-C decision table",
+    "Core Cicero pipeline, alpha estimation, and permutation negative control behave as documented on real public PBMC data",
+    "ArchR and LinkPeaks routes ran with plausible outputs; Hi-C concordance snippet recovered planted truth",
+    "Lean SKILL.md with routed references and preserved MIT provenance"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "CLI fails on binarized (pattern) .mtx input",
+      "observed_in": [
+        4
+      ],
+      "problem": "The documented three-file CLI exits 1 because readMM returns a logical ngTMatrix that monocle3 rejects; the natural binary peak export is exactly this format.",
+      "root_cause": "The script passes readMM output straight to new_cell_data_set with no coercion or validation.",
+      "fix": "Coerce to a numeric dgCMatrix, set dimnames from the metadata, validate dimensions, and re-run the CLI on a pattern .mtx (COACC-001)."
+    },
+    {
+      "priority": "P1",
+      "title": "enhancer-gene CSV column contains factor codes",
+      "observed_in": [
+        1
+      ],
+      "problem": "Half of the enhancer values are integer factor codes, not peak names, and the table over-counts pairs (4,728 vs 3,083 correct).",
+      "root_cause": "c() of a factor Peak2 and a character Peak1 coerces the factor to integer codes.",
+      "fix": "Use as.character() on both anchors, de-duplicate unordered pairs, and assert every enhancer is an input peak name (COACC-002)."
+    },
+    {
+      "priority": "P2",
+      "title": "Hard-coded all-chromosome genome_df; 25 min timeout",
+      "observed_in": [
+        5
+      ],
+      "problem": "The unmodified function did not finish in 25 min on a chr1-only input; restricted to chr1 it took 8.5 min.",
+      "root_cause": "genome_df is fixed to all hg38 primary chromosomes regardless of the peak set.",
+      "fix": "Derive genome_df from the peak coordinates and document runtime scaling (COACC-003)."
+    },
+    {
+      "priority": "P2",
+      "title": "Wrong cicero version and duplicated pair counts",
+      "observed_in": [
+        1,
+        6
+      ],
+      "problem": "'Cicero 1.20+' resolves to the monocle-2 Bioconductor package, and every peak pair appears in both orientations so counts and concordance are doubled.",
+      "root_cause": "Version text was not checked against the monocle3-branch package; the symmetric output is not de-duplicated.",
+      "fix": "State GitHub cicero-release@monocle3 1.3.x and de-duplicate pairs before counting or plotting (COACC-004, COACC-005)."
+    },
+    {
+      "priority": "P2",
+      "title": "Documentation contract errors: parameter, scores, plotting",
+      "observed_in": [
+        1,
+        6
+      ],
+      "problem": "genomic_distance_max does not exist, scores are described as 0-1 but go negative, and plotTracks(track) errors as written.",
+      "root_cause": "Reference snippets were not executed against the installed packages.",
+      "fix": "Use window/distance_constraint, document the -1 to 1 range and NA handling, give the plot a locus, and add a seed argument (COACC-006 to COACC-008)."
+    },
+    {
+      "priority": "P2",
+      "title": "Enhancer-gene mapping inputs and unsupported claims",
+      "observed_in": [
+        1
+      ],
+      "problem": "The TSS BED is unshipped and silently skipped, promoter-promoter pairs are labelled enhancers, and several quantitative claims and the SCENIC+ version/Docker statements are unsupported.",
+      "root_cause": "Undocumented input contract; claims carried over without citations or execution.",
+      "fix": "Document or generate the TSS BED, label promoter pairs, cite or soften the ranges, and pin SCENIC+ (COACC-009 to COACC-013)."
+    }
+  ]
+}

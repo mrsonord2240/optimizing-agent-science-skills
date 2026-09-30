@@ -1,0 +1,70 @@
+{
+  "skill_id": "bio-atac-seq-co-accessibility",
+  "version": "candidate@3c8089b0496f-bio-atac-seq-co-accessibility",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/co-accessibility",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility"
+  },
+  "candidate": {
+    "identity": "3c8089b0496fa6375512ece4b85ce85c10c47f3cb4a9c8e48c7288a62b9162e3",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-co-accessibility",
+    "content_sha256": "3c8089b0496fa6375512ece4b85ce85c10c47f3cb4a9c8e48c7288a62b9162e3",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 4295,
+        "sha256": "836382fd20765ac3e861b889c4e73646292cfeed8bd4772c3dd1a442b4ac910f"
+      },
+      {
+        "path": "references/method-reference.md",
+        "bytes": 15699,
+        "sha256": "2d9e2711955191ef3f71ae63ad2dd1cc0d42ac6ece6604492d6eb7c944c1d5a8"
+      },
+      {
+        "path": "references/usage-guide.md",
+        "bytes": 6100,
+        "sha256": "601ef6e262430d9e5539aaad43861a8332e807fa9367f7b98f6775545221dcdb"
+      },
+      {
+        "path": "scripts/cicero_workflow.R",
+        "bytes": 4195,
+        "sha256": "16a20f0f7c28b95c58289a1f72acfdc23171db8246b066ee3d367898dde8e35e"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 0
+  }
+}
