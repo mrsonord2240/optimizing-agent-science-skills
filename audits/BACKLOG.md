@@ -14,23 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: SVA snippet is an extraction example, not a tested analysis path, and use_sva is not reachable from the CLI.
 - Fix: Choose n.sv with num.sv capped by sample count, feed SVs into the design and assert the model uses them; else remove the branch and route to the tested method-reference recipe. DAC-001.
 
-## P1 (54)
-
-### `bio-atac-seq-co-accessibility` — CLI fails on binarized (pattern) .mtx input
-
-- Skill: 63, Beta Only · candidate `3c8089b0496f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md)
-- Observed in inputs: 4
-- Problem: The documented three-file CLI exits 1 because readMM returns a logical ngTMatrix that monocle3 rejects; the natural binary peak export is exactly this format.
-- Root cause: The script passes readMM output straight to new_cell_data_set with no coercion or validation.
-- Fix: Coerce to a numeric dgCMatrix, set dimnames from the metadata, validate dimensions, and re-run the CLI on a pattern .mtx (COACC-001).
-
-### `bio-atac-seq-co-accessibility` — enhancer-gene CSV column contains factor codes
-
-- Skill: 63, Beta Only · candidate `3c8089b0496f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md)
-- Observed in inputs: 1
-- Problem: Half of the enhancer values are integer factor codes, not peak names, and the table over-counts pairs (4,728 vs 3,083 correct).
-- Root cause: c() of a factor Peak2 and a character Peak1 coerces the factor to integer codes.
-- Fix: Use as.character() on both anchors, de-duplicate unordered pairs, and assert every enhancer is an input peak name (COACC-002).
+## P1 (52)
 
 ### `bio-atac-seq-differential-accessibility` — Documented CLI args 2-5 silently ignored
 
@@ -448,39 +432,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (153)
-
-### `bio-atac-seq-co-accessibility` — Hard-coded all-chromosome genome_df; 25 min timeout
-
-- Skill: 63, Beta Only · candidate `3c8089b0496f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md)
-- Observed in inputs: 5
-- Problem: The unmodified function did not finish in 25 min on a chr1-only input; restricted to chr1 it took 8.5 min.
-- Root cause: genome_df is fixed to all hg38 primary chromosomes regardless of the peak set.
-- Fix: Derive genome_df from the peak coordinates and document runtime scaling (COACC-003).
-
-### `bio-atac-seq-co-accessibility` — Wrong cicero version and duplicated pair counts
-
-- Skill: 63, Beta Only · candidate `3c8089b0496f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md)
-- Observed in inputs: 1, 6
-- Problem: 'Cicero 1.20+' resolves to the monocle-2 Bioconductor package, and every peak pair appears in both orientations so counts and concordance are doubled.
-- Root cause: Version text was not checked against the monocle3-branch package; the symmetric output is not de-duplicated.
-- Fix: State GitHub cicero-release@monocle3 1.3.x and de-duplicate pairs before counting or plotting (COACC-004, COACC-005).
-
-### `bio-atac-seq-co-accessibility` — Documentation contract errors: parameter, scores, plotting
-
-- Skill: 63, Beta Only · candidate `3c8089b0496f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md)
-- Observed in inputs: 1, 6
-- Problem: genomic_distance_max does not exist, scores are described as 0-1 but go negative, and plotTracks(track) errors as written.
-- Root cause: Reference snippets were not executed against the installed packages.
-- Fix: Use window/distance_constraint, document the -1 to 1 range and NA handling, give the plot a locus, and add a seed argument (COACC-006 to COACC-008).
-
-### `bio-atac-seq-co-accessibility` — Enhancer-gene mapping inputs and unsupported claims
-
-- Skill: 63, Beta Only · candidate `3c8089b0496f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md)
-- Observed in inputs: 1
-- Problem: The TSS BED is unshipped and silently skipped, promoter-promoter pairs are labelled enhancers, and several quantitative claims and the SCENIC+ version/Docker statements are unsupported.
-- Root cause: Undocumented input contract; claims carried over without citations or execution.
-- Fix: Document or generate the TSS BED, label promoter pairs, cite or soften the ranges, and pin SCENIC+ (COACC-009 to COACC-013).
+## P2 (150)
 
 ### `bio-atac-seq-differential-accessibility` — Annotation PDF omits TSS-distance plot
 
@@ -713,6 +665,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
+
+### `bio-atac-seq-co-accessibility` — Cryptic zero-read halt; conflicting TSS window prompt
+
+- Skill: 85, Production Ready · candidate `0aac567b1870` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@0aac567b1870-reaudit-run/viewer.md)
+- Observed in inputs: 7
+- Problem: A cell with no reads in the peak set stops the CLI with 'attempt to set an attribute on NULL' (only monocle3's warning names the cause), and a usage-guide prompt says tssRegion=c(-2000, 500) while the script and SKILL use TSS +/- 2 kb.
+- Root cause: No guard for empty cells in run_cicero_pipeline and one prompt copied from ArchR conventions.
+- Fix: Fail early with a message naming zero-read cells (or drop them with a count) and align the prompt to TSS +/- 2 kb; not blocking.
 
 ### `bio-atac-seq-atac-qc` — Fragment-size PDF never visually inspected
 

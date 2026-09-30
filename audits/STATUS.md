@@ -29,7 +29,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 |---|---|---:|---|---:|---|
 | `bio-atac-seq-atac-peak-calling` | Data Analysis | 87 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@b19054ded9df-reaudit-run/viewer.md) |
 | `bio-atac-seq-atac-qc` | Data Analysis | 86 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-atac-qc/candidate@cf524ad680cf-reaudit-run/viewer.md) |
-| `bio-atac-seq-co-accessibility` | Data Analysis | 63 | Beta Only | 0 / 2 / 4 | [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md) |
+| `bio-atac-seq-co-accessibility` | Data Analysis | 85 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-atac-seq-co-accessibility/candidate@0aac567b1870-reaudit-run/viewer.md) |
 | `bio-atac-seq-differential-accessibility` | Data Analysis | 64 | Reject | 1 / 2 / 6 | [viewer](skills/bio-atac-seq-differential-accessibility/candidate@890c5349e680-initial-20260930/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |

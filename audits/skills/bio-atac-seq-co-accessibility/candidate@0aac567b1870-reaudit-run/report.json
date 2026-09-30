@@ -1,0 +1,390 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-co-accessibility",
+    "description": "Infer cis-regulatory connections (peak-to-peak co-accessibility) from scATAC-seq using Cicero, ArchR getCoAccessibility, or SCENIC+, and map them to enhancer-gene candidates.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; planted truth recovered and independent recomputations match; unsourced ranges are labelled as heuristics"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research analysis guidance; no clinical claims"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Co-accessibility framed as a hypothesis generator, not 3D contact; SCENIC+ stated as not executed"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "CLI and function ran on pattern .mtx, multi-chromosome and larger slices; the zero-read failure is loud, not silent (COACC-014)"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 82,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Cicero, ArchR, planted-truth recovery, multi-chromosome and downstream snippets all work; LinkPeaks, Hi-C, SCENIC+ and reference databases remain prose or unshipped, honestly labelled"
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Early guards, seed, empty-set handling and deterministic output; a zero-read cell halts with a cryptic error (COACC-014); whole-genome run untested"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "51-line SKILL.md with routed references; runtime scaling is documented for the chr1 case only"
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Clear tool selection table with per-route execution status; version guidance now consistent; one usage-guide prompt contradicts the TSS window (COACC-015)"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Readable tables and status column; inputs need strict formats with limited recovery guidance"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or string execution; file arguments unchecked beyond existence"
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Single script mixes CLI and pipeline but is now versioned, commented and internally consistent; no tests shipped"
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Precise trigger description and progressive disclosure; SCENIC+ route static-only and stated as such"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 31,
+      "total": 32
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Shipped CLI on real 3-chromosome PBMC Multiome ATAC slice (766 peaks x 2,701 cells, pattern-format .mtx) with 4th-arg TSS BED",
+        "status": "COMPLETED",
+        "note": "exit 0 in 5.2 min; 1,121 strong pairs, 287 enhancer-gene rows; all independent checks pass",
+        "basic": 36,
+        "specialized": 55,
+        "assertions": [
+          {
+            "text": "CLI exits 0 on a pattern-format binary .mtx and writes the connections TSV and enhancer-gene CSV (COACC-001)",
+            "result": "PASS",
+            "note": "exit 0; cicero_connections.tsv 1,121 rows, CSV 287 rows"
+          },
+          {
+            "text": "Strong table has one row per unordered pair, scores in (0.25,1], anchors are input peak names, no cross-chromosome pairs, span within the 500 kb window (COACC-005/007)",
+            "result": "PASS",
+            "note": "score 0.250-0.915; max span 498,991; chr1 255 / chr19 832 / chr2 34"
+          },
+          {
+            "text": "enhancer column holds peak names and the set of enhancer-gene pairs equals an independent recomputation from the BED (COACC-002/009)",
+            "result": "PASS",
+            "note": "independent 287 vs csv 287; no integer codes; no duplicates"
+          },
+          {
+            "text": "enhancer_is_promoter flag equals an independent TSS-window overlap of the enhancer peak",
+            "result": "PASS",
+            "note": "157 TRUE of 287"
+          },
+          {
+            "text": "Multi-chromosome input runs through the peak-derived genome_df without cross-chromosome scoring (COACC-003)",
+            "result": "PASS",
+            "note": "3 chromosomes scored; 0 cross-chromosome pairs"
+          }
+        ],
+        "status_flag": "\u2705",
+        "total": 91,
+        "assertions_total": 5,
+        "assertions_passed": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "run_cicero_pipeline API: window=1e6 (multi-chromosome), tss_bed=NULL branch, seed reproducibility",
+        "status": "COMPLETED",
+        "note": "window=1e6 run 6.2 min; NULL-TSS and repeat runs byte-identical (sha256 72bec6f9...)",
+        "basic": 35,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "window=1e6 scores pairs beyond 500 kb and stays within the window measured end-to-start (COACC-006)",
+            "result": "PASS",
+            "note": "15,077 scored pairs >500 kb; max gap 998,051 (start-to-start 1,010,898 is inside one peak width, peaks reach 67 kb)"
+          },
+          {
+            "text": "No cross-chromosome pairs and all three chromosomes scored at window=1e6",
+            "result": "PASS",
+            "note": "16,481 / 33,793 / 853 pairs"
+          },
+          {
+            "text": "tss_bed=NULL prints the skip message and writes only the connections TSV",
+            "result": "PASS",
+            "note": "no enhancer-gene file written; message seen"
+          },
+          {
+            "text": "Same seed and input give an identical strong table across three fresh processes (tss on, tss off, repeat)",
+            "result": "PASS",
+            "note": "sha256 72bec6f9f675... identical, 78 rows"
+          },
+          {
+            "text": "Scored-pair count is reported as unordered pairs with negatives counted",
+            "result": "PASS",
+            "note": "51,127 scored (11,599 negative)"
+          }
+        ],
+        "status_flag": "\u2705",
+        "total": 87,
+        "assertions_total": 5,
+        "assertions_passed": 5
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "ArchR addCoAccessibility/getCoAccessibility as documented on public PBMC 5k chr1 slice",
+        "status": "COMPLETED",
+        "note": "documented calls run verbatim; SimpleList wording verified",
+        "basic": 34,
+        "specialized": 50,
+        "assertions": [
+          {
+            "text": "addCoAccessibility(k=100, knnIteration=500, maxDist=250000) completes on 835 cells / 1,876 peaks",
+            "result": "PASS",
+            "note": "4,462 loops"
+          },
+          {
+            "text": "getCoAccessibility(returnLoops=TRUE) returns a SimpleList whose element 1 is a GRanges (COACC-010)",
+            "result": "PASS",
+            "note": "class SimpleList / GRanges"
+          },
+          {
+            "text": "returnLoops=FALSE returns a DataFrame of correlations within [0.5,1] respecting maxDist",
+            "result": "PASS",
+            "note": "8,924 rows; 0.50-0.96; max distance 249,998 bp"
+          },
+          {
+            "text": "Route is executed only where code ran (no claim for routes not run)",
+            "result": "PASS",
+            "note": "SKILL.md labels ArchR executed on a PBMC chr1 slice"
+          }
+        ],
+        "status_flag": "\u2705",
+        "total": 84,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Synthetic planted-truth dataset (60 peaks, 4 latent states, 4 co-varying peak groups) plus a threshold that leaves zero strong pairs",
+        "status": "COMPLETED",
+        "note": "planted structure recovered exactly; empty strong set handled",
+        "basic": 37,
+        "specialized": 55,
+        "assertions": [
+          {
+            "text": "Within-group planted pairs are strong",
+            "result": "PASS",
+            "note": "1.00 of 60"
+          },
+          {
+            "text": "Cross-group and independent background pairs are not strong",
+            "result": "PASS",
+            "note": "0.00 of 216 cross-group; 0.02 of 608 background"
+          },
+          {
+            "text": "Cross-group scores are negative or low relative to within-group (negatives retained, range -1..1) (COACC-007)",
+            "result": "PASS",
+            "note": "mean -0.29 vs 0.89; observed min -0.48, max 0.96"
+          },
+          {
+            "text": "Threshold 0.999 (no strong pairs) with a TSS BED completes without crashing and writes header-only outputs",
+            "result": "PASS",
+            "note": "pl_connections.tsv 0 rows; exit 0"
+          },
+          {
+            "text": "Two identical seeds reproduce the connections table byte for byte",
+            "result": "PASS",
+            "note": "sha256 equal across runs"
+          }
+        ],
+        "status_flag": "\u2705",
+        "total": 92,
+        "assertions_total": 5,
+        "assertions_passed": 5
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Shipped CLI on the larger real PBMC 5k chr1:1-30 Mb slice (1,726 peaks x 3,277 cells, pattern .mtx)",
+        "status": "COMPLETED",
+        "note": "exit 0 in 5.2 min (documented 8.5-14 min, load dependent); 6,035 strong / 2,027 enhancer-gene",
+        "basic": 34,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "CLI completes within the documented runtime range on the larger slice",
+            "result": "PASS",
+            "note": "5.2 min, exit 0"
+          },
+          {
+            "text": "All structural invariants hold (unique unordered pairs, scores, window, peak names)",
+            "result": "PASS",
+            "note": "score 0.250-0.927; max span 498,272"
+          },
+          {
+            "text": "Enhancer-gene set equals independent recomputation and promoter flag matches",
+            "result": "PASS",
+            "note": "2,027 vs 2,027; 493 promoter-promoter"
+          },
+          {
+            "text": "Counts match the fix worker's earlier run (deterministic result)",
+            "result": "PASS",
+            "note": "6,035 / 2,027 identical"
+          }
+        ],
+        "status_flag": "\u2705",
+        "total": 86,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Downstream doc snippets on the CLI output: locus arc plot (>0.5) and Hi-C concordance against a planted BEDPE",
+        "status": "COMPLETED",
+        "note": "arc plot readable; concordance snippet matches independent expectation",
+        "basic": 34,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "Visualizing Connections snippet runs verbatim (locus, GenomeAxisTrack, >0.5 filter) and renders a readable arc figure (COACC-008)",
+            "result": "PASS",
+            "note": "1400x500 png inspected: axis, 21 arcs anchored in window, no hairball"
+          },
+          {
+            "text": "Hi-C concordance snippet count equals an independent orientation-agnostic overlap count on a planted BEDPE (30 real + 30 decoy loops)",
+            "result": "PASS",
+            "note": "46 vs 46 (4.1%)"
+          },
+          {
+            "text": "Snippet is unaffected by lexicographic Peak1<Peak2 ordering (GenomicInteractions normalizes anchors)",
+            "result": "PASS",
+            "note": "6 supported pairs had Peak1 genomically downstream; 0 missed"
+          },
+          {
+            "text": "Unsourced concordance bands are labelled as heuristics, not benchmarks (COACC-011)",
+            "result": "PASS",
+            "note": "method-reference.md states 'unsourced heuristics, not benchmarks'"
+          }
+        ],
+        "status_flag": "\u2705",
+        "total": 86,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Failure guards: dimension mismatch, colon-format peak names, missing TSS BED, BED without gene column, and a cell with zero reads",
+        "status": "COMPLETED",
+        "note": "four early clear guards (0.4 s); zero-read cell halts with a cryptic monocle3 error",
+        "basic": 33,
+        "specialized": 45,
+        "assertions": [
+          {
+            "text": "Dimension mismatch is rejected before any long computation",
+            "result": "PASS",
+            "note": "stopifnot(nrow == nrow)"
+          },
+          {
+            "text": "chr:start-end peak names are rejected with the chr_start_end contract in the message (COACC-009)",
+            "result": "PASS",
+            "note": "message names the required format"
+          },
+          {
+            "text": "Missing or gene-less TSS BED is rejected before the long run with a specific message",
+            "result": "PASS",
+            "note": "'tss_bed not found' / 'needs the gene name in column 4'; all guards 0.4 s"
+          },
+          {
+            "text": "Peak names, TSS and matrix guard failures do not write partial outputs or report success",
+            "result": "PASS",
+            "note": "no output files created"
+          },
+          {
+            "text": "A zero-read cell halts with an actionable message naming the cause (COACC-014)",
+            "result": "FAIL",
+            "note": "error is 'attempt to set an attribute on NULL'; only monocle3's warning names the remedy"
+          }
+        ],
+        "status_flag": "\u2705",
+        "total": 78,
+        "assertions_total": 5,
+        "assertions_passed": 4
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 51.8,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All prior P1/P2 defects reproduce as fixed on independent real-data runs: pattern .mtx CLI, enhancer names, unordered pairs, window, guards",
+    "Planted-truth recovery is exact (within-group 1.00 strong, cross-group 0.00) and outputs are byte-reproducible with the seed",
+    "Independent recomputation of the enhancer-gene table matches on both the 3-chromosome and the 30 Mb slices",
+    "Honest per-route execution status: SCENIC+ and prose-only routes are labelled as not executed"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Cryptic zero-read halt; conflicting TSS window prompt",
+      "observed_in": [
+        7
+      ],
+      "problem": "A cell with no reads in the peak set stops the CLI with 'attempt to set an attribute on NULL' (only monocle3's warning names the cause), and a usage-guide prompt says tssRegion=c(-2000, 500) while the script and SKILL use TSS +/- 2 kb.",
+      "root_cause": "No guard for empty cells in run_cicero_pipeline and one prompt copied from ArchR conventions.",
+      "fix": "Fail early with a message naming zero-read cells (or drop them with a count) and align the prompt to TSS +/- 2 kb; not blocking."
+    }
+  ]
+}
