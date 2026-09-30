@@ -1,0 +1,57 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/footprinting",
+    "subtree": "7ded85e1af526f2912805fe6da472f78fe2940e8",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "fix/atac-footprinting",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity": "sha256-manifest-v1",
+    "manifest_sha256": "737bd9416e385a3e91eba2ca2d4f5849c575840e866f46392c0e5533cf84e4cd",
+    "path": "F:\\OpenScience\\wt\\atac-footprinting\\skills\\bio-atac-seq-footprinting",
+    "status_before": "5 files untracked (normalization output); no working-tree edits",
+    "status_after_execution": "unchanged (manifest re-verified after execution)",
+    "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; tab-separated; LF joins; ordinal UTF-8 byte ordering; no trailing LF"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 6094,
+      "sha256": "7219587b1d7e1acee70cd9c44d2e3d324464e525422586ca2d4ff89f59c286c3",
+      "git_blob": "34d4c2647a194c8c55ce48a0882de1631190404d"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 14399,
+      "sha256": "66b6b9f72f4785e1e8e721e3bb25a2fcdfcb509dee72d3c98d5e88e446d12855",
+      "git_blob": "9edecef7d6779935258f27bfcd110ee7b868cc95"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 2046,
+      "sha256": "6577cf766bce873f11fed1b6d29a57ae572b9337f26f4bd8a9e952b684bddd9f",
+      "git_blob": "8900a139d1fdc3cead4f3d321dcb5a7d8bb8e7c5"
+    },
+    {
+      "path": "scripts/run_tobias.sh",
+      "bytes": 2967,
+      "sha256": "503278b3ddaa7f5e3bf7b7567ecdda6be45d06e390c6c049cbf482ab7136f377",
+      "git_blob": "fcc437ab12b0925aa5274f985e5eed724edcdc82"
+    }
+  ],
+  "tooling": {
+    "tools_md_sha256": "c8b391741b2801f10e9b99d01eebff8d07169b41b291e38be463b5021fd55d32",
+    "environment_fingerprint_sha256": "6c4d696ae59d00c3c931723ccb26b2d62c87c7236b4b7849d89ef16d00c4c674",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

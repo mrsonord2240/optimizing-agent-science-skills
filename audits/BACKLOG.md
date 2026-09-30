@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Reference examples were written from tool documentation without executing them against installed versions.
 - Fix: Add a `chrombpnet prep nonpeaks -g -c -p -fl -o` step before step 2 (documented output `<prefix>_negatives.bed`), wire it to NONPEAKS, check inputs exist up front, and document the stage runtimes.
 
-## P1 (62)
+## P1 (65)
 
 ### `bio-atac-seq-enhancer-gene-linking` — Matched Hi-C path not runnable from the script
 
@@ -127,6 +127,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 'Kipoi for Enformer' is false (kipoi ls shows no Enformer; Enformer works via enformer-pytorch/HF: real 196,608 bp hg38 -> (1,896,5313) finite).
 - Root cause: Reference examples were written from tool documentation without executing them against installed versions.
 - Fix: Give a working Enformer command (enformer-pytorch) with input-length and track guidance, drop or qualify Borzoi, and rewrite the scBasset guidance around per-cell input with prerequisites and versions.
+
+### `bio-atac-seq-footprinting` — CTCF validation silently skipped without a CTCF motif
+
+- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
+- Observed in inputs: 3
+- Problem: With a motif file lacking CTCF, run_tobias.sh exits 0 with an empty validation directory and no message.
+- Root cause: The if [ -f ... ] guard has no else branch.
+- Fix: Warn or fail when no CTCF bound bed is found and document alternative controls (FOOT-001).
+
+### `bio-atac-seq-footprinting` — scPrinter route not runnable as documented
+
+- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
+- Observed in inputs: 5
+- Problem: The clone-install line breaks without tangermeme 0.4.4 and snapatac2 2.8.0 and the bundle has no scPrinter procedure although requests advertise scATAC work.
+- Root cause: The tool is named without a tested recipe or version pins.
+- Fix: Ship a tested pinned recipe or narrow the claims; update the stale 0.1+ floor (FOOT-002, FOOT-012).
+
+### `bio-atac-seq-footprinting` — One-line install resolves TOBIAS 0.13.3 on Python 3.7
+
+- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
+- Observed in inputs: —
+- Problem: The documented conda line installs versions below the stated floors; bioconda-only is unsolvable.
+- Root cause: rgt and pydnase pin Python 3.7 in the same environment.
+- Fix: Use separate environments and state channels (FOOT-003).
 
 ### `bio-data-visualization-ggplot2-fundamentals` — ggtext '\u2212' label prints a literal backslash sequence
 
@@ -528,7 +552,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (157)
+## P2 (160)
 
 ### `bio-atac-seq-enhancer-gene-linking` — Normalization guidance conflicts with script
 
@@ -601,6 +625,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 'Strongest bias correction of the compared tools', '100x speedup', '<50M reads / <30k peaks' and the compute figures are uncited; bounded runs cannot confirm them..
 - Root cause: Reference examples were written from tool documentation without executing them against installed versions.
 - Fix: Cite or soften.
+
+### `bio-atac-seq-footprinting` — JASPAR URL 404; stale HINT-ATAC and Wellington guidance
+
+- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
+- Observed in inputs: 4
+- Problem: The wget URL is 404, rgt-hint needs undocumented data, the Wellington crash claim is contradicted and -A is omitted, the stranded-mode claim is absent from 1.0.2.
+- Root cause: Claims and commands were not executed against current tool versions.
+- Fix: Correct the URL and give tested HINT-ATAC and Wellington commands (FOOT-004, FOOT-005, FOOT-010, FOOT-011).
+
+### `bio-atac-seq-footprinting` — run_tobias.sh summary order, quoting and QC gate
+
+- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: The summary is sorted by p-value though labelled by \|change\|, unquoted variables break on spaces, and the CTCF dip gate is met even without bias correction.
+- Root cause: Script logic was condensed without checking labels, quoting or the discrimination of the QC.
+- Fix: Fix ranking, quote variables and validate the gate at unselected or ChIP-anchored sites (FOOT-006, FOOT-007, FOOT-008).
+
+### `bio-atac-seq-footprinting` — Two-tool concordance rule undefined and unmet on real data
+
+- Skill: 70, Beta Only · candidate `737bd9416e38` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@737bd9416e38-initial-audit-20260930/viewer.md)
+- Observed in inputs: 4
+- Problem: The >50% overlap rule has no stated denominator; measured values are 40.6% or 15.1% for HINT and 6.3-11.2% for Wellington.
+- Root cause: Threshold carried over without calibration.
+- Fix: Define the statistic and give an empirical expectation (FOOT-009).
 
 ### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
 
