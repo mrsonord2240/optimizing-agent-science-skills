@@ -1,0 +1,54 @@
+{
+ "origin": {
+  "repository": "GPTomics/bioSkills",
+  "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+  "path": "atac-seq/differential-accessibility",
+  "normalization_note": "Candidate is a normalized derivative (references/, scripts/ routed); origin identifies the source Skill subtree, not a one-to-one file map."
+ },
+ "candidate": {
+  "branch": "fix/atac-differential-accessibility",
+  "base_commit": "3186916",
+  "path": "F:\\OpenScience\\wt\\atac-differential-accessibility\\skills\\bio-atac-seq-differential-accessibility",
+  "status": "untracked Skill subtree only; unmodified by audit",
+  "content_sha256": "890c5349e6800257d819457a4704a35b14f2fd5a48fe3dd6c3b751f73ad3c7d7",
+  "content_manifest": {
+   "file_count": 5,
+   "bytes": 38661,
+   "recipe": "relative POSIX path, byte count, lowercase SHA-256 separated by TAB; sorted StringComparer.Ordinal; joined by LF; no trailing LF"
+  },
+  "files": [
+   {
+    "path": "LICENSE",
+    "bytes": 1065,
+    "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+   },
+   {
+    "path": "SKILL.md",
+    "bytes": 4447,
+    "sha256": "09f19c7115f9b12c574914617d89c776b6e55e0a481da89c1b2fc0d1a5378c19"
+   },
+   {
+    "path": "references/method-reference.md",
+    "bytes": 21850,
+    "sha256": "d241e933479f953f9147ca5216d9e1642ca69cb9264b298a3c541ef863fc7efc"
+   },
+   {
+    "path": "references/usage-guide.md",
+    "bytes": 6919,
+    "sha256": "8b09333748409eb72492a4796aea4aa8203c1b9ca27a59c908840bac238c2989"
+   },
+   {
+    "path": "scripts/diff_accessibility.R",
+    "bytes": 4380,
+    "sha256": "886332f06a558484ecbfc559991bc3b62c5b2856d3e282e18815a3aede4f046b"
+   }
+  ]
+ },
+ "tooling": {
+  "tools_md": "F:\\OpenScience\\audits\\bio-atac-seq-differential-accessibility\\TOOLS.md",
+  "env_fingerprint": "2998eae45e95156bbe8b1ec4f619756fe7f8e1803c9931270a3f7a4594d54236",
+  "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+  "environment": "WSL2 science, micromamba env bio-atac-seq-differential-accessibility; R 4.4.3, DiffBind 3.16.0, DESeq2 1.46.0, edgeR 4.4.0, csaw 1.40.0, ChIPseeker 1.42.0, sva 3.54.0, RUVSeq 1.40.0; /mnt/openscience only"
+ },
+ "candidate_cache_artifacts_after_execution": []
+}

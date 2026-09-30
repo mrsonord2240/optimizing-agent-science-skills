@@ -1,0 +1,398 @@
+{
+ "meta": {
+  "skill_name": "bio-atac-seq-differential-accessibility",
+  "description": "Identify differentially accessible chromatin regions across conditions using DiffBind, csaw, DESeq2, or edgeR; covers consensus-peak vs sliding-window choice, normalization, SVA/RUVseq batch handling and effect-size thresholds.",
+  "evaluated_on": "2026-09-30",
+  "evaluator_version": "skill-auditor@1.0",
+  "category": "Data Analysis",
+  "execution_mode": "B",
+  "complexity": "Complex",
+  "n_inputs": 6
+ },
+ "veto_gates": {
+  "skill_veto": {
+   "gate": "PASS",
+   "stability": "PASS",
+   "contract": "PASS",
+   "determinism": "PASS",
+   "security": "PASS"
+  },
+  "research_veto": {
+   "applicable": true,
+   "gate": "FAIL",
+   "scientific_integrity": {
+    "result": "PASS",
+    "detail": "No fabricated values; planted K562-only peaks recovered at 0.970-0.992"
+   },
+   "practice_boundaries": {
+    "result": "PASS",
+    "detail": "No clinical claims; research-only analysis"
+   },
+   "methodological_ground": {
+    "result": "PASS",
+    "detail": "Default DESeq2 path is sound; silent CLI-arg and normalization inconsistencies are filed as P1 findings, not principled fallacies"
+   },
+   "code_usability": {
+    "result": "FAIL",
+    "detail": "Input 3: shipped use_sva=TRUE branch fails on a 4-sample design and never applies the SVs; Input 5: empty result crashes"
+   }
+  }
+ },
+ "static_score": {
+  "subtotal": 74,
+  "max": 100,
+  "categories": {
+   "functional_suitability": {
+    "score": 8,
+    "max": 12,
+    "note": "Runnable script covers only a DESeq2 two-group contrast; edgeR/csaw/RUVseq/spike-in/covariate design are recipes, not code"
+   },
+   "reliability": {
+    "score": 6,
+    "max": 12,
+    "note": "SVA branch crashes; zero-hit contrast crashes; documented CLI args silently ignored"
+   },
+   "performance_context": {
+    "score": 7,
+    "max": 8,
+    "note": "SKILL.md 57 lines with routed references; method-reference is 317 lines but routed"
+   },
+   "agent_usability": {
+    "score": 12,
+    "max": 16,
+    "note": "Clear trigger and workflow; script usage promises parameters the CLI does not expose; default normalization contradicts SKILL.md workflow"
+   },
+   "human_usability": {
+    "score": 6,
+    "max": 8,
+    "note": "Undocumented control/treated label requirement; misleading errors; heatmap colour bars have no legend"
+   },
+   "security": {
+    "score": 11,
+    "max": 12,
+    "note": "No injection or destructive surface; plain file inputs and outputs in cwd"
+   },
+   "maintainability": {
+    "score": 9,
+    "max": 12,
+    "note": "Dependencies and versions stated and satisfied; license and provenance preserved; stale usage line"
+   },
+   "agent_specific": {
+    "score": 15,
+    "max": 20,
+    "note": "Description is precise; body oversells SVA/edgeR/RUV as supported by the script"
+   }
+  }
+ },
+ "dynamic_score": {
+  "execution_avg": 57.2,
+  "max": 100,
+  "assertion_pass_rate": {
+   "passed": 9,
+   "total": 21
+  },
+  "inputs": [
+   {
+    "index": 1,
+    "type": "Canonical",
+    "label": "CLI DESeq2 run on ENCODE GM12878 vs K562 (2 vs 2 reps, hg38 chr1:1-30Mb)",
+    "status": "COMPLETED",
+    "status_flag": "✅",
+    "note": "1096 DA sites (535 opened/561 closed); 0.970 of planted K562-only peaks opened; annotation PDF is missing the TSS-distance plot",
+    "basic": 33,
+    "specialized": 46,
+    "total": 79,
+    "assertions_passed": 4,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "Script exits 0 and writes opened/closed BED, annotated CSV and two PDFs",
+      "result": "PASS",
+      "note": "TOOLS.md smoke-skill.log; evidence/cli.log"
+     },
+     {
+      "text": "Annotated CSV rows equal opened+closed BED rows",
+      "result": "PASS",
+      "note": "1096 vs 1096"
+     },
+     {
+      "text": "Planted truth: K562-only peaks (absent from GM12878 peaks) gain accessibility in treated=K562",
+      "result": "PASS",
+      "note": "0.970 opened in tooling run; 0.976 (541 sites) against the stricter both-GM-reps truth in norm.log"
+     },
+     {
+      "text": "Diagnostics PDF has legible, interpretable PCA, MA, volcano and heatmap",
+      "result": "PASS",
+      "note": "4 pages; equivalent PNG renders inspected (work/plots); PC1 94% separates conditions; heatmap colour bars have no legend"
+     },
+     {
+      "text": "Annotation PDF contains both plotAnnoPie and plotDistToTSS",
+      "result": "FAIL",
+      "note": "plt_annoplot.pdf /Count 1: the ggplot returned by plotDistToTSS is never printed"
+     }
+    ]
+   },
+   {
+    "index": 2,
+    "type": "Variant A",
+    "label": "run_diff(normalize_mode=DBA_NORM_LIB) via sourced function, same data",
+    "status": "COMPLETED",
+    "status_flag": "✅",
+    "note": "1181 sites (766 opened/415 closed) vs 1096 (535/561) under NATIVE; NATIVE reports RLE + RiP library, LIB reports lib + full",
+    "basic": 33,
+    "specialized": 47,
+    "total": 80,
+    "assertions_passed": 3,
+    "assertions_total": 4,
+    "assertions": [
+     {
+      "text": "Run completes and reports FDR<0.05, |Fold|>=1 sites",
+      "result": "PASS",
+      "note": "evidence/norm.log"
+     },
+     {
+      "text": "Normalization applied is lib/full as requested",
+      "result": "PASS",
+      "note": "dba.normalize(bRetrieve) norm.method=lib lib.method=full"
+     },
+     {
+      "text": "Planted K562-only peaks opened >=85%",
+      "result": "PASS",
+      "note": "751 sites, 0.992 opened"
+     },
+     {
+      "text": "Console log names the normalization mode used",
+      "result": "FAIL",
+      "note": "prints Normalizing ( nmode ) (variable name) instead of the mode"
+     }
+    ]
+   },
+   {
+    "index": 3,
+    "type": "Variant B",
+    "label": "run_diff(use_sva=TRUE) on 4 samples (SVA hidden-batch branch)",
+    "status": "ERROR",
+    "status_flag": "❌",
+    "note": "svaseq(n.sv=2) fails: density.default missing values / NaNs in pf; n.sv=1 works (tooling probe); SVs are never fed to the model",
+    "basic": 14,
+    "specialized": 12,
+    "total": 26,
+    "assertions_passed": 0,
+    "assertions_total": 3,
+    "assertions": [
+     {
+      "text": "SVA branch completes on a 2 vs 2 design",
+      "result": "FAIL",
+      "note": "evidence/sva.log error; TOOLS evidence sva-probe.log"
+     },
+     {
+      "text": "Surrogate variables enter the DESeq2/DiffBind design",
+      "result": "FAIL",
+      "note": "script only prints ncol(sv); dba.analyze is unchanged (static, script lines 39-46)"
+     },
+     {
+      "text": "Number of SVs adapts to sample size",
+      "result": "FAIL",
+      "note": "n.sv hard-coded 2 with 4 samples"
+     }
+    ]
+   },
+   {
+    "index": 4,
+    "type": "Edge",
+    "label": "Documented CLI usage: Rscript diff_accessibility.R sheet.csv mypfx DBA_NORM_LIB 0.01 3",
+    "status": "COMPLETED",
+    "status_flag": "⚠️",
+    "note": "Exit 0 but args 2-5 silently ignored: outputs named diff_atac_*, reported at FDR<0.05, |Fold|>=1, NATIVE",
+    "basic": 22,
+    "specialized": 26,
+    "total": 48,
+    "assertions_passed": 0,
+    "assertions_total": 3,
+    "assertions": [
+     {
+      "text": "output_prefix argument honored",
+      "result": "FAIL",
+      "note": "no mypfx_* files; diff_atac_* written"
+     },
+     {
+      "text": "fdr_thr / lfc_thr arguments honored",
+      "result": "FAIL",
+      "note": "log says Reporting at FDR < 0.05, |Fold| >= 1.0 despite 0.01 and 3"
+     },
+     {
+      "text": "Ignoring a documented argument is signalled to the user",
+      "result": "FAIL",
+      "note": "no warning; exit status 0"
+     }
+    ]
+   },
+   {
+    "index": 5,
+    "type": "Edge",
+    "label": "Valid null result: lfc_thr=10 gives zero differential sites",
+    "status": "PARTIAL",
+    "status_flag": "❌",
+    "note": "DiffBind warns No sites above threshold, then export(NULL) errors; no BED/CSV/annotation produced",
+    "basic": 24,
+    "specialized": 28,
+    "total": 52,
+    "assertions_passed": 1,
+    "assertions_total": 3,
+    "assertions": [
+     {
+      "text": "Zero-hit contrast finishes cleanly with empty outputs or a clear message",
+      "result": "FAIL",
+      "note": "Error in export: cannot export object of class NULL"
+     },
+     {
+      "text": "Failure message tells the user the result was simply empty",
+      "result": "FAIL",
+      "note": "cryptic export error"
+     },
+     {
+      "text": "Underlying DiffBind warning is surfaced",
+      "result": "PASS",
+      "note": "No sites above threshold warning present"
+     }
+    ]
+   },
+   {
+    "index": 6,
+    "type": "Edge",
+    "label": "Sample sheet with Condition labels GM12878/K562 instead of control/treated",
+    "status": "PARTIAL",
+    "status_flag": "❌",
+    "note": "dba.contrast hard-coded to treated/control fails: Invalid contrast: no replicates in one group",
+    "basic": 26,
+    "specialized": 32,
+    "total": 58,
+    "assertions_passed": 1,
+    "assertions_total": 3,
+    "assertions": [
+     {
+      "text": "Condition labels other than control/treated are accepted or documented as required",
+      "result": "FAIL",
+      "note": "SKILL.md and usage guide never state the hard-coded labels"
+     },
+     {
+      "text": "Error message names the label mismatch",
+      "result": "FAIL",
+      "note": "misleading no replicates in one group"
+     },
+     {
+      "text": "Fails loudly rather than silently mis-signing the contrast",
+      "result": "PASS",
+      "note": "run stops before analysis"
+     }
+    ]
+   }
+  ]
+ },
+ "final": {
+  "static_weighted": 29.6,
+  "dynamic_weighted": 34.3,
+  "score": 64,
+  "max": 100,
+  "grade": "Reject",
+  "grade_symbol": "❌",
+  "deployable": false,
+  "veto_override": true
+ },
+ "key_strengths": [
+  "Default DESeq2/DiffBind CLI runs end to end on real ENCODE data and recovers planted K562-only peaks at 0.97-0.99",
+  "Diagnostics PDF contains four populated, interpretable figures (PCA, MA, volcano, heatmap)",
+  "Method reference gives a coherent decision table, normalization-trap analysis and cited literature",
+  "Stated package minimums are met by current Bioconductor releases; provenance and license preserved"
+ ],
+ "recommendations": [
+  {
+   "priority": "P0",
+   "title": "SVA branch crashes and never corrects",
+   "observed_in": [
+    3
+   ],
+   "problem": "use_sva=TRUE fails with hard-coded n.sv=2 on 4 samples; even when it runs, SVs are only printed and never enter the model, yet the log implies a correction.",
+   "root_cause": "SVA snippet is an extraction example, not a tested analysis path, and use_sva is not reachable from the CLI.",
+   "fix": "Choose n.sv with num.sv capped by sample count, feed SVs into the design and assert the model uses them; else remove the branch and route to the tested method-reference recipe. DAC-001."
+  },
+  {
+   "priority": "P1",
+   "title": "Documented CLI args 2-5 silently ignored",
+   "observed_in": [
+    4
+   ],
+   "problem": "Usage lists output_prefix, normalize_mode, fdr_thr, lfc_thr but only args[1] is used; requested FDR 0.01 / lfc 3 silently become 0.05 / 1.",
+   "root_cause": "Entry point calls run_diff(args[1]) only.",
+   "fix": "Parse and validate args (or named flags) including use_sva; reject unknown values. DAC-002."
+  },
+  {
+   "priority": "P1",
+   "title": "Default normalization contradicts the Skill guidance",
+   "observed_in": [
+    1,
+    2
+   ],
+   "problem": "Script default DBA_NORM_NATIVE yields RLE with RiP library size; SKILL.md calls full-library the default and the usage guide prescribes DBA_NORM_LIB for cross-cell-type comparisons. Opened/closed split moves from 535/561 to 766/415.",
+   "root_cause": "The effective library method is never logged and the defaults were not reconciled.",
+   "fix": "Pick one default consistent with the guidance, log norm.method/lib.method from dba.normalize, and state the RiP trade-off in the Skill body. DAC-003."
+  },
+  {
+   "priority": "P2",
+   "title": "Annotation PDF omits TSS-distance plot",
+   "observed_in": [
+    1
+   ],
+   "problem": "plotDistToTSS returns a ggplot that is never printed inside pdf(); the file has one page.",
+   "root_cause": "ggplot objects are not auto-printed inside a function.",
+   "fix": "print() the plot object and assert page count. DAC-004."
+  },
+  {
+   "priority": "P2",
+   "title": "Zero-hit contrast crashes",
+   "observed_in": [
+    5
+   ],
+   "problem": "A legitimate empty result stops with export(NULL) and no outputs.",
+   "root_cause": "No length(results)==0 guard.",
+   "fix": "Guard empty results: write empty BEDs/CSV and a clear message. DAC-005."
+  },
+  {
+   "priority": "P2",
+   "title": "control/treated labels hard-coded and undocumented",
+   "observed_in": [
+    6
+   ],
+   "problem": "Other Condition labels fail with a misleading error.",
+   "root_cause": "dba.contrast is fixed to c(Condition, treated, control).",
+   "fix": "Take group labels as parameters or document and validate them. DAC-006."
+  },
+  {
+   "priority": "P2",
+   "title": "edgeR/RUV/spike-in/covariate paths lack runnable code",
+   "observed_in": [],
+   "problem": "Only DESeq2 two-group runs; edgeR (via DiffBind), csaw and RUV recipes executed by tooling as reference code only; spike-in and covariate design not executed.",
+   "root_cause": "Skill body lists them as workflow options without shipped code.",
+   "fix": "Ship a parameterised edgeR backend and design argument, or label the rest recipe-only. DAC-007 (NORM-001..003)."
+  },
+  {
+   "priority": "P2",
+   "title": "Console log and plot titles misreport",
+   "observed_in": [
+    2,
+    1
+   ],
+   "problem": "Log prints nmode for the normalization; MA/volcano titles count FDR<=0.05 sites (1835) while the report uses |Fold|>=1 (1096).",
+   "root_cause": "deparse(substitute()) on a variable; DiffBind plots ignore the fold filter.",
+   "fix": "Log the resolved mode; pass th/fold to plots or note the difference. DAC-008."
+  },
+  {
+   "priority": "P2",
+   "title": "hg38 TxDb hard-coded",
+   "observed_in": [],
+   "problem": "No genome argument or annotation bypass though method-reference advertises custom genomes.",
+   "root_cause": "Static library() of the hg38 TxDb.",
+   "fix": "Add a TxDb/genome parameter or state hg38-only. DAC-009."
+  }
+ ]
+}
