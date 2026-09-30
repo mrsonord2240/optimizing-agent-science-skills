@@ -1,0 +1,480 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-single-cell-atac",
+    "description": "Process and analyze single-cell ATAC-seq data with Signac, ArchR, SnapATAC2, or Cell Ranger ATAC. Use when handling 10X scATAC or 10X Multiome (paired RNA+ATAC) data, performing per-cell QC, choosing between ArchR/Signac/SnapATAC2 ecosystems, building per-cluster consensus peaksets, integrating with paired scRNA-seq, doublet detection (AMULET vs ArchR vs scDblFinder), or running pseudobulk differential accessibility per cluster.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; checked figures (XIST coordinates, LSI1-depth correlation, cell-calling leniency) are traceable; uncited numbers noted in SCATAC-008 and SCATAC-014"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-only genomics Skill with no clinical conclusions"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "dims 2:30 rationale confirmed on real data; the ScaleData cell-cycle remedy and AMULET-primary default are flawed (SCATAC-007, SCATAC-008) but are guidance errors, not a principled fallacy in a produced result"
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The primary shipped script scripts/signac_workflow.R does not run on its documented input (annotation genome mismatch, SCATAC-001); reproduced in two independent runs; one-line class of fix, but the script is not runnable as shipped"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 75,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Broad ecosystem coverage and routing; primary script fails as shipped, SnapATAC2 block fails twice, cell-cycle fix ineffective"
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Script has no annotation/input guard; ArchR returns empty quietly; scDblFinder/AMULET/macs3 edge behaviour undocumented"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md about 10 KB with one-level routed references; QC and doublet tables are dense but sectioned"
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Clear ecosystem decision table and failure modes; QC rule set contradictory across files; AMULET without a command"
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Good trigger description and example requests; error recovery advice limited"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or destructive operations; script writes to CWD with a default prefix; upstream downloads unchecksummed"
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "License and provenance preserved, versions verified current; unpinned, no numpy/AMULET env note"
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger-rich description; scientific rationale for dims 2:30 verified; several uncited numbers and overstated defaults"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 68.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 22,
+      "total": 36
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "signac_workflow.R as shipped on 10x PBMC 5k scATAC (chr1 slice)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Aborts with annotation genome mismatch; no outputs (SCATAC-001)",
+        "basic": 14,
+        "specialized": 26,
+        "total": 40,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Script exits 0 on the documented 3-argument invocation",
+            "result": "FAIL",
+            "note": "Execution halted at CreateSeuratObject/SetAssayData"
+          },
+          {
+            "text": "Script writes the QC PDF, depth-correlation PDF, UMAP PDF and scatac_signac.rds",
+            "result": "FAIL",
+            "note": "No output files written"
+          },
+          {
+            "text": "Failure is loud and specific rather than silently wrong",
+            "result": "PASS",
+            "note": "Error names the annotation/object genome mismatch"
+          },
+          {
+            "text": "Documented hg38 + EnsDb.Hsapiens.v86 assumption works without annotation conversion",
+            "result": "FAIL",
+            "note": "Ensembl-style seqlevels without genome; reproduced in tooling and audit runs"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Same script, 2-line-patched copy (UCSC style, genome hg38), relaxed TSS > 1; plus QC-table and cell-cycle probes",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs after patch; documented TSS > 4 keeps 13 cells on the slice (relaxed keeps 458/1472); one cluster; ScaleData probe fails",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Patched script completes and writes ATAC + ACT assays, UMAP, LSI, gene activity",
+            "result": "PASS",
+            "note": "458 cells, ACT 2027 x 458, UMAP 458x2, chr1 features; QC violin/UMAP PNGs rendered and read"
+          },
+          {
+            "text": "Per-cell QC values in plausible ranges",
+            "result": "PASS",
+            "note": "TSS 1.0-6.4, nucleosome signal 0.36-1.99, FRiP 23-88% (whole-genome Cell Ranger counts over a slice)"
+          },
+          {
+            "text": "Cell Ranger cell calling is lenient as the Skill states",
+            "result": "PASS",
+            "note": "Real singlecell.csv: 384/5335 called cells (7.2%) < 1000 fragments"
+          },
+          {
+            "text": "LSI component 1 correlates about -1 with depth",
+            "result": "FAIL",
+            "note": "+0.88 on this run (sign arbitrary; SCATAC-009)"
+          },
+          {
+            "text": "Documented ScaleData(vars.to.regress) cell-cycle correction runs on the ATAC assay",
+            "result": "FAIL",
+            "note": "Errors on ChromatinAssay in Signac 1.17.1 / Seurat 5.5.1 (SCATAC-007)"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant A",
+        "label": "Multiome WNN block on 10x PBMC 3k granulocyte-sorted Multiome (full genome, counts only)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Runs with magrittr attached; 2,557 cells, 12 WNN clusters, weights RNA 0.475 / ATAC 0.525 median",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "WNN block runs as written after loading Signac and Seurat only",
+            "result": "FAIL",
+            "note": "%>% not found (SCATAC-006); works with library(magrittr)"
+          },
+          {
+            "text": "Joint clusters are biologically sensible",
+            "result": "PASS",
+            "note": "12 clusters; means of CD3E/CD14/MS4A1/NKG7/GNLY/CST3 separate T, monocyte, B, NK; ARI(wnn,RNA)=0.822, ARI(wnn,ATAC 2:30)=0.858"
+          },
+          {
+            "text": "LSI1 tracks depth as claimed",
+            "result": "PASS",
+            "note": "cor -0.96 (LSI2/3 -0.14/-0.11)"
+          },
+          {
+            "text": "dims 2:30 lowers depth association of the ATAC UMAP versus 1:30",
+            "result": "PASS",
+            "note": "max |cor(UMAP,depth)| 0.045 vs 0.098 (modest)"
+          },
+          {
+            "text": "Per-modality weights can be inspected as advised",
+            "result": "PASS",
+            "note": "RNA/ATAC weights per cell present; IQR 0.41-0.52 / 0.48-0.59"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "SnapATAC2 block (import_fragments -> tsse -> tile matrix -> spectral -> leiden -> macs3 -> gene matrix), PBMC 5k slice",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Two documented steps fail on 2.10.0; runs after fixes with relaxed filter (697 cells, 6 clusters)",
+        "basic": 24,
+        "specialized": 38,
+        "total": 62,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "pp.import_fragments exists and pp.import_data does not on 2.10.0, as the Skill states",
+            "result": "PASS",
+            "note": "hasattr checks and 2,973 barcodes imported"
+          },
+          {
+            "text": "data.obs['sample_id'] = 'rep1' works as documented",
+            "result": "FAIL",
+            "note": "RuntimeError lengths don't match (SCATAC-002)"
+          },
+          {
+            "text": "spectral -> umap -> leiden works as documented",
+            "result": "FAIL",
+            "note": "No such key: distances; needs snap.pp.knn (SCATAC-003)"
+          },
+          {
+            "text": "After fixes the pipeline yields clusters, peaks and a gene matrix",
+            "result": "PASS",
+            "note": "6 leiden clusters, macs3 (n_jobs=1) ok, gene matrix 697 x 60606 (documented filter keeps 0 cells on the slice; relaxed 400/0.3 used)"
+          },
+          {
+            "text": "Documented snap.tl.macs3 default parallelism works in a plain script",
+            "result": "FAIL",
+            "note": "Bootstrapping RuntimeError in spawn workers / HDF5 lock death (SCATAC-011)"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "ArchR block (Arrow files -> doublets -> IterativeLSI -> clusters -> UMAP -> group coverages -> reproducible peaks -> PeakMatrix), PBMC 5k slice",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0 in 37 min under load; documented thresholds return no ArrowFile on the slice, relaxed (minTSS=1, minFrags=500) gives 403 cells",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Arrow file, TileMatrix and GeneScoreMatrix are built and doublets filtered",
+            "result": "PASS",
+            "note": "403 cells, 402 after filterDoublets; GeneScoreMatrix 24919 x 402"
+          },
+          {
+            "text": "Clustering and UMAP produce interpretable output",
+            "result": "PASS",
+            "note": "5 clusters (25/53/119/118/87); UMAP PNG rendered and read; clusters overlap in embedding at this depth"
+          },
+          {
+            "text": "addReproduciblePeakSet accepts macs3 via pathToMacs2 and yields a peak set",
+            "result": "PASS",
+            "note": "7,788 peaks, chr1 only, median width 501; PeakMatrix 7788 x 402"
+          },
+          {
+            "text": "Matrices share the same cells and expected dimensions",
+            "result": "PASS",
+            "note": "PeakMatrix and GeneScoreMatrix both 402 cells"
+          },
+          {
+            "text": "Documented thresholds give either cells or a clear error",
+            "result": "FAIL",
+            "note": "Empty return with log line only on shallow data (SCATAC-010; slice-driven)"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Variant B",
+        "label": "Signac CallPeaks per cluster (MACS3) and scDblFinder doublets (amulet() and synthetic ATAC mode), PBMC 5k slice",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Runs with magrittr and explicit macs3 path; 3 clusters (847/558/67) -> 7,959 peaks; scDblFinder 103/1472 doublets",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "CallPeaks returns a valid GRanges with peak_called_in per cluster",
+            "result": "PASS",
+            "note": "7,959 peaks, width median 150, chr1 only, cluster labels present"
+          },
+          {
+            "text": "Tn5 recipe (format BED, shift -75, extsize 150) is honoured",
+            "result": "PASS",
+            "note": "median width 150"
+          },
+          {
+            "text": "scDblFinder ATAC mode (aggregateFeatures, nfeatures 25, normFeatures) classifies cells",
+            "result": "PASS",
+            "note": "1369 singlet / 103 doublet, threshold ~0.76; score-depth cor 0.81 on this shallow slice"
+          },
+          {
+            "text": "scDblFinder::amulet() yields per-cell q-values from the fragments file",
+            "result": "PASS",
+            "note": "834 cells, 47 with q < 0.05"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Variant B",
+        "label": "AMULET v1.1 fragment route on PBMC 5k slice (chr1)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs only in a numpy<1.24 env; no command in the Skill; BAM/jar route not executed",
+        "basic": 27,
+        "specialized": 36,
+        "total": 63,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "AMULET runs on modern numpy",
+            "result": "FAIL",
+            "note": "np.object AttributeError on numpy 2.5.3; ran with numpy 1.23.5 (SCATAC-005)"
+          },
+          {
+            "text": "Output files parse and are consistent",
+            "result": "PASS",
+            "note": "5,335 cells, 426 merged regions, 55 multiplets (1.03%) in MultipletSummary.txt"
+          },
+          {
+            "text": "Skill documents the invocation and the numpy pin",
+            "result": "FAIL",
+            "note": "Neither present in SKILL.md or usage-guide.md"
+          },
+          {
+            "text": "AMULET-primary advice matches the depth of the demo data",
+            "result": "FAIL",
+            "note": "Median 10.7K fragments per called cell, 69.9% under 15K (SCATAC-008)"
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "PEAKVI scArches mapping (GPU) on PBMC 5k slice peak matrix, plus peak-set mismatch probes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mapping runs (30 epochs, RTX 5070 Ti); first attempt hit a transient CUDA-busy error, rerun ok; test is a same-dataset split",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "load_query_data + train + get_latent_representation run as documented",
+            "result": "PASS",
+            "note": "368 x 6 finite latent (epochs 30, bounded from 200)"
+          },
+          {
+            "text": "Query cells fall inside the reference latent space",
+            "result": "PASS",
+            "note": "median query->ref NN distance 0.034 vs ref-ref 0.033"
+          },
+          {
+            "text": "Query with a different peak count is rejected",
+            "result": "PASS",
+            "note": "ValueError var count mismatch"
+          },
+          {
+            "text": "Skill states the peak-set alignment precondition",
+            "result": "FAIL",
+            "note": "Absent; same-count/different-name query only warns (SCATAC-012)"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.0,
+    "dynamic_weighted": 41.3,
+    "score": 71,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Strong ecosystem-choice guidance and failure-mode table; the LSI dims 2:30 rationale reproduces on real Multiome data",
+    "Most workflows execute end to end on real public PBMC data once documented gaps are patched: WNN, ArchR, Signac CallPeaks, scDblFinder, AMULET fragment route, PEAKVI mapping",
+    "Version claims are current (Signac 1.17.1, Seurat 5.5.1, ArchR 1.0.3, SnapATAC2 2.10.0 with import_fragments); XIST coordinates verified; cell-calling leniency confirmed on real singlecell.csv",
+    "Clean progressive disclosure with one-level routed references; MIT license and provenance preserved"
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Shipped signac_workflow.R fails on annotation genome",
+      "observed_in": [
+        1
+      ],
+      "problem": "The primary script aborts with 'Annotation genome does not match genome of the object' on its documented input and writes nothing.",
+      "root_cause": "EnsDb annotation is Ensembl-style with no genome while the object is hg38/UCSC.",
+      "fix": "Convert annotation with seqlevelsStyle(ann) <- 'UCSC' and genome(ann) <- 'hg38' before CreateChromatinAssay and rerun end to end (SCATAC-001)."
+    },
+    {
+      "priority": "P1",
+      "title": "SnapATAC2 block errors twice on 2.10.0",
+      "observed_in": [
+        4
+      ],
+      "problem": "data.obs['sample_id']='rep1' raises and tl.leiden fails with 'No such key: distances'; default macs3 parallelism fails in plain scripts.",
+      "root_cause": "Block was not executed against the current SnapATAC2 API.",
+      "fix": "Use a list assignment or drop the line, add snap.pp.knn before leiden, and use n_jobs=1 or a main guard for macs3 (SCATAC-002, SCATAC-003, SCATAC-011)."
+    },
+    {
+      "priority": "P1",
+      "title": "Contradictory QC thresholds across files",
+      "observed_in": [
+        2,
+        4,
+        5
+      ],
+      "problem": "SKILL.md table, script and usage guide use different metrics and bands; the script omits mito and doublet steps the workflow requires.",
+      "root_cause": "Thresholds merged from sources without one canonical rule set.",
+      "fix": "Define one rule set, implement or explicitly exclude each row in the script, and align examples (SCATAC-004)."
+    },
+    {
+      "priority": "P2",
+      "title": "AMULET route: no command, numpy pin, depth default",
+      "observed_in": [
+        7
+      ],
+      "problem": "No AMULET command or numpy<1.24 requirement is given, and AMULET is ranked primary although most cells in the demo data are below its recall depth.",
+      "root_cause": "Defers to upstream and states ranking without the depth condition.",
+      "fix": "Add the AMULET.sh recipe and env pin, make tool choice depth-conditional, and source the depth threshold (SCATAC-005, SCATAC-008)."
+    },
+    {
+      "priority": "P2",
+      "title": "Cell-cycle regression and WNN snippets not executable",
+      "observed_in": [
+        2,
+        3
+      ],
+      "problem": "ScaleData on the ChromatinAssay errors and would not affect RunSVD; the WNN block needs magrittr.",
+      "root_cause": "RNA idioms and implicit package attachments were carried over untested.",
+      "fix": "Replace the regression method with one that acts on LSI and test it; attach magrittr or avoid pipes (SCATAC-006, SCATAC-007)."
+    },
+    {
+      "priority": "P2",
+      "title": "Prerequisites, guards and uncited claims",
+      "observed_in": [
+        5,
+        6,
+        8
+      ],
+      "problem": "Install list misses leidenbase/magrittr/macs3, ArchR and PEAKVI lack input guards, several quantitative claims are uncited, and singlecell.csv columns are unverified beyond Cell Ranger ATAC 1.0.1.",
+      "root_cause": "Prerequisites and claims were not derived from executed code paths.",
+      "fix": "Complete the prerequisites, add the ArrowFiles and peak-set checks, cite or soften numbers, and test cellranger-arc metadata when 10x access exists (SCATAC-009, SCATAC-010, SCATAC-012, SCATAC-013, SCATAC-014, SCATAC-015)."
+    }
+  ]
+}
