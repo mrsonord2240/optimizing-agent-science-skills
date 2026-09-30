@@ -6,7 +6,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 - Audit coverage: **191 / 561 (34.0%)** in-scope Skills
 - Untouched: **370**
-- Ready on the optimized shelf: **173**
+- Ready on the optimized shelf: **183**
 - Out of scope: **1**
 
 `Audited` includes every in-scope Skill with a published latest audit, including ready Skills. `Ready` means the provider records a score of at least 85 with a Production Ready grade, deployable exact bytes, no open P0, a completed fix pass, and no pending re-audit. Marketplace intake is a separate gate before a run may call newly completed work done.
@@ -17,9 +17,9 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 |---|---:|---:|---:|---:|---:|
 | Evidence Insight | 1 | 1 | 0 | 1 | 0 |
 | Protocol Design | 7 | 7 | 0 | 7 | 0 |
-| Data Analysis | 183 | 183 | 0 | 165 | 0 |
+| Data Analysis | 183 | 183 | 0 | 175 | 0 |
 | Unclassified | 371 | 0 | 370 | 0 | 1 |
-| **Total** | **562** | **191** | **370** | **173** | **1** |
+| **Total** | **562** | **191** | **370** | **183** | **1** |
 
 `Unclassified` contains Skills for which neither the current audit nor the corpus snapshot supplies an authoritative category. This generator does not guess from directory names.
 
@@ -27,16 +27,6 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
-| `bio-atac-seq-atac-peak-calling` | Data Analysis | 87 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@b19054ded9df-reaudit-run/viewer.md) |
-| `bio-atac-seq-atac-qc` | Data Analysis | 86 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-atac-qc/candidate@cf524ad680cf-reaudit-run/viewer.md) |
-| `bio-atac-seq-co-accessibility` | Data Analysis | 85 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-atac-seq-co-accessibility/candidate@0aac567b1870-reaudit-run/viewer.md) |
-| `bio-atac-seq-deep-learning-atac` | Data Analysis | 88 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-atac-seq-deep-learning-atac/candidate@3a9d1b4cab32-reaudit-run/viewer.md) |
-| `bio-atac-seq-differential-accessibility` | Data Analysis | 86 | Production Ready | 0 / 0 / 4 | [viewer](skills/bio-atac-seq-differential-accessibility/candidate@dd1e7bda67b8-reaudit-run/viewer.md) |
-| `bio-atac-seq-enhancer-gene-linking` | Data Analysis | 88 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-atac-seq-enhancer-gene-linking/candidate@44385431f019-reaudit-run/viewer.md) |
-| `bio-atac-seq-footprinting` | Data Analysis | 86 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-footprinting/candidate@a71e561087bc-reaudit-run/viewer.md) |
-| `bio-atac-seq-motif-deviation` | Data Analysis | 86 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-atac-seq-motif-deviation/candidate@fb58807b04cb-reaudit-run/viewer.md) |
-| `bio-atac-seq-nucleosome-positioning` | Data Analysis | 85 | Production Ready | 0 / 0 / 4 | [viewer](skills/bio-atac-seq-nucleosome-positioning/candidate@2192c9d1500c-reaudit-run/viewer.md) |
-| `bio-atac-seq-single-cell-atac` | Data Analysis | 86 | Production Ready | 0 / 0 / 4 | [viewer](skills/bio-atac-seq-single-cell-atac/candidate@4ced0da507d6-reaudit-run/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |

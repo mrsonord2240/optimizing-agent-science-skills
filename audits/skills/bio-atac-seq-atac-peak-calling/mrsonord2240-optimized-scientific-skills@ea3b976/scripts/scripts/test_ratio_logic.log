@@ -1,0 +1,7 @@
+pass_case: Nt=1197 N1=1143 N2=1249 Np=1036 rescue=1.155 self=1.093 verdict=PASS expected=PASS
+borderline_rescue: Nt=100 N1=200 N2=210 Np=500 rescue=5.000 self=1.050 verdict=BORDERLINE expected=BORDERLINE
+borderline_self: Nt=500 N1=100 N2=400 Np=480 rescue=1.042 self=4.000 verdict=BORDERLINE expected=BORDERLINE
+fail_both: Nt=100 N1=400 N2=100 Np=500 rescue=5.000 self=4.000 verdict=FAIL expected=FAIL
+fail_zero_Nt: Nt=0 N1=300 N2=100 Np=400 rescue=inf self=3.000 verdict=FAIL expected=FAIL
+zero_both_ok: Nt=0 N1=0 N2=0 Np=0 rescue=inf self=inf verdict=FAIL expected=FAIL
+boundary_exactly_2: Nt=100 N1=200 N2=100 Np=200 rescue=2.000 self=2.000 verdict=PASS expected=PASS

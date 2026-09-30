@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-atac-qc",
+  "candidate_version": "candidate@cf524ad680cf-reaudit-run",
+  "candidate_identity": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+  "provider_path": "skills/bio-atac-seq-atac-qc",
+  "provider_tree": "2f12ff658e780615d5d121a58042af88c304cbd0",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+  "file_count": 8,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 13053,
+      "sha256": "49cc6d1bd3a3abec9159440a78b13cbe32fedc67509e1842fa70905b113959b8"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 8445,
+      "sha256": "e6af81892a13fb63c0c03421f164c86b1aeb5f33d6b26049761a08585e54c535"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 6345,
+      "sha256": "1d4ad2b7b1e5fbe0e6cf0c16a3bb0f5ad236fce9f5e33189b0ee3140fdc297a0"
+    },
+    {
+      "path": "scripts/aggregate_qc.py",
+      "bytes": 3745,
+      "sha256": "d9f97ec3f5ae34170bff52dc8cf67af93a36354e4a73c5d6520d0f6306c9cdd3"
+    },
+    {
+      "path": "scripts/atac_qc_metrics.R",
+      "bytes": 5329,
+      "sha256": "6f144faebacb695c02e68c41ea42b87bd82c89259815856a8b790f2e6b7a9d93"
+    },
+    {
+      "path": "scripts/encode_tss_enrichment.py",
+      "bytes": 3419,
+      "sha256": "252decb450cfce6eaa7ae9da587a3cd3b19bc9896cf61ccef99647bdd14d4a62"
+    },
+    {
+      "path": "scripts/library_complexity.py",
+      "bytes": 3576,
+      "sha256": "5c96b5b352cb61e34b920968250195242767a3513aac631c0a48f55ace76b107"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

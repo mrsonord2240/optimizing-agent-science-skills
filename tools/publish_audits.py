@@ -293,6 +293,8 @@ def _modular_candidate(identity, where):
     for key in ("branch", "commit", "subtree", "content_sha256", "path"):
         if raw.get(key) is not None:
             candidate[key] = raw[key]
+    if "path" not in candidate and raw.get("root") is not None:
+        candidate["path"] = raw["root"]
     files = identity.get("files")
     if isinstance(files, list):
         candidate["files"] = files

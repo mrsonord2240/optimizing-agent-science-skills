@@ -1,0 +1,348 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-nucleosome-positioning",
+    "description": "Map nucleosome center positions, occupancy, and fuzziness from ATAC-seq fragment-size patterns using NucleoATAC, ATACseqQC, DANPOS3, or scprinter. Use when characterizing nucleosome organization at promoters and enhancers, calling +1/-1 nucleosomes flanking NFRs, generating V-plots for chromatin structure visualization, or comparing nucleosome positioning between conditions.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Unsourced H2A.Z and yeast +1 figures removed or labelled untested; measured values stated in the Skill (178 calls, +121 bp median) match this re-run"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-only genomics Skill with no clinical conclusions"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "V-plot centring and strand handling verified against independent recounts; DANPOS3 columns and filter reproduce planted truth"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "estimate_nrl.py, vplot.py and nucleosome_analysis.R run on real GM12878 data; the NucleoATAC route runs from a clean install with a precisely specified, disclosed one-line edit and a stated fallback"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Scripts and both routes run on real data; NucleoATAC calls need a disclosed third-party edit"
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Failure guards present and exercised; NRL plateau ambiguity and export/summary count mismatch remain"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Short SKILL.md with routed references; method reference is long but sectioned"
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Clear workflow, columns and post-run nucpos check named; scPrinter has no command"
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Example requests, tested versions and decision table; patch steps are copy-paste"
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials or network calls; one documented edit of installed third-party source inside an isolated env"
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "License and provenance kept; tested versions stated; unmaintained upstream noted"
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger-rich description; claims sourced or labelled untested"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 22,
+      "total": 24
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "V-plot at 300 chr1 protein-coding TSS, GM12878 rep1 (vplot.py, strand column)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Independent recount matches; strand mirroring gives consistent polarity; PNG legible",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Grid total equals an independent leftmost-mate recount within 1 percent",
+            "result": "PASS",
+            "note": "121,246 vs 121,291"
+          },
+          {
+            "text": "NFR fragments are enriched at the TSS centre versus flanks",
+            "result": "PASS",
+            "note": "1.84x with a wide 200-400 bp flank window; my pre-set 2x threshold was mis-calibrated to that window (disclosed); fixer's narrower-window value was 4.0"
+          },
+          {
+            "text": "Minus-strand TSS are mirrored: plus and minus subsets show the same downstream/upstream mono polarity",
+            "result": "PASS",
+            "note": "0.45 plus vs 0.59 minus; strand-aware pooled 0.51 vs 0.83 ignoring strand"
+          },
+          {
+            "text": "Rendered PNG is legible with labelled axes, colour bar and an interpretable NFR hotspot",
+            "result": "PASS",
+            "note": "viewed; NFR hotspot upstream of TSS, axes and colour bar readable"
+          },
+          {
+            "text": "Unknown chromosome gives a clear failure and no PNG; mixed BED keeps valid rows",
+            "result": "PASS",
+            "note": "rc 1 'no BED rows on chromosomes present in the BAM header'; 300 of 300 kept"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "NRL estimate from fragment sizes (estimate_nrl.py) on three real BAMs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Prior P0 IndexError fixed; one GM12878 replicate reports the plateau centre 31 bp above the 1-bp mode",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "GM12878 rep1 returns a 150-250 bp value within 6 bp of the independent 1-bp mode",
+            "result": "PASS",
+            "note": "178 vs 176 bp"
+          },
+          {
+            "text": "K562 rep1 returns a value within 6 bp of the independent mode",
+            "result": "PASS",
+            "note": "208 vs 206 bp"
+          },
+          {
+            "text": "GM12878 rep2 returns a value within 6 bp of the independent mode",
+            "result": "FAIL",
+            "note": "208 vs 177 bp; rep2 mono region is a broad 185-235 bp plateau, 5 bp-bin maximum at 205-215; documented as approximate but no ambiguity signal (NUCPOS-016)"
+          },
+          {
+            "text": "NFR-only BAM fails with an actionable message and no traceback",
+            "result": "PASS",
+            "note": "rc 1, 'no fragment-size peak at 150-250 bp (peaks found: [48.0])'"
+          },
+          {
+            "text": "Single-end BAM fails with a clear paired-end message",
+            "result": "PASS",
+            "note": "rc 1, 'no proper-pair read1 fragments found; is the BAM paired-end and indexed?'"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "ATACseqQC pipeline (nucleosome_analysis.R) on GM12878 rep1 with protein-coding TSS BED",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Prior P0 halts fixed: rc 0 in 6.7 min, all outputs written; export record counts differ from summary counts",
+        "basic": 33,
+        "specialized": 51,
+        "total": 84,
+        "assertions_passed": 5,
+        "assertions_total": 6,
+        "assertions": [
+          {
+            "text": "Script exits 0 and writes fragsize PDF, heatmap PDF, NFR and mono BAMs and summary CSV",
+            "result": "PASS",
+            "note": "rc 0; all files present"
+          },
+          {
+            "text": "Fragment-class fractions are plausible for ATAC",
+            "result": "PASS",
+            "note": "NFR 28.4, mono 14.7, di 15.6 percent of 460,309 MAPQ>=30 pairs"
+          },
+          {
+            "text": "Exported BAMs honour the MAPQ >= 30 filter",
+            "result": "PASS",
+            "note": "0 of 283,302 NFR and 0 of 129,158 mono records below 30"
+          },
+          {
+            "text": "Mono BAM records all have template length 180-247 bp",
+            "result": "PASS",
+            "note": "129,158 of 129,158"
+          },
+          {
+            "text": "Heatmap is interpretable",
+            "result": "PASS",
+            "note": "8 labelled panels with colour keys; signal only in top rows on this 30 Mb slice; viewed via the delta run's PDF, which has byte-identical size and body (no PDF rasteriser available here)"
+          },
+          {
+            "text": "Exported record counts agree with the summary CSV counts",
+            "result": "FAIL",
+            "note": "NFR BAM 141,651 pairs vs nfr_count 130,774; mono 64,579 vs 67,604; exports are classed after Tn5 shift, counts before (NUCPOS-017)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "NucleoATAC from a clean py2.7 install following usage-guide.md, then the documented patch",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "As installed: rc 0 but 0 nucpos calls (silent); after the documented edit: 178 calls, 6 redundant",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Documented micromamba command resolves NucleoATAC 0.3.4, Python 2.7.15, cython 0.29.15, numpy 1.16.5",
+            "result": "PASS",
+            "note": "fresh env np-reaudit-nucleoatac, explicit list saved"
+          },
+          {
+            "text": "Unpatched control reproduces the silent empty nucpos, so the Skill's post-run check is needed",
+            "result": "PASS",
+            "note": "nucpos 0, redundant 0, occ 130,082 rows, NFR 47, rc 0"
+          },
+          {
+            "text": "Documented sed pattern matches the installed line and the rebuild succeeds",
+            "result": "PASS",
+            "note": "line 23 'cdef DTYPE_t value' -> 'value = 0'; cythonize rc 0; source shows the accumulator used before assignment"
+          },
+          {
+            "text": "Patched run gives non-empty nucpos calls that lie in the input regions with no NaN",
+            "result": "PASS",
+            "note": "178 calls, 178 in regions, 0 NaN, median 198 bp from nearest TSS"
+          },
+          {
+            "text": "Occupancy track is non-degenerate and within [0,1]",
+            "result": "PASS",
+            "note": "130,082 rows, range 0.0 to 1.0"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "DANPOS3 differential filter from the method reference on the planted +40 bp pair",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Documented awk filter run verbatim (extracted from the doc); danpos dpos itself reused as identity-matched unchanged evidence",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Doc-extracted awk filter runs and yields calls",
+            "result": "PASS",
+            "note": "4,103 rows"
+          },
+          {
+            "text": "Recall of planted positions in the shifted half",
+            "result": "PASS",
+            "note": "4,103 of 4,542 = 90.3 percent"
+          },
+          {
+            "text": "No false calls in the unshifted half",
+            "result": "PASS",
+            "note": "0"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 51.0,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All three prior P0 code defects are fixed and reproduced independently on real GM12878 chr1 data (estimate_nrl 178 vs 176 bp; R pipeline rc 0 with all outputs; V-plot recount within 0.04 percent)",
+    "The NucleoATAC route works from a clean install: the Skill names the upstream defect, gives an idempotent sed plus rebuild, warns that unpatched runs exit 0 with empty nucpos, and offers occupancy/NFR outputs and DANPOS3 as fallbacks",
+    "Failure guards (no periodicity, single-end, unknown chromosome) give actionable messages instead of tracebacks",
+    "The DANPOS3 differential filter copied from the doc recovers 90.3 percent of planted shifts with 0 false calls"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "NRL estimator: flag broad or ambiguous mono plateaus",
+      "observed_in": [
+        2
+      ],
+      "problem": "On GM12878 rep2 estimate_nrl.py reports 208 bp while the 1-bp mode is 177 bp because the mono region is a 185-235 bp plateau with a 175 bp shoulder; no warning is given.",
+      "root_cause": "The tallest 5 bp-bin peak in 150-250 bp is reported without a peak-quality or shoulder check.",
+      "fix": "Print the 1-bp mode next to the binned value, or warn when two candidates within the window differ by more than about 15 bp. (NUCPOS-016)"
+    },
+    {
+      "priority": "P2",
+      "title": "R exports and summary CSV use different class assignments",
+      "observed_in": [
+        3
+      ],
+      "problem": "Exported NFR/mono BAM pair counts differ from nfr_count/mono_count in the summary (141,651 vs 130,774; 64,579 vs 67,604).",
+      "root_cause": "Counts come from unshifted alignments; exports come from post-shift splitGAlignmentsByCut classes.",
+      "fix": "State the difference in a script comment or usage note, or compute the summary from the exported classes. (NUCPOS-017)"
+    },
+    {
+      "priority": "P2",
+      "title": "NucleoATAC calls still need a third-party source edit",
+      "observed_in": [
+        4
+      ],
+      "problem": "The unmaintained upstream calculateCov leaves its accumulator uninitialised, so calls exist only after the documented one-line edit and rebuild.",
+      "root_cause": "Upstream defect with no released fix; not repairable inside the Skill.",
+      "fix": "Keep the disclosure and fallback; optionally file the upstream issue and record its URL in the method reference. (NUCPOS-006, accepted workaround)"
+    },
+    {
+      "priority": "P2",
+      "title": "scPrinter route remains untested",
+      "observed_in": [],
+      "problem": "scPrinter is named for single-cell and per-base use but no command or test ships; the Skill says so.",
+      "root_cause": "Out of bounded scope (GPU, source install).",
+      "fix": "Keep the untested label or add a tested minimal workflow later. (NUCPOS-015, deferred)"
+    }
+  ]
+}

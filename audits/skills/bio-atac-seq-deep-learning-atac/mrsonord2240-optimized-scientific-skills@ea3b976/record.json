@@ -1,0 +1,53 @@
+{
+  "skill_id": "bio-atac-seq-deep-learning-atac",
+  "version": "mrsonord2240-optimized-scientific-skills@ea3b976",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+    "path": "skills/bio-atac-seq-deep-learning-atac",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-deep-learning-atac"
+  },
+  "candidate": {
+    "identity": "3a9d1b4cab32a0a18917e8ee70b552a395e832da48a98902b90001a5190dea87",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-deep-learning-atac",
+    "commit": "3186916",
+    "content_sha256": "3a9d1b4cab32a0a18917e8ee70b552a395e832da48a98902b90001a5190dea87",
+    "path": "F:\\OpenScience\\wt\\atac-deep-learning-atac\\skills\\bio-atac-seq-deep-learning-atac",
+    "provider_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+    "provider_tree": "6af3270f8b19fd7986e94d3d22b13b208c61a5da"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@3a9d1b4cab32-reaudit-run",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 11,
+    "provider_binding": "binding.json"
+  }
+}

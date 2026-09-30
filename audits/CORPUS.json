@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-29",
+  "generated": "2026-09-30",
   "source": {
     "upstream": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
     "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
     "provider_ref": "main",
-    "provider_skills_tree": "5ff1503af7465e7fa49865cdbfbb769b27d22021"
+    "provider_skills_tree": "18ecc6d806a8564774c474b2563a48e164b866a5"
   },
   "skills": [
     {
@@ -101,20 +101,20 @@
     {
       "id": "bio-atac-seq-atac-peak-calling",
       "upstream_path": "atac-seq/atac-peak-calling",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-atac-qc",
       "upstream_path": "atac-seq/atac-qc",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-co-accessibility",
       "upstream_path": "atac-seq/co-accessibility",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-consensus-peakset",
@@ -125,44 +125,44 @@
     {
       "id": "bio-atac-seq-deep-learning-atac",
       "upstream_path": "atac-seq/deep-learning-atac",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-differential-accessibility",
       "upstream_path": "atac-seq/differential-accessibility",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-enhancer-gene-linking",
       "upstream_path": "atac-seq/enhancer-gene-linking",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-footprinting",
       "upstream_path": "atac-seq/footprinting",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-motif-deviation",
       "upstream_path": "atac-seq/motif-deviation",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-nucleosome-positioning",
       "upstream_path": "atac-seq/nucleosome-positioning",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-atac-seq-single-cell-atac",
       "upstream_path": "atac-seq/single-cell-atac",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-bam-statistics",

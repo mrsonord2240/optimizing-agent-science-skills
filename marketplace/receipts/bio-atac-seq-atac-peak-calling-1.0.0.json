@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-atac-peak-calling",
+  "version": "1.0.0",
+  "result": "pass",
+  "validated_at": "2026-09-30T11:50:15.276005-07:00",
+  "validator_repository": "openscience-skill-marketplace",
+  "validator_commit": "f564bd007e9c26e32da388d8d5ceeea4903b12a3",
+  "command": "npm run --silent intake:skill -- --manifest <release.config.json> --source F:\\optimized-scientific-skills (ten manifests in one invocation)",
+  "optimized_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+  "source_path": "skills/bio-atac-seq-atac-peak-calling",
+  "manifest_sha256": "a787bfeaf58e6b065a7508856021a186963786a7ec51f1fdcb9e4cdd31079b55",
+  "content_sha256": "f968dc54792cfbfdf2d544d36223f7e483c9c28a0a5010afcca06ca48d5fcafc",
+  "license_expression": "MIT",
+  "license_file_sha256": "baacaab2d3f82cc6f6d1b0fbfba347c6be171c25a0b1f58ba935a5d2d43de2c5",
+  "entry_count": 10,
+  "stderr": "",
+  "note": "Local unsigned intake compatibility check only; no review, approval, build, submission, registration, release, publication, or remote write was performed."
+}

@@ -1,0 +1,70 @@
+{
+  "phase": "final re-audit",
+  "independent_auditor": true,
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/single-cell-atac",
+    "subtree": "ef5b1305663382e0228349bd42d9768afc19dcb8",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean"
+  },
+  "candidate": {
+    "branch": "fix/atac-single-cell-atac",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity": "sha256-manifest-v1",
+    "manifest_sha256": "4ced0da507d684d209beb4676ce6d206fc6d1730ff2e45d8ff965c3e2d78f286",
+    "file_count": 6,
+    "byte_total": 34930,
+    "path": "F:\\OpenScience\\wt\\atac-single-cell-atac\\skills\\bio-atac-seq-single-cell-atac",
+    "status_before": "untracked skills/bio-atac-seq-single-cell-atac/ (fixed, uncommitted)",
+    "status_after_execution": "unchanged (manifest recomputed after execution; no __pycache__)",
+    "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; tab-separated; LF joins; ordinal UTF-8 byte ordering; no trailing LF"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17",
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "bytes": 1065
+    },
+    {
+      "path": "SKILL.md",
+      "git_blob": "93c10623c47885dbc46ed179bba5b2cdfb5d5865",
+      "sha256": "81fea0ef935f7e574c09c9aa0c04ef2caca8a38252d9bc27dbc0ecb5d15f0a26",
+      "bytes": 11900
+    },
+    {
+      "path": "references/ecosystem-workflows.md",
+      "git_blob": "868a0ff1e5a648266acb19f5e7dc6ce3ca843f67",
+      "sha256": "12bcb71d335abd5d0a0105be95d5b287ef5995640b996da81d00bcda868be1f2",
+      "bytes": 5813
+    },
+    {
+      "path": "references/specialized-topics.md",
+      "git_blob": "8237bdddc9a6847bb2e945418b3ecd49368b7955",
+      "sha256": "4a743475f4be97bb11978c953f0ff45ee4bf18a61af3bc674d3d45e1c762293a",
+      "bytes": 7471
+    },
+    {
+      "path": "references/usage-guide.md",
+      "git_blob": "b3ce31658c7b78a1fafa6c191f0a77d7c8c72f14",
+      "sha256": "4c2345f3b660a4fee3a0acb742c577af3e895b12c92da1589375b95d1d0b024e",
+      "bytes": 3676
+    },
+    {
+      "path": "scripts/signac_workflow.R",
+      "git_blob": "5fc7c74f3ff980ee1913c14b611a7ce6a7f8e9f7",
+      "sha256": "02f7e39d271ab84a517f204bb3705fe2d65778838191d60aad73898d274e22d7",
+      "bytes": 5005
+    }
+  ],
+  "tooling": {
+    "tools_md_sha256": "5ff751ca0e1811b707935577c1475188c71a67502abe8a833963ca03fc917a66",
+    "environment_fingerprint_sha256": "a71616d93f0054da50acf07256b6158c3ec1d4f7c23673deab0080ee7098a2c6",
+    "environment_fingerprint_recipe": "sha256 of the LF-joined sha256 values of evidence/logs conda-list-r.json, conda-list-py.json, conda-list-amulet.json, R-packages.csv, pip-py.txt",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "supersedes_audit_identity": "da2da9c8bbafb674486ac581373867852f7b577f77626b19e63cc8dcecf55d08",
+  "candidate_cache_artifacts_after_execution": []
+}

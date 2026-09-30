@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-deep-learning-atac",
+  "candidate_version": "candidate@3a9d1b4cab32-reaudit-run",
+  "candidate_identity": "3a9d1b4cab32a0a18917e8ee70b552a395e832da48a98902b90001a5190dea87",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+  "provider_path": "skills/bio-atac-seq-deep-learning-atac",
+  "provider_tree": "6af3270f8b19fd7986e94d3d22b13b208c61a5da",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "3a9d1b4cab32a0a18917e8ee70b552a395e832da48a98902b90001a5190dea87",
+  "file_count": 10,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 5400,
+      "sha256": "a9ab0bb56f8a0e09b190d98323347ce8c87d0b07e11e2fc40733d09f6faf8f43"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 5983,
+      "sha256": "297f72118f06e6e821347e9c2174771d4fc508790e4614ca5a89365b1ecd64c6"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 16462,
+      "sha256": "d6dc2a31b0da2077323a8b46ae362b1e8a53429901b46d02e2e9ad88d4b72378"
+    },
+    {
+      "path": "references/tool-decision-tree.md",
+      "bytes": 2394,
+      "sha256": "988f7519a1ba69dde3936c83501e119e93add0bbd3a63f3da5392dff11600e44"
+    },
+    {
+      "path": "scripts/attributions_to_modisco_npz.py",
+      "bytes": 2559,
+      "sha256": "26020605af4c6906eda4383bca9f3a4a7e931e8d9e8cce5adc0f27dcc2c31ca2"
+    },
+    {
+      "path": "scripts/chrombpnet_pipeline.sh",
+      "bytes": 6399,
+      "sha256": "3614aa650dcf41bc6db4b09738d38ee9366eb1556988b80732f6d2407c4fa629"
+    },
+    {
+      "path": "scripts/chrombpnet_qc_gate.py",
+      "bytes": 1922,
+      "sha256": "2e96a7725ebb13e90861606d6c369fe37b48e86b9a43cecd68a2ab53795ccc91"
+    },
+    {
+      "path": "scripts/enformer_variant_effect.py",
+      "bytes": 2825,
+      "sha256": "c7cc028a2b6226e2aec6a27c19109e9afa2f589ace4e4f21eb53974552c6c8aa"
+    },
+    {
+      "path": "scripts/score_variants_torch.py",
+      "bytes": 2681,
+      "sha256": "54a14d7b157b13b6d9e9bd35f458fe1a2bc3f650b9c7ccdd0690704a31547ba8"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

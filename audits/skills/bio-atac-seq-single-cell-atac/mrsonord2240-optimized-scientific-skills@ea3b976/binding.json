@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-single-cell-atac",
+  "candidate_version": "candidate@4ced0da507d6-reaudit-run",
+  "candidate_identity": "4ced0da507d684d209beb4676ce6d206fc6d1730ff2e45d8ff965c3e2d78f286",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+  "provider_path": "skills/bio-atac-seq-single-cell-atac",
+  "provider_tree": "75bbb22e2c5455984dd63a737d103bda2ab8e23a",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "4ced0da507d684d209beb4676ce6d206fc6d1730ff2e45d8ff965c3e2d78f286",
+  "file_count": 6,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 11900,
+      "sha256": "81fea0ef935f7e574c09c9aa0c04ef2caca8a38252d9bc27dbc0ecb5d15f0a26"
+    },
+    {
+      "path": "references/ecosystem-workflows.md",
+      "bytes": 5813,
+      "sha256": "12bcb71d335abd5d0a0105be95d5b287ef5995640b996da81d00bcda868be1f2"
+    },
+    {
+      "path": "references/specialized-topics.md",
+      "bytes": 7471,
+      "sha256": "4a743475f4be97bb11978c953f0ff45ee4bf18a61af3bc674d3d45e1c762293a"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 3676,
+      "sha256": "4c2345f3b660a4fee3a0acb742c577af3e895b12c92da1589375b95d1d0b024e"
+    },
+    {
+      "path": "scripts/signac_workflow.R",
+      "bytes": 5005,
+      "sha256": "02f7e39d271ab84a517f204bb3705fe2d65778838191d60aad73898d274e22d7"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

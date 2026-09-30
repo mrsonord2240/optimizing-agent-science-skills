@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-footprinting",
+  "version": "1.0.0",
+  "result": "pass",
+  "validated_at": "2026-09-30T11:50:15.276005-07:00",
+  "validator_repository": "openscience-skill-marketplace",
+  "validator_commit": "f564bd007e9c26e32da388d8d5ceeea4903b12a3",
+  "command": "npm run --silent intake:skill -- --manifest <release.config.json> --source F:\\optimized-scientific-skills (ten manifests in one invocation)",
+  "optimized_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+  "source_path": "skills/bio-atac-seq-footprinting",
+  "manifest_sha256": "f00b2b02ef1c7f18b679350d10d40428b6793cff713fefb30cd021f3c3217454",
+  "content_sha256": "361479f90e1bec5743bb885205f3888ca12e99c4c84fd48fd25fcc45749d86f9",
+  "license_expression": "MIT",
+  "license_file_sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+  "entry_count": 10,
+  "stderr": "",
+  "note": "Local unsigned intake compatibility check only; no review, approval, build, submission, registration, release, publication, or remote write was performed."
+}

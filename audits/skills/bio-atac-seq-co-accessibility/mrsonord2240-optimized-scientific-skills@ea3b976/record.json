@@ -1,0 +1,79 @@
+{
+  "skill_id": "bio-atac-seq-co-accessibility",
+  "version": "mrsonord2240-optimized-scientific-skills@ea3b976",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+    "path": "skills/bio-atac-seq-co-accessibility",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-co-accessibility"
+  },
+  "candidate": {
+    "identity": "0aac567b1870fb501220470d665c600af91f274cfa816e649bdcad81db8c8afa",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-co-accessibility",
+    "content_sha256": "0aac567b1870fb501220470d665c600af91f274cfa816e649bdcad81db8c8afa",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 4757,
+        "sha256": "bc373617d51c492ad537a437dbeb98b1496a55eaec5a7acf689bff20567b7e9a"
+      },
+      {
+        "path": "references/method-reference.md",
+        "bytes": 17865,
+        "sha256": "a398f2f09afce4d5e8f5641c5ae7aebc79c203c6093cddb97df42e67094789a8"
+      },
+      {
+        "path": "references/usage-guide.md",
+        "bytes": 6994,
+        "sha256": "198ef89fd1c19c6b8374e55d9ee9e3a98dc43b9a84f65db1e9610831c61099d5"
+      },
+      {
+        "path": "scripts/cicero_workflow.R",
+        "bytes": 6831,
+        "sha256": "2505bdb23ac79f7bb6e28db44e1ffbd768e52e49c9861e948ea989912c2101a4"
+      }
+    ],
+    "path": "F:/OpenScience/wt/atac-co-accessibility/skills/bio-atac-seq-co-accessibility",
+    "provider_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+    "provider_tree": "f150ba1e7db5da69f142f3fa73cbb8f98fa74f36"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@0aac567b1870-reaudit-run",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 10,
+    "provider_binding": "binding.json"
+  }
+}

@@ -1,0 +1,422 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-differential-accessibility",
+    "description": "Identify differentially accessible chromatin regions across conditions using DiffBind, csaw, DESeq2, or edgeR; covers consensus-peak vs sliding-window choice, normalization, SVA/RUVseq batch handling and effect-size thresholds.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 8
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; planted K562-only peaks recovered as opened at 0.976-1.000 across modes"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-only analysis with no clinical claims"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Surrogate variables verified to enter the DESeq2 design and change results; documented design restriction verified; residual mode inconsistencies are P2"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped CLI modes ran on real ENCODE data (rc 0) and guards rejected bad input with rc 1; the prior SVA and zero-hit failures are fixed and reproduced fixed"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "DESeq2 and edgeR DiffBind backends, covariate design and SVA shipped; csaw, RUVseq and spike-in are labelled recipe-only; non-human TxDb untested"
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Previous crashes fixed (SVA, zero hits, CLI args); guards for labels, flags and design; SVA mode silently ignores --method and skips the blacklist filter"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md 57 lines with routed references and a single script"
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Clear workflow and CLI header; SVA-mode limits documented only in the script header, and method-reference says SVA runs inside DiffBind"
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Actionable error messages, effective normalization logged; PCA labels overlap for identical K562 replicates"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Plain file inputs and cwd outputs; --txdb value is loaded with library() by name (local package name only)"
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Versions stated and satisfied, license and provenance preserved; threshold semantics differ between default and SVA paths without a note"
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Precise description; body now matches the shipped script, except heatmap listed as output and SVA limits under-documented"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 29
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Default CLI DESeq2 run on ENCODE GM12878 vs K562 (2 vs 2, hg38 chr1:1-30Mb)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1181 sites (766 opened/415 closed); BED rows sum to CSV rows; 751 planted K562-only hits, 0.992 opened; diagnostics PDF (PCA, MA, volcano, heatmap) and 2-page annotation PDF rendered and inspected",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Exit 0 and all five outputs written with prefix d_",
+            "result": "PASS",
+            "note": "d_opened.bed, d_closed.bed, d_annotated.csv, d_diagnostics.pdf, d_annoplot.pdf"
+          },
+          {
+            "text": "Opened+closed BED rows equal annotated CSV rows and all rows pass FDR<0.05 and |Fold|>=1",
+            "result": "PASS",
+            "note": "766+415=1181; max FDR 0.0499; min |Fold| 1.22"
+          },
+          {
+            "text": "Planted K562-only peaks are predominantly reported as opened",
+            "result": "PASS",
+            "note": "751 hits, 0.992 opened (independent overlap of narrowPeak sets)"
+          },
+          {
+            "text": "Rendered MA title count equals reported count and heatmap shows condition clustering",
+            "result": "PASS",
+            "note": "MA title 1181; heatmap splits GM1/GM2 vs K1/K2; TSS-distance page present"
+          },
+          {
+            "text": "Log states effective normalization matching docs default",
+            "result": "PASS",
+            "note": "Normalization: norm.method=lib lib.method=full"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "--sva=2 surrogate-variable mode (P0 path); independent re-implementation and no-SV comparison",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "svaseq capped 2->1 SV; design ~SV1 + Condition; 822 sites (383/439); output identical to my own svaseq+DESeq2 fit (max |dLFC|=0); SV changes results vs ~Condition alone (1372->822 sites); SV1 coefficient nonzero",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Surrogate variable enters the fitted DESeq2 design",
+            "result": "PASS",
+            "note": "independent dds design ~SV1 + Condition, coef Intercept,SV1,Condition_treated_vs_control; skill table equals independent fit exactly"
+          },
+          {
+            "text": "Requested SVs beyond n-ncol(mod)-1 are capped and svaseq NaN is guarded",
+            "result": "PASS",
+            "note": "--sva=2, 4 and 9 all yield 1 SV with rc 0; NaN check present"
+          },
+          {
+            "text": "SV adjustment changes results in a plausible direction without destroying the planted signal",
+            "result": "PASS",
+            "note": "cor(LFC) 0.9992 vs no-SV, sites 1372->822, K562-only opened fraction 0.995"
+          },
+          {
+            "text": "SVA mode applies the same blacklist filter, threshold semantics and plots as the default path",
+            "result": "FAIL",
+            "note": "No blacklist step (0 removed on this data, general risk), hard |LFC|>=1 filter instead of DiffBind lfcThreshold test, no heatmap; only the script header notes part of this"
+          },
+          {
+            "text": "Volcano and MA figures legible with counts matching reported sites",
+            "result": "PASS",
+            "note": "MA and volcano titles read 822 sites; red/grey coding clear"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "--method=edger backend via DiffBind",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1341 sites (906/435); 883 K562-only hits, 0.992 opened; rows consistent; figures rendered",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "edgeR backend executes end to end",
+            "result": "PASS",
+            "note": "rc 0, 'Fitting edger model', outputs with prefix e_"
+          },
+          {
+            "text": "Rows, BED split and thresholds are internally consistent",
+            "result": "PASS",
+            "note": "906+435=1341; max FDR 0.0495"
+          },
+          {
+            "text": "Planted K562-only peaks recovered as opened",
+            "result": "PASS",
+            "note": "883 hits, 0.992 opened"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "--design='~Tissue + Condition' covariate design and DiffBind design restriction claim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1020 sites (626/394), 614 K562-only hits, 0.995 opened; '~Batch + Condition' rejected by DiffBind with 'Invalid factors in design: Batch' as documented",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Covariate design runs and reports consistent rows",
+            "result": "PASS",
+            "note": "626+394=1020; max FDR 0.0499"
+          },
+          {
+            "text": "Documented restriction to Tissue/Factor/Condition/Treatment/Replicate is true",
+            "result": "PASS",
+            "note": "Batch column: Error: Invalid factors in design: Batch (rc 1)"
+          },
+          {
+            "text": "Planted signal preserved under covariate adjustment",
+            "result": "PASS",
+            "note": "614 hits, 0.995 opened"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Edge",
+        "label": "Documented positional args and normalization choices (native; FDR 0.01, LFC 3)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "mypfx_* prefix honoured; FDR<0.01 and |LFC|>=3 -> 212 sites, min |Fold| 3.56, max FDR 0.0099; native reports RLE/RiP and 1096 sites (0.976 opened)",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Positional prefix, normalize, fdr and lfc are honoured",
+            "result": "PASS",
+            "note": "mypfx_* files; log 'FDR < 0.01, |log2FC| >= 3.0'"
+          },
+          {
+            "text": "Reported sites satisfy the stricter thresholds",
+            "result": "PASS",
+            "note": "212 rows, max FDR 0.0099, min |Fold| 3.56"
+          },
+          {
+            "text": "native normalization is selectable and logged",
+            "result": "PASS",
+            "note": "norm.method=RLE lib.method=RiP; 1096 sites vs 1181 under lib"
+          },
+          {
+            "text": "Docs default (lib, full library) matches script default",
+            "result": "PASS",
+            "note": "default log norm.method=lib lib.method=full"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "Valid null result: no site passes (lfc_thr=10) in default and --sva modes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Warning emitted, empty opened/closed BEDs and diagnostics PDF written, no crash, rc 0 in both modes; prior crash fixed",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Zero-hit contrast does not crash",
+            "result": "PASS",
+            "note": "rc 0 for default and --sva=1"
+          },
+          {
+            "text": "User is warned and outputs are well-formed",
+            "result": "PASS",
+            "note": "warning 'No sites pass the thresholds'; 0-byte BEDs; diagnostics PDF present"
+          },
+          {
+            "text": "No misleading annotated table is produced",
+            "result": "PASS",
+            "note": "no *_annotated.csv written"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "Non-standard Condition labels and annotation scope (--case/--control, --txdb=none)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Default labels error names the sheet's labels; --case=K562 --control=GM12878 reproduces 1181 sites; --txdb=none writes unannotated CSV without annotation PDF. Non-human TxDb package not executed (not installed)",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Wrong labels fail early with actionable message",
+            "result": "PASS",
+            "note": "Condition labels 'treated'/'control' not found; sheet has: GM12878, K562 (set --case/--control)"
+          },
+          {
+            "text": "Explicit labels reproduce the standard analysis",
+            "result": "PASS",
+            "note": "1181 sites, 766/415, 751 K562-only hits"
+          },
+          {
+            "text": "--txdb=none skips annotation and still writes the DA table",
+            "result": "PASS",
+            "note": "nt_annotated.csv has 1181 rows, no annotation column; no annoplot PDF"
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Adversarial",
+        "label": "Unknown flag, non-numeric thresholds, too-large --sva",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "--bogus rejected with usage; fdr='abc' rejected; invalid --sva request capped instead of returning NaN results",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Unknown flags are rejected rather than silently ignored",
+            "result": "PASS",
+            "note": "rc 1, Usage message naming 'bogus'"
+          },
+          {
+            "text": "Non-numeric thresholds are rejected",
+            "result": "PASS",
+            "note": "rc 1, 'fdr_thr and lfc_thr must be numeric'"
+          },
+          {
+            "text": "Oversized SV request cannot produce NaN model",
+            "result": "PASS",
+            "note": "--sva=4 and 9 capped to 1 SV, results identical to --sva=1"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 52.1,
+    "score": 86,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P0 SVA path is fixed: surrogate variables enter the DESeq2 design and the output equals an independent svaseq+DESeq2 fit exactly",
+    "Every advertised CLI mode (DESeq2, edgeR, covariate design, SVA, native/lib normalization, thresholds) runs on real ENCODE data and recovers the planted K562-only peaks",
+    "Failure guards are useful: unknown flags, wrong condition labels, invalid DiffBind design terms, zero-hit results and oversized SV requests",
+    "Docs now separate shipped code from recipe-only methods and state the DiffBind design restriction, which was verified true"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "SVA mode skips blacklist filter with no warning",
+      "observed_in": [
+        2
+      ],
+      "problem": "--sva fits DESeq2 on dba.count output and never runs the DiffBind blacklist step that the default path applies in dba.analyze; on this chr1 slice 0 of 2260 intervals were affected, but genome-wide input could report blacklisted regions.",
+      "root_cause": "fit_sva bypasses dba.analyze, which is where DiffBind applies blacklist and greylist filtering.",
+      "fix": "Call dba.blacklist with the genome-matched blacklist before the SVA fit, or emit a runtime warning and list the limit in SKILL.md."
+    },
+    {
+      "priority": "P2",
+      "title": "SVA-mode limits documented only in the script header",
+      "observed_in": [
+        2
+      ],
+      "problem": "method-reference says --sva runs inside DiffBind although it is a direct DESeq2 fit; --method is ignored silently with --sva; SKILL.md lists a heatmap output that SVA mode does not produce.",
+      "root_cause": "Behavior notes live in the R header comment, not in SKILL.md or the reference.",
+      "fix": "State in SKILL.md and method-reference that --sva fits DESeq2 directly, ignores --method and --design, and omits the heatmap and blacklist step; warn at runtime when --method is passed with --sva."
+    },
+    {
+      "priority": "P2",
+      "title": "Effect-size threshold semantics differ between modes",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "Default and edgeR paths pass fold to DiffBind, which uses it as a DESeq2 lfcThreshold test (338 sites with FDR<0.05 and |Fold|>=1 are excluded, minimum reported |Fold| 1.22), while --sva applies a hard |LFC|>=1 post-filter (minimum 1.01); both are logged as |log2FC| >= 1.",
+      "root_cause": "DiffBind dba.report(fold=) is a thresholded significance test, not a post-hoc filter, and the docs describe both paths as the same cutoff.",
+      "fix": "Document the semantics difference or use a post-hoc |Fold| filter in both paths so counts are comparable across modes."
+    },
+    {
+      "priority": "P2",
+      "title": "Non-human TxDb untested; no SVA low-n caution",
+      "observed_in": [
+        2,
+        7
+      ],
+      "problem": "--txdb=<package> was executed only for none because no non-human TxDb was installed; the 4-sample SVA yields 1 SV correlated 0.53 with Condition and no caution says it may absorb real signal.",
+      "root_cause": "Only hg38 annotation packages were installed in the audit environment; no guidance on SVA validity for 2 vs 2 designs.",
+      "fix": "Add a short SKILL.md caution about SVA on very small designs and validate one non-model-organism TxDb when available."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "phase": "final re-audit",
+  "independent_auditor": true,
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/footprinting",
+    "subtree": "7ded85e1af526f2912805fe6da472f78fe2940e8",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "fix/atac-footprinting",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity": "sha256-manifest-v1",
+    "manifest_sha256": "a71e561087bc769f5b14f703c8c535d1fda3a7f90de84d2a4b0dc7ccfb2ade87",
+    "file_count": 7,
+    "byte_total": 42157,
+    "path": "F:\\OpenScience\\wt\\atac-footprinting\\skills\\bio-atac-seq-footprinting",
+    "status_before": "skills/bio-atac-seq-footprinting untracked (7 files); no tracked-file edits",
+    "status_after_execution": "unchanged; manifest recomputed live before and after execution (scripts/manifest.py)",
+    "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; tab-separated; LF joins; ordinal UTF-8 byte ordering; no trailing LF"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 7816,
+      "sha256": "620e12ce924803c875cade1ab69b4ea68362fe2154a825fde83a625900903e0a",
+      "git_blob": "0558bb7c9d385a86131e69bbcd1af3f2b07b5978"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 15784,
+      "sha256": "14952bcec67f8af341b8f3b6318cb7d3c17e015eded1e84c4c2f2ed0beff3da3",
+      "git_blob": "7e87c6951096dcadfe8640fb5f27c87e83e2aba1"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 4864,
+      "sha256": "b05f559e2a2bf8d8189479c964f3e9a65434b5167c80adee8987e2d8da4df8ea",
+      "git_blob": "4fe1867d8e55523b59f72bfc39c472cc58de5f54"
+    },
+    {
+      "path": "scripts/run_tobias.sh",
+      "bytes": 5506,
+      "sha256": "51226b7e80738af55848d3be864db28abb95fbc11ea5db6553e28475c79890c3",
+      "git_blob": "05e3a32eba1b0d516d5bf1381e471202ab11f70f"
+    },
+    {
+      "path": "scripts/scprinter_footprint.py",
+      "bytes": 4823,
+      "sha256": "2cf95752e17bbed9678e3fe1a758b507cf88ddee63853b241431d61f07f372b6",
+      "git_blob": "a7695af4412a9cd2cee1b25dee468a70fab65fb5"
+    },
+    {
+      "path": "scripts/site_concordance.sh",
+      "bytes": 2299,
+      "sha256": "e6a12bcb31d0143c2da5d8bb6a203ddab1dc7105240483911e55d85f0442ee04",
+      "git_blob": "0d9fb7f43972fa5c45aeaa53a44d3a4235e2567f"
+    }
+  ],
+  "tooling": {
+    "tools_md_sha256": "303b12248b7ad738192c087a72887020cd5f0ed80061eb21ea2746e66811484f",
+    "environment_fingerprint_sha256": "48e27feb8a7d10a6fa41936ce8078dc4f6a5a68ac340d90ddca6a51ca4f49974",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

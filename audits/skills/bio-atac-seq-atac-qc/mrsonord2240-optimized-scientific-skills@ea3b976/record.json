@@ -1,0 +1,52 @@
+{
+  "skill_id": "bio-atac-seq-atac-qc",
+  "version": "mrsonord2240-optimized-scientific-skills@ea3b976",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+    "path": "skills/bio-atac-seq-atac-qc",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-atac-qc"
+  },
+  "candidate": {
+    "identity": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-atac-qc",
+    "content_sha256": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+    "path": "F:/OpenScience/wt/atac-atac-qc/skills/bio-atac-seq-atac-qc",
+    "provider_commit": "ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4",
+    "provider_tree": "2f12ff658e780615d5d121a58042af88c304cbd0"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@cf524ad680cf-reaudit-run",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 11,
+    "provider_binding": "binding.json"
+  }
+}

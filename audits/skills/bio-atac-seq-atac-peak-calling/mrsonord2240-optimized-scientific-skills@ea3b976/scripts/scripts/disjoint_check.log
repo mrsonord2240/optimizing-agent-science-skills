@@ -1,0 +1,5 @@
+reads: total=1048048 h1=525136 h2=522912
+names: all=524024 h1=262568 h2=261456 shared=0 union=524024
+flag-1 reads (paired) : 1048048 of 1048048
+orig name multiplicity 2 524024
+h1 name multiplicity 2 262568

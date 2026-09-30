@@ -14,7 +14,8 @@
     "identity": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
     "identity_kind": "sha256-manifest",
     "branch": "fix/atac-atac-qc",
-    "content_sha256": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99"
+    "content_sha256": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+    "path": "F:/OpenScience/wt/atac-atac-qc/skills/bio-atac-seq-atac-qc"
   },
   "audit": {
     "method": {
