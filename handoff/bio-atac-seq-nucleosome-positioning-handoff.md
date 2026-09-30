@@ -1,70 +1,60 @@
-# Handoff: bio-atac-seq-nucleosome-positioning / fix-scientific-skill
+# Handoff: bio-atac-seq-nucleosome-positioning / orchestrator (commit + intake)
 
 - Updated: 2026-09-30
 - Lane: 5
-- Status: ready-for-phase
-- Owner leaving: audit-scientific-skill worker (lane 5)
-- Next role: fix-scientific-skill
+- Status: candidate-ready
+- Owner leaving: final re-audit worker (independent; did not write, fix, tool or initially audit)
+- Next role: orchestrator (commit exact bytes to the optimized shelf, publish the audit record, run intake); no fixer needed
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:atac-seq/nucleosome-positioning
-- Working tree: `F:\OpenScience\wt\atac-nucleosome-positioning\skills\bio-atac-seq-nucleosome-positioning`
-- Branch/worktree: `fix/atac-nucleosome-positioning`, starting commit 3186916 (uncommitted candidate)
-- Candidate tree hash: `sha256-manifest-v1 ce9a8a0618678bc71ab7afa41b98c37beab513e9b0c599d5a83197d31b879cd7` (7 files; re-verified live after audit; no `__pycache__`; Skill unmodified)
-- Applicable audit: `F:\OpenScience\audits\bio-atac-seq-nucleosome-positioning\initial-audit-20260930\report.json` (identity above; not yet published to records)
+- Working tree: F:\OpenScience\wt\atac-nucleosome-positioning\skills\bio-atac-seq-nucleosome-positioning
+- Branch/worktree: fix/atac-nucleosome-positioning, start 3186916 (files untracked, no commits)
+- Candidate identity (sha256-manifest-v1, 7 files, 34,598 bytes): 2192c9d1500c5d260545b2dda74a0ea0f8e6e4b15a39023519d5c2f5fc495c4b (verified live before and after; no __pycache__)
+- Applicable audit: F:\OpenScience\audits\bio-atac-seq-nucleosome-positioning\reaudit-run (this identity). Superseded baseline: initial-audit-20260930 (ce9a8a06..., 57 Reject)
+
+## Decision: candidate-ready
+
+Final 85 (Production Ready). Static 85, execution average 85.0, Layer 1 33.8, Layer 2 51.2, assertions 22/24 (91.7%). No veto, no open P0. Rubric zip sha256 e54e9ff8...f0de.
 
 ## Completed this phase
 
-- Initial audit: score 57, Reject (research veto M4 FAIL); static 65, execution avg 52.0, assertions 12/23. Diagnostic, not certification.
-- Ran V-plot, NRL, R/ATACseqQC (verbatim + scratch-patched), NucleoATAC run, py3.7 pip recipe, DANPOS3 differential on a planted +40 bp pair.
-- Diagnosed the empty NucleoATAC `nucpos` (NUCPOS-006): uninitialised accumulator in `calculateCov` gives NaN z-scores.
-- Record: `report.json`, `viewer.md`, `findings.json`, `source-identity.json`, `scripts/`, `logs/`, `out/` in the audit dir; report validated against the pinned schema (P0/P1/P2 only, sorted).
+- Independently reproduced all P0 fixes on real GM12878 chr1 data: estimate_nrl 178 vs 176 bp; nucleosome_analysis.R rc 0 with all outputs and 0 MAPQ<30 export records; vplot recount 121,246 vs 121,291. Evidence: reaudit-run\logs\py_reaudit.log, r_bed.log.
+- NucleoATAC from a clean install following usage-guide.md: unpatched rc 0 with 0 nucpos calls; documented sed + cythonize gives 178 calls / 6 redundant. Evidence: logs\na_clean.log, na_check.log.
+- Judged the documented one-line third-party edit an acceptable, honestly disclosed workaround (precise, idempotent, isolated env, root cause verified in source, upstream defect named, fallback and empty-output check present). Details in viewer.md.
+- DANPOS3 doc filter recomputed: 4,103/4,542 planted, 0 false.
+- Throwaway env np-reaudit-nucleoatac removed (verified).
 
-## Required next actions
+## Open findings (all P2, none blocking)
 
-1. Fix P0 first: NUCPOS-001 (`estimate_nrl.py`, distance in bins + guard), NUCPOS-002 and -003 (`nucleosome_analysis.R`: `readBamFile(asMates=TRUE)`, load ChIPpeakAnno). A tested patched R copy is `scripts/a2_patched_nucleosome_analysis.R` in the audit dir.
-2. Then P1: NUCPOS-004/-005 (`vplot.py` centre and strand), NUCPOS-006/-007 (NucleoATAC py2.7 install, nucpos non-empty check, execute any workaround such as a source build with `value = 0` before documenting it).
-3. Then P2 NUCPOS-008 to -013 and P3 NUCPOS-014, -015; rerun the affected surfaces; classify tooling impact (R env needs ChIPpeakAnno already present).
-
-## Open findings and blockers
-
-| ID | Severity | State | Evidence | Required disposition |
+| ID | Severity | State | Evidence | Disposition |
 |---|---|---|---|---|
-| NUCPOS-001 | P0 | open | `logs/a1_py_checks.log` | fix estimate_nrl peak spacing and empty-result guard |
-| NUCPOS-002 | P0 | open | `logs/a2_r_script.log` | fix shift input in R script |
-| NUCPOS-003 | P0 | open | `logs/tooling_probe_fas.log` | load ChIPpeakAnno, update install |
-| NUCPOS-004 | P1 | open | `logs/a1_py_checks.log` | correct fragment centre |
-| NUCPOS-005 | P1 | open | `out/a1_vplot_compare.png` | strand-aware V-plot |
-| NUCPOS-006 | P1 | open | `logs/na_debug_z.log`, `logs/na_cov_probe2.log` | document/test workaround, add check |
-| NUCPOS-007 | P1 | open | `logs/a5_pip_install.log` | correct install recipe and Python claims |
-| NUCPOS-008 | P2 | open | `logs/a2_check_bams.log` | apply MAPQ filter consistently |
-| NUCPOS-009 | P2 | open | `logs/a2_r_script.log` | TSS set filtering, heatmap check |
-| NUCPOS-010 | P2 | open | `logs/a4_danpos.log` | name DANPOS columns |
-| NUCPOS-011 | P2 | open | `logs/tooling_danpos_dpos_help.txt` | update DANPOS install/executable |
-| NUCPOS-012 | P2 | open | Skill references | cite or drop claims |
-| NUCPOS-013 | P2 | open | `SKILL.md`, `usage-guide.md` | replace unverified-version caveats |
-| NUCPOS-014 | P3 | open | `logs/a1_py_checks.log` | vplot.py output hardening |
-| NUCPOS-015 | P3 | open | `TOOLS.md` | scPrinter example or removal |
+| NUCPOS-016 | P2 | open | logs\py_reaudit.log, rep2_probe.log | estimate_nrl reports 208 bp on GM12878 rep2 (1-bp mode 177); optional warning |
+| NUCPOS-017 | P2 | open | viewer.md input 3 | R export class counts differ from summary counts (post-shift); document or align |
+| NUCPOS-006 | P2 | accepted workaround | logs\na_clean.log | upstream defect remains; optionally file upstream issue |
+| NUCPOS-015 | P2 | deferred | static | scPrinter untested, labelled |
 
-Deferred/static-only: scPrinter and single-cell route (no command); whole-genome scale (data are chr1:1-30 Mb, ~0.5M pairs); H2A.Z ground truth.
+## Failed, blocked or reused surfaces
+
+- Failed: none. Assertion failures: rep2 NRL (NUCPOS-016), export vs summary counts (NUCPOS-017).
+- Reused (identity-matched, not rerun): R default knownGene route (fix-run, ~13 min), `danpos dpos` and ATAC recipe, H2A.Z snippet.
+- Not run: BiocManager install line (conda-equivalent versions used); scPrinter. Heatmap PDF viewed via the delta run's byte-identical file (no PDF rasteriser).
 
 ## Environment and evidence
 
-- Tool inventory: `F:\OpenScience\audits\bio-atac-seq-nucleosome-positioning\TOOLS.md` (sha256 `fdbc099f2395d3116692305b8ecae9249a3a639f5128e1741b8b90e2be743925`)
-- Environment fingerprint: `0972fade33110926b7f703a40c83aaf07b4072b4ef027cde196890e22f08f866`; rubric zip sha256 `e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de`
-- Run evidence: `F:\OpenScience\audits\bio-atac-seq-nucleosome-positioning\initial-audit-20260930\`; rerun via `F:\OpenScience\audit-envs\bio-atac-seq-nucleosome-positioning\wsl_env.sh`
-- Minor repair: none (no audit-local edits)
+- Tool inventory: F:\OpenScience\audits\bio-atac-seq-nucleosome-positioning\TOOLS.md, fingerprint sha256 72f7cc5bd216ef9d9e74f453b76508c0f5c3c27d3f77c9ad5d620a62044e5cc5
+- Run root: F:\OpenScience\audits\bio-atac-seq-nucleosome-positioning\reaudit-run\ (report.json schema-checked, viewer.md, source-identity.json, scripts\, logs\, out\)
 - Restricted-access items: none
-- Tooling impact: none (audit used prepared envs; shared envs read-only; scratch work under `audit-envs\...\work\{a2,a3,a4}`)
+- Tooling impact: none
 
 ## Worktree safety
 
-- Run-owned changes: `F:\OpenScience\audits\bio-atac-seq-nucleosome-positioning\initial-audit-20260930\`, this handoff
-- Pre-existing/user-owned changes (untouched): `F:\optimizing-agent-science-skills\tools\run_mercury_worker.py`, `tools\test_run_mercury_worker.py`
-- Records state: uncommitted; not published (orchestrator publishes)
+- Run-owned changes: reaudit-run\ records, this handoff
+- Pre-existing/user-owned changes: F:\optimizing-agent-science-skills\tools\run_mercury_worker.py, tools\test_run_mercury_worker.py (untouched)
+- Records state: uncommitted, not published to the records repo (orchestrator to publish with tools/publish_audits.py --run-dir, then npm run audits:index / audits:check)
 - Product commits/pushes: none
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes
+- Next-phase prerequisites met: yes (commit exact bytes, then reconcile inventory)
