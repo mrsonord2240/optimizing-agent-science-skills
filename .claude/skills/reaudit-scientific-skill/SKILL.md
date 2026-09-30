@@ -1,6 +1,6 @@
 ---
 name: reaudit-scientific-skill
-description: Independently re-audit one fixed scientific agent Skill with risk-based executable coverage and decide candidate readiness for exact bytes. Use only for the relay's final certification phase with a fresh auditor.
+description: Independently re-audit one fixed scientific agent Skill with risk-based executable coverage and decide candidate readiness for exact bytes. Use only for the relay's final certification phase, or its delta mode for text-only changes to certified bytes, with a fresh auditor.
 ---
 
 # Re-audit Scientific Skill
@@ -14,7 +14,7 @@ Verify that you did not perform the candidate's fix or initial audit. Check
 origin and exact candidate identity, working path/branch, lane and audit-output
 ownership, prior reports, finding dispositions, current `TOOLS.md`, and live
 Git status. Preserve pre-existing changes and keep source checkouts read-only.
-Work on one Skill and this phase only. Do not create a product commit, push,
+Work only on the Skills your brief assigns (one, or a batch the relay allows) and this phase only. Do not create a product commit, push,
 release, submit, or publish.
 
 Use the current rubric, veto rules, classification, and schema from
@@ -64,6 +64,28 @@ tooling-delta pass. For a paid, private, authenticated, licensed,
 registration-bound, unavailable, or resource-infeasible surface, record the
 exact after-action item and do not count it as executed.
 
+## Delta mode
+
+Use delta mode only when the brief says so and the Skill already has a
+published `candidate-ready` audit. The change since those certified bytes must
+be limited to prose, comments, and frontmatter, or one localized script change
+of at most 20 lines. Anything larger gets the full re-audit above.
+
+1. Verify the new identity with `tools/skill_preflight.py`.
+2. Diff the candidate against the certified bytes (the optimized shelf copy or
+   the certified audit's recorded path). Every change must be one the brief
+   lists; report any other change as a finding.
+3. Check each changed statement against the certified run's evidence or new
+   evidence. Execute any changed command or script path, including its
+   intended failure guard.
+4. Carry the certified report's scores forward. Re-score only the dimensions
+   and assertions the change touches, and mark resolved findings.
+5. Keep the certified report's schema; update identity, date, scores, and
+   recommendations. Write to a new run directory and publish it as below.
+
+A delta auditor may carry up to three Skills. It must not have fixed any of
+them.
+
 ## Keep repairs exceptional
 
 Use the same quantitative minor-repair budget as the initial-audit Skill only
@@ -89,8 +111,15 @@ at `audits/STATUS.md` and `audits/STATUS.html`. The generator derives their
 counts from `audits/CORPUS.json` and published audits; never edit the counts by
 hand. If it fails, resolve or report the concrete blocker before transition.
 
+Recommendation priorities are `P0`, `P1`, or `P2` only; the records indexer
+rejects anything else. A surface marked `heavy-optional` in `TOOLS.md` is
+`static-only` and does not block readiness when the Skill labels it as not
+executed.
+
 For modular raw evidence, keep origin provenance and exact candidate identity
-in `source-identity.json`, not as extra fields in the strict report schema. An
+in `source-identity.json`, not as extra fields in the strict report schema.
+Record the candidate's absolute `path` there, put every published script or
+input under the run's `scripts/`, and use a new run directory for every run. An
 uncommitted candidate needs a deterministic 64-character content SHA-256 plus
 its file manifest; a 40-character Git tree id is valid only when it identifies
 the exact audited subtree. Publish the explicit run root and only the named

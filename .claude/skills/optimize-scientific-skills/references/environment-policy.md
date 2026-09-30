@@ -26,4 +26,6 @@ Private, authenticated, paid, license-bound, registration-gated, unavailable,
 or resource-infeasible requirements remain explicit blockers. Record the exact
 error, affected workflow, evidence obtained, user action, and rerun steps.
 Never silently replace the advertised workflow with a materially different
-public alternative.
+public alternative. A heavy optional surface left untooled by policy (defined
+in the tooling worker Skill) is not a blocker: the Skill labels it as not
+executed and no user action is requested.

@@ -8,7 +8,11 @@ replaces, the scientific re-audit.
 
 Use the Marketplace repository at
 `F:\optimizing-agent-science-skills\marketplace\intake\openscience-skill-marketplace`
-and its `npm run --silent intake:skill` command. Intake reads committed Git
+and its `npm run --silent intake:skill` command, at the current upstream
+validator: run `git fetch origin`, then run intake from a detached worktree of
+`origin/main` (`git worktree add --detach F:\OpenScience\marketplace-validator
+origin/main`, then `npm ci` there; move an existing one with `git -C
+<worktree> checkout --detach origin/main`). Record that commit in the receipt. Intake reads committed Git
 blobs from a full commit SHA and ignores working-tree changes; the manifest
 must therefore pin the exact unpublished optimized batch commit.
 
@@ -21,8 +25,9 @@ records, register a release, enroll, publish, or push.
 In a disposable directory under `F:\OpenScience`, create one temporary
 `release.config.json` per Skill. Derive rather than guess:
 
-- ID from `SKILL.md` frontmatter;
-- version and category from authoritative provider or release metadata;
+- ID and category from `SKILL.md` frontmatter (`name`, `category`; the
+  preflight already enforces one of the five Marketplace labels);
+- version from release metadata, `1.0.0` for a first release;
 - canonical optimized repository URL;
 - full optimized commit SHA and `skills/<skill-id>` source path;
 - actual nonempty license files at that commit.

@@ -1,6 +1,6 @@
 ---
 name: optimize-scientific-skills
-description: Coordinate an up-to-five-lane relay that normalizes scientific agent Skills, prepares their tooling, audits and repairs them, independently certifies them, and runs local Marketplace intake. Use when Sam asks to process or resume the science-Skill backlog, run audit-fix-reaudit work, or close a refinement batch.
+description: Coordinate a batched relay of up to five concurrent workers that pre-screens, normalizes scientific agent Skills, prepares their tooling, audits and repairs them, independently certifies them, and runs local Marketplace intake. Use when Sam asks to process or resume the science-Skill backlog, run audit-fix-reaudit work, or close a refinement batch.
 ---
 
 # Optimize Scientific Skills
@@ -41,18 +41,22 @@ Use the following worker Skills by exact name:
 | Initial audit | `audit-scientific-skill` | diagnostic report and finding ledger |
 | Fix | `fix-scientific-skill` | finding dispositions and tooling impact |
 | Final re-audit | `reaudit-scientific-skill` | candidate-ready decision for exact bytes |
+| Delta re-audit | `reaudit-scientific-skill`, delta mode | candidate-ready decision for text-only changes to certified bytes |
 
 Worker-contract delivery is part of dispatch. Resolve the selected worker
 Skill's actual `SKILL.md` as a sibling of this orchestrator Skill and include
-that absolute path in the worker brief. The worker's first action must be to
+that absolute path in the worker brief. Set the worker's model explicitly from
+the model table in [relay operations](references/relay-operations.md). The worker's first action must be to
 read the complete file successfully. Merely naming the Skill is insufficient:
 a fresh agent may start from a repository that does not expose the orchestrator's
 Skill registry. If the contract cannot be read, the worker must report that
 blocker and stop without searching other repositories for a substitute role or
 improvising the phase.
 
-Dispatch a fresh agent for every phase. A worker owns one Skill and one phase,
-then retires after writing the canonical handoff. The orchestrator must not
+Dispatch a fresh agent for every phase. A worker owns one phase for the Skills
+assigned to it under the batching table in relay operations (one Skill unless
+that table allows a batch), then retires after writing each Skill's canonical
+handoff. The orchestrator must not
 invoke a worker Skill in its own context or perform worker-phase tasks. It may
 only select and claim work, dispatch the exact worker Skill, validate the
 handoff and evidence, update lane state, and close accepted batches.
@@ -140,14 +144,39 @@ targeted queries. State that reason before expanding scope.
 
 Inspect live agents and claims and relevant Git status for the resolved targets.
 Select only in-scope or canonically next-eligible Skills. Record exact source
-identity and the earliest incomplete phase. Claim no more than five Skills.
-Default to five eligible lanes, but honor any lower invocation-level lane,
+identity and the earliest incomplete phase. Claim at most ten Skills and run at
+most five concurrent workers, and honor any lower invocation-level lane,
 worker, or Skill limit as a hard run boundary. Do not refill beyond a stated
 batch-size limit.
 
+#### Pre-screen before any agent
+
+Before claiming, run the mechanical preflight on every shortlisted source
+directory from the records repository root:
+
+```powershell
+git -C marketplace\intake\openscience-skill-marketplace fetch origin
+python tools/skill_preflight.py <source-skill-dir> [...]
+```
+
+- A `fail` for an ID collision (already in the live Marketplace catalog,
+  differing from one only by `bio-`, or already in the Marketplace review
+  queue) excludes the Skill: record the reason in the lane table and do not
+  dispatch any phase for it.
+- A `warn` for a near-duplicate name goes into the Skill's handoff for the
+  normalizer and auditor to judge semantic overlap; it does not exclude.
+- Hygiene, category, and author failures on upstream sources are expected;
+  normalization must clear them.
+
+Maintainers judge inclusion; they check duplicates, license scope,
+attribution, and whether claims hold. Spend nothing on a Skill the pre-screen
+already disqualifies.
+
 ### 2. Normalize every Skill
 
-Run `normalize-scientific-skill` before tooling or behavioral audit. A prior
+Run `normalize-scientific-skill` before tooling or behavioral audit. Accept a
+normalize handoff only when `tools/skill_preflight.py` reports `PASS` for the
+normalized tree and its identity equals the handoff's. A prior
 audit is reusable only when it applies to the exact normalized candidate bytes,
 uses the current report schema, and retains its evidence. A structural
 change normally makes an older audit diagnostic history rather than the active
@@ -159,6 +188,9 @@ Run a full `prepare-scientific-skill-tooling` pass after normalization, unless
 an existing `TOOLS.md` covers the exact runnable-surface inventory and its
 recorded environment fingerprint is verified live. Tooling must be ready
 before an initial audit or, when a usable initial audit is reused, before a fix.
+Batch tooling by ecosystem so shared environments and public inputs are built
+once. Do not tool heavy optional surfaces (defined in the tooling worker
+Skill); they stay labelled as not executed in the Skill.
 
 ### 4. Audit, fix, and certify
 
@@ -186,18 +218,30 @@ evidence identity, or materially changes the advertised workflow set. A
 user-action blocker may be parked without occupying a worker slot once its
 exact state is durable.
 
-Publish the initial baseline and accepted final audit. Keep rejected
-intermediate runs as durable local evidence and publish them only when needed
-to preserve a blocker, explain a candidate-identity transition, or satisfy the
-records schema. Regenerate canonical views after each published audit. Keep
-each freed lane filled while eligible work remains.
+The initial auditor, delta re-auditor, and final re-auditor each publish their
+own record and regenerate the views as soon as their report is final, so a
+crash cannot lose a finished audit. At transition the orchestrator verifies the
+publication and commits the records repository. Keep rejected intermediate runs
+as durable local evidence and publish them only when needed to preserve a
+blocker, explain a candidate-identity transition, or satisfy the records
+schema. Keep each freed lane filled while eligible work remains.
+
+The readiness gate is the target, not a score. Once a Skill is
+`candidate-ready`, do not dispatch fix work only to raise its score. Open P2s
+after that are handled only in the cheap path: one text-only fix worker for up
+to ten candidate-ready Skills, then delta re-auditors (up to three Skills each)
+under the re-audit worker's delta mode. A P2 that needs runnable-byte changes
+or new execution waits for a later refinement run unless it makes output wrong.
 
 ### 5. Stage candidate-ready Skills
 
 Copy or promote each exact candidate-ready tree to
 `F:\optimized-scientific-skills\skills\<skill-id>` with only the provider and
-provenance metadata needed to identify it. Verify byte identity. Exclude every
-in-progress or blocked Skill and all unrelated changes.
+provenance metadata needed to identify it. Verify byte identity with
+`tools/skill_preflight.py --offline` on both the working tree and the staged
+shelf copy: both must report `PASS` and the identity of the accepted final or
+delta audit. Exclude every in-progress or blocked Skill and all unrelated
+changes.
 
 ### 6. Close the run
 

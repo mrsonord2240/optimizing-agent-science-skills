@@ -1,6 +1,6 @@
 ---
 name: prepare-scientific-skill-tooling
-description: Prepare or refresh the reproducible tools, environments, public inputs, and per-surface coverage map for one normalized scientific Skill. Use for a full pre-audit tooling pass or a focused tooling-delta pass after fixes.
+description: Prepare or refresh the reproducible tools, environments, public inputs, and per-surface coverage map for one normalized scientific Skill or an ecosystem batch. Use for a full pre-audit tooling pass or a focused tooling-delta pass after fixes.
 ---
 
 # Prepare Scientific Skill Tooling
@@ -13,7 +13,7 @@ quality, repair its instructions, or change product bytes.
 Verify the candidate identity, surface inventory, working path and branch,
 lane ownership, existing `TOOLS.md`, and requested mode: `full` or `delta`.
 Inspect relevant Git status, preserve all pre-existing changes, keep source
-checkouts read-only, and work on this Skill and phase only. Do not change Skill
+checkouts read-only, and work only on the Skills your brief assigns (one, or a batch the relay allows) and this phase only. Do not change Skill
 bytes or commit, push, release, submit, or publish a product repository.
 
 ## Inventory the complete surface
@@ -25,6 +25,22 @@ Map every advertised or shipped runnable surface to its requirements:
 - models, databases, reference files, and real public test inputs;
 - remote services, authentication, licenses, registrations, hardware, and
   graphical or native-application requirements.
+
+Classify each surface as core or optional. Core surfaces are the Skill's
+common end-to-end workflow and any materially distinct mode its `SKILL.md`
+workflow requires; optional surfaces are alternative tools or modes it offers.
+Do not build an optional surface that is heavy: it needs a GPU, a single smoke
+run is expected to take over 10 minutes, its inputs exceed 5 GB, or it needs
+registration or a paid license. List it in `TOOLS.md` as
+`heavy-optional (not tooled)` with the reason, and record in the handoff that
+the Skill must label it as not executed. Build a heavy core surface, and stage
+its inputs once for the ecosystem.
+
+When the brief assigns several Skills of one ecosystem, build each shared
+environment and public input once, write one `TOOLS.md` per Skill that links the
+shared rows, and stage shared inputs under
+`F:\OpenScience\audit-envs\<ecosystem>\public-data\` with a README recording
+source URL, bytes, and sha256.
 
 For a delta pass, compare the fix handoff and diff with the prior inventory.
 Verify unaffected surfaces retain a live environment; rebuild only what the

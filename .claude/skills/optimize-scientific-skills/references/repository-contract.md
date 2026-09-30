@@ -20,7 +20,8 @@ Use user-supplied roots when they explicitly replace these defaults.
 Before mutation, record the canonical Skill ID, origin repository/path/commit,
 working path/branch/starting commit, applicable audit identity, current phase,
 owner, and durable handoff path. The directory name and frontmatter `name` must
-agree. Claim one Skill and one phase only.
+agree. Claim one phase only, for one Skill or for the batch the relay batching
+table allows.
 
 ## Protect existing work
 

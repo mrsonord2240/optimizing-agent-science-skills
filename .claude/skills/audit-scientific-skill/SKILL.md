@@ -1,6 +1,6 @@
 ---
 name: audit-scientific-skill
-description: Conduct a bounded diagnostic audit of one normalized scientific agent Skill using prepared tooling, producing schema-valid findings and executable evidence without claiming final certification. Use for the relay's initial audit phase when no usable exact audit exists.
+description: Conduct a bounded diagnostic audit of one normalized scientific agent Skill (or a relay-assigned batch of light Skills) using prepared tooling, producing schema-valid findings and executable evidence without claiming final certification. Use for the relay's initial audit phase when no usable exact audit exists.
 ---
 
 # Audit Scientific Skill
@@ -15,7 +15,7 @@ Verify the origin and exact candidate identity, working path and branch, lane
 and audit-output ownership, current `TOOLS.md`, and separation from other
 workers.
 Inspect relevant Git status, preserve all pre-existing changes, and keep source
-checkouts read-only. Work on one Skill and this phase only. Do not make a
+checkouts read-only. Work only on the Skills your brief assigns (one, or a batch the relay allows) and this phase only. Do not make a
 product commit, push, open a pull request, release, submit, or publish.
 
 Use the current `skill-auditor.zip` rubric, veto rules, classification, and
@@ -58,6 +58,10 @@ a scientific conclusion, report false success, cross a security or destructive
 boundary, or corrupt a public output contract. Ordinary input mistakes are not
 a required test matrix.
 
+A surface marked `heavy-optional (not tooled)` in `TOOLS.md` is `static-only`
+with reason `heavy-optional`; check only that the Skill labels it as not
+executed, and file a finding when it does not.
+
 You may defer expensive secondary examples and redundant permutations. Mark a
 materially distinct advertised workflow that lacks representative evidence as
 `static-only` or `blocked`; do not treat a combinatorial parameter or invalid-
@@ -89,14 +93,19 @@ post-repair bytes and retain the pre-repair observation and rerun evidence.
 Write schema-valid `report.json`, `viewer.md`, saved run scripts and inputs,
 source identity, execution classifications, findings with severity and stable
 IDs, minor-repair evidence, and restricted-access after-action items. Keep a
-single ordered finding ledger for the fixer.
+single ordered finding ledger for the fixer. Recommendation priorities are
+`P0`, `P1`, or `P2` only; the records indexer rejects anything else.
 
 For a modular run root, `source-identity.json` must keep the immutable origin
 repository/commit/path separate from the exact working candidate. Identify an
 uncommitted candidate with a deterministic 64-character content SHA-256 (and
 its file manifest); use a 40-character Git tree id only when it identifies the
-exact audited subtree. Never put publication metadata into the strict audit
-report merely to satisfy older tooling.
+exact audited subtree. Take that identity from `tools/skill_preflight.py`, and
+record the candidate's absolute `path` in `source-identity.json`. Put every
+published script or input under the run's `scripts/`, and use a new run
+directory for every run because published versions are immutable. Never put
+publication metadata into the strict audit report merely to satisfy older
+tooling.
 
 Publish through the records repository tooling and regenerate the audit index,
 backlog, and status outputs at `audits/STATUS.md` and `audits/STATUS.html`. The

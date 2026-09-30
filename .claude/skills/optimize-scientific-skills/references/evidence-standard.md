@@ -23,6 +23,8 @@ An empty, malformed, misleading, illegible, scientifically unexpected, or
 unusable output fails even if the process exits successfully.
 
 Classify each surface as `executed`, `failed`, `static-only`, `blocked`, or
-`not-applicable`. Documentation and source inspection can support a finding but
+`not-applicable`. A heavy optional surface (see the tooling worker Skill) is
+`static-only` with the reason `heavy-optional`; it does not block readiness
+when the Skill labels it as not executed. Documentation and source inspection can support a finding but
 are not executed evidence. A blocked route retains its limitation and
 after-action item; it does not receive an inflated score.

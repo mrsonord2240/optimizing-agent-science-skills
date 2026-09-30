@@ -1,6 +1,6 @@
 ---
 name: normalize-scientific-skill
-description: Normalize one scientific agent Skill before audit by resolving safe software-version drift, removing instruction redundancy, and migrating reusable code and conditional detail into routed resource directories. Use when an optimization relay assigns the normalization phase for an exact Skill.
+description: Normalize one scientific agent Skill, or a relay-assigned batch, before audit by resolving safe software-version drift, removing instruction redundancy, and migrating reusable code and conditional detail into routed resource directories. Use when an optimization relay assigns the normalization phase for an exact Skill.
 ---
 
 # Normalize Scientific Skill
@@ -15,7 +15,7 @@ repository you may touch. Treat pre-existing modified and untracked files as
 user-owned; use a run-owned branch or isolated worktree and stop for any
 unisolated overlap. Keep provider-source checkouts read-only.
 
-Work on one Skill and this phase only. Do not reset, clean, rebase, overwrite,
+Work only on the Skills your brief assigns (one, or a batch the relay allows) and this phase only. Do not reset, clean, rebase, overwrite,
 delete, or reconcile unrelated work. Do not commit a product repository, push,
 open a pull request, release, submit, or publish.
 
@@ -59,6 +59,15 @@ conditions, caveats, and scientific meaning.
   together. Record a genuinely ambiguous or breaking migration for audit or
   user decision instead of guessing.
 
+- Make the frontmatter Marketplace-complete: keep `name`, `description`, and
+  `license`; add exactly one `category:` from `Academic Writing`,
+  `Data Analysis`, `Evidence Insight`, `Other`, `Protocol Design`, chosen from
+  what the Skill does; add `author:` with the original author credit from the
+  provider (for GPTomics bioSkills: `author: GPTomics`).
+- Write every text file as UTF-8 without BOM, with LF line endings. Remove
+  `__pycache__`, `*.pyc`, dot-prefixed paths, and LICENSE copies below the
+  Skill root.
+
 Do not redesign scientific methods, change analytical defaults, add features,
 install tooling, or resolve behavioral findings unrelated to safe version
 normalization in this phase. Record such issues for audit.
@@ -70,6 +79,11 @@ core workflow, scripts retain their full content and executable entry points,
 and no required guidance became undiscoverable. Run lightweight link, metadata,
 and syntax checks when available; leave behavioral execution to tooling and
 audit workers.
+
+Then run, from the records repository root,
+`python tools/skill_preflight.py <normalized-skill-dir>`. It must report
+`PASS`. Take the candidate identity from its output; never compute or copy an
+identity by hand. Carry any `warn` lines into the handoff.
 
 Summarize migration at file or purpose level. Do not catalog every moved or
 deleted passage; the diff is that record.

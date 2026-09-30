@@ -1,6 +1,7 @@
 # Phase handoff contract
 
-Use one canonical handoff per active lane. Replace its current-state sections;
+Use one canonical handoff per active Skill, also when a batched worker carries
+several Skills. Replace its current-state sections;
 do not append a diary. Link evidence instead of pasting it. A new worker must
 be able to resume from this file, the live worktree, and linked artifacts
 without chat history.
@@ -40,7 +41,7 @@ command output, diffs, or resolved-history narrative.
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| <id> | <P0-P3> | <open/blocked/deferred> | <path> | <action> |
+| <id> | <P0-P2> | <open/blocked/deferred> | <path> | <action> |
 
 ## Environment and evidence
 

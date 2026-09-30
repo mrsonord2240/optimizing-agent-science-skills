@@ -11,6 +11,15 @@ veto, no open P0, and representative inspected execution for every materially
 distinct required workflow and output family. Exact-identity reusable evidence
 may satisfy unchanged surfaces under the re-audit contract.
 
+The Marketplace does not read audit scores: providers do not submit evaluation
+reports, and its `intake:skill` gate checks structure, metadata, and license
+evidence only. The audit is our evidence that the science and commands hold,
+for the maintainer who decides inclusion. Treat the gate above as the finish
+line; a higher score is not a goal.
+
+Report recommendations use `P0`, `P1`, or `P2` only. The records indexer
+rejects any other priority, so map a would-be P3 to P2 or drop it.
+
 Use these states:
 
 - `untouched`: no usable audit for the relevant source;
@@ -39,9 +48,13 @@ npm run audits:index
 ```
 
 For the active modular run layout, preserve the strict report unchanged and
-pass source/candidate provenance through `source-identity.json`. Publish the
-exact run explicitly and enumerate every saved script or bounded input selected
-for the public record:
+pass source/candidate provenance through `source-identity.json`, which must
+record the candidate's absolute `path` (candidate binding reads it). Each run
+needs `report.json`, `viewer.md`, and `source-identity.json` at the run root;
+artifacts must sit under the run's `scripts/`. The publisher refuses to
+overwrite a published version, so every audit run uses a new run directory
+name. Publish the exact run explicitly and enumerate every saved script or
+bounded input selected for the public record:
 
 ```powershell
 python tools/publish_audits.py --repo <records-root> --skill <skill-id> `

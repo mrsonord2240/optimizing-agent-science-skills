@@ -1,6 +1,6 @@
 ---
 name: fix-scientific-skill
-description: Repair one audited scientific agent Skill against a durable finding ledger, execute changed behavior, and classify tooling impact for independent re-audit. Use for the relay's potentially long, resumable fix phase.
+description: Repair one audited scientific agent Skill against a durable finding ledger, execute changed behavior, and classify tooling impact for independent re-audit. Use for the relay's potentially long, resumable fix phase, or a text-only fix batch.
 ---
 
 # Fix Scientific Skill
@@ -14,7 +14,7 @@ Read the complete active audit report, ordered finding ledger, `TOOLS.md`, and
 live diff. Verify the origin and candidate identities, working path/branch,
 lane ownership, and audit identity. Inspect relevant Git status, preserve all
 pre-existing changes, keep source checkouts read-only, and isolate unexplained
-changes before editing. Work on one Skill and this phase only. Do not create a
+changes before editing. Work only on the Skills your brief assigns (one, or a batch the relay allows) and this phase only. Do not create a
 product commit, push, release, submit, or publish.
 
 Do not repeat normalization as a ritual. Preserve its resource routing and do
@@ -30,10 +30,23 @@ state: `open`, `in-progress`, `fixed`, `not-reproduced`, `blocked`, or
 instead of copying their contents into prose. Add newly discovered defects with
 new IDs and severity.
 
-Fix every known P0 by default. Also fix P1/P2 findings that block readiness,
-produce wrong or unusable output, invalidate an advertised workflow, or are
-safely bounded within the current Skill. Surface wider product, scientific,
-license, access, or architectural decisions instead of guessing.
+Fix every known P0 by default. Fix a P1 or P2 only when it blocks readiness,
+produces wrong or unusable output, invalidates an advertised workflow, or is a
+text-only correction; record every other one as `deferred-with-rationale`
+("not needed for readiness"). Do not work toward a higher score than the
+readiness gate. Surface wider product, scientific, license, access, or
+architectural decisions instead of guessing.
+
+A heavy optional surface the tooling worker left untooled gets a short label in
+the Skill saying it was not executed here; do not tool or execute it.
+
+### Text-only batch mode
+
+When the brief assigns a batch of `candidate-ready` Skills with text-only P2s,
+change only prose, comments, and frontmatter; no runnable behavior may change.
+For each Skill, record the finding IDs, changed files, and new identity in its
+handoff and fix log, and route it to `reaudit-scientific-skill` in delta mode.
+If a finding turns out to need a runnable change, leave it open and say so.
 
 ## Implement deliberately
 
@@ -85,6 +98,10 @@ Before handoff, set one value:
 Do not use `none` merely because the old environment still starts.
 
 ## Hand off
+
+Run `python tools/skill_preflight.py --offline <skill-dir>` from the records
+repository root; it must report `PASS`, and its identity is the candidate
+identity for the handoff.
 
 Replace the canonical handoff's current state, keep it under 120 lines, and
 link evidence rather than pasting output. Include every finding disposition,
