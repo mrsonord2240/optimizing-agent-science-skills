@@ -1,0 +1,21 @@
+Genrich, version 0.6.2
+Copyright (C) 2018 John M. Gaspar (jsh58@wildcats.unh.edu)
+shim.so
+macs3 3.0.4
+genrich_rc=0
+genrich_noE_rc=0
+genrich_peaks_with_blacklist=14498 without=14328
+genrich coordinate-sorted (should abort):
+Error! SAM/BAM file not sorted by queryname (samtools sort -n)
+hmm_rc=0
+rep1_hmm_accessible_regions.narrowPeak
+rep1_hmm_cutoff_analysis.tsv
+rep1_hmm_model.json
+hmm regions=2064 mean_width=300.213
+chr1	10590	10650	MACS_peak_1	22	.	0	0	0	9
+chr1	629080	630060	MACS_peak_2	13605	.	0	0	0	716
+nfr_reads=322156
+nfr_rc=0
+10951 nfr/sample_nfr_peaks.narrowPeak
+ENCFF346CZA.bed.gz
+ENCFF917REN.bed.gz

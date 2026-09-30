@@ -1,0 +1,25 @@
+GUARD missing_genome rc=1 :: /mnt/openscience/wt/atac-atac-peak-calling/skills/bio-atac-seq-atac-peak-calling/scripts/call_atac_peaks.sh: line 21: 3: missing GENOME_SIZE (effective size, e.g. 2.806e9)
+GUARD missing_arg4 rc=1 :: /mnt/openscience/wt/atac-atac-peak-calling/skills/bio-atac-seq-atac-peak-calling/scripts/call_atac_peaks.sh: line 22: 4: missing BLACKLIST.bed
+GUARD missing_bam rc=1 :: ERROR: BAM not readable: /mnt/openscience/audit-envs/bio-atac-seq-atac-peak-calling/run/reaudit/guards/nope.bam
+GUARD missing_blacklist rc=1 :: ERROR: blacklist not readable: /mnt/openscience/audit-envs/bio-atac-seq-atac-peak-calling/run/reaudit/guards/nope.bed
+GUARD unindexed rc=1 :: ERROR: BAM not indexed (samtools index): /mnt/openscience/audit-envs/bio-atac-seq-atac-peak-calling/run/reaudit/guards/noidx.bam
+GUARD unsorted rc=1 :: ERROR: BAM not coordinate-sorted: /mnt/openscience/audit-envs/bio-atac-seq-atac-peak-calling/run/reaudit/guards/nsort.bam
+GUARD missing_tool rc=1 :: ERROR: /nonexistent/idr not on PATH
+GUARD bad_chromsizes rc=1 :: ERROR: chrom sizes not readable: /mnt/openscience/audit-envs/bio-atac-seq-atac-peak-calling/run/reaudit/guards/nope.sizes
+@HD	VN:1.6	SO:coordinate
+@SQ	SN:chr1	LN:248956422
+@SQ	SN:chr2	LN:242193529
+1
+source idxstats chrM:
+chrM	16569	0	0
+chrM	16569	3	0
+GUARD chrM_reads rc=1 :: ERROR: m.bam has 3 reads on the mitochondrial contig; remove chrM first
+recipe usage-guide (idxstats contig selection):
+rc=0
+p1	97	chr1	100	chrM
+p2	65	chr1	300	=
+p2	129	chr1	400	=
+header SQ:
+2
+old recipe (grep -v chrM on SAM text) for contrast:
+2

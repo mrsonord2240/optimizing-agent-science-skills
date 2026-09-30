@@ -1,0 +1,8 @@
+dry_a_rc=0
+dry_b_rc=0
+--- documented OLD line (bioconda only):
+old_rc=1
+       └─ macs3 3.0.1 would require
+          └─ hmmlearn =0.3 *, which conflicts with any installable versions previously reported.
+critical libmamba Could not solve for environment specs
+ls: cannot access '/home/sci/micromamba/envs/reaudit-dry*': No such file or directory

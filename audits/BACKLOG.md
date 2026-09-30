@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: SVA snippet is an extraction example, not a tested analysis path, and use_sva is not reachable from the CLI.
 - Fix: Choose n.sv with num.sv capped by sample count, feed SVs into the design and assert the model uses them; else remove the branch and route to the tested method-reference recipe. DAC-001.
 
-## P1 (57)
+## P1 (54)
 
 ### `bio-atac-seq-co-accessibility` — CLI fails on binarized (pattern) .mtx input
 
@@ -127,30 +127,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: With savefig.bbox=tight the saved page is 89.42 mm (Skill rcParams) or 91.96 mm (example, default pad), over Nature's 89 mm column. The example's so.Plot figure is 162.56 x 121.92 mm with 11-12 pt text and no rasterization.
 - Root cause: bbox tight resizes the figure; so.Plot uses its own theme and size.
 - Fix: For exact size use constrained_layout without bbox tight (or set savefig.pad_inches=0 and state the tolerance); for so.Plot add .layout(size=(w,h)) and .theme(mpl.rcParams) then re-check the size.
-
-### `bio-atac-seq-atac-peak-calling` — Use disjoint pseudoreplicates in the ENCODE script
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: 1
-- Problem: The two pseudoreplicates share 50% of their reads and Nself is inflated (2,473 vs 1,234 with disjoint halves), giving a false ratio of 2.066.
-- Root cause: samtools view -s with two seeds draws independent subsamples.
-- Fix: Split each BAM with -s SEED.5 -o a.bam -U b.bam and correct the method-reference wording. (ATACPC-001)
-
-### `bio-atac-seq-atac-peak-calling` — Implement ENCODE rescue and self-consistency ratios
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: 1
-- Problem: One Nt/Nself ratio from rep1 only is reported; pooled and rep2 pseudoreplicates are built or ignored, and thresholds differ (0.05 vs 0.10).
-- Root cause: The ENCODE rule was condensed and the pipeline stops early.
-- Fix: Compute N1, N2, Np, Nt at one IDR threshold and report rescue and self ratios with pass/borderline/fail; align all three files. (ATACPC-002)
-
-### `bio-atac-seq-atac-peak-calling` — Fix the install line and the idr numpy incompatibility
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: 1
-- Problem: The documented conda line does not solve on bioconda alone and yields an idr that crashes on numpy>=1.24.
-- Root cause: Install line and tested-version claim were never executed.
-- Fix: Document a solving install with idr isolated or numpy<1.24 and correct the tested-versions statement. (ATACPC-003)
 
 ### `bio-data-visualization-volcano-and-ma-plots` — Threshold line drawn on the wrong axis quantity
 
@@ -472,7 +448,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (155)
+## P2 (153)
 
 ### `bio-atac-seq-co-accessibility` — Hard-coded all-chromosome genome_df; 25 min timeout
 
@@ -617,46 +593,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill does not say to leave R/ggplot users, interactive figures or genome tracks to other Skills.
 - Root cause: Escape hatches only in Related Skills.
 - Fix: Add three lines of scope limits.
-
-### `bio-atac-seq-atac-peak-calling` — Prefer macs3 callpeak; macs2 import fails on new glibc
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: macs2 2.2.9.1 fails at import with __log_finite and the script hardcodes macs2.
-- Root cause: Build depends on removed glibc symbols.
-- Fix: Make the binary a variable defaulting to macs3 callpeak. (ATACPC-004)
-
-### `bio-atac-seq-atac-peak-calling` — Reconcile genome-size default and comment with the tables
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: 1
-- Problem: Script defaults to -g hs and labels 2.701e9 as 100 bp while the Skill table says 2.806e9.
-- Root cause: Unreconciled defaults.
-- Fix: Require the size or default to a stated value and correct the comment. (ATACPC-005)
-
-### `bio-atac-seq-atac-peak-calling` — Align script claims with behaviour
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: 1
-- Problem: The script does not validate BAMs, filters only the IDR true-rep set, yields no final peak set or bigWig, and is called exact ENCODE without --call-summits or tagAlign.
-- Root cause: Documentation describes intended rather than implemented behaviour.
-- Fix: Add minimal checks and the missing outputs or narrow the claims. (ATACPC-006, ATACPC-007, ATACPC-010)
-
-### `bio-atac-seq-atac-peak-calling` — Add tested Genrich and hmmratac commands
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: 3, 4
-- Problem: Genrich needs name-sorted BAMs and the q-cutoff parity advice is wrong; hmmratac has no command and writes narrowPeak, not BED.
-- Root cause: Sections are descriptive and were untested.
-- Fix: Add executed commands and correct the reconciliation and output descriptions. (ATACPC-008, ATACPC-009)
-
-### `bio-atac-seq-atac-peak-calling` — Resolve single-sample guidance and uncited methods
-
-- Skill: 76, Beta Only · candidate `e8bc49ba345f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md)
-- Observed in inputs: —
-- Problem: Single-sample -q differs between files, the rotation-permutation proxy has no source or test, and the ROSE snippet lacks a GFF step.
-- Root cause: Sections written independently.
-- Fix: Choose one setting, cite or remove the proxy, fix or mark the ROSE snippet. (ATACPC-011, ATACPC-012, ATACPC-013)
 
 ### `bio-data-visualization-volcano-and-ma-plots` — EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce
 
@@ -873,6 +809,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Both are recommended with no PAUP* block or BPP control file.
 - Root cause: Method table without worked commands.
 - Fix: Add a minimal PAUP* svdq block and a BPP A00/A10 control-file skeleton, or route explicitly.
+
+### `bio-atac-seq-atac-peak-calling` — Trim description claim of 501bp consensus peaks (ATACPC-015)
+
+- Skill: 87, Production Ready · candidate `b19054ded9df` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@b19054ded9df-reaudit-run/viewer.md)
+- Observed in inputs: —
+- Problem: The description advertises fixing 501bp consensus peaks but the Skill only mentions the Corces re-centering convention and routes to consensus-peakset.
+- Root cause: Trigger text inherited from upstream.
+- Fix: Reword to point to atac-seq/consensus-peakset for fixed-width peaks, or state that only re-centering is described.
+
+### `bio-atac-seq-atac-peak-calling` — ROSE snippet remains unexecuted (ATACPC-012)
+
+- Skill: 87, Production Ready · candidate `b19054ded9df` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@b19054ded9df-reaudit-run/viewer.md)
+- Observed in inputs: —
+- Problem: The ROSE_main.py and GFF conversion are labelled illustrative but were never run because ROSE is not installed.
+- Root cause: Optional, outside the primary workflow.
+- Fix: Keep the illustrative label, or execute it in a ROSE environment before dropping the label.
+
+### `bio-atac-seq-atac-peak-calling` — State orphan-mate behaviour of the chrM recipe (ATACPC-016)
+
+- Skill: 87, Production Ready · candidate `b19054ded9df` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@b19054ded9df-reaudit-run/viewer.md)
+- Observed in inputs: 4
+- Problem: The idxstats contig-selection recipe keeps a chr1 read whose mate maps to chrM, leaving a paired-flag orphan that the chrM guard cannot see.
+- Root cause: Selection is by the read's own contig only.
+- Fix: Add one sentence, or filter by RNEXT as well, when using BAMPE or hmmratac downstream.
 
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 

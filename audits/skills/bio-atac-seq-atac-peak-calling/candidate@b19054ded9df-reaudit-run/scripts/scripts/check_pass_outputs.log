@@ -1,0 +1,28 @@
+--- reproducibility.txt
+Nt=1197 N1=1143 N2=1249 Np=1036 rescue=1.155 self_consistency=1.093 verdict=PASS (IDR <= 0.05)
+true_reps idr rows=1197 rows_score>=540=1197 min_score=540
+rep1_pseudoreps idr rows=1143 rows_score>=540=1143 min_score=541
+rep2_pseudoreps idr rows=1249 rows_score>=540=1249 min_score=540
+pooled_pseudoreps idr rows=1036 rows_score>=540=1036 min_score=542
+pooled_pseudoreps.idr pooled_pseudoreps.idr.png pooled_pseudoreps.log rep1_pseudoreps.idr rep1_pseudoreps.idr.png rep1_pseudoreps.log rep2_pseudoreps.idr rep2_pseudoreps.idr.png rep2_pseudoreps.log reproducibility.txt true_reps.idr true_reps.idr.png true_reps.log 
+peak counts: rep1=4803 rep2=4366 pooled=4310
+pseudorep calls: rep1_psr1=6341 rep1_psr2=6287 rep2_psr1=5202 rep2_psr2=5253 pool_psr1=4513 pool_psr2=4498 
+--- conservative
+1188
+10 
+chr1	9909990	9911279	.	1000	.	-1	464.30500	-1	583
+chr1	27725471	27726569	.	1000	.	-1	384.64900	-1	358
+blacklist overlaps in final: 0
+cols7,9 uniq: -1  / -1 
+conservative peaks overlapping ENCODE ENCFF346CZA (conservative IDR): 1059 of 1188; ENCODE peaks recovered: 2194 of 138366 (slice-wide, ENCODE set has all chr1 peaks; restrict)
+ENCODE conservative in slice: 2566; recovered: 2194
+--- macs2 vs macs3 identity
+IDENTICAL idr/true_reps.idr
+IDENTICAL final/conservative.narrowPeak
+IDENTICAL idr/reproducibility.txt
+peaks macs2: rep1=4803 rep1_macs3=4803
+conservative.narrowPeak
+--- bigWig header readback
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+struct.error: unpack requires a buffer of 56 bytes

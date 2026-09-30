@@ -1,0 +1,71 @@
+{
+  "skill_id": "bio-atac-seq-atac-peak-calling",
+  "version": "candidate@b19054ded9df-reaudit-run",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/atac-peak-calling",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling",
+    "subtree": "821b1f00393b73c7b940de82e7f57b2555c3fb5a"
+  },
+  "candidate": {
+    "identity": "b19054ded9df6cf3d48b45b6f38c7b209454bb2627f95b5f7d73c794a02720c2",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-atac-peak-calling",
+    "path": "F:\\OpenScience\\wt\\atac-atac-peak-calling\\skills\\bio-atac-seq-atac-peak-calling",
+    "files": [
+      {
+        "path": "LICENSE",
+        "sha256": "baacaab2d3f82cc6f6d1b0fbfba347c6be171c25a0b1f58ba935a5d2d43de2c5",
+        "bytes": 1088
+      },
+      {
+        "path": "SKILL.md",
+        "sha256": "88ef32ef3d9f0c813b8e9b86093cd6c0bd371a24d93902bf89346cc1c81af7b0",
+        "bytes": 3775
+      },
+      {
+        "path": "references/method-reference.md",
+        "sha256": "95d4fcd6063b989bdafa3e8bfb447bf536c5d0868ea2d3429c9153cd3394a461",
+        "bytes": 20140
+      },
+      {
+        "path": "references/usage-guide.md",
+        "sha256": "2e3a5d23cd552b0ba9f4d011633bc69d19152f4bfe50386dc25c906f14f2ae26",
+        "bytes": 7727
+      },
+      {
+        "path": "scripts/call_atac_peaks.sh",
+        "sha256": "46273e4c34b810074f85b560ddd93b1820ae9491fd5f158274e2fea3b76e2f42",
+        "bytes": 6640
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@e8bc49ba345f-initial-audit-20260930",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 22
+  }
+}

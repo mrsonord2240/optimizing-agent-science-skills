@@ -1,68 +1,54 @@
-# Handoff: bio-atac-seq-atac-peak-calling / fix-scientific-skill
+# Handoff: bio-atac-seq-atac-peak-calling / orchestrator (candidate-ready)
 
 - Updated: 2026-09-30
 - Lane: 1
-- Status: ready-for-phase
-- Owner leaving: audit-scientific-skill agent (Sonnet 5.5)
-- Next role: fix-scientific-skill
+- Status: candidate-ready
+- Owner leaving: reaudit-scientific-skill worker (lane 1, independent; did not write, fix or initially audit)
+- Next role: orchestrator (commit exact bytes to make `ready`, then intake)
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills @ d91ed3d563019e649dc854c56ccd62551359488a : atac-seq/atac-peak-calling
-- Working tree: F:\OpenScience\wt\atac-atac-peak-calling (skills\bio-atac-seq-atac-peak-calling)
-- Branch/worktree: fix/atac-atac-peak-calling (starting 3186916)
-- Candidate tree hash: sha256-manifest-v1 e8bc49ba345f27792466c23bfee96faa4898937641d32bd266c7e58f0f3a7658 (5 files; re-verified after audit, unchanged)
-- Applicable audit: F:\OpenScience\audits\bio-atac-seq-atac-peak-calling\initial-audit-20260930\report.json (same identity). Score 76, Beta Only, no veto, static 75, execution avg 76.4, assertions 14/21. Not published to records repo yet (orchestrator does it).
+- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:atac-seq/atac-peak-calling
+- Working tree: F:\OpenScience\wt\atac-atac-peak-calling\skills\bio-atac-seq-atac-peak-calling
+- Branch/worktree: fix/atac-atac-peak-calling, base 3186916 (5 files staged/modified, uncommitted)
+- Candidate identity: sha256-manifest-v1 b19054ded9df6cf3d48b45b6f38c7b209454bb2627f95b5f7d73c794a02720c2 (5 files, 39,370 bytes); recomputed at start and end of re-audit, unchanged
+- Applicable audit: F:\OpenScience\audits\bio-atac-seq-atac-peak-calling\reaudit-run\ (this identity). Prior: initial-audit-20260930 (e8bc49ba..., 76, Beta Only)
 
 ## Completed this phase
 
-- Static review of all 5 files; 5 executed workflows (script, MACS3/MACS2, Genrich, hmmratac, NFR/blacklist/bigWig) with independent assertions; report.json validated by scripts\validate_report.py (schema checklist, P0-P2 only).
-- Key result: script pseudoreps share 50% of reads; disjoint pseudoreps give ratios 1.09-1.16 (pass) vs script 2.066.
-- Findings ledger: initial-audit-20260930\findings.json; viewer.md, source-identity.json, scripts\, out\ alongside.
+- Independent re-audit: score 87 (Production Ready): static 85, execution avg 88.0, Layer 1 35.2, Layer 2 52.8, assertions 18/19 (94.7%), no veto, no P0/P1.
+- Every claimed fix retested by me: disjoint pseudoreps, Nt/N1/N2/Np and ratios on a passing (PASS 1.155/1.093) and a genuinely failing library (FAIL 3.394/4.906), install recipe (dry-run solve; old line fails), MACS2 mode, guards, conservative set, bigWig readback, Genrich, hmmratac, NFR, chrM recipe.
+- Report and viewer: reaudit-run\report.json (schema checklist validated, scripts\validate_report.py), viewer.md, source-identity.json.
 
 ## Required next actions
 
-1. Fix ATACPC-001, -002 together in scripts\call_atac_peaks.sh plus SKILL.md, usage-guide.md and method-reference.md wording: disjoint pseudoreps (`samtools view -s SEED.5 -o a -U b`), per-rep and pooled pseudoreps, one IDR threshold, rescue = Np/Nt, self = N1/N2, pass/borderline/fail. Recheck with scripts\a2_disjoint_pseudoreps.sh (expect Nt 1197, N1 1143, N2 1249, Np 1036).
-2. ATACPC-003 install line (conda-forge + bioconda, idr with numpy<1.24 separate env) and ATACPC-004 macs binary variable defaulting to macs3 (tooling delta pass needed for the idr env if instructions change).
-3. ATACPC-005 to -011: genome-size default/comment, validation claim, blacklist/final outputs, Genrich name-sort command and q advice, hmmratac command/outputs, ENCODE-exactness wording, single-sample -q.
-4. P3 ATACPC-012 (ROSE), -013 (quoting) at fixer discretion.
+1. Orchestrator: commit the exact candidate bytes on the optimized shelf, reconcile provider metadata, bind the final audit to the full commit, then publish the record (not done here) and run intake.
+2. Optional: apply ATACPC-015/016 wording fixes before commit only if identity change is acceptable; that would require re-audit of the changed bytes.
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| ATACPC-001 | P1 | open | out\a1.log, out\a2_disjoint_pseudoreps.log | disjoint pseudoreplicates |
-| ATACPC-002 | P1 | open | out\a1.log, out\a2_disjoint_pseudoreps.log | ENCODE ratios (N1,N2,Np,Nt) |
-| ATACPC-003 | P1 | open | evidence\dryrun_documented_install.log | solving install; idr numpy pin |
-| ATACPC-004 | P2 | open | out\a4_misc_snippets.log | macs3 default / binary var |
-| ATACPC-005 | P2 | open | script line 9; method-reference lines 27-34 | genome size default and comment |
-| ATACPC-006 | P2 | open | SKILL.md, script | add validation or drop claim |
-| ATACPC-007 | P2 | open | out\a1.log | final blacklisted set / bigWig or state QC-only |
-| ATACPC-008 | P2 | open | out\a3_genrich_checks.log | tested Genrich command, fix -q advice |
-| ATACPC-009 | P2 | open | evidence\check_callers.log | hmmratac command, output names |
-| ATACPC-010 | P2 | open | method-reference line 132 | ENCODE-style wording or --call-summits |
-| ATACPC-011 | P2 | open | method-reference 98-104, 191 | one -q; cite or remove rotation method |
-| ATACPC-012 | P3 | open (static-only) | method-reference 121-128 | GFF step or mark illustrative |
-| ATACPC-013 | P3 | open | script | quote variables |
-
-Deferred/blocked surfaces: ROSE (not installed), HOMER/nf-core/chromap/khmer (prose only), whole-genome and mm10 runs, bigWig signal readback.
+| ATACPC-012 | P2 (was P3) | open, non-blocking | report.json rec 2 | ROSE snippet static-only, labelled illustrative |
+| ATACPC-015 | P2 | new, non-blocking | report.json rec 1 | description names 501bp consensus peaks not built |
+| ATACPC-016 | P2 | new, non-blocking | scripts\guards_and_recipes.log | chrM idxstats recipe leaves chr1 reads whose mate is on chrM |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-atac-seq-atac-peak-calling\TOOLS.md (sha256 86d6679d9ffe162870f2c94965c50f2ae62d42b1d115749efadbe694b07edc25); env fingerprint 08bd20dfc98af31b1acf5751fd307372decbc33017586ea9a5e80e8677a902b6
-- Run evidence: F:\OpenScience\audits\bio-atac-seq-atac-peak-calling\initial-audit-20260930\ (report.json, findings.json, viewer.md, source-identity.json, scripts\, out\) and ...\evidence\
-- Run with `MSYS_NO_PATHCONV=1 wsl.exe -d science -u sci --cd /home/sci -- bash /mnt/openscience/audits/.../scripts/<x>.sh`
+- Tool inventory: F:\OpenScience\audits\bio-atac-seq-atac-peak-calling\TOOLS.md (sha256 cccc0250..., env fingerprint 08bd20df...02b6 unchanged)
+- Run evidence: reaudit-run\scripts\*.log, reaudit-run\out\ (pass/fail/macs2 logs, IDR plots); raw outputs F:\OpenScience\audit-envs\bio-atac-seq-atac-peak-calling\run\reaudit\
+- Failed/blocked surfaces: one assertion failed (input 2, first failing-library attempt hit a transient drvfs truncated-BAM read under 3 concurrent runs; rerun passed; not reproduced in 4 other runs). ROSE static-only. chrM guard tested on a synthetic 3-read fixture only (source BAMs lack chrM); judged adequate. Whole-genome, mm10, standalone HMMRATAC, HOMER, chromap untested.
+- Reused evidence: delta-pass fresh-env install and script run (same bytes and fingerprint).
 - Restricted-access items: none
-- Tooling impact: none from audit; fix may change idr/macs install (tooling delta pass)
+- Tooling impact: none
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\audits\bio-atac-seq-atac-peak-calling\initial-audit-20260930\; run outputs under F:\OpenScience\audit-envs\bio-atac-seq-atac-peak-calling\run\{disjoint,genrich_audit,misc_audit}; this handoff
-- Pre-existing/user-owned changes: tools\run_mercury_worker.py, tools\test_run_mercury_worker.py (untouched); candidate still staged (5 A files)
-- Records state: uncommitted, unpublished
+- Run-owned changes: reaudit-run\ dir, run\reaudit\ outputs, this handoff. Candidate not edited.
+- Pre-existing/user-owned changes: F:\optimizing-agent-science-skills\tools\run_mercury_worker.py, tools\test_run_mercury_worker.py (untouched); other lanes' handoffs untouched
+- Records state: uncommitted, not published to the records repo
 - Product commits/pushes: none
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes
-- If no: n/a
+- Next-phase prerequisites met: yes (candidate-ready)
