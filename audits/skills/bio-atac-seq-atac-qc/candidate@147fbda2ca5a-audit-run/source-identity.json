@@ -1,0 +1,77 @@
+{
+  "schema": "scientific-skill-audit-source-identity-v1",
+  "phase": "initial audit",
+  "skill_id": "bio-atac-seq-atac-qc",
+  "independent_auditor": false,
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/atac-qc",
+    "license": "MIT"
+  },
+  "candidate": {
+    "root": "F:\\OpenScience\\wt\\atac-atac-qc\\skills\\bio-atac-seq-atac-qc",
+    "worktree": "F:\\OpenScience\\wt\\atac-atac-qc",
+    "branch": "fix/atac-atac-qc",
+    "product_head": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity_scheme": "sha256-manifest-v1",
+    "content_sha256": "147fbda2ca5adf8924015bcb5564ce43b76eef574246c38d93409f4637bf995f",
+    "manifest_bytes": 747,
+    "file_count": 8,
+    "manifest_recipe": "Ordinal POSIX relative paths; each UTF-8 line is path, TAB, byte count, TAB, lowercase file SHA-256; lines joined by LF without a trailing LF; SHA-256 over the manifest bytes.",
+    "manifest_path": "candidate-manifest.tsv",
+    "identity_before": "147fbda2ca5adf8924015bcb5564ce43b76eef574246c38d93409f4637bf995f",
+    "identity_after": "147fbda2ca5adf8924015bcb5564ce43b76eef574246c38d93409f4637bf995f",
+    "tree_status": "Candidate skill directory is untracked in the worktree; no candidate bytes were modified by this audit."
+  },
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-atac-seq-atac-qc\\TOOLS.md",
+    "environment_lock_sha256": "e29e33c21ca3d6a660029311c4c9c7edbac105953734bd45b6a8f24799b009ac"
+  },
+  "rubric": {
+    "zip": "F:\\optimizing-agent-science-skills\\skill-auditor.zip",
+    "evaluator_version": "skill-auditor@1.0"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 11091,
+      "sha256": "16836ab3823eb6291ab3600b2a6e384a6ff901fd70c36dd57043b978b3294864"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 8120,
+      "sha256": "1c49a24c19add4d7a8e4cac1cbd63c98ca3f247161c4da038c0dc38309cd2ad5"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 6256,
+      "sha256": "820e452f285f6543e23b5cec5756253ccc87dcffc70e7fd820be03cb9362c258"
+    },
+    {
+      "path": "scripts/aggregate_qc.py",
+      "bytes": 2943,
+      "sha256": "cc552445c97cb6048fe0d52886dbd5d1dc214bc9a1690a25398906db3328c2b1"
+    },
+    {
+      "path": "scripts/atac_qc_metrics.R",
+      "bytes": 3402,
+      "sha256": "ca0ffaa439d2d8752c2889bf555da28fad9a208167c10ce5fb48503ee0e70d4e"
+    },
+    {
+      "path": "scripts/encode_tss_enrichment.py",
+      "bytes": 2862,
+      "sha256": "65a7468861bbae41f7c35f9eca6199aa667b4973d2e38119bc1c70806a393ffa"
+    },
+    {
+      "path": "scripts/library_complexity.py",
+      "bytes": 1818,
+      "sha256": "73116ef4e82ba2cec8a405bd5e34949d3080812986c13686c76875654cec4780"
+    }
+  ]
+}

@@ -1,0 +1,489 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-atac-qc",
+    "description": "ATAC-seq library quality control -- TSS enrichment, FRiP, fragment-size periodicity, library complexity (NRF/PBC1/PBC2), mitochondrial fraction, and ENCODE 4 thresholds.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations or values observed; attribution of the 0.7-0.9 NRF/PBC bands to Landt 2012 is unverified and filed as P3 ATAC-QC-010"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "QC guidance for research data; no clinical claims"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "NRF/PBC on single-end read starts is a serious method mismatch (ATAC-QC-001, P1) but implements the Skill's literal stated definition and is not a correlation/causation-class fallacy; escalated as P1 rather than veto"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All four scripts and the CLI recipes ran on numpy 2.5, pandas 3.0 and deepTools 4.0 without modification"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 76,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Workflow covers the seven ENCODE metrics, but documented NRF/PBC filters, periodicity classification and per-sample MultiQC output are not delivered by the shipped scripts"
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Some inputs fail loudly, but absent chromosomes, empty TSS BEDs and minus-strand gene intervals return 0.0 or wrong values with exit 0"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is about 11 KB with routed references; thresholds and failure modes are deferred correctly"
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Clear workflow and thresholds; bigWig construction, preseq -P and the TSS BED contract require inference"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Usage guide has prompts and tips; no worked sample-level example or expected output layout"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, shell injection or destructive operations; scripts only read supplied paths"
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Small modular scripts with docstrings; no tests or fixtures shipped; Pearson vs Spearman contradiction in references"
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger description is precise and version-drift guidance present; several documented behaviors do not match the scripts"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 67.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 21,
+      "total": 34
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "ENCODE-style TSS enrichment on real GM12878 chr1 slice",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Score 11.38 vs independent deepTools 11.39; bigWig construction recipe is undocumented and moves the score 11.3-16.0",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script emits parseable JSON with a TSS_enrichment float",
+            "result": "PASS",
+            "note": "tss.json from the tooling run; JSON valid"
+          },
+          {
+            "text": "Score agrees with independent deepTools computeMatrix/plotProfile",
+            "result": "PASS",
+            "note": "11.381 vs 11.391 (TOOLS.md)"
+          },
+          {
+            "text": "TSS profile is a single sharp peak with flat flanks",
+            "result": "PASS",
+            "note": "tss_profile.png inspected in tooling pass"
+          },
+          {
+            "text": "Score is at or above the ENCODE hg38 ideal of 7 for a healthy GM12878 library",
+            "result": "PASS",
+            "note": "11.3"
+          },
+          {
+            "text": "Skill documents how to build the bigWig input so the score is reproducible",
+            "result": "FAIL",
+            "note": "no recipe; extendReads 11.32, plain 14.92, 5-prime offset 15.98 (t_bw.log)"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Canonical",
+        "label": "NRF/PBC on real unfiltered and ENCODE-filtered BAMs",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Values are single-end read-start metrics, not fragment NRF/PBC; contradict the documented dedup=1.0 invariant",
+        "basic": 26,
+        "specialized": 30,
+        "total": 56,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script runs and returns JSON on a real BAM",
+            "result": "PASS",
+            "note": "NRF 0.353 on unfiltered, exit 0"
+          },
+          {
+            "text": "Planted-truth synthetic BAM reproduces hand-computed counts",
+            "result": "PASS",
+            "note": "total 250 distinct 160 (TOOLS.md)"
+          },
+          {
+            "text": "Unfiltered NRF/PBC1 agree with independent fragment-level computation",
+            "result": "FAIL",
+            "note": "0.353/0.632 vs 0.619/0.767 (MAPQ>=30: 0.779/0.799); run_all.log"
+          },
+          {
+            "text": "Deduplicated BAM gives NRF 1.0 as the Skill states",
+            "result": "FAIL",
+            "note": "script 0.573; independent fragment NRF 1.000"
+          },
+          {
+            "text": "MAPQ>=30 and chrM exclusion documented in the Skill are applied",
+            "result": "FAIL",
+            "note": "planted BAM: total 300 NRF 0.34 vs 100 and 1.0 (run2.log)"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant A",
+        "label": "ATACseqQC R script on filtered slice with ENCODE IDR peaks",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs; TSSEscore 23.54 (2.1x ENCODE-style) matches the Skill claim; .bed.gz peaks fail; periodicity is counted not classified",
+        "basic": 30,
+        "specialized": 45,
+        "total": 75,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "TSSEscore ratio to ENCODE-style score is within the documented 2-3x",
+            "result": "PASS",
+            "note": "23.54 / 11.38 = 2.07"
+          },
+          {
+            "text": "Fragment-class counts and fractions are internally consistent",
+            "result": "PASS",
+            "note": "NFR 28.4%, mono 14.7%, di 15.6%"
+          },
+          {
+            "text": "Fragment-size figure is legible and shows NFR/mono/di structure",
+            "result": "PASS",
+            "note": "fragsize_replot.png inspected; shipped PDF is valid %PDF-1.4, 1 page, but was not rasterized directly"
+          },
+          {
+            "text": "FRiP is computed from a narrowPeak file",
+            "result": "PASS",
+            "note": "0.671 with ENCFF917REN.narrowPeak"
+          },
+          {
+            "text": "Peaks file with a .bed.gz extension is accepted",
+            "result": "FAIL",
+            "note": "scan() expected an integer, got 22.06932 (out/rbed run)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "aggregate_qc.py grading and MultiQC hand-off",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Grades match thresholds but the TSV is long-format per-metric, not per-sample MultiQC content",
+        "basic": 27,
+        "specialized": 36,
+        "total": 63,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "PASS/WARN/FAIL grades match the Skill threshold table",
+            "result": "PASS",
+            "note": "7 metrics hand-checked incl. inverted mt_fraction"
+          },
+          {
+            "text": "Null/NaN metrics graded NA without crashing",
+            "result": "PASS",
+            "note": "TOOLS.md"
+          },
+          {
+            "text": "Output is a per-sample MultiQC-compatible table as documented",
+            "result": "FAIL",
+            "note": "MultiQC custom_content parsed 7 metric rows as 7 samples"
+          },
+          {
+            "text": "Non-numeric metric value handled with a clear error",
+            "result": "FAIL",
+            "note": "TypeError traceback on a string value"
+          },
+          {
+            "text": "library_complexity.py JSON output round-trips in strict JSON parsers",
+            "result": "FAIL",
+            "note": "PBC2 emitted as bare Infinity"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "deepTools/Picard/samtools/MultiQC CLI recipes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All recipes ran; outputs consistent with the ENCODE slice",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "multiBamSummary + plotCorrelation Spearman between replicates is high",
+            "result": "PASS",
+            "note": "0.958; heatmap legible"
+          },
+          {
+            "text": "plotFingerprint metrics file has synthetic JS distance",
+            "result": "PASS",
+            "note": "0.72 and 0.67"
+          },
+          {
+            "text": "Picard insert-size median is biologically plausible",
+            "result": "PASS",
+            "note": "median 191, NFR mode 45"
+          },
+          {
+            "text": "MultiQC detects Picard, flagstat and fingerprint outputs",
+            "result": "PASS",
+            "note": "multiqc_sources.txt"
+          },
+          {
+            "text": "--JSDsample claim consistent with installed deepTools 4.0.0",
+            "result": "PASS",
+            "note": "plotFingerprint --help"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Variant B",
+        "label": "preseq c_curve/lc_extrap recipes on paired-end ATAC BAM",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Documented commands omit -P; c_curve -s 1e6 returns header only on a library under 1M fragments",
+        "basic": 27,
+        "specialized": 34,
+        "total": 61,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "lc_extrap returns finite monotone yield curve with ordered CI",
+            "result": "PASS",
+            "note": "plateau about 1.2M distinct"
+          },
+          {
+            "text": "Skill-literal c_curve returns a curve on the test BAM",
+            "result": "FAIL",
+            "note": "header row only (t_pre.log)"
+          },
+          {
+            "text": "Documented commands are correct for paired-end BAM without extra flags",
+            "result": "FAIL",
+            "note": "-P merges mates: 500,001 distinct of 524,024 vs 305,029 without -P on the deduplicated BAM (t_pre3.log)"
+          },
+          {
+            "text": "Paired-end mode works on a coordinate-sorted BAM",
+            "result": "PASS",
+            "note": "c_curve -B -P ran; name-sorted input fails"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Edge",
+        "label": "Planted-truth silent-failure probes for TSS and complexity scripts",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Minus-strand gene intervals and absent chromosomes give wrong or zero scores with exit 0; chrM and MAPQ0 reads counted",
+        "basic": 24,
+        "specialized": 28,
+        "total": 52,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "1 bp plus-strand TSS on planted bigWig returns the planted 21.0",
+            "result": "PASS",
+            "note": "run2.log cases A, C, D, G"
+          },
+          {
+            "text": "Minus-strand gene interval (start,end) is scored at its true TSS",
+            "result": "FAIL",
+            "note": "1.0 vs 21.0 planted"
+          },
+          {
+            "text": "Chromosome absent from the bigWig raises an error rather than 0.0",
+            "result": "FAIL",
+            "note": "exit 0, TSS_enrichment 0.0 (also empty BED)"
+          },
+          {
+            "text": "Unindexed BAM fails with an explicit error",
+            "result": "PASS",
+            "note": "ValueError: fetch called on bamfile without index"
+          },
+          {
+            "text": "chrM and MAPQ 0 reads are excluded from NRF/PBC",
+            "result": "FAIL",
+            "note": "planted BAM total 300, NRF 0.34"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.4,
+    "dynamic_weighted": 40.2,
+    "score": 71,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "TSS enrichment script agrees with independent deepTools computation on real ENCODE data (11.38 vs 11.39)",
+    "Threshold table, TSS-implementation comparison and failure-mode reference are substantive and mostly accurate",
+    "CLI recipes (Picard, deepTools fingerprint/correlation, MultiQC) execute and produce plausible values",
+    "Scripts are small, dependency-light and run unchanged on current numpy/pandas/deepTools majors"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "library_complexity.py NRF/PBC are single-end read-start m...",
+      "observed_in": [
+        2
+      ],
+      "problem": "On paired-end ATAC BAMs the script keys each mate by (chr, start, strand). Unfiltered rep1: 0.353/0.632/3.40 vs independent fragment NRF/PBC1/PBC2 0.619/0.767/4.87 (MAPQ>=30: 0.779/0.799/5.10); the ENCODE-filtered deduplicated BAM gives 0.573 instead of the 1.0 the Skill states. Grading against the 0.7 reject line would fail acceptable libraries.",
+      "root_cause": "Skill defines NRF over reads/positions and the script never pairs mates.",
+      "fix": "Compute on fragments (chr, fragment start, end) for paired-end input, keep a single-end mode, use 5-prime coordinates for reverse reads, and state definition and units in SKILL.md and method-reference.md."
+    },
+    {
+      "priority": "P2",
+      "title": "library_complexity.py ignores documented MAPQ>=30, chrM e...",
+      "observed_in": [
+        2,
+        7
+      ],
+      "problem": "Docs say NRF/PBC run after MAPQ>=30 filtering; a planted BAM with 100 unique nuclear reads plus 100 chrM and 100 MAPQ0 duplicates returned total 300, NRF 0.34 instead of 100 and 1.0.",
+      "root_cause": "Filtering is left to an undocumented pre-step and the script has no options.",
+      "fix": "Add --min-mapq and contig-exclusion defaults matching the Skill, or state the required pre-filter command."
+    },
+    {
+      "priority": "P2",
+      "title": "aggregate_qc.py output is not per-sample or MultiQC-compa...",
+      "observed_in": [
+        4
+      ],
+      "problem": "Long-format metric/value/flag TSV; MultiQC custom content parsed 7 metric rows as 7 samples. No sample column, no overall grade, missing metrics produce no row, string values raise TypeError.",
+      "root_cause": "Docs describe a per-sample report card and _mqc.tsv that the script does not write.",
+      "fix": "Emit a sample-wide _mqc.tsv with headers and an overall grade, report missing required metrics as NA, validate numeric types, or correct the documentation."
+    },
+    {
+      "priority": "P2",
+      "title": "encode_tss_enrichment.py returns wrong or zero scores wit...",
+      "observed_in": [
+        7
+      ],
+      "problem": "Planted bigWig with true score 21.0: minus-strand gene interval (start,end) scored 1.0 because start is used as TSS; a chromosome absent from the bigWig and an empty BED both return 0.0 with success; strand is read from the last column so a name column after strand defaults to plus; used and skipped TSS counts are never reported.",
+      "root_cause": "Input contract is only 'chrom start end ... strand' and skipped TSS are swallowed.",
+      "fix": "Document that the BED must be 1 bp TSS with strand in column 6, read column 6, report used/skipped TSS counts, and exit nonzero when none are used."
+    },
+    {
+      "priority": "P2",
+      "title": "TSS bigWig recipe undocumented; score depends on it; pyTS...",
+      "observed_in": [
+        1
+      ],
+      "problem": "Same BAM and TSS set gives 11.32 (bamCoverage --extendReads), 14.92 (plain), 15.98 (--Offset 1) and 11.48 (CPM, bin 10). Skill and usage guide call the script the ENCODE pyTSSe convention but give no bigWig command and no comparison to ENCODE-reported values.",
+      "root_cause": "Signal-track construction is a hidden parameter of the metric.",
+      "fix": "Add the exact bamCoverage command (bin size 1, chosen read representation), state the ENCODE reference method or soften the pyTSSe equivalence, and note that scores differ by recipe."
+    },
+    {
+      "priority": "P2",
+      "title": "preseq recipes omit -P for paired-end BAMs; c_curve step ...",
+      "observed_in": [
+        6
+      ],
+      "problem": "On the deduplicated paired BAM c_curve without -P reports 305,029 distinct of 500,000 reads while -P reports 500,001 of 524,024. Without -P preseq counted 929,546 reads for 1.82M mates. c_curve -s 1e6 returns only the 0 0 row when depth is below the step; -P fails on name-sorted input.",
+      "root_cause": "Commands were copied from single-end preseq usage.",
+      "fix": "Use -B -P on a coordinate-sorted BAM for paired-end ATAC, state that deduplicated BAMs are unsuitable for lc_extrap, and set the step relative to depth."
+    },
+    {
+      "priority": "P2",
+      "title": "atac_qc_metrics.R does not classify periodicity and label...",
+      "observed_in": [
+        3
+      ],
+      "problem": "Workflow step 3 and the usage guide promise periodicity classification; the script only counts NFR/mono/di/tri. nuclear_reads_M counts pairs including chrM and duplicates yet is graded against the ENCODE nuclear-read threshold.",
+      "root_cause": "Metric naming and documentation overstate what the script computes.",
+      "fix": "Implement the documented pattern classification and chrM/duplicate exclusion, or rename the field and correct the docs."
+    },
+    {
+      "priority": "P2",
+      "title": "atac_qc_metrics.R input contract: .bed.gz narrowPeak fail...",
+      "observed_in": [
+        3
+      ],
+      "problem": "ENCODE narrowPeak distributed as .bed.gz fails with scan() expected an integer, got 22.06932. TxDb hg38 is fixed with no genome argument or seqlevels check.",
+      "root_cause": "rtracklayer infers format from the extension.",
+      "fix": "Pass format='narrowPeak' to import or document supported extensions; expose the genome/TxDb as an argument."
+    },
+    {
+      "priority": "P2",
+      "title": "library_complexity.py emits non-standard JSON Infinity fo...",
+      "observed_in": [
+        4
+      ],
+      "problem": "All-singleton BAM prints PBC2 Infinity, rejected by strict JSON parsers.",
+      "root_cause": "json.dumps default allows non-finite floats.",
+      "fix": "Emit null or a string when PBC2 is undefined."
+    },
+    {
+      "priority": "P2",
+      "title": "Reference inconsistencies and unverified threshold attrib...",
+      "observed_in": [],
+      "problem": "method-reference.md says Pearson correlation on binned counts while the recipe and tips use Spearman; NRF/PBC 0.7-0.9 bands are attributed to Landt 2012 although the Skill says the PBC1/PBC2 split is a later refinement (not verified against ENCODE pages in this pass); the usage guide lists a Picard insert-size step with no command in the Skill; prerequisites omit preseq.",
+      "root_cause": "Compiled from several sources without reconciliation.",
+      "fix": "Reconcile to Spearman, verify each threshold against the current ENCODE ATAC standards and cite the exact source, add the Picard command and preseq install line."
+    }
+  ]
+}
