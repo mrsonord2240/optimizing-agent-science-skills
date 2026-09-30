@@ -1,0 +1,48 @@
+# Audit run: independent checks on outputs of the shipped function (chr1-only substitution run, evidence res_chr1.rds)
+suppressPackageStartupMessages({library(cicero); library(monocle3); library(GenomicRanges); library(rtracklayer); library(GenomicInteractions)})
+CO <- Sys.getenv("CO")
+res <- readRDS(file.path(CO, "work/chr1/res_chr1.rds")); conns <- res$conns; strong <- res$strong
+csv <- read.csv(file.path(CO, "work/chr1/ex_chr1_enhancer_gene_pairs.csv"))
+pm <- read.delim(file.path(CO, "work/input/peak_metadata.tsv"), row.names=1)
+cat("== versions\n"); for (p in c("cicero","monocle3","GenomicInteractions","Gviz","Signac","ArchR")) cat(p, as.character(packageVersion(p)), "\n")
+d <- packageDescription("cicero"); cat("cicero RemoteType/Repo/Ref:", d$RemoteType, d$RemoteRepo, d$RemoteRef, substr(d$RemoteSha,1,8), "\n")
+cat("run_cicero formals:", paste(names(formals(cicero::run_cicero)), collapse=", "), "\n")
+cat("'genomic_distance_max' is an argument of run_cicero/generate_cicero_models:", "genomic_distance_max" %in% c(names(formals(run_cicero)), names(formals(generate_cicero_models))), "\n")
+cat("== T2 enhancer column\n")
+cat("class of Peak1/Peak2 in strong:", class(strong$Peak1), class(strong$Peak2), "\n")
+cat("csv enhancer head:", head(csv$enhancer, 8), " | any csv enhancer value a real peak name:", any(csv$enhancer %in% rownames(pm)), "\n")
+cat("csv enhancer all integer-like:", all(grepl("^[0-9]+$", as.character(csv$enhancer))), " n rows:", nrow(csv), "\n")
+# independent re-derivation with correct peak names
+tss <- import(file.path(CO, "work/patched/gencode_v29_protein_coding_tss.bed")); te <- resize(tss, width=4000, fix="center")
+p1 <- as.character(strong$Peak1); p2 <- as.character(strong$Peak2)
+g1 <- GRanges(sub("_(\\d+)_(\\d+)$", ":\\1-\\2", p1)); g2 <- GRanges(sub("_(\\d+)_(\\d+)$", ":\\1-\\2", p2))
+o1 <- findOverlaps(g1, te); o2 <- findOverlaps(g2, te)
+ref <- unique(data.frame(enhancer=c(p2[queryHits(o1)], p1[queryHits(o2)]), gene=c(te$name[subjectHits(o1)], te$name[subjectHits(o2)]),
+                         coaccess=c(strong$coaccess[queryHits(o1)], strong$coaccess[queryHits(o2)])))
+cat(sprintf("independent correct table rows=%d, csv rows=%d; gene+coaccess multiset identical=%s\n", nrow(ref), nrow(csv),
+            identical(sort(paste(ref$gene, round(ref$coaccess, 8))), sort(paste(csv$gene, round(csv$coaccess, 8))))))
+cat("enhancer values in correct table are peak names:", all(ref$enhancer %in% rownames(pm)), "\n")
+# promoter-promoter pairs mislabelled as enhancer-gene
+prom_peak <- unique(c(p1[queryHits(o1)], p2[queryHits(o2)]))
+cat(sprintf("enhancer anchors that are themselves within a TSS window (promoter peaks): %d of %d pairs\n", sum(ref$enhancer %in% prom_peak), nrow(ref)))
+cat("== score range / doc '0-1'\n")
+cc <- conns$coaccess[!is.na(conns$coaccess)]
+cat(sprintf("coaccess range %.3f..%.3f; negative scores: %d of %d (%.1f%%); NA: %d\n", min(cc), max(cc), sum(cc < 0), length(cc), 100*mean(cc < 0), sum(is.na(conns$coaccess))))
+cat("== doc claim '~10-50% of peaks have >=1 strong connection'\n")
+sp <- unique(c(p1, p2)); cat(sprintf("peaks with >=1 strong connection: %d / %d = %.1f%%\n", length(sp), nrow(pm), 100*length(sp)/nrow(pm)))
+cat("== Hi-C concordance snippet (method-reference.md) with SYNTHETIC planted BEDPE\n")
+set.seed(7)
+pick <- sample(nrow(strong), 300)                        # planted true positives: 300 strong pairs written as loops (fine 10 kb-style anchors = the peaks themselves)
+dec <- sample(nrow(strong), 300)                         # decoy loops: 300 random genomic positions on chr1 (planted negatives)
+mk <- function(a, b) data.frame(chrom1="chr1", start1=a$start-1, end1=a$end, chrom2="chr1", start2=b$start-1, end2=b$end)
+ga <- as.data.frame(g1[pick]); gb <- as.data.frame(g2[pick])
+pos <- mk(ga, gb)
+rs <- sample(1e6:29e6, 600); dneg <- data.frame(chrom1="chr1", start1=rs[1:300], end1=rs[1:300]+5000, chrom2="chr1", start2=rs[301:600], end2=rs[301:600]+5000)
+bed <- rbind(setNames(pos, names(dneg)), dneg); tf <- file.path(CO, "work/audit_hic.bedpe")
+write.table(bed, tf, sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+hic_loops <- makeGenomicInteractionsFromFile(tf, type="bedpe", experiment_name="hiccups", description="planted")
+ci <- GenomicInteractions(anchor1=GRanges(sub('_(\\d+)_(\\d+)$', ':\\1-\\2', strong$Peak1)), anchor2=GRanges(sub('_(\\d+)_(\\d+)$', ':\\1-\\2', strong$Peak2)))
+overlap <- countOverlaps(ci, hic_loops) > 0
+cat(sprintf("snippet ran; loops=%d; overlapping strong pairs=%d (%.2f%%); planted true pairs (300 expected as minimum): recovered %d of 300\n",
+            length(hic_loops), sum(overlap), 100*mean(overlap), sum(overlap[pick])))
+cat("decoy-only overlap expectation ~0: overlaps among non-planted strong pairs:", sum(overlap[-pick]), "of", length(overlap) - 300, "\n")

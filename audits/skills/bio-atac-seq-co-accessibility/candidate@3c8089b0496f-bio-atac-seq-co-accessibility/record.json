@@ -65,6 +65,6 @@
     "viewer": "viewer.md",
     "source_identity": "source-identity.json",
     "fixes": null,
-    "scripts": 0
+    "scripts": 12
   }
 }
