@@ -1,0 +1,362 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-motif-deviation",
+    "description": "Analyze TF motif accessibility variability across samples or single cells using chromVAR. Use when identifying TF motifs whose accessibility correlates with conditions, computing per-sample motif z-scores after matched background correction, comparing to ArchR / Signac equivalents, or distinguishing motif-accessibility signal from per-site footprinting.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; verified formulas and biology; prose errors filed as MOTDEV-005 and MOTDEV-009"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-only genomics skill with no clinical conclusions"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "chromVAR core method sound (hand-check 1e-16); DecoupleR semantics concern scored down and filed as MOTDEV-006, not a principled fallacy in the primary workflow"
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "Bundled chromvar_bulk_analysis.R fails at filterSamples on realistic input because colData depth is never set or documented (MOTDEV-001); Signac RunChromVAR snippet does not exist in current Signac (MOTDEV-002)"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 71,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Core chromVAR route is sound and verified; the shipped script cannot run, the Signac route is stale, and method prose mis-defines deviation and z"
+      },
+      "reliability": {
+        "score": 5,
+        "max": 12,
+        "note": "No seed, no depth check, no NA guard; failures are loud but undocumented"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is short with routed references; method-reference is long but sectioned"
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Clear workflow table and routing; hard-coded 6-sample condition and undocumented depth input"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Useful decision table; outputs are ID-only and stale numeric expectations"
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials or destructive operations; local files only"
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "License and provenance preserved; version floors stale and unverified snippets"
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger-rich description and good progressive disclosure; some untested advertised routes"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 52.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 13,
+      "total": 24
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Shipped bulk script on ENCODE GM12878 x3 vs K562 x3 (chr1:1-30 Mb, 6,357 peaks)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Stops at filterSamples: no colData depth; requirement undocumented",
+        "basic": 10,
+        "specialized": 10,
+        "total": 20,
+        "assertions": [
+          {
+            "text": "Script exits 0 and writes deviations, variability, differential CSVs and two PDFs",
+            "result": "FAIL",
+            "note": "Exit 1 at filterSamples; no outputs"
+          },
+          {
+            "text": "Required per-sample depth input is documented in the Skill",
+            "result": "FAIL",
+            "note": "Not mentioned in SKILL.md, usage-guide.md or script comments"
+          },
+          {
+            "text": "Failure message tells the user how to proceed",
+            "result": "PASS",
+            "note": "Error names colData depth with total reads per sample"
+          },
+          {
+            "text": "No fabricated or partial results reported after the failure",
+            "result": "PASS",
+            "note": "No output files produced"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 4
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Same script with one-line depth patch; chromVAR hand-check; two-seed rerun",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs and matches biology; not reproducible without a seed; IDs not names",
+        "basic": 32,
+        "specialized": 42,
+        "total": 74,
+        "assertions": [
+          {
+            "text": "879 motifs x 6 samples z-score matrix with no NA after filters (5,340 peaks)",
+            "result": "PASS",
+            "note": "Parsed: dim 879 x 6, 0 NA"
+          },
+          {
+            "text": "Contrast recovers known B-lymphoid vs erythroid biology",
+            "result": "PASS",
+            "note": "GM12878-up SPI1, EBF1, IRF/REL; K562-up GATA2, GATA1::TAL1"
+          },
+          {
+            "text": "computeDeviations equals an independent hand computation",
+            "result": "PASS",
+            "note": "Max abs diff 1.1e-16 for deviations and z; planted signal recovered"
+          },
+          {
+            "text": "Two identical-input runs give the same z-scores and hit list",
+            "result": "FAIL",
+            "note": "Max dz 1.25; sig sets 728 vs 747, Jaccard 0.88"
+          },
+          {
+            "text": "Differential CSV and heatmap identify TFs by name",
+            "result": "FAIL",
+            "note": "Rows are JASPAR IDs only (heat-1.png, chromvar_differential.csv)"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Signac AddMotifs / RunChromVAR / FindAllMarkers on 10x PBMC 5k slice",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "RunChromVAR absent in current Signac; works on 1.16.0",
+        "basic": 22,
+        "specialized": 30,
+        "total": 52,
+        "assertions": [
+          {
+            "text": "AddMotifs attaches 879 JASPAR2024 PFMs on current Signac",
+            "result": "PASS",
+            "note": "Signac 1.17.1: pfm 879"
+          },
+          {
+            "text": "RunChromVAR runs on current Signac",
+            "result": "FAIL",
+            "note": "Function does not exist in 1.17.1 (removed per NEWS)"
+          },
+          {
+            "text": "Signac 1.16.0 yields a chromvar assay without NA",
+            "result": "PASS",
+            "note": "879 x 1,853, range -4.2..4.5, 0 NA"
+          },
+          {
+            "text": "FindAllMarkers with mean.fxn=rowMeans and fc.name='avg_diff' returns avg_diff",
+            "result": "PASS",
+            "note": "Column present; T, B and monocyte TFs (TCF7, GATA3, SPIB, Spi1) among cluster hits"
+          },
+          {
+            "text": "Stated Signac floor (1.13+) is a valid compatibility statement",
+            "result": "FAIL",
+            "note": "1.17.x cannot run the documented chain"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 5
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "ArchR chain on the same PBMC slice (216 cells)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Runs through addDeviationsMatrix; getMarkerFeatures fails on NA z",
+        "basic": 24,
+        "specialized": 32,
+        "total": 56,
+        "assertions": [
+          {
+            "text": "addReproduciblePeakSet through addDeviationsMatrix complete",
+            "result": "PASS",
+            "note": "1,185 peaks, MotifMatrix 870 x 216"
+          },
+          {
+            "text": "Verbatim getMarkerFeatures on MotifMatrix z succeeds",
+            "result": "FAIL",
+            "note": "presto wilcoxauc refuses NA"
+          },
+          {
+            "text": "MotifMatrix z matrix is NA-free",
+            "result": "FAIL",
+            "note": "23 NA in 16 motifs x 6 cells; zero-read motif peaks give zero background SD"
+          },
+          {
+            "text": "Skill documents an NA check or remedy",
+            "result": "FAIL",
+            "note": "No mention"
+          },
+          {
+            "text": "Marker call completes once NA cells are removed",
+            "result": "PASS",
+            "note": "6 cells dropped; runs; 34 markers in C3 (weak at this size)"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "DecoupleR ulm/mlm/consensus on chromVAR z (1.8.0) and API rename check (2.2.0)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs after fixes; tuple return, missing omnipath, dubious semantics",
+        "basic": 28,
+        "specialized": 34,
+        "total": 62,
+        "assertions": [
+          {
+            "text": "run_ulm/run_mlm/run_consensus execute on 6 x 879 z with CollecTRI",
+            "result": "PASS",
+            "note": "307 TFs overlap; shapes (6, 307)"
+          },
+          {
+            "text": "Activity sign agrees with the contrast biology",
+            "result": "PASS",
+            "note": "IRF3/IRF5/STAT2 lower in K562; TAL1/GATA6 higher"
+          },
+          {
+            "text": "Snippet as written returns usable activities",
+            "result": "FAIL",
+            "note": "run_ulm returns a tuple; needs omnipath; collectri_net undefined"
+          },
+          {
+            "text": "Motif z-scores are a valid input for TF-activity inference against CollecTRI targets",
+            "result": "FAIL",
+            "note": "Features are TF motifs, targets are genes; not TF activity"
+          },
+          {
+            "text": "Stated decoupler 2.x renames are correct",
+            "result": "PASS",
+            "note": "dc.mt.ulm/mlm/consensus, dc.op.collectri present in 2.2.0"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 5
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.4,
+    "dynamic_weighted": 31.7,
+    "score": 60,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "chromVAR deviations and z-scores equal an independent hand computation to 1e-16 and a planted signal is recovered",
+    "With the depth patch the bulk workflow reproduces known GM12878 vs K562 biology on real ENCODE data",
+    "SKILL.md is compact with routed references, a clear workflow table, and JASPAR2024/TFBSTools issue #39 workaround confirmed still needed",
+    "License and provenance preserved; decoupler 2.x rename note verified"
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Make the bulk script runnable: supply colData depth",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "The shipped script fails at filterSamples because colData$depth is never set or documented (MOTDEV-001).",
+      "root_cause": "Depth requirement of chromVAR filterSamples was not checked.",
+      "fix": "Add a documented total-depth input and set colData(se)$depth before filterSamples; state it is library total, not colSums(counts); rerun end to end."
+    },
+    {
+      "priority": "P0",
+      "title": "Add set.seed and document background randomness",
+      "observed_in": [
+        2
+      ],
+      "problem": "Two identical runs differ by up to 1.25 z and the significant sets overlap only 0.88 (MOTDEV-003).",
+      "root_cause": "getBackgroundPeaks is stochastic and no seed is managed.",
+      "fix": "set.seed before getBackgroundPeaks in the script; document seed and niterations as required reporting."
+    },
+    {
+      "priority": "P1",
+      "title": "Replace or pin the Signac RunChromVAR route",
+      "observed_in": [
+        3
+      ],
+      "problem": "RunChromVAR no longer exists in Signac 1.17.1 while the Skill says Signac 1.13+ (MOTDEV-002).",
+      "root_cause": "Snippet not re-run against current Signac.",
+      "fix": "Pin Signac <=1.16.0 or give a tested direct chromVAR route; update compatibility, tool table and examples."
+    },
+    {
+      "priority": "P1",
+      "title": "Guard ArchR marker step against NA z-scores",
+      "observed_in": [
+        4
+      ],
+      "problem": "getMarkerFeatures fails because sparse cells give NaN z when a motif's peaks have zero reads (MOTDEV-004).",
+      "root_cause": "Snippet assumes an NA-free z matrix.",
+      "fix": "Count NA in the z matrix, filter sparse cells or drop NA cells before getMarkerFeatures, and document it."
+    },
+    {
+      "priority": "P2",
+      "title": "Correct method prose, DecoupleR snippet, and output labels",
+      "observed_in": [
+        2,
+        5
+      ],
+      "problem": "Deviation/z definitions are wrong, the DecoupleR snippet returns tuples and misuses motif z, outputs lack TF names, and several counts and thresholds are stale or uncited (MOTDEV-005 to MOTDEV-012).",
+      "root_cause": "Prose and snippets carried from the source without execution.",
+      "fix": "Rewrite the chromVAR formulas, test or drop the DecoupleR block, name motifs in CSVs and heatmap, and correct the counts, wording and uncited heuristics."
+    }
+  ]
+}

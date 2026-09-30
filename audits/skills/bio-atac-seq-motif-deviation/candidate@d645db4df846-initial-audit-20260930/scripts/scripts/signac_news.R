@@ -1,0 +1,5 @@
+library(Signac); cat(as.character(packageVersion("Signac")),"\n")
+nf <- system.file("NEWS.md", package="Signac"); cat("news:", nf, "\n")
+x <- readLines(nf); i <- grep("RunChromVAR|chromVAR|chromvar", x, ignore.case=TRUE); print(x[sort(unique(unlist(lapply(i, function(k) (k-2):(k+2)))))])
+cat("exports with chromvar:", grep("chromvar", getNamespaceExports("Signac"), ignore.case=TRUE, value=TRUE), "\n")
+cat("RunChromVAR exists:", exists("RunChromVAR", envir=asNamespace("Signac")), "\n")

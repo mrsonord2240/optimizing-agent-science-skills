@@ -1,0 +1,83 @@
+{
+  "skill_id": "bio-atac-seq-motif-deviation",
+  "version": "candidate@d645db4df846-initial-audit-20260930",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/motif-deviation",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/motif-deviation",
+    "subtree": "d3c1b1e3d0abb103a4c6e72c6e9cb87503ee934e"
+  },
+  "candidate": {
+    "identity": "d645db4df84650ecf90027b9013e38b0d9adce73fb985a605d769c730d68fefc",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-motif-deviation",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "path": "F:\\OpenScience\\wt\\atac-motif-deviation\\skills\\bio-atac-seq-motif-deviation",
+    "files": [
+      {
+        "path": "LICENSE",
+        "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+        "bytes": 1065
+      },
+      {
+        "path": "SKILL.md",
+        "git_blob": "5f6acffd93b017d59ecc4dee63d59a69140108c0",
+        "sha256": "bffca098c57b479af870d78e8def3f4c55346484513d1b36aa5f34637efaa2ad",
+        "bytes": 6504
+      },
+      {
+        "path": "references/method-reference.md",
+        "git_blob": "2621d27bb189ad43b2c41942dca65b3ff38ccf28",
+        "sha256": "1bab8a9ad6359bb3318170a9d4e1c799391a909ba5b4977264c4b1d5b9b9d119",
+        "bytes": 9118
+      },
+      {
+        "path": "references/single-cell.md",
+        "git_blob": "ce1621171ec270b282c7e348cb42f66ceca38ef0",
+        "sha256": "0415ac446324547d3aae5094197c81474913abbc753f2128d3f34da43df32e14",
+        "bytes": 3543
+      },
+      {
+        "path": "references/usage-guide.md",
+        "git_blob": "0994b4d8d6c90661c0e06105e26a5ae58b9c1dfd",
+        "sha256": "f2a2da24bc33f03eca65c56e64fb253371fac8cd8e6af195feb4b03dbc499c54",
+        "bytes": 2566
+      },
+      {
+        "path": "scripts/chromvar_bulk_analysis.R",
+        "git_blob": "dc3c70c727875f0499596ddf46c1ae297bb0fd7c",
+        "sha256": "6326c2c6c868298336e93fdbdc9191d732f0c5b3ecf2070bac3f8a741ac4e899",
+        "bytes": 3517
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 24
+  }
+}

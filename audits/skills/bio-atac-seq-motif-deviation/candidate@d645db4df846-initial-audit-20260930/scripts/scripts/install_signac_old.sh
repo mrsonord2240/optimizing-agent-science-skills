@@ -1,0 +1,3 @@
+source /mnt/openscience/audit-envs/bio-atac-seq-motif-deviation/tools/env.sh
+mkdir -p $MD/rlib-signac1.16
+micromamba run -n $ENVN Rscript -e 'options(repos=c(CRAN="https://cloud.r-project.org")); u<-"https://cran.r-project.org/src/contrib/Archive/Signac/Signac_1.16.0.tar.gz"; install.packages(u, repos=NULL, type="source", lib="/mnt/openscience/audit-envs/bio-atac-seq-motif-deviation/rlib-signac1.16", dependencies=FALSE); .libPaths(c("/mnt/openscience/audit-envs/bio-atac-seq-motif-deviation/rlib-signac1.16",.libPaths())); library(Signac); print(as.character(packageVersion("Signac"))); print(exists("RunChromVAR"))' > $MD/logs/install_signac_old.log 2>&1; tail -8 $MD/logs/install_signac_old.log
