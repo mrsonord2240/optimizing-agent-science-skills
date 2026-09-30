@@ -36,7 +36,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-atac-seq-footprinting` | Data Analysis | 86 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-footprinting/candidate@a71e561087bc-reaudit-run/viewer.md) |
 | `bio-atac-seq-motif-deviation` | Data Analysis | 86 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-atac-seq-motif-deviation/candidate@fb58807b04cb-reaudit-run/viewer.md) |
 | `bio-atac-seq-nucleosome-positioning` | Data Analysis | 85 | Production Ready | 0 / 0 / 4 | [viewer](skills/bio-atac-seq-nucleosome-positioning/candidate@2192c9d1500c-reaudit-run/viewer.md) |
-| `bio-atac-seq-single-cell-atac` | Data Analysis | 71 | Reject | 1 / 2 / 3 | [viewer](skills/bio-atac-seq-single-cell-atac/candidate@da2da9c8bbaf-initial-audit-20260930/viewer.md) |
+| `bio-atac-seq-single-cell-atac` | Data Analysis | 86 | Production Ready | 0 / 0 / 4 | [viewer](skills/bio-atac-seq-single-cell-atac/candidate@4ced0da507d6-reaudit-run/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
 | `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 75 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |
