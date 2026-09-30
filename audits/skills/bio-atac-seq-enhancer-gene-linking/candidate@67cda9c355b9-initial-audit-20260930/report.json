@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-enhancer-gene-linking",
+    "description": "Predict enhancer-gene regulatory connections from ATAC-seq using ABC, ENCODE-rE2G, HiChIP, or Cicero; choose contact-aware, accessibility-only or orthogonal approaches, threshold and validate predictions.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 4
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; unsupported claims (rE2G 1 Mb window, average of 10 cell types, catalog URL) are recorded as findings rather than invented results."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Predictions are framed as hypotheses; therapeutic nomination requires experimental validation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy: ABC and rE2G scores reproduced exactly by the upstream pipelines. Deviations (raw candidate peaks, missing qnorm, fixed thresholds, model choice by tissue) are filed as P1/P2 findings."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The only shipped script, scripts/run_abc.sh, crashes at predict.py (missing --accessibility_feature; avg Hi-C also needs --hic_gamma/--hic_scale) on ABC v1.1.2 and main; the needed patch is outside the audit-local repair budget."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 69,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 6,
+        "max": 12,
+        "note": "Matched-Hi-C path cannot run from the shipped script; rE2G model/threshold guidance and ATAC-only routing are inaccurate"
+      },
+      "reliability": {
+        "score": 6,
+        "max": 12,
+        "note": "set -euo pipefail only; hard failure at predict.py with no guard, no input checks, unquoted variables"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Lean SKILL.md with routed references; reference loaded on demand"
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Clear workflow and warnings, but conflicting normalization guidance, unusable snippet keys, and an agent cannot recover the crash from the Skill text"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Natural triggers and request examples; rigid hard-coded inputs and placeholder arguments"
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No secrets or destructive commands; unquoted shell variables and remote download suggestions without integrity checks"
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "Modular layout; script has hard-coded inputs, unused GENOME_FA, backtick-comment hack and no tests"
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Precise but long description, good routing and provenance disclaimer; stale version claims and no escape hatch when a pipeline step fails"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 51.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 9,
+      "total": 17
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scripts/run_abc.sh as shipped, K562 chr22 (ABC example BAMs, chr22 K562 Hi-C substitute)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "bamCoverage and run.neighborhoods.py ran (26,030 candidates); predict.py died: ValueError feature has to be ATAC or DHS; rc=1, no predictions.",
+        "basic": 13,
+        "specialized": 21,
+        "total": 34,
+        "assertions": [
+          {
+            "text": "Shipped run_abc.sh completes and writes EnhancerPredictionsAllPutative.tsv.gz",
+            "result": "FAIL",
+            "note": "rc=1; no predictions file"
+          },
+          {
+            "text": "bamCoverage RPGC tracks and neighborhood step complete before the failure",
+            "result": "PASS",
+            "note": "Neighborhoods Complete; 26,030 candidate rows staged"
+          },
+          {
+            "text": "Failure message tells the agent how to recover",
+            "result": "FAIL",
+            "note": "ValueError comes from predict.py; the script neither documents nor passes --accessibility_feature, and avg Hi-C also needs --hic_gamma/--hic_scale"
+          },
+          {
+            "text": "Failure is deterministic on both ABC v1.1.2 and main 92ac503",
+            "result": "PASS",
+            "note": "Same crash on both (tooling phase) and on main (audit rerun)"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 4
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "run_abc.sh minimally patched copy (adds --accessibility_feature DHS, gamma/scale), same inputs",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Completes rc=0: 2,508,180 putative rows, 3,000 links >= 0.02 (awk == pandas). Candidates are raw MACS peaks (median 150 bp, max 10.7 Mb); neighborhoods ran with qnorm=None; only 63 percent of official-pipeline links recovered (loose bound; Hi-C substitute).",
+        "basic": 24,
+        "specialized": 37,
+        "total": 61,
+        "assertions": [
+          {
+            "text": "Patched copy runs end to end and writes parseable AllPutative table with ABC.Score in [0,1]",
+            "result": "PASS",
+            "note": "2,508,180 rows; scores within [0,1]"
+          },
+          {
+            "text": "Script threshold count equals pandas count at ABC.Score >= 0.02",
+            "result": "PASS",
+            "note": "3000 == 3000; links within 5 Mb"
+          },
+          {
+            "text": "Candidate regions follow ABC method (summit-centred 500 bp, blacklist, top-N)",
+            "result": "FAIL",
+            "note": "Raw narrowPeak minus promoters: median 150 bp, max 10,709,810 bp, 47 peaks > 5 kb; official candidates 17,732 at median 500 bp"
+          },
+          {
+            "text": "Quantile normalisation required by SKILL.md workflow step 3 is applied",
+            "result": "FAIL",
+            "note": "run.neighborhoods.py echo shows qnorm=None"
+          },
+          {
+            "text": "Links recover the official ABC pipeline calls on the same data (loose sanity, > 0.3)",
+            "result": "PASS",
+            "note": "458 of 723 non-self official links (0.63); script yields 2,905 non-self links, 4x official"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "ENCODE-rE2G Snakemake (Skill step 4 route: config.yaml + ABC_BIOSAMPLES) on K562 chr22",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Pipeline (main d039062, isolated env, remote 34 GB Hi-C by range) reproduces expected all-putative (1,675,272 rows) and thresholded (7,218 rows at 0.243) tables exactly. The Skill's own threshold 0.5 keeps 2,087 rows; pipeline model is dhs_intact_hic chosen automatically.",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions": [
+          {
+            "text": "Pipeline completes and all-putative table matches shipped expected output",
+            "result": "PASS",
+            "note": "Identical; 18 of 18 steps"
+          },
+          {
+            "text": "Scores are probabilities in [0,1] and rank plausibly with ABC",
+            "result": "PASS",
+            "note": "Spearman(ABC, rE2G) 0.263; 2,087 rows >= 0.5"
+          },
+          {
+            "text": "Skill-stated standard threshold (>= 0.5) matches the pipeline's calibrated threshold",
+            "result": "FAIL",
+            "note": "Pipeline threshold file 0.243 (models 0.18-0.30 at 70 percent recall); 0.5 keeps 29 percent of the calibrated set"
+          },
+          {
+            "text": "Skill-stated model selection by tissue similarity / no-hic model exists in the pipeline",
+            "result": "FAIL",
+            "note": "Models are keyed by assay and Hi-C type (atac/dhs, h3k27ac, intact/megamap); no no-hic model; pipeline selects the model from the biosample config"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 4
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "method-reference combine snippet (ABC + rE2G merge, HiChIP flag) on the real chr22 outputs",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Snippet extracted verbatim from the Skill: KeyError 'enhancer_id'. Real keys are name/TargetGene; hichip_anchors placeholder raises TypeError on isin. Standalone awk threshold snippet works (3,000 rows plus header).",
+        "basic": 15,
+        "specialized": 25,
+        "total": 40,
+        "assertions": [
+          {
+            "text": "Combine snippet runs on real ABC and rE2G outputs as written",
+            "result": "FAIL",
+            "note": "KeyError: 'enhancer_id'; both outputs use name/TargetGene"
+          },
+          {
+            "text": "Merge with the correct keys yields a high-confidence intersection",
+            "result": "PASS",
+            "note": "825 pairs (ABC >= 0.02 thresholded table x rE2G >= 0.5)"
+          },
+          {
+            "text": "hichip_anchors placeholder is usable as written",
+            "result": "FAIL",
+            "note": "isin(Ellipsis) raises TypeError; the step is only a comment-described placeholder"
+          },
+          {
+            "text": "Standalone awk threshold snippet keeps header and only ABC.Score >= 0.02 rows",
+            "result": "PASS",
+            "note": "3,001 lines = header + 3,000"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 4
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 27.6,
+    "dynamic_weighted": 31.1,
+    "score": 59,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The upstream ABC (v1.1.2 and main) and ENCODE-rE2G pipelines the Skill routes to reproduce the shipped expected chr22 tables exactly, and scores obey ABC invariants.",
+    "Method-selection table, cell-type-proxy warning and therapeutic-nomination rule (two methods plus CRISPRi validation) are scientifically sensible.",
+    "The Skill discloses unverified versions and hard-coded script inputs and routes depth to references.",
+    "Once patched, run_abc.sh produces coherent tracks, neighborhoods and a parseable score table; the standalone awk threshold snippet is correct."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "run_abc.sh crashes at predict.py",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "predict.py raises ValueError because --accessibility_feature is not passed; with --hic_type avg it also needs --hic_gamma and --hic_scale. The only shipped script fails deterministically on ABC v1.1.2 and main.",
+      "root_cause": "The script was written without running predict.py against a current ABC release.",
+      "fix": "Pass --accessibility_feature (ATAC or DHS) and the avg Hi-C gamma/scale (from ABC config) as documented arguments, then rerun the chr22 example end to end. (EGL-001)"
+    },
+    {
+      "priority": "P1",
+      "title": "Matched Hi-C path not runnable from the script",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "The script hard-codes --hic_type avg and --hic_resolution 5000 and describes the Hi-C input as cooler or hic, but the primary documented workflow (matched Hi-C) needs --hic_type hic and predict.py has no cooler mode.",
+      "root_cause": "Script parameters are fixed instead of exposed.",
+      "fix": "Expose hic type, file and resolution as arguments, correct the comment, and test the hic branch. (EGL-002)"
+    },
+    {
+      "priority": "P1",
+      "title": "Candidate regions differ from ABC method",
+      "observed_in": [
+        2
+      ],
+      "problem": "Candidates are raw MACS peaks minus promoters (median 150 bp, max 10.7 Mb, no blacklist, no top-N); ABC uses summit-centred 500 bp regions. run_abc.sh gives 4x the official non-self links and recovers 63 percent of them.",
+      "root_cause": "SKILL.md step 3 and the script replace makeCandidateRegions with bedtools intersect -v.",
+      "fix": "Use ABC makeCandidateRegions.py (with blacklist and chrom sizes) or state the deviation and its cost. (EGL-003)"
+    },
+    {
+      "priority": "P1",
+      "title": "ENCODE-rE2G model selection and threshold wrong",
+      "observed_in": [
+        3
+      ],
+      "problem": "Pretrained models are keyed by assay and Hi-C type and the pipeline chooses them; there is no no-hic model or cell-type selection. Pipeline thresholds are 0.18-0.30 at 70 percent recall, not 0.5/0.8.",
+      "root_cause": "Guidance was written from memory of the preprint, not the repository.",
+      "fix": "Rewrite step 4 and the thresholds table from the repository models directory and threshold files. (EGL-004, EGL-005)"
+    },
+    {
+      "priority": "P1",
+      "title": "ABC threshold ignores input-dependent calibration",
+      "observed_in": [
+        2,
+        3
+      ],
+      "problem": "Official ABC thresholds are automatic (0.013-0.027 in the chr22 runs) and depend on accessibility, H3K27ac and Hi-C type; the Skill uses a flat 0.02 and skips qnorm.",
+      "root_cause": "Single fixed cutoff copied from the original paper.",
+      "fix": "Point to reference/abc_thresholds.tsv and the pipeline's automatic threshold; keep 0.02 as a fallback with caveat. (EGL-005, EGL-006)"
+    },
+    {
+      "priority": "P2",
+      "title": "Normalization guidance conflicts with script",
+      "observed_in": [
+        2
+      ],
+      "problem": "Step 3 requires --qnorm, RPGC/RPM-IP scaling, but run.neighborhoods.py counts BAM reads and the script never passes --qnorm.",
+      "root_cause": "Tracks were retained from an earlier design.",
+      "fix": "State that qnorm is optional or add the argument with the reference file. (EGL-006)"
+    },
+    {
+      "priority": "P2",
+      "title": "ATAC-only routes to Cicero, which needs scATAC",
+      "observed_in": [],
+      "problem": "The method table sends bulk ATAC-only users to Cicero (single-cell), although ABC supports ATAC-only activity and has thresholds for it.",
+      "root_cause": "Data-availability table conflates bulk and single-cell inputs.",
+      "fix": "Split bulk and single-cell rows and allow ABC without H3K27ac. (EGL-007)"
+    },
+    {
+      "priority": "P2",
+      "title": "Script arguments ignored and unquoted",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "atac_peaks.narrowPeak, promoter_regions.bed and ubiquitously_expressed.txt are hard-coded, GENOME_FA is unused, variables are unquoted, and comments sit in backticks.",
+      "root_cause": "Sketch-level scripting.",
+      "fix": "Make inputs arguments, quote variables, remove unused slot. (EGL-008)"
+    },
+    {
+      "priority": "P2",
+      "title": "Combine snippet uses nonexistent columns",
+      "observed_in": [
+        4
+      ],
+      "problem": "Merge keys enhancer_id/gene raise KeyError; real outputs use name/TargetGene; hichip_anchors is a placeholder.",
+      "root_cause": "Snippet never run on real output.",
+      "fix": "Use name and TargetGene and either implement the HiChIP overlap or label it pseudocode. (EGL-009)"
+    },
+    {
+      "priority": "P2",
+      "title": "Install commands stale",
+      "observed_in": [],
+      "problem": "abcenv.yml does not solve today, monocle3 is not on Bioconductor, and unpinned pip install snakemake gives 9.x while ABC and rE2G need 7.x.",
+      "root_cause": "Commands not re-executed.",
+      "fix": "Replace with working, pinned commands. (EGL-010)"
+    }
+  ]
+}

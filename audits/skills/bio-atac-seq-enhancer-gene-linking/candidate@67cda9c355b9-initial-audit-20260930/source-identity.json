@@ -1,0 +1,72 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/enhancer-gene-linking",
+    "subtree": "413389bfe7c67a87707624a350f97ab33ad3d0f2",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "git_blob": "3548fc42f31ed81518860af0f444d83bf9a054d1"
+      },
+      {
+        "path": "examples/run_abc.sh",
+        "git_blob": "c723092d3e7bbd7b48aa5a47b1d7f09ebfe0f6d4"
+      },
+      {
+        "path": "usage-guide.md",
+        "git_blob": "b4930661495729f4fdc870ace5a895131c5f5664"
+      }
+    ],
+    "normalization_note": "The audited normalized tree adds LICENSE and references/method-reference.md and moves examples/run_abc.sh to scripts/run_abc.sh and usage-guide.md to references/usage-guide.md; origin identifies the source Skill subtree, not a one-to-one file mapping."
+  },
+  "candidate": {
+    "branch": "fix/atac-enhancer-gene-linking",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "path": "F:\\OpenScience\\wt\\atac-enhancer-gene-linking\\skills\\bio-atac-seq-enhancer-gene-linking",
+    "status_before": "untracked Skill subtree only",
+    "status_after_execution": "untracked Skill subtree only; candidate files unchanged",
+    "content_sha256": "67cda9c355b93f584f3d6628f847e8c0ba610059e102866e3d8e42096afd9cef",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 24809,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted by UTF-8 bytes and separated by LF; no trailing LF",
+      "manifest_bytes": 443
+    },
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 5315,
+        "sha256": "0ffb03d39a735ae0d096c8e28119f15c4d90e2549543b10a713b5ccb8a4e798b"
+      },
+      {
+        "path": "references/method-reference.md",
+        "bytes": 12391,
+        "sha256": "97b791c990dba3285b34250ebab22b4ad54442e01cd8baf3302bb7f2c306a0ca"
+      },
+      {
+        "path": "references/usage-guide.md",
+        "bytes": 2364,
+        "sha256": "95393945c9dc56266379e238de5bcff0acbe7b4e3ecef914a18a7b85b109df9a"
+      },
+      {
+        "path": "scripts/run_abc.sh",
+        "bytes": 3674,
+        "sha256": "119dab7e9054746a0dfc003c3a3a6027e72e58f8cbd578e6dd51a85196e21cfb"
+      }
+    ]
+  },
+  "tooling": {
+    "tools_md_sha256": "b8e3d73033d7187b7dc5e246f3c314cebef145d28075c44749e136a4292dd4c1",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "environment": "WSL2 science, /mnt/openscience-only, interop disabled; envs bio-atac-seq-enhancer-gene-linking (fingerprint 0d625a9289f42a80a13f97585a240d68bb7195be39c813766ea78b32da29368b; py 3.10.21, pandas 2.3.3, pyranges 0.1.4, hic-straw 1.3.1, macs2 2.2.9.1 with LD_PRELOAD shim, deepTools 3.5.5, bedtools 2.31.1, snakemake 7.32.4) and -re2g (3680ac7e8ed1262247cbf9dd0c389eb36b7da7e160cadf3bb2c597d52741c7dd; py 3.10.14, scikit-learn 1.2.1); ABC main 92ac503 and v1.1.2 e2a88d2; ENCODE-rE2G d039062"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}
