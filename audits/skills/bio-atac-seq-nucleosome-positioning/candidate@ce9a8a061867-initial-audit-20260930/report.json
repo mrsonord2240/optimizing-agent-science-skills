@@ -1,0 +1,373 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-nucleosome-positioning",
+    "description": "Map nucleosome center positions, occupancy, and fuzziness from ATAC-seq fragment-size patterns using NucleoATAC, ATACseqQC, DANPOS3, or scprinter. Use when characterizing nucleosome organization at promoters and enhancers, calling +1/-1 nucleosomes flanking NFRs, generating V-plots for chromatin structure visualization, or comparing nucleosome positioning between conditions.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; uncited quantitative claims are filed as NUCPOS-012"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-only genomics skill with no clinical conclusions"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Methods are established (V-plot, NucleoATAC, DANPOS3); centring and strand handling defects are filed NUCPOS-004 and NUCPOS-005 and scored down"
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "estimate_nrl.py raises IndexError on real ATAC data (NUCPOS-001) and nucleosome_analysis.R halts at the shift step and then lacks featureAlignedSignal (NUCPOS-002, NUCPOS-003); two of the three shipped scripts are not runnable as documented"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 65,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 6,
+        "max": 12,
+        "note": "Right method families, but the estimator, R pipeline and install recipe do not run as documented and NucleoATAC calls are empty"
+      },
+      "reliability": {
+        "score": 4,
+        "max": 12,
+        "note": "Two of three scripts fail on real data, no input guards, upstream NaN defect undetected"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is short with routed references; method-reference is long but sectioned"
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Clear step order and routing; unclear which DANPOS columns, no post-run checks, scPrinter has no command"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Example requests and decision table help; wrong Python 3.7 guidance would mislead"
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials, destructive operations or network calls; unchecked inputs and file paths"
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "License and provenance preserved; stale versions and unresolved process caveats"
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Trigger-rich description; workflow gate depends on a mis-centred V-plot and claims are partly uncited"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 52.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "V-plot at 300 chr1 TSS from GM12878 rep1 (vplot.py)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs and shows the NFR hotspot, but half the fragment centres are wrong and TSS strand is ignored",
+        "basic": 30,
+        "specialized": 34,
+        "assertions": [
+          {
+            "text": "Grid shape (600,2000) and total equal an independent recount with the script definition",
+            "result": "PASS",
+            "note": "116,428 vs 116,428"
+          },
+          {
+            "text": "NFR fragments are enriched at the TSS centre versus flanks",
+            "result": "PASS",
+            "note": "ratio 6.80"
+          },
+          {
+            "text": "Fragment centre equals the true fragment centre for at least 99 percent of mono read1",
+            "result": "FAIL",
+            "note": "only 50.1 percent exact; median error 112 bp for the rest"
+          },
+          {
+            "text": "Strand-aware orientation is applied for a TSS list containing minus-strand genes",
+            "result": "FAIL",
+            "note": "strand ignored; pooled mono ratio 1.21 vs 0.46 strand-aware"
+          },
+          {
+            "text": "Rendered PNG is legible with labelled axes at intended size",
+            "result": "PASS",
+            "note": "axes and NFR band legible; lobes dim on linear scale (NUCPOS-014)"
+          }
+        ],
+        "total": 64,
+        "assertions_passed": 3,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "NRL estimate from fragment sizes (estimate_nrl.py)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "IndexError on real GM12878 data and on the planted BAM",
+        "basic": 14,
+        "specialized": 12,
+        "assertions": [
+          {
+            "text": "estimate_nrl returns a 150-250 bp NRL on real ATAC data",
+            "result": "FAIL",
+            "note": "IndexError: no peak in window"
+          },
+          {
+            "text": "Failure on a BAM without periodicity gives an actionable message",
+            "result": "FAIL",
+            "note": "raw traceback"
+          },
+          {
+            "text": "Same peak picking with a 50 bp separation recovers the independent mono mode",
+            "result": "PASS",
+            "note": "177.5 bp vs 178 bp"
+          }
+        ],
+        "total": 26,
+        "assertions_passed": 1,
+        "assertions_total": 3
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "ATACseqQC pipeline (nucleosome_analysis.R) on GM12878 rep1",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Verbatim run halts at the shift step; with two API fixes it completes but exports are unfiltered and the heatmap is uninformative on the slice",
+        "basic": 20,
+        "specialized": 22,
+        "assertions": [
+          {
+            "text": "Verbatim script exits 0 and writes heatmap, BAMs and summary CSV",
+            "result": "FAIL",
+            "note": "halts at shiftGAlignmentsList (rc 1)"
+          },
+          {
+            "text": "Fragment-class fractions are parsed and plausible for ATAC (NFR > mono, mono and di present)",
+            "result": "PASS",
+            "note": "NFR 28.4, mono 14.7, di 15.6 percent"
+          },
+          {
+            "text": "Script with the two API fixes completes and writes all declared outputs",
+            "result": "PASS",
+            "note": "rc 0; heatmap PDF, NFR/mono BAMs, CSV; mono BAM 100 percent 180-247 bp"
+          },
+          {
+            "text": "Exported BAMs honour the stated MAPQ >= 30 filter",
+            "result": "FAIL",
+            "note": "65,070 NFR records with MAPQ < 30"
+          },
+          {
+            "text": "Heatmap is interpretable",
+            "result": "FAIL",
+            "note": "uniform zero-coverage colour on chr1 slice; alt-contig out-of-bound warnings"
+          }
+        ],
+        "total": 42,
+        "assertions_passed": 2,
+        "assertions_total": 5
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "NucleoATAC run at TSS-flank regions (GM12878 rep1+rep2)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Occupancy and NFR outputs work; nucleosome calls are empty because every z-score is NaN (upstream defect)",
+        "basic": 26,
+        "specialized": 26,
+        "assertions": [
+          {
+            "text": "nucleoatac run exits 0 and writes all output families",
+            "result": "PASS",
+            "note": "rc 0; 11 output files"
+          },
+          {
+            "text": "Occupancy is non-degenerate and within [0,1]",
+            "result": "PASS",
+            "note": "130,082 bp; mean 0.39; sd 0.32"
+          },
+          {
+            "text": "NFR calls lie near TSS",
+            "result": "PASS",
+            "note": "47 NFRs, median 83 bp from a TSS"
+          },
+          {
+            "text": "nucpos.bed contains called nucleosomes",
+            "result": "FAIL",
+            "note": "0 rows; z-scores NaN (calculateCov uninitialised)"
+          },
+          {
+            "text": "Documented Python 3.7 pip install of NucleoATAC works",
+            "result": "FAIL",
+            "note": "Python version must be 2.7"
+          }
+        ],
+        "total": 52,
+        "assertions_passed": 3,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "DANPOS3 differential on a planted 40 bp shift pair",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Recovers planted shifts; column and executable guidance missing or stale",
+        "basic": 32,
+        "specialized": 44,
+        "assertions": [
+          {
+            "text": "treat2control_dis median is near 40 bp in the shifted half",
+            "result": "PASS",
+            "note": "40.0 bp"
+          },
+          {
+            "text": "treat2control_dis median is below 10 bp in the unshifted half",
+            "result": "PASS",
+            "note": "0.0 bp"
+          },
+          {
+            "text": "Skill rule (shift >= 30 and FDR < 0.05) recovers at least half of planted positions with no false calls",
+            "result": "PASS",
+            "note": "90.4 percent recovered, 0 false calls (point_diff_FDR)"
+          },
+          {
+            "text": "The FDR and shift columns are unambiguous from the Skill text",
+            "result": "FAIL",
+            "note": "smt_diff_FDR gives 0 percent recovery"
+          },
+          {
+            "text": "Documented python danpos.py invocation and GitHub-only install match the tested package",
+            "result": "FAIL",
+            "note": "conda danpos3 3.2.4 provides the danpos command"
+          }
+        ],
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 5
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.0,
+    "dynamic_weighted": 31.2,
+    "score": 57,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "DANPOS3 differential recovered a planted 40 bp shift (90.4 percent of positions, 0 false calls in the unshifted half) using the documented flags",
+    "NucleoATAC occupancy and NFR outputs are sound on real GM12878 data (values in [0,1]; NFR calls a median 83 bp from a TSS)",
+    "Fragment-class windows (NFR < 100, mono 180-247, di 315-473) are correct and reproduced by ATACseqQC class counts",
+    "Short routed SKILL.md with a clear tool-by-goal decision table; MIT license and provenance preserved"
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Make estimate_nrl.py run on real ATAC data",
+      "observed_in": [
+        2
+      ],
+      "problem": "estimate_nrl.py raises IndexError on real GM12878 chr1 data and on the planted BAM.",
+      "root_cause": "find_peaks(distance=50) is 250 bp in 5 bp bins, so the NFR peak suppresses the mono peak, and the empty selection is unguarded.",
+      "fix": "Use a distance of about 10 bins, guard the empty result with a clear message, and check against an independent mono mode. (NUCPOS-001)"
+    },
+    {
+      "priority": "P0",
+      "title": "Repair nucleosome_analysis.R for current Bioconductor",
+      "observed_in": [
+        3
+      ],
+      "problem": "The script halts at shiftGAlignmentsList(as(gal, GAlignmentsList)) and would then fail because featureAlignedSignal moved to ChIPpeakAnno.",
+      "root_cause": "API changes in GenomicAlignments/ATACseqQC not tracked.",
+      "fix": "Use readBamFile(asMates=TRUE) for the shift input and load ChIPpeakAnno; state tested versions and add ChIPpeakAnno to the install. (NUCPOS-002, NUCPOS-003)"
+    },
+    {
+      "priority": "P1",
+      "title": "Fix V-plot centring and strand orientation",
+      "observed_in": [
+        1
+      ],
+      "problem": "vplot.py mis-centres about half of mono fragments and pools plus and minus TSS, which smears the V/W that the Skill uses as its go/no-go gate.",
+      "root_cause": "Centre from one mate start and no use of the BED strand column.",
+      "fix": "Use the leftmost mate start and mirror minus-strand windows; add a recount test. (NUCPOS-004, NUCPOS-005)"
+    },
+    {
+      "priority": "P1",
+      "title": "Correct the NucleoATAC install and detect empty calls",
+      "observed_in": [
+        4
+      ],
+      "problem": "The Python 3.7 pip recipe fails and nucpos.bed is empty because calculateCov returns NaN (uninitialised accumulator), which the Skill blames on region size or depth.",
+      "root_cause": "Install never executed; upstream extension defect not known to the Skill.",
+      "fix": "Document the working py2.7 conda install, add a nucpos non-empty check with the NaN diagnosis and a tested workaround or alternative for +1 calls. (NUCPOS-006, NUCPOS-007)"
+    },
+    {
+      "priority": "P2",
+      "title": "Align R exports and TSS set with the stated filters",
+      "observed_in": [
+        3
+      ],
+      "problem": "Exported BAMs contain MAPQ < 30 reads (18.7 percent of NFR) and the TSS set contradicts its comment and includes alt contigs.",
+      "root_cause": "Two loading routes; no TSS filtering.",
+      "fix": "Filter to MAPQ >= 30 once, restrict to standard-chromosome protein-coding TSS, and check the heatmap on real rows. (NUCPOS-008, NUCPOS-009)"
+    },
+    {
+      "priority": "P2",
+      "title": "Specify the DANPOS3 columns and current install",
+      "observed_in": [
+        5
+      ],
+      "problem": "The shift and FDR columns are unnamed (smt_diff_FDR gives zero calls; point_diff_FDR works) and the executable and install guidance is stale.",
+      "root_cause": "Rule written without mapping to output columns or the conda package.",
+      "fix": "Name treat2control_dis and point_diff_FDR with a filter command and document the danpos executable. (NUCPOS-010, NUCPOS-011)"
+    },
+    {
+      "priority": "P2",
+      "title": "Remove stale caveats and unsupported claims",
+      "observed_in": [],
+      "problem": "Process language about unverified versions remains, the 10 bp H2A.Z figure and the yeast +1 position are uncited or inconsistent, and small script and scPrinter gaps remain.",
+      "root_cause": "Normalization deferred version checks and claims were not sourced.",
+      "fix": "Replace caveats with tested versions, cite or drop the claims, harden vplot.py output and add or drop the scPrinter route. (NUCPOS-012, NUCPOS-013, NUCPOS-014, NUCPOS-015)"
+    }
+  ]
+}
