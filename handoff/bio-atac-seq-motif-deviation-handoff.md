@@ -1,63 +1,57 @@
-# Handoff: bio-atac-seq-motif-deviation / fix-scientific-skill
+# Handoff: bio-atac-seq-motif-deviation / orchestrator (candidate-ready)
 
 - Updated: 2026-09-30
 - Lane: 3
-- Status: ready-for-phase
-- Owner leaving: audit-scientific-skill worker (lane 3)
-- Next role: fix-scientific-skill
+- Status: candidate-ready
+- Owner leaving: reaudit-scientific-skill worker (independent; did not fix or initially audit)
+- Next role: orchestrator (commit exact bytes to make `ready`; intake makes `done`)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:atac-seq/motif-deviation
-- Working tree: `F:\OpenScience\wt\atac-motif-deviation` (candidate at `skills\bio-atac-seq-motif-deviation`)
-- Branch/worktree: fix/atac-motif-deviation, starting commit 3186916 (skill dir untracked)
-- Candidate tree hash: `sha256-manifest-v1 d645db4df84650ecf90027b9013e38b0d9adce73fb985a605d769c730d68fefc` (6 files; re-verified live, unchanged)
-- Applicable audit: `F:\OpenScience\audits\bio-atac-seq-motif-deviation\initial-audit-20260930\report.json` (same identity). Score 60, grade Reject by veto (skill veto stability+determinism, research veto code usability). Static 71, execution 52.8, assertions 13/24. Not published to records yet (orchestrator).
+- Working tree: F:\OpenScience\wt\atac-motif-deviation\skills\bio-atac-seq-motif-deviation
+- Branch/worktree: fix/atac-motif-deviation, start 3186916; files untracked, no commit
+- Candidate identity (sha256-manifest-v1): `fb58807b04cb2e753dce4d199ef54c057c2d762635c526a0e7aef124e2a19c4e` (6 files, 29,756 bytes); recomputed live before and after execution, unchanged
+- Applicable audit: F:\OpenScience\audits\bio-atac-seq-motif-deviation\reaudit-run\ (report.json, viewer.md, source-identity.json). Superseded initial audit d645db4d: 60/100.
+
+## Readiness decision: candidate-ready
+
+Score 86 (Production Ready), static 86, execution avg 86.6, Layer 1 34.6, Layer 2 52.0, assertions 18/20 (90%), no veto, no open P0. Rubric zip sha256 e54e9ff8...
 
 ## Completed this phase
 
-- Static read of all 6 files; executed 5 workflows (patched and shipped bulk, Signac 1.17.1/1.16.0, ArchR, DecoupleR 1.8/2.2) plus chromVAR hand-check, reseed determinism, ArchR NA diagnosis.
-- report.json (schema checklist verified), viewer.md, findings.json, source-identity.json, scripts/, logs/ in the run dir.
-- ArchR NA cause characterized (T3): zero-read motif peaks in sparse cells give zero background SD; dropping the 6 NA cells lets getMarkerFeatures run.
+- Independent retest of every claimed fix. Bulk script with depth.tsv run twice: byte-identical; unseeded control differs, so reproducibility comes from set.seed (MOTDEV-001, -003).
+- Signac direct chromVAR route verbatim on 1.17.1 and 1.16.0: 879 x 1,853, 0 NA, identical (MOTDEV-002).
+- ArchR: no-guard fails on NA, guard passes; Skill honestly says full-scale recurrence is untested (MOTDEV-004).
+- Biology matches: K562 GATA2/GATA1::TAL1 up, GM12878 SPIB/Spi1/IRF4/EBF1 up; heatmap legible.
+- Reused only identity-matched evidence (chromVAR hand-check, JASPAR workaround); ArchR upstream lines identical to origin.
 
-## Required next actions (findings ledger: `initial-audit-20260930\findings.json`)
+## Open findings (none blocking)
 
-1. MOTDEV-001 (P0): document/set `colData(se)$depth` (total library reads, not colSums) in script and Skill; rerun end to end on `outputs\counts.tsv`, `peaks.bed`, `depth.tsv`.
-2. MOTDEV-003 (P0): `set.seed` before `getBackgroundPeaks`; document seed/stochasticity.
-3. MOTDEV-002 (P1): Signac `RunChromVAR` gone in 1.17.x; pin <=1.16.0 or give a tested direct-chromVAR route; fix version floor.
-4. MOTDEV-004 (P1): NA check and remedy before ArchR `getMarkerFeatures`.
-5. MOTDEV-005/006/007 (P2): fix chromVAR formulas in SKILL.md, DecoupleR snippet, TF names in CSV/heatmap.
-6. MOTDEV-008 to -012 (P3): wording, stale counts (879 not ~1900; ArchR cisbp 870 not ~5000; logFC range), uncited heuristics, ggplot2 note, Bioc 3.23 note.
-
-## Open findings and blockers
-
-| ID | Severity | State | Evidence | Required disposition |
+| ID | Severity | State | Evidence | Disposition |
 |---|---|---|---|---|
-| MOTDEV-001 | P0 | open | logs/run_bulk_unmodified.err | fix and rerun |
-| MOTDEV-003 | P0 | open | logs/determinism_bulk.log | fix and rerun |
-| MOTDEV-002 | P1 | open | logs/smoke_signac_1.17.1.log | fix, rerun both Signac versions |
-| MOTDEV-004 | P1 | open | logs/archr_na_diag.log | fix, rerun ArchR |
-| MOTDEV-005 | P2 | open | logs/smoke_chromvar_handcheck.log | edit prose |
-| MOTDEV-006 | P2 | open | logs/smoke_decoupler.log | test or drop |
-| MOTDEV-007 | P2 | open | ../outputs/heat-1.png | add names |
-| MOTDEV-008 to -012 | P3 | open | findings.json | fix or defer with reason |
+| MOTDEV-013 | P2 | open (new) | reaudit-run\scripts\analyze_z.py; SKILL.md line 22 | "top motifs exceeded 9" is wrong for z (max 7.24; logFC reaches ~14). One-line edit, but editing changes the identity and requires re-audit; orchestrator may accept as-is |
+| MOTDEV-004 | P2 | residual | reaudit-run\logs\archr_guard.log | Guarded, not root-caused; full-depth recurrence unproven, stated in the Skill |
 
-Deferred/static-only: bulk time-course spline, custom PFM/plant genome, scBasset/SCENIC+; Bioc 3.23/R 4.6 stack not built.
+All other MOTDEV-001..012 dispositions confirmed.
+
+## Failed or blocked surfaces
+
+None failed. Not run: ArchR upstream chain (reused first-pass, lines identical to origin), Bioc 3.23/R 4.6, whole-genome PBMC set. Restricted-access items: none.
 
 ## Environment and evidence
 
-- Tool inventory: `F:\OpenScience\audits\bio-atac-seq-motif-deviation\TOOLS.md` (sha256 47287b4b...5ab6), env fingerprint `91dcd6702bfba8518d2ff53ff1fec2bf447b62d06a091c00124c7ee4e1118ecd`
-- Run evidence: `F:\OpenScience\audits\bio-atac-seq-motif-deviation\initial-audit-20260930\{scripts,logs}`; env root `F:\OpenScience\audit-envs\bio-atac-seq-motif-deviation`; activation in TOOLS.md
-- Restricted-access items: none
-- Tooling impact: none (no environment change; Signac 1.16.0 side lib already present for rerun)
+- Tool inventory: F:\OpenScience\audits\bio-atac-seq-motif-deviation\TOOLS.md (delta); fingerprint 91dcd6702bfba8518d2ff53ff1fec2bf447b62d06a091c00124c7ee4e1118ecd verified live
+- Run evidence: F:\OpenScience\audits\bio-atac-seq-motif-deviation\reaudit-run\ (scripts\, logs\, bulk_A/B/U, guard_missing, out_signac*)
+- Tooling impact: none
 
 ## Worktree safety
 
-- Run-owned changes: `F:\OpenScience\audits\bio-atac-seq-motif-deviation\initial-audit-20260930\`, `F:\OpenScience\audit-disposable\mda-rubric\`, this handoff. Skill bytes untouched, no audit-local repair used.
-- Pre-existing/user-owned changes: `F:\optimizing-agent-science-skills\tools\run_mercury_worker.py`, `tools\test_run_mercury_worker.py`
-- Records state: uncommitted, unpublished
+- Run-owned changes: reaudit-run\ and this handoff only; candidate not edited
+- Pre-existing/user-owned changes: F:\optimizing-agent-science-skills\tools\run_mercury_worker.py and tools\test_run_mercury_worker.py (untouched)
+- Records state: unpublished, uncommitted (per instruction)
 - Product commits/pushes: none
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes
+- Next-phase prerequisites met: yes (commit exact bytes, then publish record with `tools/publish_audits.py --run-dir` and regenerate audit index)
