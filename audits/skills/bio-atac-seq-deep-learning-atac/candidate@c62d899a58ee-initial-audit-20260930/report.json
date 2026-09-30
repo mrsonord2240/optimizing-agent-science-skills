@@ -1,0 +1,439 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-deep-learning-atac",
+    "description": "Sequence-based deep learning for ATAC-seq using chromBPNet, BPNet, scBasset, or Enformer: Tn5 bias correction, per-base accessibility profiles, in silico variant effects, and DeepLIFT/TF-MoDISco motif discovery.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations or results; uncited speed/compute claims are scored under maintainability."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research analysis scope; no diagnostic or therapeutic conclusions."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "Input 2: documented log2FC on the log-count head understates effects about 5x (mean -0.46 vs true -2.27), so the |log2fc|>1 rule would call strong effects weak (DLA-001)."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "Input 1: shipped pipeline script fails at once because the required nonpeaks file is never generated; documented variants.tsv and pred_bw region formats also fail (DLA-002, DLA-003, DLA-007)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 67,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "Core chromBPNet and modisco pieces work, but variant, motif and scBasset/Enformer/Borzoi routes are missing steps or wrong as written."
+      },
+      "reliability": {
+        "score": 6,
+        "max": 12,
+        "note": "No input checks; missing nonpeaks and column-format failures surface as raw stack traces and the slow interpret stage is unmentioned."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md 88 lines with three focused references; compute figures uncited."
+      },
+      "agent_usability": {
+        "score": 9,
+        "max": 16,
+        "note": "Tool-selection guidance is clear but several documented commands cannot be followed cold; inconsistent scBasset and bias-model statements."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Good triggers and a when-not-to-use list; rigid undocumented input formats."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No secrets or destructive commands; unquoted variables and placeholder path unvalidated."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Clean routing; only one runnable script and no tests or examples."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Strong progressive disclosure and routing; re-run of prep nonpeaks fails on existing outputs; escape hatches only partly stated."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 56.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Shipped chromBPNet script on real-derived GM12878 fixture",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "As shipped it fails 34 s in (no nonpeaks file); with a generated negatives file the models and metrics are produced but neither long stage exited within the CPU caps",
+        "basic": 20,
+        "specialized": 30,
+        "total": 50,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script runs as shipped with only path/contig substitution",
+            "result": "FAIL",
+            "note": "FileNotFoundError nonpeaks.bed; empty out/model"
+          },
+          {
+            "text": "Splits JSON matches documented chromosome assignment",
+            "result": "PASS",
+            "note": "test chr1/3/6, valid chr8/20, 450 train contigs"
+          },
+          {
+            "text": "Bias and accessibility models trained with scientifically sane metrics",
+            "result": "PASS",
+            "note": "bias.h5; nobias test-peak counts pearson 0.474, spearman 0.461 (2-epoch, 2,166 peaks)"
+          },
+          {
+            "text": "Both pipeline processes exit cleanly",
+            "result": "FAIL",
+            "note": "bias pipeline 61-76 min and pipeline 60 min capped in DeepSHAP interpret stage"
+          },
+          {
+            "text": "Documented outputs (bias.h5, chrombpnet_nobias.h5) exist",
+            "result": "PASS",
+            "note": "present; footprint PNGs and bias response 0.001 inspected"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Variant effect scoring: ENCODE GM12878 model + tangermeme formula",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "variant-scorer works only with a 5-column list; documented tangermeme formula gives ~5x-understated effects and has no chromBPNet loader",
+        "basic": 25,
+        "specialized": 33,
+        "total": 58,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Documented 4-column variants.tsv is accepted",
+            "result": "FAIL",
+            "note": "ValueError expects 5 columns"
+          },
+          {
+            "text": "5-column run gives finite logfc equal to log2(allele2/allele1)",
+            "result": "PASS",
+            "note": "max deviation 1.1e-7; 200 real NA12878 SNPs; 2/200 abs logfc >1"
+          },
+          {
+            "text": "Pretrained ENCODE model separates real peaks from non-peaks",
+            "result": "PASS",
+            "note": "mean logcounts 5.94 vs 3.30, AUC 0.970"
+          },
+          {
+            "text": "Documented tangermeme log2fc line returns the true count log2FC",
+            "result": "FAIL",
+            "note": "mean -0.46 vs true -2.27 on planted-motif fixture"
+          },
+          {
+            "text": "Documented chromBPNet-to-tangermeme route is executable",
+            "result": "FAIL",
+            "note": "load_chrombpnet_model is pseudocode; no adapter"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Bias-corrected prediction bigWigs with pred_bw",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Works only with 10-column narrowPeak regions; the natural 3-column BED fails with an unclear error",
+        "basic": 28,
+        "specialized": 38,
+        "total": 66,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "3-column regions.bed accepted",
+            "result": "FAIL",
+            "note": "ValueError cannot convert float NaN to integer"
+          },
+          {
+            "text": "10-column narrowPeak run writes both bigWigs",
+            "result": "PASS",
+            "note": "pred_bias.bw and pred_chrombpnet_nobias.bw parsed with pyBigWig"
+          },
+          {
+            "text": "Bias track differs from corrected track as expected",
+            "result": "PASS",
+            "note": "sum 421.5 vs 17,923.6; 60,959 non-zero bins"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "DeepLIFT + TF-MoDISco motif discovery",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "modisco CLI recovers the planted motif from bpnet-lite attributions; chromBPNet contribs_bw h5 feeds `modisco motifs -i` but the documented shap_to_modisco conversion does not exist",
+        "basic": 26,
+        "specialized": 36,
+        "total": 62,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "modisco motifs (documented flags) runs and recovers planted TGACTCA",
+            "result": "PASS",
+            "note": "pattern_0 consensus contains TGACTCA, 91 seqlets"
+          },
+          {
+            "text": "modisco report annotates against JASPAR2024",
+            "result": "PASS",
+            "note": "MA0462.3/MA0835.3/MA1634.2 TGACTCA q=0.0026 with tomtom present; fails without tomtom"
+          },
+          {
+            "text": "Attributions concentrate on the planted motif; captum completeness holds",
+            "result": "PASS",
+            "note": "0.235 vs 0.0005; delta 6e-8"
+          },
+          {
+            "text": "Documented contribs_bw then shap_to_modisco conversion is executable as written",
+            "result": "FAIL",
+            "note": "shap_to_modisco absent; undocumented h5 route ran (20 regions, exit 0)"
+          },
+          {
+            "text": "Documented npz layout works as-is",
+            "result": "FAIL",
+            "note": "(N,L,4) fails; (N,4,L) required"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Other advertised models: scBasset, Enformer, Kipoi, Borzoi",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "scBasset ran only on TF 2.15 CPU (3 epochs); Enformer works via enformer-pytorch not Kipoi; Borzoi not run",
+        "basic": 18,
+        "specialized": 26,
+        "total": 44,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "scBasset preprocess/train/reload on real 10x PBMC on the documented tensorflow 2.13+",
+            "result": "FAIL",
+            "note": "Keras 3 ModelCheckpoint error; only TF 2.15 Keras 2 CPU env ran"
+          },
+          {
+            "text": "scBasset per-cell projection kernel finite after training",
+            "result": "PASS",
+            "note": "(32,4609) finite, val_auc 0.53 after 3 epochs"
+          },
+          {
+            "text": "Enformer available through Kipoi as documented",
+            "result": "FAIL",
+            "note": "no Enformer in Kipoi listing"
+          },
+          {
+            "text": "Enformer forward on real hg38 gives valid tracks",
+            "result": "PASS",
+            "note": "(1,896,5313) finite, non-negative, mean 1.352"
+          },
+          {
+            "text": "Borzoi route executed",
+            "result": "FAIL",
+            "note": "not installed; blocked/resource item"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.8,
+    "dynamic_weighted": 33.6,
+    "score": 60,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Clear tool-selection guidance and when-not-to-use boundaries that keep classical ATAC steps out of scope.",
+    "Correct current-CLI details in places (chrombpnet prep splits flags, snp_score removed, variant-scorer companion repo).",
+    "Concise SKILL.md with routed references and a shipped end-to-end script skeleton.",
+    "Core tooling verified live: pretrained ENCODE model separates real peaks (AUC 0.970); variant-scorer logfc exact; modisco recovers a planted motif."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "DLA-001 log2FC formula understates effects ~5x on log-count ",
+      "observed_in": [
+        2
+      ],
+      "problem": "`np.log2(y_alt.sum(-1)/y_ref.sum(-1))` is a ratio of LOG counts, not a count fold change.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "State the head semantics (chromBPNet outputs profile logits + log counts). Compute (y_alt - y_ref)/ln2 on the log-count head (or log2 of exp-counts), or use variant-scorer's logfc; wrap tuple outputs with CountWrapper; add a numeric regression using a planted motif."
+    },
+    {
+      "priority": "P0",
+      "title": "DLA-002 Shipped pipeline not runnable as documented (no nonp",
+      "observed_in": [
+        1
+      ],
+      "problem": "The script consumes NONPEAKS (default nonpeaks.bed) but nothing generates it; neither SKILL.md nor the script mentions `chrombpnet prep nonpeaks`.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Add a `chrombpnet prep nonpeaks -g -c -p -fl -o` step before step 2 (documented output `<prefix>_negatives.bed`), wire it to NONPEAKS, check inputs exist up front, and document the stage runtimes."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-003 variants.tsv format and pybedtools prerequisite wron",
+      "observed_in": [
+        2
+      ],
+      "problem": "Documented `chrom, pos, ref, alt` (4 columns) fails in variant-scorer: `ValueError: File has 4 columns but chrombpnet schema expects 5 columns`.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Document the 5-column schema with an example row, name the output columns, and list pybedtools (conda) as a prerequisite."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-004 tangermeme route for chromBPNet models has no loader",
+      "observed_in": [
+        2
+      ],
+      "problem": "The SKILL/decision tree route variants through 'tangermeme on pre-trained chromBPNet' but `load_chrombpnet_model` is pseudocode and `tangermeme.io.adapter` does not exist (tangermeme 1.5.0 io exposes read_meme/read_vcf/extract_loci etc.).",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Route chromBPNet/ENCODE .h5 variant scoring to variant-scorer; keep tangermeme for torch models (bpnet-lite, bpnetlite.chrombpnet) with a working loader example; remove the 100x-speed claim or cite it."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-005 chromBPNet-to-modisco route documented incorrectly",
+      "observed_in": [
+        4
+      ],
+      "problem": "The reference says `chrombpnet contribs_bw` writes hypothetical contributions to be converted 'via shap_to_modisco'; no such tool exists in chrombpnet 1.0.1.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Document the actual chromBPNet route (interpret output or a working DeepSHAP-to-npz conversion), the (N,4,L) layout, the tomtom/MEME prerequisite and expected CPU runtime, and add an executed example."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-006 Version claims (TF 2.13+) unsatisfiable for chromBPN",
+      "observed_in": [
+        5
+      ],
+      "problem": "chrombpnet 1.0.1 pins tensorflow 2.8.0/keras 2.8/numpy 1.23/python 3.8 (CPU only; libcudart 11 missing, sm_120 unsupported); scBasset training fails on Keras 3 (`ModelCheckpoint filepath must end in .weights.h5`) and needs TF<=2.15; modisco-lite is the PyPI name (chromBPNet env carries 2.0.7, Skill .",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Document separate environments per tool (chromBPNet TF 2.8/py3.8 CPU; torch stack for bpnet-lite/tangermeme/modisco; scBasset TF<=2.15), correct the pins and the 'GPU required' claim for chromBPNet."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-007 pred_bw regions need 10-column narrowPeak",
+      "observed_in": [
+        3
+      ],
+      "problem": "`chrombpnet pred_bw -r regions.bed` with a natural 3-column BED fails `ValueError: cannot convert float NaN to integer`; a 10-column narrowPeak (summit column) works and produced pred_bias.bw / pred_chrombpnet_nobias.bw (bias track sum 421.5 vs corrected 17,923.6 in regions, 60,959 non-zero bins).",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "State the 10-column requirement and give a one-line way to derive it from peaks.narrowPeak."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-008 Uncalibrated |log2FC|>1 threshold; tool null ignored",
+      "observed_in": [
+        2
+      ],
+      "problem": "The Skill declares |log2fc|>1 'strong effect' with no calibration.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Recommend the shuffled-null p-values and jsd, describe how to pick thresholds, and label |log2FC|>1 as a heuristic."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-009 No model QC acceptance criteria after training",
+      "observed_in": [
+        1
+      ],
+      "problem": "No step checks bias-model or corrected-model quality.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Add a QC gate (bias/corrected metrics, footprint and max bias response, `chrombpnet qc`) with pass/fail guidance before variant or motif use."
+    },
+    {
+      "priority": "P1",
+      "title": "DLA-010 Enformer/Borzoi/scBasset advice unsupported or contr",
+      "observed_in": [
+        5
+      ],
+      "problem": "'Kipoi for Enformer' is false (kipoi ls shows no Enformer; Enformer works via enformer-pytorch/HF: real 196,608 bp hg38 -> (1,896,5313) finite).",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Give a working Enformer command (enformer-pytorch) with input-length and track guidance, drop or qualify Borzoi, and rewrite the scBasset guidance around per-cell input with prerequisites and versions."
+    },
+    {
+      "priority": "P2",
+      "title": "DLA-011 CPU stage runtime undocumented; DeepSHAP stage never",
+      "observed_in": [
+        1
+      ],
+      "problem": "`chrombpnet bias pipeline` (two runs, 61-76 min) and `chrombpnet pipeline` (step 3, capped at 3,600 s, log ends 'Generating profile shap scores / Done 0 examples of 2165' at 60m01s) did not exit in the post-training DeepSHAP interpret stage on CPU under load; the interpret directories hold only args.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Document that interpretation is the slow tail, how to reduce/skip it, and per-stage runtimes; keep the 'exit not observed' limitation until rerun on suitable hardware."
+    },
+    {
+      "priority": "P2",
+      "title": "DLA-012 Stale or non-existent flags and terms",
+      "observed_in": [],
+      "problem": "`--num-filters` is `-fil/--filters`; `target_seqlet_fdr` and 'flank_size' are TF-MoDISco v1 terms not exposed by modisco-lite 2.x (`-f` seqlet flank; no FDR flag); 'DeepLIFT (RevealCancel rule)' conflicts with the stated rescale default; 'bias trained on naked-DNA control' conflicts with the pipelin.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Replace each with the installed CLI's names and reconcile the bias-model statements."
+    },
+    {
+      "priority": "P2",
+      "title": "DLA-013 Script hygiene: unquoted paths, placeholder scorer p",
+      "observed_in": [],
+      "problem": "Variables are unquoted (paths with spaces break); VARIANT_SCORER defaults to `/path/to/variant-scorer` with no existence check, so a placeholder failure would surface only after the long training; `-tcr/-vcr` are test/valid but the header says train/val/test order; step 4 says the `variants.tsv` con.",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Quote variables, fail fast on missing inputs and scorer path, and fix the comment."
+    },
+    {
+      "priority": "P2",
+      "title": "DLA-014 Unsupported comparative claims and thresholds",
+      "observed_in": [],
+      "problem": "'Strongest bias correction of the compared tools', '100x speedup', '<50M reads / <30k peaks' and the compute figures are uncited; bounded runs cannot confirm them..",
+      "root_cause": "Reference examples were written from tool documentation without executing them against installed versions.",
+      "fix": "Cite or soften."
+    }
+  ]
+}

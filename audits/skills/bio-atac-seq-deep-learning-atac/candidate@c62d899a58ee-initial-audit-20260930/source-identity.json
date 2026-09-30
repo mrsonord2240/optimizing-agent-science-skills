@@ -1,0 +1,56 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/deep-learning-atac"
+  },
+  "candidate": {
+    "branch": "fix/atac-deep-learning-atac",
+    "commit": "3186916",
+    "path": "F:\\OpenScience\\wt\\atac-deep-learning-atac\\skills\\bio-atac-seq-deep-learning-atac",
+    "status_before": "untracked normalized subtree only",
+    "status_after_execution": "untracked normalized subtree only (bytes unchanged)",
+    "content_sha256": "c62d899a58ee945dcf6cdb9e2ba797b65c09b2c9730da4a3be70a3f8f1a28943",
+    "content_manifest": {
+      "file_count": 6,
+      "scheme": "sha256-manifest-v1 as computed by the tooling phase; per-file sha256 below verified live"
+    },
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 5359,
+        "sha256": "7158f25acc821596aff2c4428d892fd1dff6ff9e6d671f4acd59d379a8ce99f4"
+      },
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 4692,
+        "sha256": "08097ec7507c551f165467c696516c257ce207750f9099b2ba9b86bae02b83b4"
+      },
+      {
+        "path": "references/method-reference.md",
+        "bytes": 11252,
+        "sha256": "8a714d1c6cecda473f30e4dbd40cb6b8c8376ccc98241ed6b860099c0bf84e7c"
+      },
+      {
+        "path": "references/tool-decision-tree.md",
+        "bytes": 3058,
+        "sha256": "d39dbc808455118b7de50091189a57769c5e432bde4179b6edd25b70db26de3a"
+      },
+      {
+        "path": "scripts/chrombpnet_pipeline.sh",
+        "bytes": 2984,
+        "sha256": "299a8b1f260b5b7fed5b350a75d2b85b72c3194a9bcb40c4b5afa927dae3f143"
+      }
+    ]
+  },
+  "tooling": {
+    "tools_md_sha256": "6d2f42b085878c59bd1f452852964daec78542aa575cb1073f0b16cdc3f325fa",
+    "environment_fingerprint_sha256": "06fc27986ce7b28c4e102689c57fa41596fc3d2716402daaa8309f93bf9cfa29",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "skill_id": "bio-atac-seq-deep-learning-atac",
+  "version": "candidate@c62d899a58ee-initial-audit-20260930",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/deep-learning-atac",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/deep-learning-atac"
+  },
+  "candidate": {
+    "identity": "c62d899a58ee945dcf6cdb9e2ba797b65c09b2c9730da4a3be70a3f8f1a28943",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-deep-learning-atac",
+    "commit": "3186916",
+    "content_sha256": "c62d899a58ee945dcf6cdb9e2ba797b65c09b2c9730da4a3be70a3f8f1a28943",
+    "path": "F:\\OpenScience\\wt\\atac-deep-learning-atac\\skills\\bio-atac-seq-deep-learning-atac"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 11
+  }
+}
