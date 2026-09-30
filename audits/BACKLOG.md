@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: SVA snippet is an extraction example, not a tested analysis path, and use_sva is not reachable from the CLI.
 - Fix: Choose n.sv with num.sv capped by sample count, feed SVs into the design and assert the model uses them; else remove the branch and route to the tested method-reference recipe. DAC-001.
 
-## P1 (58)
+## P1 (57)
 
 ### `bio-atac-seq-co-accessibility` — CLI fails on binarized (pattern) .mtx input
 
@@ -47,14 +47,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Script default DBA_NORM_NATIVE yields RLE with RiP library size; SKILL.md calls full-library the default and the usage guide prescribes DBA_NORM_LIB for cross-cell-type comparisons. Opened/closed split moves from 535/561 to 766/415.
 - Root cause: The effective library method is never logged and the defaults were not reconciled.
 - Fix: Pick one default consistent with the guidance, log norm.method/lib.method from dba.normalize, and state the RiP trade-off in the Skill body. DAC-003.
-
-### `bio-atac-seq-atac-qc` — library_complexity.py NRF/PBC are single-end read-start m...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 2
-- Problem: On paired-end ATAC BAMs the script keys each mate by (chr, start, strand). Unfiltered rep1: 0.353/0.632/3.40 vs independent fragment NRF/PBC1/PBC2 0.619/0.767/4.87 (MAPQ>=30: 0.779/0.799/5.10); the ENCODE-filtered deduplicated BAM gives 0.573 instead of the 1.0 the Skill states. Grading against the 0.7 reject line would fail acceptable libraries.
-- Root cause: Skill defines NRF over reads/positions and the script never pairs mates.
-- Fix: Compute on fragments (chr, fragment start, end) for paired-end input, keep a single-end mode, use 5-prime coordinates for reverse reads, and state definition and units in SKILL.md and method-reference.md.
 
 ### `bio-data-visualization-ggplot2-fundamentals` — ggtext '\u2212' label prints a literal backslash sequence
 
@@ -480,7 +472,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (161)
+## P2 (155)
 
 ### `bio-atac-seq-co-accessibility` — Hard-coded all-chromosome genome_df; 25 min timeout
 
@@ -561,78 +553,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: No genome argument or annotation bypass though method-reference advertises custom genomes.
 - Root cause: Static library() of the hg38 TxDb.
 - Fix: Add a TxDb/genome parameter or state hg38-only. DAC-009.
-
-### `bio-atac-seq-atac-qc` — library_complexity.py ignores documented MAPQ>=30, chrM e...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 2, 7
-- Problem: Docs say NRF/PBC run after MAPQ>=30 filtering; a planted BAM with 100 unique nuclear reads plus 100 chrM and 100 MAPQ0 duplicates returned total 300, NRF 0.34 instead of 100 and 1.0.
-- Root cause: Filtering is left to an undocumented pre-step and the script has no options.
-- Fix: Add --min-mapq and contig-exclusion defaults matching the Skill, or state the required pre-filter command.
-
-### `bio-atac-seq-atac-qc` — aggregate_qc.py output is not per-sample or MultiQC-compa...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 4
-- Problem: Long-format metric/value/flag TSV; MultiQC custom content parsed 7 metric rows as 7 samples. No sample column, no overall grade, missing metrics produce no row, string values raise TypeError.
-- Root cause: Docs describe a per-sample report card and _mqc.tsv that the script does not write.
-- Fix: Emit a sample-wide _mqc.tsv with headers and an overall grade, report missing required metrics as NA, validate numeric types, or correct the documentation.
-
-### `bio-atac-seq-atac-qc` — encode_tss_enrichment.py returns wrong or zero scores wit...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 7
-- Problem: Planted bigWig with true score 21.0: minus-strand gene interval (start,end) scored 1.0 because start is used as TSS; a chromosome absent from the bigWig and an empty BED both return 0.0 with success; strand is read from the last column so a name column after strand defaults to plus; used and skipped TSS counts are never reported.
-- Root cause: Input contract is only 'chrom start end ... strand' and skipped TSS are swallowed.
-- Fix: Document that the BED must be 1 bp TSS with strand in column 6, read column 6, report used/skipped TSS counts, and exit nonzero when none are used.
-
-### `bio-atac-seq-atac-qc` — TSS bigWig recipe undocumented; score depends on it; pyTS...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 1
-- Problem: Same BAM and TSS set gives 11.32 (bamCoverage --extendReads), 14.92 (plain), 15.98 (--Offset 1) and 11.48 (CPM, bin 10). Skill and usage guide call the script the ENCODE pyTSSe convention but give no bigWig command and no comparison to ENCODE-reported values.
-- Root cause: Signal-track construction is a hidden parameter of the metric.
-- Fix: Add the exact bamCoverage command (bin size 1, chosen read representation), state the ENCODE reference method or soften the pyTSSe equivalence, and note that scores differ by recipe.
-
-### `bio-atac-seq-atac-qc` — preseq recipes omit -P for paired-end BAMs; c_curve step ...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 6
-- Problem: On the deduplicated paired BAM c_curve without -P reports 305,029 distinct of 500,000 reads while -P reports 500,001 of 524,024. Without -P preseq counted 929,546 reads for 1.82M mates. c_curve -s 1e6 returns only the 0 0 row when depth is below the step; -P fails on name-sorted input.
-- Root cause: Commands were copied from single-end preseq usage.
-- Fix: Use -B -P on a coordinate-sorted BAM for paired-end ATAC, state that deduplicated BAMs are unsuitable for lc_extrap, and set the step relative to depth.
-
-### `bio-atac-seq-atac-qc` — atac_qc_metrics.R does not classify periodicity and label...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 3
-- Problem: Workflow step 3 and the usage guide promise periodicity classification; the script only counts NFR/mono/di/tri. nuclear_reads_M counts pairs including chrM and duplicates yet is graded against the ENCODE nuclear-read threshold.
-- Root cause: Metric naming and documentation overstate what the script computes.
-- Fix: Implement the documented pattern classification and chrM/duplicate exclusion, or rename the field and correct the docs.
-
-### `bio-atac-seq-atac-qc` — atac_qc_metrics.R input contract: .bed.gz narrowPeak fail...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 3
-- Problem: ENCODE narrowPeak distributed as .bed.gz fails with scan() expected an integer, got 22.06932. TxDb hg38 is fixed with no genome argument or seqlevels check.
-- Root cause: rtracklayer infers format from the extension.
-- Fix: Pass format='narrowPeak' to import or document supported extensions; expose the genome/TxDb as an argument.
-
-### `bio-atac-seq-atac-qc` — library_complexity.py emits non-standard JSON Infinity fo...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: 4
-- Problem: All-singleton BAM prints PBC2 Infinity, rejected by strict JSON parsers.
-- Root cause: json.dumps default allows non-finite floats.
-- Fix: Emit null or a string when PBC2 is undefined.
-
-### `bio-atac-seq-atac-qc` — Reference inconsistencies and unverified threshold attrib...
-
-- Skill: 71, Beta Only · candidate `147fbda2ca5a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md)
-- Observed in inputs: —
-- Problem: method-reference.md says Pearson correlation on binned counts while the recipe and tips use Spearman; NRF/PBC 0.7-0.9 bands are attributed to Landt 2012 although the Skill says the PBC1/PBC2 split is a later refinement (not verified against ENCODE pages in this pass); the usage guide lists a Picard insert-size step with no command in the Skill; prerequisites omit preseq.
-- Root cause: Compiled from several sources without reconciliation.
-- Fix: Reconcile to Spearman, verify each threshold against the current ENCODE ATAC standards and cite the exact source, add the Picard command and preseq install line.
 
 ### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
 
@@ -857,6 +777,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
+
+### `bio-atac-seq-atac-qc` — Fragment-size PDF never visually inspected
+
+- Skill: 86, Production Ready · candidate `cf524ad680cf` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@cf524ad680cf-reaudit-run/viewer.md)
+- Observed in inputs: 3
+- Problem: atac_qc_metrics.R PDF written but not rendered in any audit
+- Root cause: No PDF renderer in the prepared environments
+- Fix: Render once in a tooling-delta pass or replace with PNG output
+
+### `bio-atac-seq-atac-qc` — TSS script slow when many TSS lie outside bigWig coverage
+
+- Skill: 86, Production Ready · candidate `cf524ad680cf` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@cf524ad680cf-reaudit-run/viewer.md)
+- Observed in inputs: 1, 7
+- Problem: Tooling pass saw more than 9 minutes for out-of-slice TSS
+- Root cause: pyBigWig.values on uncovered regions
+- Fix: Optional note or per-chromosome coverage pre-check
+
+### `bio-atac-seq-atac-qc` — No shipped fixtures or tests
+
+- Skill: 86, Production Ready · candidate `cf524ad680cf` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@cf524ad680cf-reaudit-run/viewer.md)
+- Observed in inputs: 2, 4, 7
+- Problem: Planted-truth checks exist only in audit logs
+- Root cause: Origin ships no tests
+- Fix: Ship a tiny synthetic BAM/bigWig and expected values
 
 ### `bio-clinical-databases-dbsnp-queries` — Batch table drops annotations for merged rsIDs
 

@@ -28,7 +28,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
 | `bio-atac-seq-atac-peak-calling` | Data Analysis | 76 | Beta Only | 0 / 3 / 5 | [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@e8bc49ba345f-initial-audit-20260930/viewer.md) |
-| `bio-atac-seq-atac-qc` | Data Analysis | 71 | Beta Only | 0 / 1 / 9 | [viewer](skills/bio-atac-seq-atac-qc/candidate@147fbda2ca5a-audit-run/viewer.md) |
+| `bio-atac-seq-atac-qc` | Data Analysis | 86 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-atac-seq-atac-qc/candidate@cf524ad680cf-reaudit-run/viewer.md) |
 | `bio-atac-seq-co-accessibility` | Data Analysis | 63 | Beta Only | 0 / 2 / 4 | [viewer](skills/bio-atac-seq-co-accessibility/candidate@3c8089b0496f-bio-atac-seq-co-accessibility/viewer.md) |
 | `bio-atac-seq-differential-accessibility` | Data Analysis | 64 | Reject | 1 / 2 / 6 | [viewer](skills/bio-atac-seq-differential-accessibility/candidate@890c5349e680-initial-20260930/viewer.md) |
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |

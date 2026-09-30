@@ -1,0 +1,40 @@
+{
+  "schema": "scientific-skill-audit-source-identity-v1",
+  "phase": "final re-audit",
+  "skill_id": "bio-atac-seq-atac-qc",
+  "independent_auditor": true,
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/atac-qc",
+    "license": "MIT"
+  },
+  "candidate": {
+    "root": "F:\\OpenScience\\wt\\atac-atac-qc\\skills\\bio-atac-seq-atac-qc",
+    "worktree": "F:\\OpenScience\\wt\\atac-atac-qc",
+    "branch": "fix/atac-atac-qc",
+    "product_head": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity_scheme": "sha256-manifest-v1",
+    "content_sha256": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+    "file_count": 8,
+    "total_bytes": 44977,
+    "manifest_recipe": "Ordinal POSIX relative paths; each UTF-8 line is path, TAB, byte count, TAB, lowercase file SHA-256; lines joined by LF without a trailing LF; SHA-256 over the manifest bytes.",
+    "manifest_path": "candidate-manifest.tsv",
+    "identity_before": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+    "identity_after": "cf524ad680cfbb3cdba3190cbd3f0a05d8e5e0fd4728e53edb12a6791645dd99",
+    "tree_status": "Candidate skill directory is untracked in the worktree; re-audit made no edits."
+  },
+  "superseded_audit": {
+    "path": "F:\\OpenScience\\audits\\bio-atac-seq-atac-qc\\audit-run",
+    "identity": "147fbda2ca5adf8924015bcb5564ce43b76eef574246c38d93409f4637bf995f",
+    "score": 71
+  },
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-atac-seq-atac-qc\\TOOLS.md",
+    "environment_lock_sha256": "e29e33c21ca3d6a660029311c4c9c7edbac105953734bd45b6a8f24799b009ac"
+  },
+  "rubric": {
+    "zip": "F:\\optimizing-agent-science-skills\\skill-auditor.zip",
+    "evaluator_version": "skill-auditor@1.0"
+  }
+}
