@@ -1,62 +1,49 @@
-# Handoff: bio-atac-seq-enhancer-gene-linking / fix-scientific-skill
+# Handoff: bio-atac-seq-enhancer-gene-linking / orchestrator (commit, then intake)
 
-- Updated: 2026-09-30T05:30:00-07:00
+- Updated: 2026-09-30T06:30-07:00
 - Lane: 2
-- Status: ready-for-phase
-- Owner leaving: audit-scientific-skill
-- Next role: fix-scientific-skill
+- Status: candidate-ready
+- Owner leaving: reaudit-scientific-skill worker (independent)
+- Next role: optimize-scientific-skills orchestrator (commit to optimized shelf); no fix needed
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:atac-seq/enhancer-gene-linking
-- Working tree: F:\OpenScience\wt\atac-enhancer-gene-linking (candidate at skills\bio-atac-seq-enhancer-gene-linking)
-- Branch/worktree: fix/atac-enhancer-gene-linking, starting commit 3186916
-- Candidate tree hash: sha256-manifest-v1 67cda9c355b93f584f3d6628f847e8c0ba610059e102866e3d8e42096afd9cef (5 files), re-verified live after execution
-- Applicable audit: F:\OpenScience\audits\bio-atac-seq-enhancer-gene-linking\initial-audit-20260930\report.json (same identity; schema v4.0 validated). Score 59, Reject (research veto: Code Usability). Static 69, execution avg 51.8, assertions 9/17.
+- Working tree: F:\OpenScience\wt\atac-enhancer-gene-linking\skills\bio-atac-seq-enhancer-gene-linking
+- Branch/worktree: fix/atac-enhancer-gene-linking, start 3186916 (Skill files untracked)
+- Candidate tree hash: sha256-manifest-v1 `44385431f01902a0e18e305b483538009282bb44c5f19de4b53d5facd2b38976` (6 files, 35,507 bytes), verified live before and after execution
+- Applicable audit: F:\OpenScience\audits\bio-atac-seq-enhancer-gene-linking\reaudit-run\ (report.json, viewer.md, source-identity.json). Prior initial audit identity 67cda9c3... (59, rejected).
 
 ## Completed this phase
 
-- Static review of all 5 files; executed run_abc.sh as shipped (fails) and as a patched copy (passes), ABC main and rE2G official chr22 pipelines (exact expected-table match), snippets on real outputs.
-- Report: `report.json`, `viewer.md`, `findings.json`, `finding-ledger.md`, `source-identity.json`, `scripts/` (run scripts and checks), `logs/`.
-- No audit-local repair; Skill bytes untouched; not published to records.
+- Decision candidate-ready: final 88, static 87, execution avg 89.2, Layer 1 36.5, Layer 2 52.75, assertions 31/33, no veto, no open P0. Schema validated (P0/P1/P2 only).
+- EGL-001..012 retested independently; P0 usage example reproduces ABC's own tables exactly. See reaudit-run\viewer.md.
+- combine_predictions.py, powerlaw, ATAC-only, MACS3 peaks, avg (substitute), v1.1.2, guards all run with output assertions.
 
 ## Required next actions
 
-1. Fix in ledger order (finding-ledger.md): EGL-001 (P0) first, rerun chr22 example via scripts/a2 style harness (`scripts/a1_shipped.sh`, `scripts/a3_check_run_abc.py`).
-2. EGL-002..005 (P1): hic type args, ABC candidate regions, rE2G model/threshold text from repo (models/*/threshold_*), calibrated ABC thresholds (reference/abc_thresholds.tsv).
-3. EGL-006..010 (P2), then EGL-011..012 (P3).
-4. Classify tooling impact; re-audit by independent auditor.
+1. Orchestrator: commit the exact bytes to the optimized shelf (state ready), then intake. Records not yet published (uncommitted).
+2. Optional non-blocking: EGL-013 P2 CR fix in run_abc.sh threshold lookup would change identity and need a fresh audit; only do it if desired.
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| EGL-001 | P0 | open | logs\a1_shipped.log | run_abc.sh: pass --accessibility_feature and avg gamma/scale |
-| EGL-002 | P1 | open | predict.py choices | expose hic type/file/resolution; drop cooler claim |
-| EGL-003 | P1 | open | logs\a3_check_run_abc.log | ABC candidate regions (makeCandidateRegions) or disclose |
-| EGL-004 | P1 | open | src\re2g\models | rE2G model selection/no-hic claims |
-| EGL-005 | P1 | open | logs\a4_/a5_check | thresholds ABC/rE2G calibrated |
-| EGL-006 | P2 | open | logs\a2_patched.log | qnorm guidance vs script |
-| EGL-007 | P2 | open | thresholds table | ATAC-only vs scATAC Cicero |
-| EGL-008 | P2 | open | scripts/run_abc.sh | hard-coded inputs, quoting |
-| EGL-009 | P2 | open | logs\a6_snippets.log | combine snippet keys, placeholder |
-| EGL-010 | P2 | open | TOOLS.md | install lines |
-| EGL-011 | P3 | open | TOOLS.md | stale/unsupported claims |
-| EGL-012 | P3 | open | SKILL.md, method-reference | average Hi-C wording |
-| B-1 | restricted | blocked | TOOLS.md | ENCODE 58 GB avg Hi-C not fetched; hic and avg branches static-only |
+| EGL-013 | P2 | open, non-blocking | reaudit-run\logs\check_powerlaw_v112.log | strip CR in awk threshold lookup (ABC v1.1.2 CRLF table) |
+| B-1 | restricted | blocked, resource-infeasible | TOOLS.md | ENCODE average Hi-C ENCFF134PUN (58 GB) not fetched; avg on real data not counted executed; substitute chr22 K562 covers mechanics only |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-atac-seq-enhancer-gene-linking\TOOLS.md (envs main 0d625a92...368b, re2g 3680ac7e...c7dd; macs2 needs LD_PRELOAD shim)
-- Run evidence: F:\OpenScience\audits\bio-atac-seq-enhancer-gene-linking\initial-audit-20260930\ (logs\, scripts\, outputs\)
-- Restricted-access items: B-1 only (resource-infeasible)
-- Tooling impact: none (Skill bytes unchanged; environments reusable; network needed for remote Hi-C reads)
+- Tool inventory: F:\OpenScience\audits\bio-atac-seq-enhancer-gene-linking\TOOLS.md (main 0d625a92..., re2g 3680ac7e..., create-command env 3f3bd2ef... reused)
+- Run evidence: F:\OpenScience\audits\bio-atac-seq-enhancer-gene-linking\reaudit-run\ (scripts\, logs\, evidence\schema-validation.json, work\combine)
+- Restricted-access items: B-1
+- Tooling impact: none
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\audits\bio-atac-seq-enhancer-gene-linking\initial-audit-20260930\; F:\OpenScience\audit-envs\bio-atac-seq-enhancer-gene-linking\src\*\tests\test_output (regenerated by official-pipeline reruns); this handoff
+- Run-owned changes: reaudit-run\ and this handoff only
 - Pre-existing/user-owned changes: F:\optimizing-agent-science-skills\tools\run_mercury_worker.py, tools\test_run_mercury_worker.py (untouched)
-- Records state: uncommitted, not published (orchestrator publishes)
+- Records state: uncommitted, not published
 - Product commits/pushes: none
 
 ## Transition assertion
