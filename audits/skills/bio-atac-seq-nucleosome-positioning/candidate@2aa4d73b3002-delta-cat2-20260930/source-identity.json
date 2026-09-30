@@ -1,0 +1,89 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/nucleosome-positioning",
+    "subtree": "4d52623608daf37e5fcf3642d3b5b4f64a0e4c48",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean"
+  },
+  "candidate": {
+    "branch": "fix/atac-nucleosome-positioning",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity": "sha256-manifest-v1",
+    "manifest_sha256": "2aa4d73b30023a6d14d690fa0e02f3a8b32a563d15bd445c24e257cb0e0ad18b",
+    "path": "F:\\OpenScience\\wt\\atac-nucleosome-positioning\\skills\\bio-atac-seq-nucleosome-positioning",
+    "status_before": "skills/bio-atac-seq-nucleosome-positioning/ untracked; no other worktree changes",
+    "status_after_execution": "unchanged (manifest recomputed after the delta checks; no __pycache__)",
+    "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; tab-separated; LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+    "file_count": 7,
+    "byte_total": 34808
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17",
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "bytes": 1065
+    },
+    {
+      "path": "SKILL.md",
+      "git_blob": "dc67ac8f7be7410de0eba1311b4cd309c43c06ac",
+      "sha256": "8aff3b68d130b88582e15da6dceadb37815181dc005bbf291a752bdd22ca817c",
+      "bytes": 4305
+    },
+    {
+      "path": "references/method-reference.md",
+      "git_blob": "19f58d458a07debf550df7ae73ad23c3f6fe3d5c",
+      "sha256": "6e54a82a1bf80acf8fc4bbe4788be3550de7924d006ddfdc38538d58ae21f5ff",
+      "bytes": 15953
+    },
+    {
+      "path": "references/usage-guide.md",
+      "git_blob": "d504032df9e4c3bea9680fc29691ff1c56cc4bfa",
+      "sha256": "095e32b22800771b74431890973194091d4df4938f84c16aadeedaa4c6cd40e3",
+      "bytes": 3778
+    },
+    {
+      "path": "scripts/estimate_nrl.py",
+      "git_blob": "7427b8e9f4f986fe01666d22499277123fbb8982",
+      "sha256": "328e45bb61b01d794f19210538337e5de818db7755e98753cd8dece155ec7bdc",
+      "bytes": 1883
+    },
+    {
+      "path": "scripts/nucleosome_analysis.R",
+      "git_blob": "7e556020956ee01b4aefe24a32d2f3b4b204b671",
+      "sha256": "0279d024796200b1255c80486610f9fb5349819f5b19f91fdcaf0c4d770477d0",
+      "bytes": 4938
+    },
+    {
+      "path": "scripts/vplot.py",
+      "git_blob": "527f79eb51ca34ae353bd3433c1e6252b222fe0e",
+      "sha256": "b14c84ac60e0f2ebb086cc3caa2120373e4d8a25329c7152cf1760f8f0864a4d",
+      "bytes": 2886
+    }
+  ],
+  "tooling": {
+    "tools_md_sha256": "b8cbe3c9a0d2b2a60b959e30163882b5b801f31d8aca519a66bd31f532a470f6",
+    "environment_fingerprint_sha256": "72f7cc5bd216ef9d9e74f453b76508c0f5c3c27d3f77c9ad5d620a62044e5cc5",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "reaudit_throwaway_env": "np-reaudit-nucleoatac (created and removed; explicit list env-np-reaudit-nucleoatac.explicit.txt)"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "phase": "delta re-audit (delta-cat2-20260930: follow-up documentation fix)",
+  "independent_auditor": true,
+  "prior_audit": {
+    "path": "F:/OpenScience/audits/bio-atac-seq-nucleosome-positioning/delta-cat-20260930",
+    "identity": "c8ef5320a0fa4a07ef8c801303862c0e6334c584103b267eeb2bda6c5303fa3d",
+    "score": 85
+  },
+  "delta": {
+    "previous_run": "F:/OpenScience/audits/bio-atac-seq-nucleosome-positioning/delta-cat-20260930",
+    "previous_identity": "c8ef5320a0fa4a07ef8c801303862c0e6334c584103b267eeb2bda6c5303fa3d",
+    "shelf_commit": "ea3b976",
+    "shelf_identity": "2192c9d1500c5d260545b2dda74a0ea0f8e6e4b15a39023519d5c2f5fc495c4b",
+    "changed_vs_previous": [
+      "scripts/nucleosome_analysis.R"
+    ]
+  }
+}

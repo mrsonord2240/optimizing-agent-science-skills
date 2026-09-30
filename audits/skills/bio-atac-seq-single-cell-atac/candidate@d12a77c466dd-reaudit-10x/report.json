@@ -1,0 +1,401 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-single-cell-atac",
+    "description": "Process and analyze single-cell ATAC-seq data with Signac, ArchR, SnapATAC2, or Cell Ranger ATAC. Use when handling 10X scATAC or 10X Multiome (paired RNA+ATAC) data, performing per-cell QC, choosing between ArchR/Signac/SnapATAC2 ecosystems, building per-cluster consensus peaksets, integrating with paired scRNA-seq, doublet detection (AMULET vs ArchR vs scDblFinder), or running pseudobulk differential accessibility per cluster.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Cell Ranger is stated as not run; ARC metric substitutions are disclosed as substitutions; reported numbers reproduced"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Public 10x data; no clinical or identifiable-person claims"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "LSI depth component skipped, depth-conditional doublet tool choice, ARC barcode mapping verified against matrix, BAM CB tag and fragments"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "signac_workflow.R ran on ARC 2.0.0, ATAC 2.1.0 and ATAC 1.0.1; AMULET routes ran as documented"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Covers ATAC 1.x/2.x and ARC inputs, three ecosystems, WNN and both AMULET routes; ARC blacklist QC is effectively non-filtering and not flagged as such"
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Loud guards for missing metadata columns, barcode mismatch, zero passing cells, empty ArrowFiles; AMULET misuse fails with exit 1; peak-set alignment is an assertion"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md 123 lines with one-level routed references and tables"
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Single filter rule, per-input AMULET flag table with derived csv recipe, depth-conditional doublet choice, relaxed-threshold guidance"
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Clear triggers, example requests and error table; recovery advice brief"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or destructive actions; writes to the working directory only; upstream downloads not checksummed"
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Audit narration removed, versions verified, provenance and MIT notice preserved; FractionCountsInRegion is soft-deprecated in Signac 1.17"
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger-rich description; dims 2:30 and cell-cycle claims reproduce; Cell Ranger not claimed as run; rule-of-thumb numbers labelled"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 30,
+      "total": 31
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Shipped signac_workflow.R on 10x ATAC 1.0.1 PBMC 5k (chr1 fragments), documented args and relaxed 1 1000",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "exit 0; 40/1472 cells at documented QC and 788/1472 relaxed, identical to prior baseline",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Script exits 0 and writes rds, QC, UMAP and depth PDFs",
+            "result": "PASS",
+            "note": "both runs exit 0; scatac_signac.rds present"
+          },
+          {
+            "text": "Kept cells satisfy the documented filter rule",
+            "result": "PASS",
+            "note": "default: passed_filters 15.6k-38k, TSS 4.2-7.4, nucleosome 0.42-0.85, FRiP 65-88%, mito<=0.040, blacklist<=0.005"
+          },
+          {
+            "text": "LSI component 1 tracks depth and dims 2:30 are used",
+            "result": "PASS",
+            "note": "LSI1-depth r -0.95/-0.96; UMAP 40x2 and 788x2 finite"
+          },
+          {
+            "text": "Rendered QC violins are legible and consistent with values",
+            "result": "PASS",
+            "note": "relaxed QC png inspected; blacklist outliers to 0.18 visible"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Shipped script auto-detecting Cell Ranger ARC 2.0.0 per_barcode_metrics.csv, PBMC 3k Multiome, whole-genome fragments",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "exit 0 in 14m; 2392/2687 cells, 8 clusters; ARC blacklist ratio is peak-level and cannot reach the 0.05 cut (max 0.004)",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "ARC metadata auto-detected and mapped without patching the script",
+            "result": "PASS",
+            "note": "log 'Metadata mode: cellranger-arc'; passed_filters == atac_fragments for all kept cells"
+          },
+          {
+            "text": "Kept cells are called cells inside the documented thresholds",
+            "result": "PASS",
+            "note": "is_cell==1 for 100%; passed_filters 1012-69101, TSS 4.02-11.2, nucleosome<=2.61, FRiP 17.9-81%, mito max 0.0499"
+          },
+          {
+            "text": "Embedding, clusters, gene activity and figures are valid and readable",
+            "result": "PASS",
+            "note": "LSI1-depth r -0.96; 8 clusters 594..117; ACT 19607x2392; UMAP finite; umap and qc png inspected"
+          },
+          {
+            "text": "ARC-substituted blacklist QC is documented with its sensitivity",
+            "result": "FAIL",
+            "note": "blacklist ratio max 0.00405 (57/128741 peaks overlap the list) versus up to 0.18 from the official ATAC column, so the filter is effectively inert; the Skill states the substitution but not that"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant A",
+        "label": "Shipped script on 10x ATAC 2.1.0 10k PBMC v2 (chr1 fragments slice), documented args and relaxed",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "exit 0; 7008/10246 at documented args, 9884/10246 relaxed; 12 and 16 clusters",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "ATAC 2.x singlecell.csv path runs at the documented three arguments",
+            "result": "PASS",
+            "note": "exit 0, 7008 cells; passed_filters 2090-79531, TSS>=4, nucleosome<=3.78"
+          },
+          {
+            "text": "Relaxed arguments 4-5 honored",
+            "result": "PASS",
+            "note": "9884 cells with 1 1000; TSS min 1.0"
+          },
+          {
+            "text": "Depth component skipped and outputs finite",
+            "result": "PASS",
+            "note": "LSI1-depth r +0.89; UMAP finite; ACT 2027 x cells; annotation genome hg38"
+          },
+          {
+            "text": "UMAP renders with separable clusters",
+            "result": "PASS",
+            "note": "12-cluster UMAP png inspected"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "AMULET BAM route on ARC per the new flag table (ARC chr1 1-30 Mb CB-tagged BAM slice)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "exit 0; 2711 cells, 481 merged regions, 21 multiplets (0.77%)",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Documented flags --forcesorted --bcidx 0 --cellidx 0 --iscellidx 3 run to completion",
+            "result": "PASS",
+            "note": "jar + AMULET.py exit 0"
+          },
+          {
+            "text": "Cell count equals the ARC is_cell total",
+            "result": "PASS",
+            "note": "2711 of 2711"
+          },
+          {
+            "text": "Output family present and self-consistent",
+            "result": "PASS",
+            "note": "MultipletBarcodes_01 has 21 lines = summary 21; probabilities 2711 rows + header"
+          },
+          {
+            "text": "Multiplet rate plausible for shallow chr1 slice",
+            "result": "PASS",
+            "note": "0.77%; recall caveat stated in Skill"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "AMULET fragment route: ARC (derived barcode,is__cell_barcode csv, whole-genome fragments) and ATAC 2.1.0 (chr1 slice, defaults)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "ARC 2711 cells/66 multiplets (2.43%); ATAC 2.1.0 10246 cells/146 multiplets (1.42%)",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Derived two-column csv recipe from the Skill text works on ARC",
+            "result": "PASS",
+            "note": "exit 0 after deriving csv from barcode and is_cell"
+          },
+          {
+            "text": "ATAC 2.1.0 fragments run at defaults",
+            "result": "PASS",
+            "note": "exit 0, 10246 cells"
+          },
+          {
+            "text": "Cell counts match the source metadata",
+            "result": "PASS",
+            "note": "2711 and 10246"
+          },
+          {
+            "text": "Multiplet files present and rates plausible",
+            "result": "PASS",
+            "note": "66 and 146 multiplets, outputs present"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "AMULET misuse controls for the table: ARC BAM with ATAC default indices; fragment route fed the raw ARC csv",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "both fail loudly (exit 1): IndexError / missing Overlaps.txt; no silent success",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Wrong-index BAM run does not report success",
+            "result": "PASS",
+            "note": "IndexError in AMULET.py line 201, exit 1, matches the Skill's warning"
+          },
+          {
+            "text": "Raw ARC csv on fragment route does not report success",
+            "result": "PASS",
+            "note": "FileNotFoundError Overlaps.txt, exit 1"
+          },
+          {
+            "text": "Skill table prevents both failure modes",
+            "result": "PASS",
+            "note": "table rows specify indices and the derived csv"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Variant A",
+        "label": "Regression: Multiome WNN block verbatim plus cell-cycle LSI regression on 10x ARC PBMC 3k",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "exit 0; WNN 2557 cells, weights 0.475/0.525; S-phase cor 0.264 to 0, ARI 0.843",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "WNN block runs with only Signac and Seurat attached",
+            "result": "PASS",
+            "note": "magrittr loaded by the block; pca, lsi, wnn.umap built"
+          },
+          {
+            "text": "Modality weights and embedding valid",
+            "result": "PASS",
+            "note": "RNA/ATAC weight medians 0.475/0.525; wnn.umap 2557x2 finite"
+          },
+          {
+            "text": "Cell-cycle regression removes the S-phase association",
+            "result": "PASS",
+            "note": "max abs cor(LSI, S.Score) 0.264 to 0; UMAP cor 0.173 to 0.107"
+          },
+          {
+            "text": "Marker means fit cell types",
+            "result": "PASS",
+            "note": "CD3E/CD14/MS4A1/NKG7 enriched in distinct clusters"
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "Regression: SnapATAC2 2.10.0 block, ArchR empty-ArrowFiles guard, PEAKVI scArches alignment on PBMC 5k chr1 slice",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "exit 0; SnapATAC2 697 cells/6 clusters; ArchR guard stops then passes relaxed; PEAKVI aligned 0.034 vs unaligned 0.099",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SnapATAC2 documented block runs (relaxed filter)",
+            "result": "PASS",
+            "note": "697 cells, 6 leiden clusters, obsp distances present, gene_mat 697x60606"
+          },
+          {
+            "text": "ArchR guard fails loudly at documented thresholds and passes relaxed",
+            "result": "PASS",
+            "note": "'length(ArrowFiles) > 0 is not TRUE' then rep1.arrow"
+          },
+          {
+            "text": "PEAKVI alignment lines change the mapping as claimed",
+            "result": "PASS",
+            "note": "median query-to-reference distance 0.099 unaligned, 0.034 aligned, ref-ref 0.033"
+          },
+          {
+            "text": "No audit narration or unrun Cell Ranger claims in the shipped text",
+            "result": "PASS",
+            "note": "SKILL.md states Cell Ranger ATAC/ARC were not run and outputs were read from public datasets"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 52.3,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The shipped script runs end to end on ARC 2.0.0, ATAC 2.1.0 and ATAC 1.0.1 metadata and stops clearly on missing columns or barcode mismatch",
+    "AMULET flag table per input type reproduces on real ARC and ATAC 2.1.0 data; misuse fails loudly",
+    "Cell Ranger is honestly stated as not run, with outputs read from public 10x datasets",
+    "Regression blocks (WNN, cell-cycle LSI, SnapATAC2, ArchR guard, PEAKVI alignment) reproduce as documented"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "ARC blacklist ratio is inert; state that",
+      "observed_in": [
+        2,
+        3
+      ],
+      "problem": "On ARC the blacklist ratio comes from the peak matrix and peaked at 0.004 (57 of 128741 peaks overlap the list), so the 0.05 cut never removes a cell, while the official ATAC 1.0.1 column reaches 0.18; ATAC 2.1.0 singlecell.csv has a zero blacklist column. The Skill states the substitution but not its insensitivity.",
+      "root_cause": "The ARC substitution is peak-level, not fragment-level, and is documented only as a method.",
+      "fix": "Add one sentence to SKILL.md that on ARC and ATAC 2.x the blacklist ratio is an approximation that rarely reaches 0.05, so blacklist QC is effectively off unless computed from fragments."
+    }
+  ]
+}

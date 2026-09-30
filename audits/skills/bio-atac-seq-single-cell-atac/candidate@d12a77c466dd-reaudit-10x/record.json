@@ -1,0 +1,76 @@
+{
+  "skill_id": "bio-atac-seq-single-cell-atac",
+  "version": "candidate@d12a77c466dd-reaudit-10x",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/single-cell-atac",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/single-cell-atac",
+    "subtree": "ef5b1305663382e0228349bd42d9768afc19dcb8"
+  },
+  "candidate": {
+    "identity": "d12a77c466ddc748e86d80ac482766aa212e3b31aa1d6bd3388a827bf59dbec0",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-single-cell-atac",
+    "path": "F:\\OpenScience\\wt\\atac-single-cell-atac\\skills\\bio-atac-seq-single-cell-atac",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 12602,
+        "sha256": "920e9abbc7a9f5f279d2ae36bbcba7cb3a47fdf288888db7e3ff68ed10e5fadf"
+      },
+      {
+        "path": "references/ecosystem-workflows.md",
+        "bytes": 6701,
+        "sha256": "9acbe57b265e297965293acf8c6828d09156fcc09813ffd030bd22097e9fb5b6"
+      },
+      {
+        "path": "references/specialized-topics.md",
+        "bytes": 7639,
+        "sha256": "ea9609bbb3e7e136e1d066e9bc28a99c45d7544a2af26f66f57141f89c07e4e2"
+      },
+      {
+        "path": "references/usage-guide.md",
+        "bytes": 3726,
+        "sha256": "c4db96aa3ef68d1c5d7b8836d34a3400495bcc03deaf07bea708b0e3fcf25e06"
+      },
+      {
+        "path": "scripts/signac_workflow.R",
+        "bytes": 6277,
+        "sha256": "d5edfce299fc979ece9518e7c956688fc8c6b37dbf94aab37c2afc7d79702c0c"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "mrsonord2240-optimized-scientific-skills@ea3b976",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 15
+  }
+}

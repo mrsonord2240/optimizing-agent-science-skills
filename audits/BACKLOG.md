@@ -410,7 +410,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (164)
+## P2 (153)
 
 ### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
 
@@ -596,33 +596,25 @@ None open.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
 
-### `bio-atac-seq-co-accessibility` — Cryptic zero-read halt; conflicting TSS window prompt
+### `bio-atac-seq-co-accessibility` — COACC-014 cryptic halt on a zero-read cell
 
-- Skill: 85, Production Ready · candidate `0aac567b1870` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 85, Production Ready · candidate `f7b386a41a3f` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/candidate@f7b386a41a3f-delta-cat-20260930/viewer.md)
 - Observed in inputs: 7
-- Problem: A cell with no reads in the peak set stops the CLI with 'attempt to set an attribute on NULL' (only monocle3's warning names the cause), and a usage-guide prompt says tssRegion=c(-2000, 500) while the script and SKILL use TSS +/- 2 kb.
-- Root cause: No guard for empty cells in run_cicero_pipeline and one prompt copied from ArchR conventions.
-- Fix: Fail early with a message naming zero-read cells (or drop them with a count) and align the prompt to TSS +/- 2 kb; not blocking.
+- Problem: A cell with no reads in the peak set stops the CLI with 'attempt to set an attribute on NULL'; only monocle3's warning names the cause. The conflicting TSS-window prompt from the prior report is fixed.
+- Root cause: No guard for empty cells in run_cicero_pipeline.
+- Fix: Fail early with a message naming zero-read cells, or drop them with a count; not blocking.
 
 ### `bio-atac-seq-nucleosome-positioning` — NRL estimator: flag broad or ambiguous mono plateaus
 
-- Skill: 85, Production Ready · candidate `2192c9d1500c` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-nucleosome-positioning) · [viewer](skills/bio-atac-seq-nucleosome-positioning/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 85, Production Ready · candidate `2aa4d73b3002` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/nucleosome-positioning) · [viewer](skills/bio-atac-seq-nucleosome-positioning/candidate@2aa4d73b3002-delta-cat2-20260930/viewer.md)
 - Observed in inputs: 2
 - Problem: On GM12878 rep2 estimate_nrl.py reports 208 bp while the 1-bp mode is 177 bp because the mono region is a 185-235 bp plateau with a 175 bp shoulder; no warning is given.
 - Root cause: The tallest 5 bp-bin peak in 150-250 bp is reported without a peak-quality or shoulder check.
 - Fix: Print the 1-bp mode next to the binned value, or warn when two candidates within the window differ by more than about 15 bp. (NUCPOS-016)
 
-### `bio-atac-seq-nucleosome-positioning` — R exports and summary CSV use different class assignments
-
-- Skill: 85, Production Ready · candidate `2192c9d1500c` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-nucleosome-positioning) · [viewer](skills/bio-atac-seq-nucleosome-positioning/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 3
-- Problem: Exported NFR/mono BAM pair counts differ from nfr_count/mono_count in the summary (141,651 vs 130,774; 64,579 vs 67,604).
-- Root cause: Counts come from unshifted alignments; exports come from post-shift splitGAlignmentsByCut classes.
-- Fix: State the difference in a script comment or usage note, or compute the summary from the exported classes. (NUCPOS-017)
-
 ### `bio-atac-seq-nucleosome-positioning` — NucleoATAC calls still need a third-party source edit
 
-- Skill: 85, Production Ready · candidate `2192c9d1500c` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-nucleosome-positioning) · [viewer](skills/bio-atac-seq-nucleosome-positioning/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 85, Production Ready · candidate `2aa4d73b3002` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/nucleosome-positioning) · [viewer](skills/bio-atac-seq-nucleosome-positioning/candidate@2aa4d73b3002-delta-cat2-20260930/viewer.md)
 - Observed in inputs: 4
 - Problem: The unmaintained upstream calculateCov leaves its accumulator uninitialised, so calls exist only after the documented one-line edit and rebuild.
 - Root cause: Upstream defect with no released fix; not repairable inside the Skill.
@@ -630,7 +622,7 @@ None open.
 
 ### `bio-atac-seq-nucleosome-positioning` — scPrinter route remains untested
 
-- Skill: 85, Production Ready · candidate `2192c9d1500c` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-nucleosome-positioning) · [viewer](skills/bio-atac-seq-nucleosome-positioning/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 85, Production Ready · candidate `2aa4d73b3002` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/nucleosome-positioning) · [viewer](skills/bio-atac-seq-nucleosome-positioning/candidate@2aa4d73b3002-delta-cat2-20260930/viewer.md)
 - Observed in inputs: —
 - Problem: scPrinter is named for single-cell and per-base use but no command or test ships; the Skill says so.
 - Root cause: Out of bounded scope (GPU, source install).
@@ -638,7 +630,7 @@ None open.
 
 ### `bio-atac-seq-atac-qc` — Fragment-size PDF never visually inspected
 
-- Skill: 86, Production Ready · candidate `cf524ad680cf` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 86, Production Ready · candidate `a78308b9bf6d` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@a78308b9bf6d-delta-cat-20260930/viewer.md)
 - Observed in inputs: 3
 - Problem: atac_qc_metrics.R PDF written but not rendered in any audit
 - Root cause: No PDF renderer in the prepared environments
@@ -646,7 +638,7 @@ None open.
 
 ### `bio-atac-seq-atac-qc` — TSS script slow when many TSS lie outside bigWig coverage
 
-- Skill: 86, Production Ready · candidate `cf524ad680cf` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 86, Production Ready · candidate `a78308b9bf6d` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@a78308b9bf6d-delta-cat-20260930/viewer.md)
 - Observed in inputs: 1, 7
 - Problem: Tooling pass saw more than 9 minutes for out-of-slice TSS
 - Root cause: pyBigWig.values on uncovered regions
@@ -654,43 +646,11 @@ None open.
 
 ### `bio-atac-seq-atac-qc` — No shipped fixtures or tests
 
-- Skill: 86, Production Ready · candidate `cf524ad680cf` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 86, Production Ready · candidate `a78308b9bf6d` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-qc) · [viewer](skills/bio-atac-seq-atac-qc/candidate@a78308b9bf6d-delta-cat-20260930/viewer.md)
 - Observed in inputs: 2, 4, 7
 - Problem: Planted-truth checks exist only in audit logs
 - Root cause: Origin ships no tests
 - Fix: Ship a tiny synthetic BAM/bigWig and expected values
-
-### `bio-atac-seq-differential-accessibility` — SVA mode skips blacklist filter with no warning
-
-- Skill: 86, Production Ready · candidate `dd1e7bda67b8` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-differential-accessibility) · [viewer](skills/bio-atac-seq-differential-accessibility/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 2
-- Problem: --sva fits DESeq2 on dba.count output and never runs the DiffBind blacklist step that the default path applies in dba.analyze; on this chr1 slice 0 of 2260 intervals were affected, but genome-wide input could report blacklisted regions.
-- Root cause: fit_sva bypasses dba.analyze, which is where DiffBind applies blacklist and greylist filtering.
-- Fix: Call dba.blacklist with the genome-matched blacklist before the SVA fit, or emit a runtime warning and list the limit in SKILL.md.
-
-### `bio-atac-seq-differential-accessibility` — SVA-mode limits documented only in the script header
-
-- Skill: 86, Production Ready · candidate `dd1e7bda67b8` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-differential-accessibility) · [viewer](skills/bio-atac-seq-differential-accessibility/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 2
-- Problem: method-reference says --sva runs inside DiffBind although it is a direct DESeq2 fit; --method is ignored silently with --sva; SKILL.md lists a heatmap output that SVA mode does not produce.
-- Root cause: Behavior notes live in the R header comment, not in SKILL.md or the reference.
-- Fix: State in SKILL.md and method-reference that --sva fits DESeq2 directly, ignores --method and --design, and omits the heatmap and blacklist step; warn at runtime when --method is passed with --sva.
-
-### `bio-atac-seq-differential-accessibility` — Effect-size threshold semantics differ between modes
-
-- Skill: 86, Production Ready · candidate `dd1e7bda67b8` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-differential-accessibility) · [viewer](skills/bio-atac-seq-differential-accessibility/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: Default and edgeR paths pass fold to DiffBind, which uses it as a DESeq2 lfcThreshold test (338 sites with FDR<0.05 and \|Fold\|>=1 are excluded, minimum reported \|Fold\| 1.22), while --sva applies a hard \|LFC\|>=1 post-filter (minimum 1.01); both are logged as \|log2FC\| >= 1.
-- Root cause: DiffBind dba.report(fold=) is a thresholded significance test, not a post-hoc filter, and the docs describe both paths as the same cutoff.
-- Fix: Document the semantics difference or use a post-hoc \|Fold\| filter in both paths so counts are comparable across modes.
-
-### `bio-atac-seq-differential-accessibility` — Non-human TxDb untested; no SVA low-n caution
-
-- Skill: 86, Production Ready · candidate `dd1e7bda67b8` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-differential-accessibility) · [viewer](skills/bio-atac-seq-differential-accessibility/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 2, 7
-- Problem: --txdb=<package> was executed only for none because no non-human TxDb was installed; the 4-sample SVA yields 1 SV correlated 0.53 with Condition and no caution says it may absorb real signal.
-- Root cause: Only hg38 annotation packages were installed in the audit environment; no guidance on SVA validity for 2 vs 2 designs.
-- Fix: Add a short SKILL.md caution about SVA on very small designs and validate one non-model-organism TxDb when available.
 
 ### `bio-atac-seq-footprinting` — CTCF control cannot detect absent bias correction
 
@@ -715,54 +675,6 @@ None open.
 - Problem: A missing fragment file exits rc 1 through a FileNotFoundError deep in scPrinter rather than a one-line message.
 - Root cause: Arguments are not checked before importing and calling scPrinter.
 - Fix: Check that --fragments, --fasta, --gtf, --blacklist and --regions exist and exit 2 with a named message, as run_tobias.sh does.
-
-### `bio-atac-seq-motif-deviation` — Correct the 'top motifs exceeded 9' z-score statement
-
-- Skill: 86, Production Ready · candidate `fb58807b04cb` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-motif-deviation) · [viewer](skills/bio-atac-seq-motif-deviation/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 1
-- Problem: SKILL.md says GM12878 vs K562 top motifs exceeded 9 in absolute z-score; the fresh run has max \|z\| 7.24 and no motif above 9; only the group difference (logFC) reaches about 14 (MOTDEV-013).
-- Root cause: The fix rewrote the range sentence without checking it against the run outputs.
-- Fix: State max \|z\| about 7 per sample and logFC up to about 14 between groups, or drop the number.
-
-### `bio-atac-seq-motif-deviation` — ArchR NA z-scores guarded, not root-caused (MOTDEV-004)
-
-- Skill: 86, Production Ready · candidate `fb58807b04cb` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-motif-deviation) · [viewer](skills/bio-atac-seq-motif-deviation/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 4
-- Problem: The guard drops NA cells so getMarkerFeatures completes, but recurrence at full depth is untested and dropped cells change cluster composition.
-- Root cause: Zero-read motif peaks give zero background SD in sparse cells; not investigated at full scale.
-- Fix: Optionally test on whole-genome PBMC 5k fragments and add a minimum-fragment cell filter before addDeviationsMatrix if NA recurs.
-
-### `bio-atac-seq-single-cell-atac` — Cell Ranger ATAC 2.x / ARC metadata untested
-
-- Skill: 86, Production Ready · candidate `4ced0da507d6` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-single-cell-atac) · [viewer](skills/bio-atac-seq-single-cell-atac/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: signac_workflow.R was verified only against Cell Ranger ATAC 1.0.1 singlecell.csv columns; cellranger-arc per_barcode_metrics.csv uses different names and only the missing-column stop was exercised.
-- Root cause: 10x registration is required to obtain Cell Ranger output (carried from SCATAC-015).
-- Fix: After-action: with 10x access run cellranger-atac/-arc count on a demo dataset and point the script at outs/; adjust column mapping if needed. The Skill already states the test scope.
-
-### `bio-atac-seq-single-cell-atac` — AMULET BAM route not executed
-
-- Skill: 86, Production Ready · candidate `4ced0da507d6` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-single-cell-atac) · [viewer](skills/bio-atac-seq-single-cell-atac/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 6
-- Problem: Only the fragment route ran; the BAM/jar route with --forcesorted has no public CB-tagged BAM to exercise.
-- Root cause: No CB-tagged BAM staged; the Skill labels it UNTESTED.
-- Fix: After-action: run AMULET.sh on a CB-tagged BAM when one is available. No Skill change required.
-
-### `bio-atac-seq-single-cell-atac` — Shipped text narrates audit history
-
-- Skill: 86, Production Ready · candidate `4ced0da507d6` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-single-cell-atac) · [viewer](skills/bio-atac-seq-single-cell-atac/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: —
-- Problem: specialized-topics.md says 'the audit saw ScaleData error on the full peak set'; the claim was not re-run in this re-audit and the phrase is process narrative in an operational Skill.
-- Root cause: Fix text kept the audit finding as a parenthetical.
-- Fix: Reword to a neutral, testable statement (for example 'ScaleData can error on the full peak set') or drop the parenthetical.
-
-### `bio-atac-seq-single-cell-atac` — SnapATAC2 import_data removal version unverified
-
-- Skill: 86, Production Ready · candidate `4ced0da507d6` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-single-cell-atac) · [viewer](skills/bio-atac-seq-single-cell-atac/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md says import_data was 'renamed/removed in 2.9'; 2.8.0 still has both names and 2.10.0 has only import_fragments, but 2.9 was not inspectable.
-- Root cause: Boundary inferred from two endpoints.
-- Fix: State 'absent in 2.10.0' or verify the 2.9 wheel and cite it.
 
 ### `bio-clinical-databases-dbsnp-queries` — Batch table drops annotations for merged rsIDs
 
@@ -836,29 +748,13 @@ None open.
 - Root cause: Method table without worked commands.
 - Fix: Add a minimal PAUP* svdq block and a BPP A00/A10 control-file skeleton, or route explicitly.
 
-### `bio-atac-seq-atac-peak-calling` — Trim description claim of 501bp consensus peaks (ATACPC-015)
+### `bio-atac-seq-motif-deviation` — ArchR NA z-scores guarded, not root-caused (MOTDEV-004)
 
-- Skill: 87, Production Ready · candidate `b19054ded9df` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: —
-- Problem: The description advertises fixing 501bp consensus peaks but the Skill only mentions the Corces re-centering convention and routes to consensus-peakset.
-- Root cause: Trigger text inherited from upstream.
-- Fix: Reword to point to atac-seq/consensus-peakset for fixed-width peaks, or state that only re-centering is described.
-
-### `bio-atac-seq-atac-peak-calling` — ROSE snippet remains unexecuted (ATACPC-012)
-
-- Skill: 87, Production Ready · candidate `b19054ded9df` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: —
-- Problem: The ROSE_main.py and GFF conversion are labelled illustrative but were never run because ROSE is not installed.
-- Root cause: Optional, outside the primary workflow.
-- Fix: Keep the illustrative label, or execute it in a ROSE environment before dropping the label.
-
-### `bio-atac-seq-atac-peak-calling` — State orphan-mate behaviour of the chrM recipe (ATACPC-016)
-
-- Skill: 87, Production Ready · candidate `b19054ded9df` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 87, Production Ready · candidate `9e4cce81ace8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/motif-deviation) · [viewer](skills/bio-atac-seq-motif-deviation/candidate@9e4cce81ace8-delta-cat-20260930/viewer.md)
 - Observed in inputs: 4
-- Problem: The idxstats contig-selection recipe keeps a chr1 read whose mate maps to chrM, leaving a paired-flag orphan that the chrM guard cannot see.
-- Root cause: Selection is by the read's own contig only.
-- Fix: Add one sentence, or filter by RNEXT as well, when using BAMPE or hmmratac downstream.
+- Problem: The guard drops NA cells so getMarkerFeatures completes, but recurrence at full depth is untested and dropped cells change cluster composition.
+- Root cause: Zero-read motif peaks give zero background SD in sparse cells; not investigated at full scale.
+- Fix: Optionally test on whole-genome PBMC 5k fragments and add a minimum-fragment cell filter before addDeviationsMatrix if NA recurs.
 
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 
@@ -908,25 +804,41 @@ None open.
 - Root cause: Conceptual section only.
 - Fix: Add the regression of HPD width on posterior mean from out.txt.
 
-### `bio-atac-seq-deep-learning-atac` — DLA-015 bedtools and bedGraphToBigWig undeclared
+### `bio-atac-seq-atac-peak-calling` — Super-enhancer pointer targets a Skill not on this shelf
 
-- Skill: 88, Production Ready · candidate `3a9d1b4cab32` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-deep-learning-atac) · [viewer](skills/bio-atac-seq-deep-learning-atac/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 5
-- Problem: chromBPNet 1.0.1 shells out to bedtools (prep nonpeaks) and bedGraphToBigWig (reads_to_bigwig in bias train and train), but the SKILL env table and the script's step 0 check only chrombpnet.
-- Root cause: The env table listed Python packages only; the external binaries were present in the audit environment.
-- Fix: Add bedtools and UCSC bedGraphToBigWig (conda: bedtools, ucsc-bedgraphtobigwig) to the chrombpnet row of the env table and to the step 0 command -v checks.
-
-### `bio-atac-seq-deep-learning-atac` — DLA-016 pipeline header points to the wrong SKILL step
-
-- Skill: 88, Production Ready · candidate `3a9d1b4cab32` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-deep-learning-atac) · [viewer](skills/bio-atac-seq-deep-learning-atac/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 88, Production Ready · candidate `3f42f520591c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/atac-peak-calling) · [viewer](skills/bio-atac-seq-atac-peak-calling/candidate@3f42f520591c-delta-cat-20260930/viewer.md)
 - Observed in inputs: —
-- Problem: scripts/chrombpnet_pipeline.sh line 3 says to run interpretation separately per SKILL.md step 5, but step 5 is variant effects; motif interpretation is step 6.
-- Root cause: Step numbers shifted when the workflow was rewritten.
-- Fix: Change the header comment to SKILL.md step 6.
+- Problem: method-reference.md routes super-enhancer work to `bio-chipseq-super-enhancers`, which exists upstream (GPTomics chip-seq/super-enhancers) and covers every topic listed, but is not shipped on this shelf. Two unchanged lines (usage-guide Tips, method-reference broad-mode trigger) still list super-enhancers among --broad targets.
+- Root cause: Cross-reference written against the upstream collection.
+- Fix: Ship or name the upstream path of the super-enhancer Skill, or add one clause saying it is optional; optionally reword the two residual lines to 'super-enhancer overlap' only.
+
+### `bio-atac-seq-differential-accessibility` — SVA mode skips blacklist filter with no runtime warning
+
+- Skill: 88, Production Ready · candidate `dfc879ea543a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/differential-accessibility) · [viewer](skills/bio-atac-seq-differential-accessibility/candidate@dfc879ea543a-delta-cat2-20260930/viewer.md)
+- Observed in inputs: 2
+- Problem: --sva fits DESeq2 on dba.count output and never runs the DiffBind blacklist step that the default path applies in dba.analyze; SKILL.md step 5 now says so, but the run prints no warning and genome-wide input could report blacklisted regions (0 of 2260 intervals on the audit slice).
+- Root cause: fit_sva bypasses dba.analyze, which is where DiffBind applies blacklist and greylist filtering.
+- Fix: Call dba.blacklist with the genome-matched blacklist before the SVA fit, or warn at runtime.
+
+### `bio-atac-seq-differential-accessibility` — --method silently ignored with --sva
+
+- Skill: 88, Production Ready · candidate `dfc879ea543a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/differential-accessibility) · [viewer](skills/bio-atac-seq-differential-accessibility/candidate@dfc879ea543a-delta-cat2-20260930/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md step 5 and method-reference now document that --sva ignores --method, but the run prints nothing when --method is passed with --sva (--design does print a message).
+- Root cause: fit_sva never reads method and main() emits no warning for the combination.
+- Fix: Warn at runtime when --method is passed together with --sva.
+
+### `bio-atac-seq-differential-accessibility` — Non-human TxDb untested
+
+- Skill: 88, Production Ready · candidate `dfc879ea543a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/differential-accessibility) · [viewer](skills/bio-atac-seq-differential-accessibility/candidate@dfc879ea543a-delta-cat2-20260930/viewer.md)
+- Observed in inputs: 7
+- Problem: --txdb=<package> was executed only for none because no non-human TxDb was installed; the SVA small-n caution is now in SKILL.md step 5.
+- Root cause: Only hg38 annotation packages were installed in the audit environment.
+- Fix: Validate one non-model-organism TxDb package when available.
 
 ### `bio-atac-seq-enhancer-gene-linking` — CR left in threshold on ABC v1.1.2 (CRLF table)
 
-- Skill: 88, Production Ready · candidate `44385431f019` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-enhancer-gene-linking) · [viewer](skills/bio-atac-seq-enhancer-gene-linking/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
+- Skill: 88, Production Ready · candidate `7f9e4608fb2a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/enhancer-gene-linking) · [viewer](skills/bio-atac-seq-enhancer-gene-linking/candidate@7f9e4608fb2a-delta-cat-20260930/viewer.md)
 - Observed in inputs: 6
 - Problem: On the v1.1.2 tag abc_thresholds.tsv has CRLF endings, so the awk lookup keeps a carriage return and output files are named threshold0.017<CR>.tsv; scores are still correct.
 - Root cause: The awk lookup prints field 4 without stripping CR, while the header claims v1.1.2 is tested.

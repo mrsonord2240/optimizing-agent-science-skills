@@ -1,48 +1,51 @@
-# Handoff: bio-atac-seq-single-cell-atac / orchestrator (commit and intake)
+# Handoff: bio-atac-seq-single-cell-atac / orchestrator commit
 
-- Updated: 2026-09-30
+- Updated: 2026-09-30 (delta RA-1)
 - Lane: 2
 - Status: candidate-ready
-- Owner leaving: reaudit-scientific-skill worker (independent final re-audit)
-- Next role: orchestrator (commit exact bytes to the optimized shelf, then intake)
+- Owner leaving: independent final re-audit worker (reaudit-10x)
+- Next role: orchestrator (commit the exact bytes; no fixer needed)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:atac-seq/single-cell-atac
-- Working tree: `F:\OpenScience\wt\atac-single-cell-atac`; candidate `skills\bio-atac-seq-single-cell-atac` (untracked, uncommitted)
-- Branch/worktree: fix/atac-single-cell-atac, starting commit 3186916
-- Candidate tree hash: `sha256-manifest-v1 4ced0da507d684d209beb4676ce6d206fc6d1730ff2e45d8ff965c3e2d78f286` (6 files, 34,930 bytes), recomputed live before and after execution; no `__pycache__`
-- Applicable audit: `F:\OpenScience\audits\bio-atac-seq-single-cell-atac\reaudit-run\` (report.json, viewer.md, source-identity.json), identity 4ced0da5...; supersedes `initial-audit-20260930\` (da2da9c8..., 71, Reject)
+- Working tree: `F:\OpenScience\wt\atac-single-cell-atac`; candidate `skills\bio-atac-seq-single-cell-atac` (untracked, uncommitted), branch fix/atac-single-cell-atac
+- Candidate tree hash: `sha256-manifest-v1 01b8b5025bee5ae72e7c71dd81caf3602744838da3079f205fad44c890b74c68` (6 files, 38,189 bytes; RA-1 sentence only vs d12a77c4), verified live before and after execution
+- Applicable audit: `F:OpenScienceuditsbio-atac-seq-single-cell-atacdelta-ra1-20260930` (final 89); prior `reaudit-10x` (88) for unchanged surfaces
 
 ## Completed this phase
 
-- Independent final re-audit: decision **candidate-ready**. Score 86; static 86; execution avg 86.0; Layer 1 34.75; Layer 2 51.25; assertions 31/31; no veto; no open P0/P1.
-- All claimed fixes retested from the live tree (shipped signac_workflow.R on 3 args and its missing-column stop; SnapATAC2 2.10.0 block; ArchR guard; WNN; AMULET fragment; PEAKVI; cell-cycle LSI regression); see `reaudit-run\viewer.md` and `reaudit-run\logs\`.
-- Relaxed QC on the chr1 slice is disclosed in SKILL.md; Cell Ranger ATAC/ARC and the AMULET BAM route are not claimed executed.
+- Independent retest of the ARC/ATAC 2.1.0/ATAC 1.0.1 paths through `signac_workflow.R`, both AMULET routes per the flag table, AMULET misuse controls, and regressions (WNN, cell-cycle, SnapATAC2, ArchR guard, PEAKVI).
+- Readiness: final 88, static 90, execution avg 87.1, Layer 1 34.9, Layer 2 52.3, assertions 30/31, no veto, no open P0/P1. Decision: candidate-ready.
+- ARC approximations: mito adequate (same definition as ATAC); blacklist ratio is peak-level and inert on ARC (max 0.004), disclosed as a substitution but not as inert.
+- Cell Ranger not run; Skill does not claim it was.
 
-## Open findings and blockers (all P2, none blocking)
+## Required next actions
+
+1. Orchestrator: commit the exact bytes above to the optimized shelf, then publish the record (`tools/publish_audits.py --run-dir ... --artifact ...`, `npm run audits:index`, `npm run audits:check`) and run inventory refresh after the product commit. Publication was not done by this phase.
+2. RA-1 is fixed in the candidate; commit these exact bytes.
+
+## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| Cell Ranger ATAC 2.x / ARC metadata untested | P2 | blocked (10x registration) | `reaudit-run\report.json` rec 1 | after-action: test with 10x access |
-| AMULET BAM route not executed | P2 | blocked (no CB-tagged BAM) | rec 2 | after-action |
-| Audit narrative sentence in `references/specialized-topics.md` line 24 | P2 | open | rec 3 | optional wording fix; changes identity if applied (would need a tooling-free re-audit of bytes) |
-| SnapATAC2 "removed in 2.9" unverified | P2 | open | rec 4 | optional wording fix, same caveat |
+| none | - | RA-1 closed by delta audit `delta-ra1-20260930` (final 89) | - | - |
 
-Failed or blocked surfaces: none failed. Blocked: Cell Ranger ATAC/ARC, AMULET BAM route. Reused (identity-matched, unchanged text and fingerprints): ArchR downstream steps, Signac CallPeaks, scDblFinder, tabix.
+Failed/blocked surfaces: none. Unexecuted by decision: Cell Ranger ATAC/ARC `count` (upstream).
+Non-blocking: `FractionCountsInRegion` soft-deprecated in Signac 1.17; tooling README says ARC fragments use `atac_barcode` (measured `barcode`).
 
 ## Environment and evidence
 
-- Tool inventory: `F:\OpenScience\audits\bio-atac-seq-single-cell-atac\TOOLS.md` (delta); environment fingerprint a71616d9... unchanged.
-- Run evidence: `reaudit-run\{scripts,logs,output}`; rubric skill-auditor.zip e54e9ff8... (unchanged).
-- Restricted-access items: Cell Ranger ATAC/ARC (10x registration), AMULET BAM route.
+- Tool inventory: `F:\OpenScience\audits\bio-atac-seq-single-cell-atac\TOOLS.md` (sha256 6089874d...); envs bio-atac-seq-single-cell-atac-{r,py,amulet}, unchanged
+- Run evidence: `F:\OpenScience\audits\bio-atac-seq-single-cell-atac\reaudit-10x\{scripts,logs}`
+- Restricted-access items: none
 - Tooling impact: none
 
 ## Worktree safety
 
-- Run-owned changes: `F:\OpenScience\audits\bio-atac-seq-single-cell-atac\reaudit-run\` and this handoff; candidate untouched
-- Pre-existing/user-owned changes: `tools\run_mercury_worker.py`, `tools\test_run_mercury_worker.py` in optimizing-agent-science-skills (untouched)
-- Records state: uncommitted; NOT published to the records repo (publish with `tools/publish_audits.py --run-dir` then `npm run audits:index` / `audits:check` when the orchestrator commits)
+- Run-owned changes: `reaudit-10x\`, this handoff, scratch work dirs `audit-envs\...\work\reaudit10x_*`
+- Pre-existing/user-owned changes: none seen; candidate untouched, no `__pycache__`
+- Records state: uncommitted, unpublished
 - Product commits/pushes: none
 
 ## Transition assertion

@@ -1,0 +1,410 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-enhancer-gene-linking",
+    "description": "Predict enhancer-gene regulatory connections from ATAC-seq using ABC, ENCODE-rE2G, HiChIP, or Cicero; choose contact-aware, accessibility-only or orthogonal approaches, threshold and validate predictions.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 8
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; the avg-Hi-C branch is labelled as run on a same-cell-type substitute and the real 58 GB average as not executed; synthetic HiChIP loops are labelled with planted truth."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Predictions are framed as hypotheses; therapeutic nomination requires two methods plus CRISPRi validation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Outputs reproduce ABC's own expected tables exactly; candidate regions, quantile normalisation, calibrated thresholds and promoter handling now follow ABC."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "run_abc.sh and combine_predictions.py run end to end on real K562 chr22 inputs; the prior P0 crash does not reproduce."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Matched-Hi-C, powerlaw, accessibility-only and avg-mechanics paths execute; thresholds and rE2G routing accurate; juicebox/bedpe branches and real avg Hi-C unexecuted"
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Input guards fail fast with messages; reruns match ABC's own tables; ABC v1.1.2 CRLF threshold file leaves CR in output names (EGL-013)"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Lean SKILL.md with detail routed to two references; method-reference prose is dense"
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Clear method table, documented env vars, tested example with expected counts; macs2 shim knowledge lives only in the usage guide"
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural request examples and a copy-paste example that reproduces the ABC chr22 result"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Variables quoted, no destructive commands; remote Hi-C URL and git clones are unauthenticated downloads without checksums"
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Parameterised script with documented header and a real-key combine script; no shipped tests; upstream layout drift is a standing risk"
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Routing and provenance good; stale claims removed; description is long; avg branch on real data is labelled unexecuted"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 31,
+      "total": 33
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Usage-guide example verbatim: run_abc.sh, K562 chr22, real ENCODE Hi-C ENCFF621AIY read remotely (HIC_TYPE=hic)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rc=0 end to end on ABC main 92ac503. 1,674,535 all-putative rows, 1,353 links at threshold 0.027, identical to ABC's shipped expected tables (ABC.Score max diff 0).",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions": [
+          {
+            "text": "run_abc.sh completes (rc=0) using only the documented environment variables and writes the predictions tables",
+            "result": "PASS",
+            "note": "rc=0; AllPutative, NonExpressed, threshold tables present"
+          },
+          {
+            "text": "Row counts and ABC.Score equal ABC's shipped expected output for the same inputs",
+            "result": "PASS",
+            "note": "1,674,535 rows; max abs ABC.Score diff 0.00e+00; 1,353 thresholded links"
+          },
+          {
+            "text": "ABC.Score equals Numerator/sum per (gene,TSS); self-promoters score 1; distance <= 5 Mb",
+            "result": "PASS",
+            "note": "max err 5.1e-07"
+          },
+          {
+            "text": "Calibrated threshold looked up from abc_thresholds.tsv (DHS, H3K27ac, intact_hic = 0.027) and applied",
+            "result": "PASS",
+            "note": "file name threshold0.027; all thresholded scores >= 0.027"
+          },
+          {
+            "text": "Candidate regions follow ABC (summit +/- 250 bp, blocklist, TSS regions kept) and non-self promoters are removed after scoring",
+            "result": "PASS",
+            "note": "17,732 candidates, median 500 bp; no non-self promoter link in thresholded table"
+          }
+        ],
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "run_abc.sh no-Hi-C powerlaw contact (HIC_TYPE=none), K562 chr22, with H3K27ac",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rc=0. Score column powerlaw.Score; threshold 0.017 from the table; 1,674,535 rows; 2,340 links.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions": [
+          {
+            "text": "Script runs to completion with HIC_TYPE=none and no Hi-C file",
+            "result": "PASS",
+            "note": "rc=0"
+          },
+          {
+            "text": "Score column is powerlaw.Score, in [0,1], equal to Numerator/sum, self-promoters 1",
+            "result": "PASS",
+            "note": "max err 5.7e-07"
+          },
+          {
+            "text": "Threshold 0.017 (DHS, TRUE, powerlaw) selected from the table",
+            "result": "PASS",
+            "note": "threshold0.017 file, all scores >= 0.017"
+          },
+          {
+            "text": "Thresholded table equals an independent filter of AllPutative + NonExpressed (non-self promoters removed)",
+            "result": "PASS",
+            "note": "2,340 == 2,340"
+          }
+        ],
+        "assertions_passed": 4,
+        "assertions_total": 4
+      },
+      {
+        "index": 3,
+        "type": "Variant A",
+        "label": "run_abc.sh accessibility-only (ACCESS_TYPE=ATAC on the DNase BAM, no H3K27ac, powerlaw); mechanics only",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rc=0. Threshold 0.013 (ATAC, FALSE, powerlaw); 1,675,272 rows; 3,462 links; no H3K27ac columns. The assay label is nominal (same BAM), so values are mechanics-only.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions": [
+          {
+            "text": "Runs with H3K27AC_BAM unset and writes tables",
+            "result": "PASS",
+            "note": "rc=0"
+          },
+          {
+            "text": "No H3K27ac columns in the prediction tables",
+            "result": "PASS",
+            "note": "columns checked"
+          },
+          {
+            "text": "Threshold 0.013 is selected for ATAC without H3K27ac",
+            "result": "PASS",
+            "note": "threshold0.013; scores >= 0.013"
+          },
+          {
+            "text": "Thresholded table equals independent filter",
+            "result": "PASS",
+            "note": "3,462 == 3,462"
+          }
+        ],
+        "assertions_passed": 4,
+        "assertions_total": 4
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "run_abc.sh with PEAKS= from MACS3 3.0.4 (documented macs2-shim alternative), powerlaw",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rc=0. The MACS3 peaks route yields 17,732 candidates, the same count as the macs2 route, and identical row counts.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions": [
+          {
+            "text": "PEAKS= route skips macs2 and completes",
+            "result": "PASS",
+            "note": "rc=0"
+          },
+          {
+            "text": "Candidate set matches the macs2 route (17,732; median 500 bp)",
+            "result": "PASS",
+            "note": "identical count"
+          },
+          {
+            "text": "Scores and thresholded table satisfy the same invariants as the macs2 route",
+            "result": "PASS",
+            "note": "2,340 links at 0.017; Numerator invariant max err 5.7e-07"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 3
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "run_abc.sh HIC_TYPE=avg on a SUBSTITUTE avg-format directory (real K562 chr22 Hi-C, not the cross-cell-type ENCFF134PUN average)",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "rc=0. Mechanics of the avg branch only (hic_dir/chrN/chrN.bed.gz, gamma/scale, avg threshold row 0.016). The real 58 GB ENCODE average was not fetched (B-1, resource-infeasible); avg on real data is not counted as executed. The Skill states the 58 GB requirement and does not claim it was run.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions": [
+          {
+            "text": "avg branch completes and writes predictions using the documented directory layout",
+            "result": "PASS",
+            "note": "rc=0; 1,731,043 rows"
+          },
+          {
+            "text": "Threshold row for avg (0.016) is used",
+            "result": "PASS",
+            "note": "threshold0.016"
+          },
+          {
+            "text": "Score invariants and thresholded table hold",
+            "result": "PASS",
+            "note": "max err 5.0e-07; 2,246 == 2,246"
+          },
+          {
+            "text": "Scientific validity of the avg branch on the real cross-cell-type average Hi-C is demonstrated",
+            "result": "FAIL",
+            "note": "not executed: ENCFF134PUN (58 GB) infeasible here; the substitute is same-cell-type Hi-C and proves mechanics only"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 4
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "run_abc.sh on the ABC v1.1.2 tag (script header says tested on v1.1.2 and main), powerlaw",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "rc=0 and scores correct (same counts and invariants), but v1.1.2's abc_thresholds.tsv has CRLF line endings, so THRESHOLD carries a carriage return and every threshold output is named EnhancerPredictionsFull_threshold0.017<CR>.tsv.",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions": [
+          {
+            "text": "Runs to completion on v1.1.2",
+            "result": "PASS",
+            "note": "rc=0; 1,674,535 rows; invariants pass"
+          },
+          {
+            "text": "Thresholded values correct on v1.1.2",
+            "result": "PASS",
+            "note": "2,340 links, all >= 0.017, non-self promoters removed"
+          },
+          {
+            "text": "Threshold value read from the table is clean and produces valid output file names",
+            "result": "FAIL",
+            "note": "file name contains a carriage return; the awk lookup does not strip CR (EGL-013)"
+          },
+          {
+            "text": "Calibrated threshold lookup selects the right row on v1.1.2",
+            "result": "PASS",
+            "note": "0.017 for DHS/TRUE/powerlaw"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 4
+      },
+      {
+        "index": 7,
+        "type": "Canonical",
+        "label": "scripts/combine_predictions.py on my usage-example ABC output x upstream ENCODE-rE2G K562 chr22 (7,218 links); HiChIP flag on SYNTHETIC loops with planted truth",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rc=0. 939 shared links equal an independently computed (name,TargetGene) intersection; both scores in range and above their calibrated cut-offs. Synthetic loops (planted truth): 5/5 planted supported incl. reversed orientation, 0/3 decoys, 2 extras that share the enhancer or gene with a planted link. Missing required argument exits 2.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions": [
+          {
+            "text": "Runs on real ABC and real rE2G tables with their real column keys",
+            "result": "PASS",
+            "note": "rc=0; ABC 1,353, rE2G 7,218"
+          },
+          {
+            "text": "Intersection equals an independently computed set and carries the rE2G score correctly",
+            "result": "PASS",
+            "note": "939 == 939; score max diff < 1e-9"
+          },
+          {
+            "text": "Scores lie in [0,1] and above the calibrated ABC (0.027) and rE2G (0.243) cut-offs",
+            "result": "PASS",
+            "note": "asserted"
+          },
+          {
+            "text": "HiChIP flag finds planted loops in either orientation and no decoys (synthetic truth)",
+            "result": "PASS",
+            "note": "5/5 planted, 0/3 decoys; 2 extras share enhancer or gene"
+          },
+          {
+            "text": "Missing required argument fails with a clear message",
+            "result": "PASS",
+            "note": "argparse error, rc=2"
+          }
+        ],
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 8,
+        "type": "Adversarial",
+        "label": "run_abc.sh input guards: missing ABC_REPO, hic without HIC_FILE, HIC_FILE with HIC_TYPE=none, bad ACCESS_TYPE, bad HIC_TYPE, non-ABC repo",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All six invalid combinations exit non-zero (1 or 2) before any computation, with a message naming the problem.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions": [
+          {
+            "text": "Missing ABC_REPO stops with a named message",
+            "result": "PASS",
+            "note": "rc=1 'set ABC_REPO'"
+          },
+          {
+            "text": "Contradictory Hi-C settings (hic without file, file with none, unknown type) are refused",
+            "result": "PASS",
+            "note": "rc=1/2 with messages"
+          },
+          {
+            "text": "Invalid ACCESS_TYPE is refused rather than silently defaulted",
+            "result": "PASS",
+            "note": "rc=2"
+          },
+          {
+            "text": "A directory that is not an ABC clone is refused",
+            "result": "PASS",
+            "note": "rc=2, no predict.py"
+          }
+        ],
+        "assertions_passed": 4,
+        "assertions_total": 4
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 53.5,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The prior P0 is fixed: the documented usage example runs end to end in one command and reproduces ABC's own chr22 K562 tables exactly (1,674,535 rows, 1,353 links at 0.027).",
+    "Hi-C, powerlaw, accessibility-only, MACS3-peaks and avg-mechanics branches execute with calibrated thresholds and correct promoter handling; the avg branch is honestly labelled as run on a substitute.",
+    "combine_predictions.py uses the real column keys and detects planted HiChIP loops in both orientations without decoys.",
+    "Fail-fast input guards and routed references keep SKILL.md lean and consistent with executed behaviour."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "CR left in threshold on ABC v1.1.2 (CRLF table)",
+      "observed_in": [
+        6
+      ],
+      "problem": "On the v1.1.2 tag abc_thresholds.tsv has CRLF endings, so the awk lookup keeps a carriage return and output files are named threshold0.017<CR>.tsv; scores are still correct.",
+      "root_cause": "The awk lookup prints field 4 without stripping CR, while the header claims v1.1.2 is tested.",
+      "fix": "Pipe the lookup through tr -d '\\r' and rerun the v1.1.2 powerlaw case. (EGL-013)"
+    }
+  ]
+}

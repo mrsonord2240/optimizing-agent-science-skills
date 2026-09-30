@@ -1,0 +1,49 @@
+{
+  "skill_id": "bio-atac-seq-consensus-peakset",
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/consensus-peakset",
+    "subtree": "3a5a7057771a3154ad411dfe616a3a92f599d46e",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "verified_commit": true
+  },
+  "candidate": {
+    "identity": "9fcaf5e21aa4bf36637df32cff1776e7eb97dc20de4015d10717de36f370b856",
+    "identity_kind": "sha256-manifest-v1",
+    "path": "F:\\OpenScience\\wt\\atac-consensus-peakset\\skills\\bio-atac-seq-consensus-peakset",
+    "branch": "none (plain directory, not a git worktree)",
+    "base_commit": "ea3b976 (shelf bytes this delta was diffed against)",
+    "file_count": 5,
+    "total_file_bytes": 29308,
+    "candidate_files_modified_by_auditor": false,
+    "worktree_status": "Not a git repository; identity recomputed before and after the delta audit and unchanged."
+  },
+  "candidate_path": "F:\\OpenScience\\wt\\atac-consensus-peakset\\skills\\bio-atac-seq-consensus-peakset",
+  "candidate_identity": {
+    "scheme": "sha256-manifest-v1",
+    "sha256": "9fcaf5e21aa4bf36637df32cff1776e7eb97dc20de4015d10717de36f370b856",
+    "file_count": 5,
+    "total_file_bytes": 29308,
+    "manifest_recipe": "Ordinal UTF-8 POSIX-relative path order; each line is path<TAB>byte-count<TAB>lowercase-sha256; LF joins; no trailing LF.",
+    "manifest_script": "scripts/manifest.py",
+    "manifest": [
+      {"path": "LICENSE", "bytes": 1065, "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"},
+      {"path": "SKILL.md", "bytes": 3327, "sha256": "2fdd65138472704e57b2bc1051b6647d4e9440db07a5b2da5c612c7d5fe337f9"},
+      {"path": "references/method-reference.md", "bytes": 19120, "sha256": "4e7f25790a61bf0bd16f34e8c91b1c2f56b079ee54a422b84369e4c815571151"},
+      {"path": "references/usage-guide.md", "bytes": 1062, "sha256": "72a30391693a09dbab81fa1c4f4f71871426ff1161a96a306a42a423074a639c"},
+      {"path": "scripts/iterative_overlap.sh", "bytes": 4734, "sha256": "669e6ef57023742f85ee0c4f9f64c61489db747d5fd2375417e818292b411ad4"}
+    ]
+  },
+  "delta_audit": {
+    "previous_semantic_candidate_identity": "95aec81162f6948184a6645892e40554840d8ebb5eded0ac5ec354366b7745d2",
+    "commit": "ea3b976 (shelf F:\\optimized-scientific-skills\\skills\\bio-atac-seq-consensus-peakset; recomputed, matches)",
+    "change_disposition": "Only SKILL.md changed: two frontmatter lines added, `category: Data Analysis` and `author: GPTomics` (+41 bytes). The other four files have identical SHA-256 values and sizes. Nothing else changed (logs/delta.diff).",
+    "identity_checked_before_and_after_guard_harnesses": true,
+    "shell_script_sha256": "669e6ef57023742f85ee0c4f9f64c61489db747d5fd2375417e818292b411ad4",
+    "runtime_fingerprint_sha256": "b781ca8a648dc74b0a2e0f410c215c90c3af274c808ad42cd249507cd7bd4514",
+    "auditor_rubric_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "audit_root": "F:\\OpenScience\\audits\\bio-atac-seq-consensus-peakset\\delta-cat-20260930"
+}

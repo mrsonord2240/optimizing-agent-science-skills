@@ -1,0 +1,18 @@
+# Multiome WNN block extracted verbatim from the fixed ecosystem-workflows.md, run in a session with only Signac+Seurat attached
+suppressPackageStartupMessages({library(Signac);library(Seurat)}); set.seed(1)
+cat("%>% before block:", exists("%>%"), "\n")
+SKILL<-Sys.getenv("SKILL")
+md<-paste(readLines(file.path(SKILL,"references/ecosystem-workflows.md"),encoding="UTF-8"),collapse="\n")
+blk<-regmatches(md,gregexpr("(?s)```r\n(.*?)```",md,perl=TRUE))[[1]]; blk<-blk[grepl("FindMultiModalNeighbors",blk)][1]
+blk<-sub("^```r\n","",blk); blk<-sub("```$","",blk); cat(blk,"\n")
+x<-Read10X_h5(file.path(Sys.getenv("CACHE"),"pbmc_granulocyte_sorted_3k_filtered_feature_bc_matrix.h5"))
+obj<-CreateSeuratObject(x[["Gene Expression"]],assay="RNA"); obj[["ATAC"]]<-CreateChromatinAssay(x[["Peaks"]],sep=c(":","-"),genome="hg38",min.cells=10)
+obj[["pct_mt"]]<-PercentageFeatureSet(obj,pattern="^MT-")
+obj<-subset(obj,nCount_RNA>1000&nCount_RNA<25000&nCount_ATAC>1000&nCount_ATAC<100000&pct_mt<20)
+eval(parse(text=blk))
+cat("cells",ncol(obj),"reductions",names(obj@reductions),"\n")
+obj<-FindClusters(obj,graph.name="wsnn",algorithm=3,resolution=0.5,verbose=FALSE); print(table(obj$seurat_clusters))
+cat("RNA.weight median",round(median(obj$RNA.weight),3),"ATAC.weight median",round(median(obj$ATAC.weight),3),"\n")
+u<-Embeddings(obj,"wnn.umap"); cat("wnn.umap",dim(u),"finite",all(is.finite(u)),"\n")
+DefaultAssay(obj)<-"RNA"; m<-c("CD3E","CD14","MS4A1","NKG7")
+print(round(sapply(m,function(g) tapply(GetAssayData(obj,assay="RNA",layer="data")[g,],obj$seurat_clusters,mean)),2))

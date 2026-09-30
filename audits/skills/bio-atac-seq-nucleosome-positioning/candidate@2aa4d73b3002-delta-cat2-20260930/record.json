@@ -1,0 +1,89 @@
+{
+  "skill_id": "bio-atac-seq-nucleosome-positioning",
+  "version": "candidate@2aa4d73b3002-delta-cat2-20260930",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/nucleosome-positioning",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/nucleosome-positioning",
+    "subtree": "4d52623608daf37e5fcf3642d3b5b4f64a0e4c48"
+  },
+  "candidate": {
+    "identity": "2aa4d73b30023a6d14d690fa0e02f3a8b32a563d15bd445c24e257cb0e0ad18b",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-nucleosome-positioning",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "path": "F:\\OpenScience\\wt\\atac-nucleosome-positioning\\skills\\bio-atac-seq-nucleosome-positioning",
+    "files": [
+      {
+        "path": "LICENSE",
+        "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+        "bytes": 1065
+      },
+      {
+        "path": "SKILL.md",
+        "git_blob": "dc67ac8f7be7410de0eba1311b4cd309c43c06ac",
+        "sha256": "8aff3b68d130b88582e15da6dceadb37815181dc005bbf291a752bdd22ca817c",
+        "bytes": 4305
+      },
+      {
+        "path": "references/method-reference.md",
+        "git_blob": "19f58d458a07debf550df7ae73ad23c3f6fe3d5c",
+        "sha256": "6e54a82a1bf80acf8fc4bbe4788be3550de7924d006ddfdc38538d58ae21f5ff",
+        "bytes": 15953
+      },
+      {
+        "path": "references/usage-guide.md",
+        "git_blob": "d504032df9e4c3bea9680fc29691ff1c56cc4bfa",
+        "sha256": "095e32b22800771b74431890973194091d4df4938f84c16aadeedaa4c6cd40e3",
+        "bytes": 3778
+      },
+      {
+        "path": "scripts/estimate_nrl.py",
+        "git_blob": "7427b8e9f4f986fe01666d22499277123fbb8982",
+        "sha256": "328e45bb61b01d794f19210538337e5de818db7755e98753cd8dece155ec7bdc",
+        "bytes": 1883
+      },
+      {
+        "path": "scripts/nucleosome_analysis.R",
+        "git_blob": "7e556020956ee01b4aefe24a32d2f3b4b204b671",
+        "sha256": "0279d024796200b1255c80486610f9fb5349819f5b19f91fdcaf0c4d770477d0",
+        "bytes": 4938
+      },
+      {
+        "path": "scripts/vplot.py",
+        "git_blob": "527f79eb51ca34ae353bd3433c1e6252b222fe0e",
+        "sha256": "b14c84ac60e0f2ebb086cc3caa2120373e4d8a25329c7152cf1760f8f0864a4d",
+        "bytes": 2886
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "mrsonord2240-optimized-scientific-skills@ea3b976",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 4
+  }
+}

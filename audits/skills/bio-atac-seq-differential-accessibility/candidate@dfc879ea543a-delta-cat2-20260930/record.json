@@ -1,0 +1,44 @@
+{
+  "skill_id": "bio-atac-seq-differential-accessibility",
+  "version": "candidate@dfc879ea543a-delta-cat2-20260930",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/differential-accessibility",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/differential-accessibility"
+  },
+  "candidate": {
+    "identity": "dfc879ea543a99d857d53f2556d8b09660006d27a8dda23ede8b03b4ff5b9b1b",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-differential-accessibility",
+    "content_sha256": "dfc879ea543a99d857d53f2556d8b09660006d27a8dda23ede8b03b4ff5b9b1b",
+    "path": "F:\\OpenScience\\wt\\atac-differential-accessibility\\skills\\bio-atac-seq-differential-accessibility"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "mrsonord2240-optimized-scientific-skills@ea3b976",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 3
+  }
+}

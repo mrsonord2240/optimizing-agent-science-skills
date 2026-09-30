@@ -1,0 +1,74 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/differential-accessibility",
+    "normalization_note": "Candidate is a normalized and fixed derivative; origin identifies the source Skill subtree."
+  },
+  "candidate": {
+    "branch": "fix/atac-differential-accessibility",
+    "base_commit": "3186916",
+    "path": "F:\\OpenScience\\wt\\atac-differential-accessibility\\skills\\bio-atac-seq-differential-accessibility",
+    "status": "untracked Skill subtree only; unmodified by delta re-audit (identity re-verified after)",
+    "content_sha256": "dfc879ea543a99d857d53f2556d8b09660006d27a8dda23ede8b03b4ff5b9b1b",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 46766,
+      "recipe": "sha256-manifest-v1: relative POSIX path, byte count, lowercase SHA-256 separated by TAB; sorted ordinal; joined by LF; no trailing LF"
+    },
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 5134,
+        "sha256": "3963e85e62f02cb429f115f875d257abe695906102e440e761dd5240fb8464be"
+      },
+      {
+        "path": "references/method-reference.md",
+        "bytes": 22727,
+        "sha256": "65b2dd5a21e4b61e45f5962cf90581ecd77307374e65ee1f45fdc231c0697850"
+      },
+      {
+        "path": "references/usage-guide.md",
+        "bytes": 7270,
+        "sha256": "a2a6ce43e5942f3dfecb48df650ee1a75cf4bc844858349b9b95c64c83df10f0"
+      },
+      {
+        "path": "scripts/diff_accessibility.R",
+        "bytes": 10570,
+        "sha256": "0ccc78724abe7e868f9d6fa9044237282219288255a4a8712578a5fdf6cc1f0d"
+      }
+    ],
+    "identity_scheme": "sha256-manifest-v1",
+    "root": "F:\\OpenScience\\wt\\atac-differential-accessibility\\skills\\bio-atac-seq-differential-accessibility",
+    "worktree": "F:\\OpenScience\\wt\\atac-differential-accessibility"
+  },
+  "prior_audit": {
+    "path": "F:\\OpenScience\\audits\\bio-atac-seq-differential-accessibility\\delta-cat-20260930\\report.json",
+    "content_sha256": "678737f8a1672087f240de16908c4b4362ff650a6e0df8ecea6cc21e4a1a0184",
+    "score": 87
+  },
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-atac-seq-differential-accessibility\\TOOLS.md",
+    "env_fingerprint": "2998eae45e95156bbe8b1ec4f619756fe7f8e1803c9931270a3f7a4594d54236",
+    "poppler_env_fingerprint": "b0ea9386c055785df71190a5db5fd70374117868f082f4f353b09367cc0bdd04",
+    "environment": "WSL2 science, micromamba env bio-atac-seq-differential-accessibility; R 4.4.3, DiffBind 3.16.0, DESeq2 1.46.0, edgeR 4.4.0, sva 3.54.0, ChIPseeker 1.42.0; /mnt/openscience only",
+    "note": "Environment not re-executed in this delta; fingerprints carried from the certified run"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "phase": "delta re-audit (delta-cat2-20260930: follow-up documentation fix)",
+  "independent_auditor": true,
+  "delta": {
+    "previous_run": "F:/OpenScience/audits/bio-atac-seq-differential-accessibility/delta-cat-20260930",
+    "previous_identity": "678737f8a1672087f240de16908c4b4362ff650a6e0df8ecea6cc21e4a1a0184",
+    "shelf_commit": "ea3b976",
+    "shelf_identity": "dd1e7bda67b8992abed303553522a42d73f5af9fb5c69bbb955f3886a5463238",
+    "changed_vs_previous": [
+      "references/method-reference.md"
+    ]
+  }
+}
