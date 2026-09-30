@@ -9,6 +9,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import run_mercury_worker as worker
@@ -87,7 +88,7 @@ class MercuryWorkerTests(unittest.TestCase):
             root = Path(directory)
             (root / "README.md").write_text("# Test\n", encoding="utf-8")
             workspace = worker.ReadOnlyWorkspace(root)
-            calls: list[dict[str, object]] = []
+            calls: list[dict[str, Any]] = []
 
             def fake_request(payload, api_key, timeout_seconds, max_retries):
                 calls.append(payload)

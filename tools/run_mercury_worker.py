@@ -663,7 +663,8 @@ def run_agent_loop(
         if not isinstance(message, dict):
             raise LauncherError("OpenRouter completion has no assistant message.")
 
-        usage = response.get("usage") if isinstance(response.get("usage"), dict) else {}
+        usage_value = response.get("usage")
+        usage: dict[str, Any] = usage_value if isinstance(usage_value, dict) else {}
         prompt_tokens = int(usage.get("prompt_tokens") or 0)
         completion_tokens = int(usage.get("completion_tokens") or 0)
         cost = float(usage.get("cost") or 0.0)
