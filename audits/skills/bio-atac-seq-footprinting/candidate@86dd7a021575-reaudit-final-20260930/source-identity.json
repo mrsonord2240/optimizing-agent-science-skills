@@ -1,0 +1,45 @@
+{
+  "phase": "final re-audit",
+  "independent_auditor": true,
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/footprinting",
+    "subtree": "7ded85e1af526f2912805fe6da472f78fe2940e8",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "path": "F:\\OpenScience\\wt\\atac-footprinting\\skills\\bio-atac-seq-footprinting",
+    "branch": "fix/atac-footprinting",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity": "sha256-manifest-v1",
+    "manifest_sha256": "86dd7a021575d6f8ed7c8c5462a9ecdc1061640e8f6e6b122b32b140808c02e2",
+    "file_count": 7,
+    "byte_total": 52673,
+    "status_before": "skills/bio-atac-seq-footprinting untracked (7 files); no tracked-file edits",
+    "status_after_execution": "unchanged; manifest recomputed before, during and after execution (scripts/manifest.py, logs/manifest_pre.txt, logs/manifest_post.txt)",
+    "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; tab-separated; LF joins; ordinal UTF-8 byte ordering; no trailing LF"
+  },
+  "files": [
+    {"path": "LICENSE", "bytes": 1065, "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f", "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17"},
+    {"path": "SKILL.md", "bytes": 8548, "sha256": "110dae62058e08368ae3c1774ebcab01b8f0a90fd3730624568e2bf4e8e36de5", "git_blob": "5f7d63d6e3dbd14a4da84208ab7741225818090a"},
+    {"path": "references/method-reference.md", "bytes": 15137, "sha256": "4fb73b35a90624d9f92baac7df2e8c1e7ea080e7625c28e296b4f79271dd6397", "git_blob": "4202ab4d74e1f742567edfa5fbe3548b129fd92d"},
+    {"path": "references/usage-guide.md", "bytes": 10568, "sha256": "a3d36af86b461f77f7446b8e69e91a2fb101d85ba5b32cb5fa271243eb7e267d", "git_blob": "93e53e89f9c065bc71461226d5a47ec027f72138"},
+    {"path": "scripts/run_tobias.sh", "bytes": 7264, "sha256": "bb17954189412df5399aa6875b39ee50ea934a2d9f402837d4f6be42c577f69f", "git_blob": "76ad185b161afcd08c719077985518c5e02a3273"},
+    {"path": "scripts/scprinter_footprint.py", "bytes": 7792, "sha256": "eaa5f4eb81983d86cc7911cacdf86aa841da4d41d2921b1d4a2697f41eb99b22", "git_blob": "d2ce4434af7840b25aff3202d383167bf387ff7a"},
+    {"path": "scripts/site_concordance.sh", "bytes": 2299, "sha256": "e6a12bcb31d0143c2da5d8bb6a203ddab1dc7105240483911e55d85f0442ee04", "git_blob": "0d9fb7f43972fa5c45aeaa53a44d3a4235e2567f"}
+  ],
+  "tooling": {
+    "tools_md_sha256": "a6c70f815a8e4c0400c8c71fcc4672ff212b94b523797996a6d2283c8d19a703",
+    "live_env_fingerprints_sha256_16": {
+      "bio-atac-seq-footprinting": "2e685696a81e5d90",
+      "bio-atac-seq-footprinting-rgt": "4417c93cad60a195",
+      "bio-atac-seq-footprinting-pydnase": "bd5268030526965b",
+      "bio-atac-seq-footprinting-scprinter": "82f4ffe4c02264e6"
+    },
+    "fresh_env": "footprint-scprinter built from the usage-guide recipe lines (extracted verbatim) 2026-09-30 15:53-16:22 PDT: torch 2.11.0+cu128 (CUDA true), scPrinter 1.2.0, tangermeme 0.4.4, snapatac2 2.8.0, pip check clean; removed after the run",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "prior_audit": "F:\\optimizing-agent-science-skills\\audits\\skills\\bio-atac-seq-footprinting\\candidate@a71e561087bc-reaudit-run",
+  "candidate_cache_artifacts_after_execution": []
+}

@@ -1,66 +1,54 @@
-# Handoff: bio-atac-seq-footprinting / orchestrator (commit and intake)
+# Handoff: bio-atac-seq-footprinting / final re-audit
 
-- Updated: 2026-09-30 (PDT, final re-audit)
+- Updated: 2026-09-30 17:30 PDT
 - Lane: 1
-- Status: candidate-ready
-- Owner leaving: reaudit-scientific-skill worker (independent; did not fix, tool or initially audit)
-- Next role: optimize-scientific-skills orchestrator (commit the exact bytes to make them `ready`, then intake)
+- Status: **candidate-ready**
+- Owner leaving: reaudit-scientific-skill worker (fresh, independent; did not fix, tool or previously audit the candidate)
+- Next role: orchestrator (commit the exact bytes to make them `ready`, then intake)
 
-## Readiness decision
+## Certified candidate
 
-**candidate-ready** for `sha256-manifest-v1 a71e561087bc769f5b14f703c8c535d1fda3a7f90de84d2a4b0dc7ccfb2ade87` (7 files, 42,157 bytes). No veto, no open P0 or P1.
+- Path: `F:\OpenScience\wt\atac-footprinting\skills\bio-atac-seq-footprinting` (branch `fix/atac-footprinting` @ 3186916, directory untracked)
+- Identity: `sha256-manifest-v1 86dd7a021575d6f8ed7c8c5462a9ecdc1061640e8f6e6b122b32b140808c02e2`, 7 files, 52,673 bytes. Recomputed before, during and after execution: identical.
+- Supersedes: `mrsonord2240-optimized-scientific-skills@ea3b976` (candidate `a71e5610...`, 86).
 
-| Metric | Value | Gate |
+## Readiness metrics
+
+| Gate | Value | Floor |
 |---|---|---|
-| Final | 86 (Production Ready) | >= 85 |
-| Static | 87 | >= 80 |
-| Execution average | 85.5 (6 inputs) | >= 85 |
-| Layer 1 / Layer 2 | 34.8 / 50.7 | >= 32 / >= 48 |
-| Assertion pass rate | 27/28 = 96.4 % | >= 90 % |
+| Final | 88 | 85 |
+| Static | 90 | 80 |
+| Execution average | 87.0 | 85 |
+| Layer 1 / Layer 2 | 35.5 / 51.5 | 32 / 48 |
+| Assertions | 30/30 | 90 % |
+| Vetoes, open P0, open P1 | none | none |
 
-The execution average clears the gate by 0.5; the one failed assertion (input 3) is the residual P2 below.
+## Evidence
 
-## Source identity
+- Raw run: `F:\OpenScience\audits\bio-atac-seq-footprinting\reaudit-final-20260930\` (`report.json`, `viewer.md`, `source-identity.json`, `scripts/`, `logs/`, `out/`)
+- Published record: `audits/skills/bio-atac-seq-footprinting/candidate@86dd7a021575-reaudit-final-20260930/` (23 scripts). `npm run audits:index` and `audits:check` pass.
+- Heavy artifacts (disposable, 4.2 GB): `F:\OpenScience\audit-envs\bio-atac-seq-footprinting\reaudit-final\`
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:atac-seq/footprinting
-- Working tree: `F:\OpenScience\wt\atac-footprinting\skills\bio-atac-seq-footprinting` (untracked, uncommitted)
-- Branch/worktree: `fix/atac-footprinting`, starting commit `3186916`
-- Candidate tree hash: `sha256-manifest-v1 a71e561087bc769f5b14f703c8c535d1fda3a7f90de84d2a4b0dc7ccfb2ade87`, recomputed live before and after execution; no `__pycache__`
-- Applicable audit: `F:\OpenScience\audits\bio-atac-seq-footprinting\reaudit-run\` (`report.json`, `viewer.md`, `source-identity.json`, `scripts/`, `logs/`, `out/`); not published to the records repo
+## What was checked
 
-## Completed this phase
+- CTCF bias check: rc 0 with real correction and rc 4 with correction absent, at full depth, 20% depth and NFR-only fragments.
+- scPrinter in a fresh usage-guide env: bulk, `--groups` per-cluster, `--shift` (source and `detect_shift`), guards.
+- seq2PRINT: usage-guide blocks run to rc 0 in 29 min (bounded; weak model, as documented).
+- HINT-ATAC, Wellington `-A`, `site_concordance.sh`: re-run in the live envs.
 
-- FOOT-001..003 (P1) retested by execution in fresh recipe envs: CTCF guard rc 3 / `ALLOW_NO_CTCF=1` rc 0, scPrinter bulk route (GPU) bound > unbound at modes 10-30, all four env recipes rc 0 with tested versions (throwaway `ra-footprint*` envs removed; live envs unchanged).
-- FOOT-004..015 retested: RGT recipe (plain pip no-op, corrected line works, HINT 358 footprints), ranking equals independent |change| order, spaces-in-path and missing-input guards, concordance recomputed in pure python, JASPAR URL 200.
-- Canonical smoke `run_tobias.sh` unmodified (GM12878 vs K562, chr1): rc 0, biology and CTCF profile asserted, PDFs rendered and inspected.
-- Excluded modes are labelled untested in SKILL.md, usage guide and method reference.
+## Remaining findings (P2)
 
-## Open findings (all P2; none blocks candidate-ready)
+- FOOT-016: the bias check catches absent correction, not always partial correction; the 0.2 default rests on two libraries.
+- FOOT-017: the usage guide does not warn that bound-versus-unbound contrast cannot pick the scPrinter `--shift`.
 
-| ID | Severity | State | Evidence | Disposition |
-|---|---|---|---|---|
-| FOOT-008 residual (report rec. 1) | P2 | open | `reaudit-run/logs/r2_check.out` (shim run N) | With corrected == uncorrected the script exits 0 silently; bound dip 7.14 vs 6.67. Skill discloses the limit. Optional: warn on missing corrected-vs-uncorrected gain |
-| Report rec. 2 | P2 | open | `references/usage-guide.md` scPrinter block | Bare `pip install` lines do not name the environment |
-| Report rec. 3 | P2 | open | `reaudit-run/logs/r3_scp_missing.log` | Missing fragment file gives a raw traceback (rc 1) |
+## Not executed
 
-## Failed or blocked surfaces
+- LoRA single-cell seq2PRINT and `seq_tfbs_seq2print`: resource-infeasible on the staged data; labelled not run in the Skill.
+- Full-depth whole-genome runs: resource-infeasible.
+- RGT data recipe rebuild, NFR count check, `alignmentSieve --ATACshift`: text and env fingerprints unchanged; prior re-audit evidence stands.
 
-- None failed. Blocked or untested (after-action, not counted as executed): full-depth (50M read) whole-genome run (resource-infeasible; chr1 slices only); scATAC/cluster scPrinter and seq2PRINT training (excluded, labelled in the Skill); ChIP-anchored CTCF validation (not shipped); PIQ, seqOutBias, chromBPNet bias model (no Skill code).
+## Worktree state
 
-## Environment and evidence
-
-- Tool inventory: `F:\OpenScience\audits\bio-atac-seq-footprinting\TOOLS.md` (sha256 `303b1224...1484f`); fresh-env fingerprints `reaudit-run\logs\r5_fingerprints.txt`
-- Restricted-access items: none
-- Tooling impact: none (no Skill bytes or dependencies changed by this phase)
-- Rubric: `skill-auditor.zip` sha256 `e54e9ff8...f0de`
-
-## Worktree safety
-
-- Run-owned changes: `F:\OpenScience\audits\bio-atac-seq-footprinting\reaudit-run\`, this handoff; heavy artifacts `F:\OpenScience\audit-envs\bio-atac-seq-footprinting\reaudit-run\` (disposable)
-- Pre-existing/user-owned changes (untouched): `tools\run_mercury_worker.py`, `tools\test_run_mercury_worker.py`
-- Records state: uncommitted, unpublished
-- Product commits/pushes: none
-
-## Transition assertion
-
-- Next-phase prerequisites met: yes. Orchestrator commits the exact audited bytes and publishes the record (`tools/publish_audits.py --run-dir ... --artifact ...`, then `npm run audits:index` and `audits:check`); any Skill byte change invalidates this record.
+- Skill bytes untouched; no commit, push or intake.
+- `F:\optimizing-agent-science-skills`: new published version dir, regenerated `audits/INDEX.md` and `audits/BACKLOG.md`, this handoff. `fixes/bio-atac-seq-footprinting.md` was already modified by the fixer and is untouched.
+- Fresh env `footprint-scprinter` removed; live env fingerprints unchanged; no run-owned processes remain.

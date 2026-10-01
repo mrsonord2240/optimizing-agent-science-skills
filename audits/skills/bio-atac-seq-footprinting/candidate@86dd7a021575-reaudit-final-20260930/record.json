@@ -1,0 +1,89 @@
+{
+  "skill_id": "bio-atac-seq-footprinting",
+  "version": "candidate@86dd7a021575-reaudit-final-20260930",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/footprinting",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting",
+    "subtree": "7ded85e1af526f2912805fe6da472f78fe2940e8"
+  },
+  "candidate": {
+    "identity": "86dd7a021575d6f8ed7c8c5462a9ecdc1061640e8f6e6b122b32b140808c02e2",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-footprinting",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "path": "F:\\OpenScience\\wt\\atac-footprinting\\skills\\bio-atac-seq-footprinting",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+        "git_blob": "bcccf5e00d6fb375e1a12f8552ccaa05e377ca17"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 8548,
+        "sha256": "110dae62058e08368ae3c1774ebcab01b8f0a90fd3730624568e2bf4e8e36de5",
+        "git_blob": "5f7d63d6e3dbd14a4da84208ab7741225818090a"
+      },
+      {
+        "path": "references/method-reference.md",
+        "bytes": 15137,
+        "sha256": "4fb73b35a90624d9f92baac7df2e8c1e7ea080e7625c28e296b4f79271dd6397",
+        "git_blob": "4202ab4d74e1f742567edfa5fbe3548b129fd92d"
+      },
+      {
+        "path": "references/usage-guide.md",
+        "bytes": 10568,
+        "sha256": "a3d36af86b461f77f7446b8e69e91a2fb101d85ba5b32cb5fa271243eb7e267d",
+        "git_blob": "93e53e89f9c065bc71461226d5a47ec027f72138"
+      },
+      {
+        "path": "scripts/run_tobias.sh",
+        "bytes": 7264,
+        "sha256": "bb17954189412df5399aa6875b39ee50ea934a2d9f402837d4f6be42c577f69f",
+        "git_blob": "76ad185b161afcd08c719077985518c5e02a3273"
+      },
+      {
+        "path": "scripts/scprinter_footprint.py",
+        "bytes": 7792,
+        "sha256": "eaa5f4eb81983d86cc7911cacdf86aa841da4d41d2921b1d4a2697f41eb99b22",
+        "git_blob": "d2ce4434af7840b25aff3202d383167bf387ff7a"
+      },
+      {
+        "path": "scripts/site_concordance.sh",
+        "bytes": 2299,
+        "sha256": "e6a12bcb31d0143c2da5d8bb6a203ddab1dc7105240483911e55d85f0442ee04",
+        "git_blob": "0d9fb7f43972fa5c45aeaa53a44d3a4235e2567f"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "mrsonord2240-optimized-scientific-skills@ea3b976",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 23
+  }
+}

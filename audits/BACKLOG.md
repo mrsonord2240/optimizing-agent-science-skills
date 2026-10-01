@@ -410,7 +410,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (153)
+## P2 (152)
 
 ### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
 
@@ -652,30 +652,6 @@ None open.
 - Root cause: Origin ships no tests
 - Fix: Ship a tiny synthetic BAM/bigWig and expected values
 
-### `bio-atac-seq-footprinting` — CTCF control cannot detect absent bias correction
-
-- Skill: 86, Production Ready · candidate `a71e561087bc` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-footprinting) · [viewer](skills/bio-atac-seq-footprinting/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 3
-- Problem: With corrected signal replaced by uncorrected signal the script exits 0 with no warning and the bound-site dip stays deep (7.14 vs 6.67); the guard only tests that a CTCF motif exists.
-- Root cause: The positive control is evaluated on sites selected by the same footprint score and gives no numeric corrected-versus-uncorrected criterion.
-- Fix: Compare corrected against uncorrected at all CTCF sites and warn when the corrected flank-minus-core gain is absent, or state the expected contrast (about 2.5 uncorrected and 3.0 corrected at all sites in the chr1 test) beside the panel description.
-
-### `bio-atac-seq-footprinting` — scPrinter recipe lines do not name the environment
-
-- Skill: 86, Production Ready · candidate `a71e561087bc` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-footprinting) · [viewer](skills/bio-atac-seq-footprinting/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 6
-- Problem: The scPrinter block runs bare pip install lines after micromamba create, so a reader can install torch and scPrinter into the wrong active environment.
-- Root cause: The TOBIAS line uses micromamba run -n but the scPrinter lines rely on an implied activation.
-- Fix: Prefix the two scPrinter pip lines with micromamba run -n footprint-scprinter or add an explicit activation line.
-
-### `bio-atac-seq-footprinting` — scprinter_footprint.py fails with a raw traceback on a missing input
-
-- Skill: 86, Production Ready · candidate `a71e561087bc` from [mrsonord2240/optimized-scientific-skills@ea3b976](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ea3b976ad47a0d0b127b4a047ea200a0d0ac1bf4/skills/bio-atac-seq-footprinting) · [viewer](skills/bio-atac-seq-footprinting/mrsonord2240-optimized-scientific-skills@ea3b976/viewer.md)
-- Observed in inputs: 5
-- Problem: A missing fragment file exits rc 1 through a FileNotFoundError deep in scPrinter rather than a one-line message.
-- Root cause: Arguments are not checked before importing and calling scPrinter.
-- Fix: Check that --fragments, --fasta, --gtf, --blacklist and --regions exist and exit 2 with a named message, as run_tobias.sh does.
-
 ### `bio-clinical-databases-dbsnp-queries` — Batch table drops annotations for merged rsIDs
 
 - Skill: 86, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/dbsnp-queries) · [viewer](skills/bio-clinical-databases-dbsnp-queries/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -843,6 +819,22 @@ None open.
 - Problem: On the v1.1.2 tag abc_thresholds.tsv has CRLF endings, so the awk lookup keeps a carriage return and output files are named threshold0.017<CR>.tsv; scores are still correct.
 - Root cause: The awk lookup prints field 4 without stripping CR, while the header claims v1.1.2 is tested.
 - Fix: Pipe the lookup through tr -d '\r' and rerun the v1.1.2 powerlaw case. (EGL-013)
+
+### `bio-atac-seq-footprinting` — Bias check catches absent correction, not always partial correction
+
+- Skill: 88, Production Ready · candidate `86dd7a021575` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@86dd7a021575-reaudit-final-20260930/viewer.md)
+- Observed in inputs: 2
+- Problem: Removing only part of the expected bias from the uncorrected aggregate passes the check once 40% (K562) or 60% (GM12878) is removed. Uncorrected r was as low as 0.362 (K562, NFR fragments), 0.16 above the 0.2 ceiling, and an independent pyBigWig aggregation of the same tracks gave 0.31. The default rests on two libraries.
+- Root cause: A single Pearson ceiling is applied to the corrected profile without reference to how strongly the uncorrected profile followed the bias.
+- Fix: In references/method-reference.md state that the check detects absent, not under-strength, correction and that 0.2 was set on GM12878 and K562. In scripts/run_tobias.sh warn that the check is uninformative when r(uncorrected, expected) is itself at or below BIAS_R_MAX.
+
+### `bio-atac-seq-footprinting` — No warning that bound-versus-unbound contrast cannot pick the scPrinter shift
+
+- Skill: 88, Production Ready · candidate `86dd7a021575` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/atac-seq/footprinting) · [viewer](skills/bio-atac-seq-footprinting/candidate@86dd7a021575-reaudit-final-20260930/viewer.md)
+- Observed in inputs: 5
+- Problem: On raw BAM fragments the wrong setting (--shift 4,-5) gave a larger CTCF bound-minus-unbound centre score than the correct 0,0 (mode 10: 0.629 vs 0.281; mode 30: 0.663 vs 0.419). A reader who tries both and keeps the stronger contrast would pick the wrong shift.
+- Root cause: The usage guide says which shift fits which fragment source but not how to tell when it is wrong.
+- Fix: Add one sentence to the fragment section of references/usage-guide.md: set --shift from how the fragments were made, never from which setting gives the stronger contrast; the wrong shift scored higher in the tested slice.
 
 ### `bio-phylo-modern-tree-inference` — Remove the false IQ-TREE flag-form warnings
 
