@@ -9,7 +9,8 @@
 - `F:\OpenScience` holds disposable worktrees, environments, cached public
   inputs, run outputs, and other reproducible heavy artifacts.
 - `mrsonord2240/bioSkills-Improved` is a downstream, bioSkills-shaped
-  compatibility fork generated one way from completed canonical bytes.
+  compatibility fork generated one way from completed canonical bytes by
+  `tools/export_bioskills.py`. Its checkout is `F:\OpenScience\bioSkills-Improved`.
 - Original provider repositories are provenance sources. Keep their source
   checkouts read-only, including generated caches and interpreter artifacts.
 

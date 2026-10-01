@@ -265,14 +265,19 @@ Treat one invocation as one product batch:
    the product commit changes. Stop only when intake has accepted the exact
    final commit and final product history contains one run-closing optimized
    commit.
-6. For accepted bio-derived Skills, prepare at most one corresponding
-   bioSkills-Improved batch commit from the exact canonical bytes.
+6. Once the optimized-shelf commit and its provenance rows are final, run
+   `python tools/export_bioskills.py --apply --push` from the records
+   repository. It copies every finished bio-derived Skill's exact committed
+   bytes to its `upstream_path` in the `F:\OpenScience\bioSkills-Improved`
+   checkout as one commit and pushes it; Sam authorized this push on
+   2026-09-30. The run is not closed until a plain `python
+   tools/export_bioskills.py` reports `to export: 0`.
 7. Commit resumable state for unfinished lanes in the records repository when
    useful; never put unfinished Skills in a product batch.
 
-Do not push, open pull requests, build Marketplace bundles, add reviewer
-identity, submit, register, release, publish, or mutate other remote state
-without separate authorization.
+Apart from the step 6 fork push, do not push, open pull requests, build
+Marketplace bundles, add reviewer identity, submit, register, release, publish,
+or mutate other remote state without separate authorization.
 
 ## Report the run
 

@@ -71,6 +71,7 @@ One invocation is one product batch. At run close, create at most one local
 optimized-shelf commit containing all and only the run's candidate-ready
 Skills. Committing exact audited bytes makes them `ready`. Run the
 Marketplace's own local `intake:skill` validator against that exact commit;
-only accepted Skills become `done`. Form at most one corresponding
-bioSkills-Improved commit for the accepted bio-derived subset. Do not preserve
+only accepted Skills become `done`. Then run
+`python tools/export_bioskills.py --apply --push`, which forms and pushes the
+one corresponding bioSkills-Improved commit. Do not preserve
 phase-by-phase commits in either product history.
