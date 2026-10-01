@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-consensus-peakset",
+    "description": "Build a differential-ready consensus peakset from per-replicate ATAC-seq peaks using iterative overlap removal, fixed-width re-centering, and majority-rule overlap. Use when generating a stable peak coordinate system for downstream differential accessibility, ML feature engineering, cross-sample comparison, or fixed-width peak counts; covers Corces 2018 iterative overlap (501 bp), DiffBind summit re-centering, and ENCODE consistency rules.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 3
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The inspected workflows did not fabricate scientific claims, statistics, or citations."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill stays within research analysis and makes no clinical or prescriptive claims."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The Bash, R, and connected Python summit guards reject absent, negative, missing, or out-of-range offsets before summit arithmetic; the R and Python guard logic was independently exercised."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The unchanged primary Bash workflow has inspected public and multi-file executions. The connected R and Python guard paths were parsed and guard-tested with mock objects; their dependency-backed end-to-end workflows remain unavailable and are not counted as executed."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "The primary iterative workflow and alternative method guidance are clear; the changed R and Python examples now validate summit availability before arithmetic."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "The Bash path preflights row shape and summit offsets; the R and Python examples guard sentinel and range failures, while full dependency-backed runs remain unverified."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "The reference warns that greedy overlap becomes expensive at large peak counts; the core implementation is appropriate for bounded peaksets but uses a quadratic scan."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Inputs, strategy selection, and output formats are well routed; alternate examples expose their package dependencies in code but lack a tested compatibility matrix."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural request examples and clear assembly/filter requirements make the Skill discoverable and understandable."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or destructive commands are present; the shell runner quotes paths and validates input rows before creating outputs."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Concise routing and separated references/scripts support maintenance; alternate examples remain standalone and lack a shared runtime test suite."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, and stop conditions are effective; the output-directory reuse behavior and alternate-runtime preconditions could be clearer."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 15,
+      "total": 15
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Public 3,000-row hg19 narrowPeak workflow",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Verified reusable direct-run evidence on the unchanged shell bytes produced 3,000 pooled, 2,927 iterative, and 2,886 final 501 bp peaks with inspected BED and SAF outputs.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The exact candidate shell runner launches directly in the prepared Linux Bash environment",
+            "result": "PASS",
+            "note": "Reused direct-run evidence is bound to the unchanged script SHA-256 and matching runtime fingerprint."
+          },
+          {
+            "text": "All 3,000 input rows are represented in pooled, clamped, and ranked intermediates",
+            "result": "PASS",
+            "note": "Saved parsed execution assertions confirm 3,000 rows at each intermediate stage."
+          },
+          {
+            "text": "Iterative output contains 2,927 sorted non-overlapping windows",
+            "result": "PASS",
+            "note": "The saved evidence confirms 2,927 iterative rows and the independent overlap/order checks passed."
+          },
+          {
+            "text": "The 2,886 final BED rows are fixed-width, in bounds, sorted, and blacklist-free",
+            "result": "PASS",
+            "note": "Saved output inspection confirms all intervals are 501 bp and pass bound, ordering, and blacklist checks."
+          },
+          {
+            "text": "SAF header, unique identifiers, row count, and 1-based coordinates match BED",
+            "result": "PASS",
+            "note": "All 2,886 SAF records map to the final BED rows with unique chr_start_end IDs and Start=BED start+1."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Two-file per-replicate glob",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Verified reusable direct-run evidence on the unchanged script consumed two files and produced 400 pooled, 393 iterative, and 388 final peaks plus SAF.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented glob expands to both replicate files",
+            "result": "PASS",
+            "note": "The parsed pooled output contains 400 rows from the two 200-row fixtures."
+          },
+          {
+            "text": "Greedy overlap removal retains 393 non-overlapping windows",
+            "result": "PASS",
+            "note": "The saved output assertions confirm 393 iterative rows and no same-chromosome overlaps."
+          },
+          {
+            "text": "Blacklist filtering emits 388 final intervals of width 501 bp",
+            "result": "PASS",
+            "note": "All 388 final intervals passed width, bounds, ordering, and blacklist checks."
+          },
+          {
+            "text": "Pooled, clamped, and ranked outputs meet their schema and signal-order contracts",
+            "result": "PASS",
+            "note": "Each intermediate contains 400 six-column 501 bp rows and descending signal order."
+          },
+          {
+            "text": "Every SAF row corresponds to one final BED row",
+            "result": "PASS",
+            "note": "All 388 unique SAF IDs and coordinate mappings match final BED."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Malformed rows and R/Python summit guards",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reused shell rejection checks passed, and the exact changed R and connected Python guard fragments were independently exercised before coordinate arithmetic; full optional dependency-backed workflows were not run.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The nine-column and summit -1 shell cases reject before output creation",
+            "result": "PASS",
+            "note": "Each returns status 1 with one file/line-specific diagnostic and creates no output directory."
+          },
+          {
+            "text": "The complete R fenced code block parses and its exact guard accepts valid boundary offsets",
+            "result": "PASS",
+            "note": "R 4.4.1 parsed the block; base-R mocks accepted offsets 0 and width-1."
+          },
+          {
+            "text": "The R guard rejects absent, missing, negative, -1, out-of-range, and length-mismatched offsets",
+            "result": "PASS",
+            "note": "Each case raised the guard's intended error before the example's start-coordinate assignment."
+          },
+          {
+            "text": "The connected Python function parses and valid endpoint offsets yield 501 bp intervals",
+            "result": "PASS",
+            "note": "The candidate function source parsed and ran with a mock BedTool sink; offsets 0 and 99 yielded width 501."
+          },
+          {
+            "text": "The Python guard rejects malformed, sentinel, negative, out-of-range, and later-row-invalid inputs before output construction",
+            "result": "PASS",
+            "note": "The 9-column, -1, -2, >=width, and second-row -1 cases raised the intended line-specific errors; the mock BedTool sink was not called."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 56.6,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The primary Bash workflow validates every narrowPeak row and summit offset before output creation or arithmetic.",
+    "Public and two-file shell runs have inspected fixed-width BED and SAF output contracts with matching cached inputs and runtime fingerprints.",
+    "The R and Python examples now reject no-summit and unusable summit offsets before their recentering arithmetic."
+  ],
+  "recommendations": []
+}

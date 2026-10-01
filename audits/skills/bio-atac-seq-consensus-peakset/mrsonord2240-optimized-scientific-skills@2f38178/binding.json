@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-consensus-peakset",
+  "candidate_version": "candidate@9fcaf5e21aa4-delta-cat-20260930",
+  "candidate_identity": "9fcaf5e21aa4bf36637df32cff1776e7eb97dc20de4015d10717de36f370b856",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+  "provider_path": "skills/bio-atac-seq-consensus-peakset",
+  "provider_tree": "9ce42d29177ea80e978aa29f341949814da50616",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "9fcaf5e21aa4bf36637df32cff1776e7eb97dc20de4015d10717de36f370b856",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 3327,
+      "sha256": "2fdd65138472704e57b2bc1051b6647d4e9440db07a5b2da5c612c7d5fe337f9"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 19120,
+      "sha256": "4e7f25790a61bf0bd16f34e8c91b1c2f56b079ee54a422b84369e4c815571151"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 1062,
+      "sha256": "72a30391693a09dbab81fa1c4f4f71871426ff1161a96a306a42a423074a639c"
+    },
+    {
+      "path": "scripts/iterative_overlap.sh",
+      "bytes": 4734,
+      "sha256": "669e6ef57023742f85ee0c4f9f64c61489db747d5fd2375417e818292b411ad4"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "scientific-skill-audit-source-identity-v1",
+  "phase": "delta re-audit",
+  "skill_id": "bio-atac-seq-co-accessibility",
+  "independent_auditor": true,
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/co-accessibility",
+    "license": "MIT"
+  },
+  "candidate": {
+    "root": "F:\\OpenScience\\wt\\atac-co-accessibility\\skills\\bio-atac-seq-co-accessibility",
+    "worktree": "F:\\OpenScience\\wt\\atac-co-accessibility",
+    "branch": "fix/atac-co-accessibility",
+    "product_head": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity_scheme": "sha256-manifest-v1",
+    "content_sha256": "f7b386a41a3f37d483683ad7e3368688722632fab74595e3a56b3f04c1d8ed38",
+    "manifest_bytes": 450,
+    "file_count": 5,
+    "manifest_recipe": "Ordinal UTF-8 relative POSIX paths; each line is path, TAB, byte count, TAB, lowercase file SHA-256 of the raw bytes; lines joined by LF without a trailing LF; SHA-256 over the manifest bytes. No file contains a CR byte, so the prior CRLF->LF normalisation is a no-op here.",
+    "manifest_path": "candidate-manifest.tsv",
+    "identity_before": "f7b386a41a3f37d483683ad7e3368688722632fab74595e3a56b3f04c1d8ed38",
+    "identity_after": "f7b386a41a3f37d483683ad7e3368688722632fab74595e3a56b3f04c1d8ed38",
+    "prior_audit_identity": "3c8089b0496fa6375512ece4b85ce85c10c47f3cb4a9c8e48c7288a62b9162e3",
+    "tree_status": "Candidate skill directory is staged with unstaged modifications (AM) in the worktree; identity recomputed live before and after this delta re-audit; no candidate bytes modified."
+  },
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-atac-seq-co-accessibility\\TOOLS.md",
+    "environment_lock_sha256": "2fcd3fc2a5de3bd194b80bf864b2f7ce9762eafc45c35179df9713958db7d552",
+    "environment_live_check": "Not re-run: the delta touches frontmatter and one usage-guide prompt only; no execution surface changed. Prior live check carried forward.",
+    "tools_md_sha256": "0fb4b3ba8bd8d255f85cea6a46f8a8fac699d1ccdd0e0b4f8078adf01535d489"
+  },
+  "rubric": {
+    "zip": "F:\\optimizing-agent-science-skills\\skill-auditor.zip",
+    "evaluator_version": "skill-auditor@1.0"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 4798,
+      "sha256": "61cc0d758996f6c110be929482859b751f3b210fc308c5a62e507b42e2da4512"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 17865,
+      "sha256": "a398f2f09afce4d5e8f5641c5ae7aebc79c203c6093cddb97df42e67094789a8"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 6980,
+      "sha256": "d1bf2fb3d3d64ac855229f80a4e0384ae5081754e5bb3bb82d18019c4e310361"
+    },
+    {
+      "path": "scripts/cicero_workflow.R",
+      "bytes": 6831,
+      "sha256": "2505bdb23ac79f7bb6e28db44e1ffbd768e52e49c9861e948ea989912c2101a4"
+    }
+  ],
+  "prior_audit_identity": "0aac567b1870fb501220470d665c600af91f274cfa816e649bdcad81db8c8afa"
+}

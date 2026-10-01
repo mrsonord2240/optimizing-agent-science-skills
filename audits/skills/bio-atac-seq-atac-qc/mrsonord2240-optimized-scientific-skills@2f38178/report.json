@@ -1,0 +1,428 @@
+{
+  "meta": {
+    "skill_name": "bio-atac-seq-atac-qc",
+    "description": "ATAC-seq library quality control: TSS enrichment, FRiP, fragment-size periodicity, library complexity (NRF/PBC1/PBC2), mitochondrial fraction, and ENCODE 4 thresholds.",
+    "evaluated_on": "2026-09-30",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Thresholds labeled ENCODE vs working convention; no fabricated values"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research QC guidance only"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "NRF/PBC computed on fragments and matches an independent counter"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All four scripts ran on numpy 2.5, pandas 3.0, deepTools 4.0"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Seven metrics covered; scripts now deliver documented filters, periodicity class and per-sample MultiQC table; mt fraction only exercised on synthetic data"
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Empty/absent/invalid inputs fail loudly with counts; residual: out-of-coverage TSS slowness, mate MAPQ not inspected (documented)"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "13 KB SKILL.md with routed references"
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Explicit script args, bigWig recipe and preseq -P; BED6 contract stated"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Prompts and tips; still no worked sample-level example"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Read-only file access, no credentials or destructive ops"
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Small documented scripts; thresholds sourced to ENCODE vs convention; no shipped tests"
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Precise trigger, version-drift guidance, provenance; claims now match execution"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 33,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "ENCODE-style TSS enrichment: real GM12878 slice plus planted bigWig",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real 11.381 vs deepTools 11.391; planted 21.0 for plus, minus, gene-interval and multi-chrom cases",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Real-slice score agrees with independent deepTools profile",
+            "result": "PASS",
+            "note": "11.381 (1,373 TSS used) vs 11.391 from the earlier deepTools matrix"
+          },
+          {
+            "text": "Planted bigWig returns 21.0 for plus, minus and chr2 TSS",
+            "result": "PASS",
+            "note": "t_tss.log"
+          },
+          {
+            "text": "Gene-interval BED6 uses start for plus and end-1 for minus",
+            "result": "PASS",
+            "note": "21.0 after correcting my own fixture (first attempt gave 11.0 because my plus-strand gene start was 1 kb off the planted TSS; t_tss_gene2.log)"
+          },
+          {
+            "text": "Absent chromosome, empty BED and BED3 fail loudly with exit 1",
+            "result": "PASS",
+            "note": "exit 1 each with used/skipped counts or BED6 message"
+          },
+          {
+            "text": "Mixed valid/absent/edge rows report used and skipped counts",
+            "result": "PASS",
+            "note": "used 1, chrom_not_in_bigwig 1, window_outside_chrom 1"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Canonical",
+        "label": "NRF/PBC1/PBC2 on real unfiltered and filtered BAM plus planted PE/SE",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real 0.778/0.798/5.074 equals independent counter; planted truth 250/160/0.64/0.625/2.0 in PE and SE",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Real unfiltered BAM equals independent fragment counter",
+            "result": "PASS",
+            "note": "601203/467814; NRF 0.7781, PBC1 0.7985, PBC2 5.074 in both"
+          },
+          {
+            "text": "Planted PE and SE reproduce hand-computed truth after MAPQ and chrM filters",
+            "result": "PASS",
+            "note": "total 250, distinct 160; unfiltered total 630"
+          },
+          {
+            "text": "Deduplicated BAM triggers warning and PBC2 null",
+            "result": "PASS",
+            "note": "NRF 1.0 with warning"
+          },
+          {
+            "text": "Output is strict JSON and empty result exits 1",
+            "result": "PASS",
+            "note": "strict parse ok; exit 1"
+          },
+          {
+            "text": "MT/M contig names are excluded",
+            "result": "PASS",
+            "note": "BAM renamed 1/MT gives 250 (excluded 600); with exclusion off 550"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant A",
+        "label": "atac_qc_metrics.R: real filtered slice with IDR .bed.gz peaks, planted BAM, hg19 TxDb argument, seqlevel mismatch",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real rep1 TSSEscore 23.54, NFR+mono, FRiP 0.671; planted 250 nuclear pairs; mismatch stops",
+        "basic": 34,
+        "specialized": 48,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Real slice metrics reproduce and periodicity class is NFR+mono",
+            "result": "PASS",
+            "note": "460,309 pairs; NFR 28.4%, mono 14.7%, di 15.6%"
+          },
+          {
+            "text": "Planted BAM nuclear pairs equal 250 after chrM, MAPQ and dup exclusion",
+            "result": "PASS",
+            "note": "out/R/pl_metrics.csv"
+          },
+          {
+            "text": "Non-default TxDb argument is honored",
+            "result": "PASS",
+            "note": "hg19 TxDb ran (TSSEscore 1.29 vs 5.13 hg38 on same reads); real non-hg38 data not available"
+          },
+          {
+            "text": "BAM/TxDb seqlevel mismatch stops with message",
+            "result": "PASS",
+            "note": "no shared seqlevels error, exit 1"
+          },
+          {
+            "text": "Fragment-size PDF is legible",
+            "result": "FAIL",
+            "note": "1-page 15.5 KB PDF written; no renderer available, so not visually inspected"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "aggregate_qc.py multi-sample and flat input, MultiQC hand-off",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Grades PASS/WARN/FAIL/INCOMPLETE correct for 5 samples; MultiQC parsed table",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Per-metric and overall grades match threshold table incl inverted mt_fraction",
+            "result": "PASS",
+            "note": "A PASS, B WARN, C FAIL, D INCOMPLETE"
+          },
+          {
+            "text": "null and absent metrics grade NA, not PASS",
+            "result": "PASS",
+            "note": "PBC2 null and missing FRiP"
+          },
+          {
+            "text": "Non-numeric and boolean values exit 2",
+            "result": "PASS",
+            "note": "exit 2"
+          },
+          {
+            "text": "Extra keys noted on stderr",
+            "result": "PASS",
+            "note": "junk ignored note"
+          },
+          {
+            "text": "MultiQC 1.35 ingests the *_mqc.tsv as a sample table",
+            "result": "PASS",
+            "note": "5 sample rows in multiqc_atac_encode_qc.txt"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "samtools/Picard/deepTools/MultiQC recipes on real slice",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "flagstat, Picard median 191, Spearman 0.9577, fingerprint curves, MultiQC modules detected",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "flagstat/idxstats report expected counts",
+            "result": "PASS",
+            "note": "1,048,048 mapped; synthetic idxstats chrM 600/1260 = 0.476 (labeled synthetic; slice has no chrM)"
+          },
+          {
+            "text": "Picard insert size metrics are plausible",
+            "result": "PASS",
+            "note": "median 191, mean 252.7"
+          },
+          {
+            "text": "Spearman heatmap and matrix are consistent",
+            "result": "PASS",
+            "note": "0.9577; heatmap rendered and labeled (2x2, no cell annotation)"
+          },
+          {
+            "text": "Fingerprint curves render and diverge from diagonal",
+            "result": "PASS",
+            "note": "fingerprint.png inspected; synthetic AUC about 0.497"
+          },
+          {
+            "text": "MultiQC detects Picard, samtools, deepTools and preseq outputs",
+            "result": "PASS",
+            "note": "multiqc_sources.txt"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Variant B",
+        "label": "preseq c_curve/lc_extrap recipes with -P on coordinate-sorted unfiltered BAM",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "c_curve -P -s 1e5 gives 10 rows to 0.9M; lc_extrap -P monotone with ordered CI",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "c_curve -P -s 1e5 returns a multi-row curve",
+            "result": "PASS",
+            "note": "10 data rows, distinct 84,302 to 561,698"
+          },
+          {
+            "text": "lc_extrap -P is monotone with ordered CI",
+            "result": "PASS",
+            "note": "0.61M at 1M reads to 2.44M at 19M"
+          },
+          {
+            "text": "Extrapolated counts are consistent with observed curve",
+            "result": "PASS",
+            "note": "608,697 expected at 1M vs observed c_curve trend"
+          },
+          {
+            "text": "Documented lc_extrap -e 200M -s 5M literal command was run",
+            "result": "FAIL",
+            "note": "run at reduced -e 20M -s 1M for time; literal values not re-executed here"
+          },
+          {
+            "text": "Step guidance yields non-header-only output",
+            "result": "PASS",
+            "note": "-s 1e5 gives rows; header-only for -s 1e6 reproduced only by the fixer"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Edge",
+        "label": "Silent-failure guards across scripts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Planted probes for TSS, complexity, aggregation and R stop or grade correctly",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "TSS script cannot report success with zero scored TSS",
+            "result": "PASS",
+            "note": "exit 1 in three cases"
+          },
+          {
+            "text": "Complexity script cannot report success with no reads",
+            "result": "PASS",
+            "note": "exit 1"
+          },
+          {
+            "text": "aggregate_qc never grades missing data PASS",
+            "result": "PASS",
+            "note": "NA/INCOMPLETE"
+          },
+          {
+            "text": "R script stops on genome-build seqlevel mismatch",
+            "result": "PASS",
+            "note": "stop message"
+          },
+          {
+            "text": "aggregate_qc rejects non-numeric input rather than coercing",
+            "result": "PASS",
+            "note": "exit 2 for string and boolean"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 51.2,
+    "score": 86,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All ten prior findings reproduced as fixed against real GM12878 data and planted truth",
+    "Fragment-level NRF/PBC matches an independent counter exactly on 601,203 fragments",
+    "Silent-success paths in TSS, complexity and aggregation scripts now exit non-zero or grade NA",
+    "Thresholds separate ENCODE-sourced values from working convention"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Fragment-size PDF never visually inspected",
+      "observed_in": [
+        3
+      ],
+      "problem": "atac_qc_metrics.R PDF written but not rendered in any audit",
+      "root_cause": "No PDF renderer in the prepared environments",
+      "fix": "Render once in a tooling-delta pass or replace with PNG output"
+    },
+    {
+      "priority": "P2",
+      "title": "TSS script slow when many TSS lie outside bigWig coverage",
+      "observed_in": [
+        1,
+        7
+      ],
+      "problem": "Tooling pass saw more than 9 minutes for out-of-slice TSS",
+      "root_cause": "pyBigWig.values on uncovered regions",
+      "fix": "Optional note or per-chromosome coverage pre-check"
+    },
+    {
+      "priority": "P2",
+      "title": "No shipped fixtures or tests",
+      "observed_in": [
+        2,
+        4,
+        7
+      ],
+      "problem": "Planted-truth checks exist only in audit logs",
+      "root_cause": "Origin ships no tests",
+      "fix": "Ship a tiny synthetic BAM/bigWig and expected values"
+    }
+  ]
+}

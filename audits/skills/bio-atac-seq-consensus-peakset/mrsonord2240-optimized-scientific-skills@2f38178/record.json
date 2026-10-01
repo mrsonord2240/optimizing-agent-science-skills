@@ -1,0 +1,51 @@
+{
+  "skill_id": "bio-atac-seq-consensus-peakset",
+  "version": "mrsonord2240-optimized-scientific-skills@2f38178",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "path": "skills/bio-atac-seq-consensus-peakset",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/2f381782596c6569fe5a8357556856512b7fbb6c/skills/bio-atac-seq-consensus-peakset"
+  },
+  "candidate": {
+    "identity": "9fcaf5e21aa4bf36637df32cff1776e7eb97dc20de4015d10717de36f370b856",
+    "identity_kind": "sha256-manifest",
+    "branch": "none (plain directory, not a git worktree)",
+    "path": "F:\\OpenScience\\wt\\atac-consensus-peakset\\skills\\bio-atac-seq-consensus-peakset",
+    "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "provider_tree": "9ce42d29177ea80e978aa29f341949814da50616"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@9fcaf5e21aa4-delta-cat-20260930",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 3,
+    "provider_binding": "binding.json"
+  }
+}

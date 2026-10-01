@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-atac-peak-calling",
+  "candidate_version": "candidate@3f42f520591c-delta-cat-20260930",
+  "candidate_identity": "3f42f520591ca655602e74dfc969e9ee0eef64632043708b67118886043ee4af",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+  "provider_path": "skills/bio-atac-seq-atac-peak-calling",
+  "provider_tree": "2d2a5118ce4198297f1982e3f8646b07c27b40d3",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "3f42f520591ca655602e74dfc969e9ee0eef64632043708b67118886043ee4af",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1088,
+      "sha256": "baacaab2d3f82cc6f6d1b0fbfba347c6be171c25a0b1f58ba935a5d2d43de2c5"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 3817,
+      "sha256": "21094ee6f22e7f2386b4fb9ed499fd18f1b8c07b14a2edae01c8b886b499b49a"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 19828,
+      "sha256": "b90a18b12a60fe4bc5af90e3ac32693af9a1b31cc2950e9d13d5362088f48e82"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 7865,
+      "sha256": "8c01ee22efefe198addf825b38fe6d65c2b9870d6eb2f6ea3a4d3f7f6c902afb"
+    },
+    {
+      "path": "scripts/call_atac_peaks.sh",
+      "bytes": 6640,
+      "sha256": "46273e4c34b810074f85b560ddd93b1820ae9491fd5f158274e2fea3b76e2f42"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

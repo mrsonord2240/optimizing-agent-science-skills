@@ -1,0 +1,53 @@
+{
+  "skill_id": "bio-atac-seq-deep-learning-atac",
+  "version": "mrsonord2240-optimized-scientific-skills@2f38178",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "path": "skills/bio-atac-seq-deep-learning-atac",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/2f381782596c6569fe5a8357556856512b7fbb6c/skills/bio-atac-seq-deep-learning-atac"
+  },
+  "candidate": {
+    "identity": "15978001ce517f446bdd6f331a174092bb1d05fe18575cdd38d536d772ea4bd5",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/atac-deep-learning-atac",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "content_sha256": "15978001ce517f446bdd6f331a174092bb1d05fe18575cdd38d536d772ea4bd5",
+    "path": "F:\\OpenScience\\wt\\atac-deep-learning-atac\\skills\\bio-atac-seq-deep-learning-atac",
+    "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "provider_tree": "8003c89de98abef9c64041369910a05c6d67b4e2"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-30",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@15978001ce51-delta-cat-20260930",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 6,
+    "provider_binding": "binding.json"
+  }
+}

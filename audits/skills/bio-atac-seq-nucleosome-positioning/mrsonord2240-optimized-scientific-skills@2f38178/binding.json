@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-nucleosome-positioning",
+  "candidate_version": "candidate@2aa4d73b3002-delta-cat2-20260930",
+  "candidate_identity": "2aa4d73b30023a6d14d690fa0e02f3a8b32a563d15bd445c24e257cb0e0ad18b",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+  "provider_path": "skills/bio-atac-seq-nucleosome-positioning",
+  "provider_tree": "753ea49c7057d71023b22275c035c08c22689f71",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "2aa4d73b30023a6d14d690fa0e02f3a8b32a563d15bd445c24e257cb0e0ad18b",
+  "file_count": 7,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 4305,
+      "sha256": "8aff3b68d130b88582e15da6dceadb37815181dc005bbf291a752bdd22ca817c"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 15953,
+      "sha256": "6e54a82a1bf80acf8fc4bbe4788be3550de7924d006ddfdc38538d58ae21f5ff"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 3778,
+      "sha256": "095e32b22800771b74431890973194091d4df4938f84c16aadeedaa4c6cd40e3"
+    },
+    {
+      "path": "scripts/estimate_nrl.py",
+      "bytes": 1883,
+      "sha256": "328e45bb61b01d794f19210538337e5de818db7755e98753cd8dece155ec7bdc"
+    },
+    {
+      "path": "scripts/nucleosome_analysis.R",
+      "bytes": 4938,
+      "sha256": "0279d024796200b1255c80486610f9fb5349819f5b19f91fdcaf0c4d770477d0"
+    },
+    {
+      "path": "scripts/vplot.py",
+      "bytes": 2886,
+      "sha256": "b14c84ac60e0f2ebb086cc3caa2120373e4d8a25329c7152cf1760f8f0864a4d"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

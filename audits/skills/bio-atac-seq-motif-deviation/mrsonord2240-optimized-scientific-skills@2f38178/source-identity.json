@@ -1,0 +1,78 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/motif-deviation",
+    "subtree": "d3c1b1e3d0abb103a4c6e72c6e9cb87503ee934e",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean"
+  },
+  "candidate": {
+    "branch": "fix/atac-motif-deviation",
+    "commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "identity": "sha256-manifest-v1",
+    "manifest_sha256": "9e4cce81ace8ed64e685173ec67852c56f25adc2b015da0c395456e54ee30e07",
+    "path": "F:\\OpenScience\\wt\\atac-motif-deviation\\skills\\bio-atac-seq-motif-deviation",
+    "status_before": "skill directory untracked; no other working-tree edits",
+    "status_after_execution": "unchanged (manifest recomputed after the delta checks; no __pycache__)",
+    "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; tab-separated; LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+    "file_count": 6,
+    "byte_total": 29802
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "bytes": 1065
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "d37376283f0517a41a5a3003f1f853869a916b6446f6607e709676d74fe4c353",
+      "bytes": 8070
+    },
+    {
+      "path": "references/method-reference.md",
+      "sha256": "4f1d3fe9c6267d302bbfb87e5d36d865deb3dca15b08c8d07ab2d748f1766251",
+      "bytes": 9063
+    },
+    {
+      "path": "references/single-cell.md",
+      "sha256": "edc97609c1b753857230bd6b3094bfe819b047bbe5487777ea19e166893e0518",
+      "bytes": 4375
+    },
+    {
+      "path": "references/usage-guide.md",
+      "sha256": "e14d4a707a1eb00b3c698e69c753c968bc3c44799ab4cf1d1170778f5b5ba201",
+      "bytes": 2756
+    },
+    {
+      "path": "scripts/chromvar_bulk_analysis.R",
+      "sha256": "7b4d844d80ce8077a994811512077e9a5d7897ebf01af14e8e92d9f650a87578",
+      "bytes": 4473
+    }
+  ],
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-atac-seq-motif-deviation\\TOOLS.md",
+    "tools_md_sha256": "808187c9bfe71337449a0b6cdfc56facaea5d20275a0d61287fb5ccf6f669a66",
+    "environment_fingerprint_sha256": "91dcd6702bfba8518d2ff53ff1fec2bf447b62d06a091c00124c7ee4e1118ecd",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "phase": "delta re-audit (delta-cat-20260930: category/author frontmatter and documented fixes)",
+  "independent_auditor": true,
+  "prior_audit": {
+    "path": "F:/optimizing-agent-science-skills/audits/skills/bio-atac-seq-motif-deviation\\candidate@fb58807b04cb-reaudit-run",
+    "identity": "fb58807b04cb2e753dce4d199ef54c057c2d762635c526a0e7aef124e2a19c4e",
+    "score": 86
+  },
+  "delta": {
+    "shelf": "F:/optimized-scientific-skills/skills/bio-atac-seq-motif-deviation",
+    "shelf_commit": "ea3b976",
+    "shelf_identity": "fb58807b04cb2e753dce4d199ef54c057c2d762635c526a0e7aef124e2a19c4e",
+    "changed": [
+      "SKILL.md"
+    ],
+    "added": [],
+    "removed": []
+  }
+}

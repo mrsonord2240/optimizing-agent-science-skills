@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-co-accessibility",
+  "candidate_version": "candidate@f7b386a41a3f-delta-cat-20260930",
+  "candidate_identity": "f7b386a41a3f37d483683ad7e3368688722632fab74595e3a56b3f04c1d8ed38",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+  "provider_path": "skills/bio-atac-seq-co-accessibility",
+  "provider_tree": "031191c4a6e4c2fe249b04a91c09eda97cf3d6a3",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "f7b386a41a3f37d483683ad7e3368688722632fab74595e3a56b3f04c1d8ed38",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 4798,
+      "sha256": "61cc0d758996f6c110be929482859b751f3b210fc308c5a62e507b42e2da4512"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 17865,
+      "sha256": "a398f2f09afce4d5e8f5641c5ae7aebc79c203c6093cddb97df42e67094789a8"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 6980,
+      "sha256": "d1bf2fb3d3d64ac855229f80a4e0384ae5081754e5bb3bb82d18019c4e310361"
+    },
+    {
+      "path": "scripts/cicero_workflow.R",
+      "bytes": 6831,
+      "sha256": "2505bdb23ac79f7bb6e28db44e1ffbd768e52e49c9861e948ea989912c2101a4"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

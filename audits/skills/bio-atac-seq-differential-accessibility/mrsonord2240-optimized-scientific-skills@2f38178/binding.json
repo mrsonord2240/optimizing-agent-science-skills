@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-differential-accessibility",
+  "candidate_version": "candidate@dfc879ea543a-delta-cat2-20260930",
+  "candidate_identity": "dfc879ea543a99d857d53f2556d8b09660006d27a8dda23ede8b03b4ff5b9b1b",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+  "provider_path": "skills/bio-atac-seq-differential-accessibility",
+  "provider_tree": "0d40f141883fb64b921400b541a3c7c203561456",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "dfc879ea543a99d857d53f2556d8b09660006d27a8dda23ede8b03b4ff5b9b1b",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 5134,
+      "sha256": "3963e85e62f02cb429f115f875d257abe695906102e440e761dd5240fb8464be"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 22727,
+      "sha256": "65b2dd5a21e4b61e45f5962cf90581ecd77307374e65ee1f45fdc231c0697850"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 7270,
+      "sha256": "a2a6ce43e5942f3dfecb48df650ee1a75cf4bc844858349b9b95c64c83df10f0"
+    },
+    {
+      "path": "scripts/diff_accessibility.R",
+      "bytes": 10570,
+      "sha256": "0ccc78724abe7e868f9d6fa9044237282219288255a4a8712578a5fdf6cc1f0d"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

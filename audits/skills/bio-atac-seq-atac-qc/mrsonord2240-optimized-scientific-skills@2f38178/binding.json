@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-atac-seq-atac-qc",
+  "candidate_version": "candidate@a78308b9bf6d-delta-cat-20260930",
+  "candidate_identity": "a78308b9bf6d1602c7c31f23458a02ec6d5a02b18f1776e03a3a0203c42fa571",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+  "provider_path": "skills/bio-atac-seq-atac-qc",
+  "provider_tree": "04e1d981808ce6a8fcd44da7a897dd4fea971df1",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "a78308b9bf6d1602c7c31f23458a02ec6d5a02b18f1776e03a3a0203c42fa571",
+  "file_count": 8,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 13094,
+      "sha256": "1772aa487245f65589736ce94770823019f5e66cd2ac09dec968617e71e35cc1"
+    },
+    {
+      "path": "references/method-reference.md",
+      "bytes": 8445,
+      "sha256": "e6af81892a13fb63c0c03421f164c86b1aeb5f33d6b26049761a08585e54c535"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 6345,
+      "sha256": "1d4ad2b7b1e5fbe0e6cf0c16a3bb0f5ad236fce9f5e33189b0ee3140fdc297a0"
+    },
+    {
+      "path": "scripts/aggregate_qc.py",
+      "bytes": 3745,
+      "sha256": "d9f97ec3f5ae34170bff52dc8cf67af93a36354e4a73c5d6520d0f6306c9cdd3"
+    },
+    {
+      "path": "scripts/atac_qc_metrics.R",
+      "bytes": 5329,
+      "sha256": "6f144faebacb695c02e68c41ea42b87bd82c89259815856a8b790f2e6b7a9d93"
+    },
+    {
+      "path": "scripts/encode_tss_enrichment.py",
+      "bytes": 3419,
+      "sha256": "252decb450cfce6eaa7ae9da587a3cd3b19bc9896cf61ccef99647bdd14d4a62"
+    },
+    {
+      "path": "scripts/library_complexity.py",
+      "bytes": 3576,
+      "sha256": "5c96b5b352cb61e34b920968250195242767a3513aac631c0a48f55ace76b107"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

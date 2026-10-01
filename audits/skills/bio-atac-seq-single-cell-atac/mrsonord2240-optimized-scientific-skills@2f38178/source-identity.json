@@ -1,0 +1,63 @@
+{
+  "phase": "final re-audit (delta, RA-1 sentence)",
+  "independent_auditor": true,
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "atac-seq/single-cell-atac",
+    "subtree": "ef5b1305663382e0228349bd42d9768afc19dcb8"
+  },
+  "candidate": {
+    "path": "F:\\OpenScience\\wt\\atac-single-cell-atac\\skills\\bio-atac-seq-single-cell-atac",
+    "identity": "sha256-manifest-v1",
+    "manifest_sha256": "01b8b5025bee5ae72e7c71dd81caf3602744838da3079f205fad44c890b74c68",
+    "file_count": 6,
+    "byte_total": 38189,
+    "branch": "fix/atac-single-cell-atac",
+    "base_commit": "3186916406e9cc6b0e6dc24ffe47880951fc0f93",
+    "status": "untracked, uncommitted; identity verified live; diff vs d12a77c4 is exactly one 179-byte SKILL.md insertion; no __pycache__",
+    "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; tab-separated; LF joins; ordinal UTF-8 byte ordering; no trailing LF"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 12781,
+      "sha256": "0e8f717767fb432c12e232afb5b98200ec8816c09236491677915c8b4711e00d"
+    },
+    {
+      "path": "references/ecosystem-workflows.md",
+      "bytes": 6701,
+      "sha256": "9acbe57b265e297965293acf8c6828d09156fcc09813ffd030bd22097e9fb5b6"
+    },
+    {
+      "path": "references/specialized-topics.md",
+      "bytes": 7639,
+      "sha256": "ea9609bbb3e7e136e1d066e9bc28a99c45d7544a2af26f66f57141f89c07e4e2"
+    },
+    {
+      "path": "references/usage-guide.md",
+      "bytes": 3726,
+      "sha256": "c4db96aa3ef68d1c5d7b8836d34a3400495bcc03deaf07bea708b0e3fcf25e06"
+    },
+    {
+      "path": "scripts/signac_workflow.R",
+      "bytes": 6277,
+      "sha256": "d5edfce299fc979ece9518e7c956688fc8c6b37dbf94aab37c2afc7d79702c0c"
+    }
+  ],
+  "supersedes_audit_identity": "d12a77c466ddc748e86d80ac482766aa212e3b31aa1d6bd3388a827bf59dbec0",
+  "tooling": {
+    "tools_md_sha256": "6089874dc93fb48cf2ade31eeb940fc620096ee4e76f936278a3b99318ae9c08",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "envs": [
+      "bio-atac-seq-single-cell-atac-r",
+      "bio-atac-seq-single-cell-atac-py",
+      "bio-atac-seq-single-cell-atac-amulet"
+    ]
+  }
+}
