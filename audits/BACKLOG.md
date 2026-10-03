@@ -8,47 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (50)
-
-### `bio-splicing-quantification` — SKILL.md inline rMATS snippet raises TypeError
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 1
-- Problem: se_jc[inc_cols].mean(axis=1) fails on every real rMATS JC file: IncLevel1/2 are comma-separated strings and startswith(IncLevel) also selects IncLevelDifference.
-- Root cause: The snippet was written for numeric columns.
-- Fix: Split IncLevel1 and IncLevel2 on commas, convert to float with NA handling, average per event, and exclude IncLevelDifference; execute against a real JC file. (SQ-01)
-
-### `bio-splicing-quantification` — parse_rmats_output fails for A5SS/A3SS/MXE/RI
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 4
-- Problem: The function selects exonStart_0base and exonEnd, which exist only in SE files; A5SS, A3SS, MXE and RI raise KeyError although its docstring lists them.
-- Root cause: Column names are hardcoded for SE.
-- Fix: Select coordinate columns per event type (longExon*/shortE*/flanking*, 1stExon*/2ndExon*, riExon*) or return only common columns; test all five types. (SQ-02)
-
-### `bio-splicing-quantification` — Shipped mean_PSI is silently wrong; filter ignores group 2
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 1
-- Problem: The script averages IncLevelDifference with replicate PSI values (310 of 958 SE rows differ, up to 0.5; e.g. true 0.5 reported 0.0), and both snippet and script apply read-count reliability to SAMPLE_1 only.
-- Root cause: Prefix match on IncLevel and SAMPLE_1-only filtering.
-- Fix: Restrict to IncLevel1 and IncLevel2, report group-wise means, and apply the junction-read filter to both groups; add a regression on the planted data. (SQ-03)
-
-### `bio-splicing-quantification` — regtools/leafcutter route silently empty without XS tags
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 5
-- Problem: Without XS tags every junction gets strand ? and leafcutter exits 0 with zero clusters (115 clusters from XS-tagged BAMs); the Skill never states the XS prerequisite or STAR --outSAMstrandField intronMotif.
-- Root cause: STAR default outSAMstrandField is None; the Skill assumes tagged BAMs.
-- Fix: State the XS requirement beside the regtools command (STAR --outSAMstrandField intronMotif or add XS), and tell the reader that zero clusters means a prerequisite or -m problem. (SQ-04)
-
-### `bio-splicing-quantification` — IRFinder command and tool version do not run as written
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 6
-- Problem: IRFinder FastQ -r REF/ -d out sample.fastq exits 1 (-r is required); the real form is IRFinder -m FastQ. The reference build is undocumented, and IRFinder-S 2.0+ is not what installs (IRFinder 1.3.1; BuildRef is FTP-only, use BuildRefFromSTARRef).
-- Root cause: Command written from memory; version floor not checked.
-- Fix: Replace with the working IRFinder -m FastQ form, document reference building, and state which IRFinder release was exercised; label IRFinder-S 2.0 unverified if not obtainable. (SQ-05)
+## P1 (45)
 
 ### `bio-data-visualization-volcano-and-ma-plots` — VOL-001 volcano_phd.R clips significant points and their labels with an unconditional y cap
 
@@ -410,55 +370,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (163)
-
-### `bio-splicing-quantification` — SUPPA2 TPM header and statsmodels pin not stated
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 3
-- Problem: A pandas-default TPM header yields no output (psiCalculator: no expression values buffered), and SUPPA 2.4 fails on import with statsmodels 0.15.0; 0.14.6 works.
-- Root cause: Input contract and dependency ceiling are undocumented.
-- Fix: Document the header-without-index-name TPM format and pin statsmodels<0.15 in the prerequisites. (SQ-06)
-
-### `bio-splicing-quantification` — filter_reliable_events range disagrees with the Skill
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 3
-- Problem: The script hardcodes mean PSI 0.1-0.9 while the quality table says 0.05-0.95 and claims rMATS/SUPPA2 default filters drop near-constitutive events; rMATS output contains PSI 0 and 1 rows.
-- Root cause: Threshold duplicated and unparameterized.
-- Fix: Expose the bounds as parameters defaulting to the documented range and correct the default-filter claim. (SQ-07)
-
-### `bio-splicing-quantification` — IncFormLen description wrong for JC files
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: 2
-- Problem: The Skill says IncFormLen adds exon body bases; JC IncFormLen is 2*(L-1) (98 at L=50) and the body appears only in JCEC (149).
-- Root cause: JC and JCEC lengths conflated.
-- Fix: State the JC and JCEC lengths separately. (SQ-08)
-
-### `bio-splicing-quantification` — MAJIQ V3 and VAST-TOOLS not labeled not-executed; benchmark figures unsourced
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: —
-- Problem: MAJIQ V3 commands and Zarr claims (restricted licence) and VAST-TOOLS (heavy VASTDB) are presented without an unexecuted/unverified label; figures such as FDR 15-30% and 14% novel-junction loss lack inline evidence.
-- Root cause: Surfaces that cannot be run are written like tested ones.
-- Fix: Add a one-line not-executed label for MAJIQ and VAST-TOOLS and mark unsourced figures as literature claims. (SQ-09)
-
-### `bio-splicing-quantification` — Related Skills names do not resolve on the shelf
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: —
-- Problem: differential-splicing and others lack the bio- prefix, and read-alignment/star-alignment and rna-quantification/alignment-free-quant (both required upstream) have no shelf Skill.
-- Root cause: Provider-style paths were kept in normalization.
-- Fix: Use shelf IDs where they exist and describe or drop the two missing upstream steps. (SQ-10)
-
-### `bio-splicing-quantification` — Input formats and tool provenance not stated
-
-- Skill: 64, Reject · candidate `1e34dbd9664e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md)
-- Observed in inputs: —
-- Problem: rMATS --b1/--b2 list-file format is not described, leafcutter_cluster_regtools.py has no stated source (usage-guide installs only the R package), and there is no Skill-root LICENSE.
-- Root cause: Prerequisites written for a reader who already knows the tools.
-- Fix: Describe the comma-separated BAM list, name where the clustering script comes from, and add a LICENSE. (SQ-11)
+## P2 (159)
 
 ### `bio-data-visualization-volcano-and-ma-plots` — VOL-003 EnhancedVolcano example loses direction and mislabels the axis
 
@@ -675,6 +587,22 @@ None open.
 - Problem: scPrinter is named for single-cell and per-base use but no command or test ships; the Skill says so.
 - Root cause: Out of bounded scope (GPU, source install).
 - Fix: Keep the untested label or add a tested minimal workflow later. (NUCPOS-015, deferred)
+
+### `bio-splicing-quantification` — parse_rmats_output raises a raw KeyError on an rMATS file with zero events
+
+- Skill: 85, Production Ready · candidate `0c0354add99b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@0c0354add99b-run-reaudit-1/viewer.md)
+- Observed in inputs: 4
+- Problem: A header-only MATS file (an event type with no events, as in the planted rMATS run for A5SS, A3SS, MXE and RI) makes DataFrame.apply return an empty frame, then df['min_reads_per_replicate'] raises KeyError.
+- Root cause: The per-row statistics are added with concat on an apply result that is empty for an empty table.
+- Fix: Return an empty frame with the expected columns (or raise a ValueError naming the empty file) when the table has no rows; add a header-only test. (SQ-12)
+
+### `bio-splicing-quantification` — JC IncFormLen/SkipFormLen stated as constants
+
+- Skill: 85, Production Ready · candidate `0c0354add99b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@0c0354add99b-run-reaudit-1/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md says JC lengths are 2*(readLength-1) and readLength-1; on real chrX data only 719 of 958 SE rows have 148/74 (58 distinct pairs), the rest are smaller where short exons or introns limit read positions.
+- Root cause: Planted single-exon data (98/49) was generalised to all events.
+- Fix: Say the values are the maximum for exons and introns longer than a read, and that rMATS prints the per-event lengths in the file. (SQ-13)
 
 ### `bio-atac-seq-atac-qc` — Fragment-size PDF never visually inspected
 

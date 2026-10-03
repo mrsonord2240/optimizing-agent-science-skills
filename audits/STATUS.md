@@ -107,6 +107,6 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | `bio-data-visualization-multipanel-figures` | Data Analysis | 94.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@3749f31/viewer.md) |
 | `bio-data-visualization-upset-plots` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md) |
 | `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 70 | Beta Only | 0 / 2 / 6 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md) |
-| `bio-splicing-quantification` | Data Analysis | 64 | Reject | 0 / 5 / 6 | [viewer](skills/bio-splicing-quantification/candidate@1e34dbd9664e-run-initial-1/viewer.md) |
+| `bio-splicing-quantification` | Data Analysis | 85 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-splicing-quantification/candidate@0c0354add99b-run-reaudit-1/viewer.md) |
 
 Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.
