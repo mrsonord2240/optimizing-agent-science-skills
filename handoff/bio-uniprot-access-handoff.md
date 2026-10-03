@@ -2,9 +2,9 @@
 
 - Updated: 2026-10-03
 - Lane: 1
-- Status: candidate-ready
+- Status: done (shelf 29f5446, intake accepted at validator a1d820d, exported to bioSkills-Improved a0224da; worktree removed)
 - Owner leaving: delta re-audit worker (lane 1; did not fix or initially audit this Skill)
-- Next role: optimize-scientific-skills (orchestrator)
+- Next role: none; open P2s wait for a later refinement run
 
 ## Source identity
 

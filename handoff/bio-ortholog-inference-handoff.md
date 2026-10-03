@@ -2,8 +2,8 @@
 
 - Updated: 2026-10-03
 - Lane: 2
-- Status: candidate-ready (not committed)
-- Next role: orchestrator (commit the exact bytes, then intake). P2 polish optional via fix-scientific-skill.
+- Status: done (shelf 29f5446, intake accepted at validator a1d820d, exported to bioSkills-Improved a0224da; worktree removed)
+- Next role: none; open P2s wait for a later refinement run
 
 ## Candidate
 
