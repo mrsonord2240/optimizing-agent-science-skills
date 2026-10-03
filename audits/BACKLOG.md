@@ -314,7 +314,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (159)
+## P2 (155)
 
 ### `bio-machine-learning-biomarker-discovery` — BD-002: scoring/legacy-attribute choice unexplained; it sets signature size
 
@@ -459,46 +459,6 @@ None open.
 - Problem: scPrinter is named for single-cell and per-base use but no command or test ships; the Skill says so.
 - Root cause: Out of bounded scope (GPU, source install).
 - Fix: Keep the untested label or add a tested minimal workflow later. (NUCPOS-015, deferred)
-
-### `bio-machine-learning-omics-classifiers` — OC-007 RF ranking claim: balanced weights raised RF AUC
-
-- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
-- Observed in inputs: 2
-- Problem: SKILL.md says reweighting changes the probability scale 'not the ranking' and the thresholds table says 'no AUC gain'; random forest AUC rose 0.776 -> 0.812 in 6/6 seeds here and 0.648 -> 0.720 in the Skill's own staged run.
-- Root cause: A result established for logistic regression (van den Goorbergh 2022) was generalized to tree ensembles.
-- Fix: Text-only: limit the claim to logistic models, say that for trees class weights can change the ranking, and keep the advice (risk model: do not reweight, tune the threshold, recalibrate if you did) unchanged.
-
-### `bio-machine-learning-omics-classifiers` — OC-008 Snippets import scripts/ by a cwd-relative path
-
-- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
-- Observed in inputs: 7
-- Problem: The batch and calibration blocks raise ModuleNotFoundError unless the working directory is the Skill directory, and the text never says so.
-- Root cause: sys.path.insert(0, 'scripts') is relative.
-- Fix: Text-only: state that the blocks run from the Skill directory, or anchor the path on the Skill's location, and show the failure.
-
-### `bio-machine-learning-omics-classifiers` — OC-009 Prose-only algorithms not labelled as not executed
-
-- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
-- Observed in inputs: 7
-- Problem: LightGBM, CatBoost, linear SVM and DLDA appear in the algorithm table and tips with no code and no statement that they were not run.
-- Root cause: Origin text kept them as recommendations.
-- Fix: Text-only: one sentence marking them literature-based guidance that this Skill's code and measurements do not cover.
-
-### `bio-machine-learning-omics-classifiers` — OC-010 Bundled XGBoost demo stops at round 0 of 2000
-
-- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: rf_xgboost_classifier.py early-stops on 63 validation samples at round 0, so the XGBoost row (AUC 0.597, spread [0.46, 0.49]) is a null model and cannot show the calibration direction the script advertises.
-- Root cause: The script uses the early-stopping setup that SKILL.md says to avoid at small n.
-- Fix: Script change of a few lines (not text-only): choose rounds by cross-validation as SKILL.md recommends, or label the XGBoost row as not informative and drop its spread line.
-
-### `bio-machine-learning-omics-classifiers` — OC-011 Small text inconsistencies, unstated measurements
-
-- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
-- Observed in inputs: 1, 4, 6
-- Problem: usage-guide gives the isotonic threshold as 1,000 samples without the 100 rarer-class events; calibration_check.py demo 2 ends 'warnings raised: 0' without showing the warning path; the 'noisy estimate' caution names 2-3 batches although the measured SD is as large at 6; saga non-zero counts vary by one between runs; recalibration at tens of samples can lose to raw probabilities (Brier 0.2089 vs raw 0.1985 at n=20).
-- Root cause: Sentence-level drift between documents written at different times.
-- Fix: Text-only: align the usage-guide threshold, add a sentence on comparing against raw probabilities at small n, widen the noise caution to any small batch count, and set random_state in the snippets.
 
 ### `bio-splicing-quantification` — parse_rmats_output raises a raw KeyError on an rMATS file with zero events
 
@@ -771,6 +731,14 @@ None open.
 - Problem: On raw BAM fragments the wrong setting (--shift 4,-5) gave a larger CTCF bound-minus-unbound centre score than the correct 0,0 (mode 10: 0.629 vs 0.281; mode 30: 0.663 vs 0.419). A reader who tries both and keeps the stronger contrast would pick the wrong shift.
 - Root cause: The usage guide says which shift fits which fragment source but not how to tell when it is wrong.
 - Fix: Add one sentence to the fragment section of references/usage-guide.md: set --shift from how the fragments were made, never from which setting gives the stronger contrast; the wrong shift scored higher in the tested slice.
+
+### `bio-machine-learning-omics-classifiers` — OC-012 Quoted demo and 1-SE figures are setup-specific
+
+- Skill: 88, Production Ready · candidate `906900fae480` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@906900fae480-reaudit2-lane3-20261003/viewer.md)
+- Observed in inputs: 1, 5, 6
+- Problem: XGBoost best round in rf_xgboost_classifier.py is 160 / 133 / 397 / 223 for n_jobs 1 / 2 / 4 / default (test AUC 0.83-0.84), but SKILL.md and the script comment quote round 223 and validation logloss 0.577 / 0.601 / 0.632 (n_jobs=4) as the result; Golub lasso + 1-SE counts quoted as 45 / 142 / 60 were 369 and 273 on two further splits; the 0.09-0.10 leave-one-batch-out spread names no setup (0.07-0.11 on mine).
+- Root cause: Single-configuration measurements were written as if they were stable properties.
+- Fix: Text-only: say the stopping round varies with thread count (about 130-400) while test AUC stays near 0.83, correct or drop the comment figures, give the Golub 1-SE range over five splits (45-369), and name the setup (40 per batch, 60 features) behind the 0.09-0.10 spread. Optionally pin n_jobs=1 in the demo.
 
 ### `bio-phylo-modern-tree-inference` — Remove the false IQ-TREE flag-form warnings
 

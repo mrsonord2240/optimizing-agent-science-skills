@@ -1,48 +1,50 @@
-# Handoff: bio-machine-learning-omics-classifiers / reaudit-scientific-skill (FULL)
+# Handoff: bio-machine-learning-omics-classifiers / orchestrator (commit and intake)
 
 - Updated: 2026-10-03
 - Lane: 3
-- Status: ready-for-phase (tooling delta after second fix done)
-- Owner leaving: tooling worker (lane 3a-2), did not audit and will not certify
-- Next role: reaudit-scientific-skill in FULL mode (no certified identity exists)
+- Status: candidate-ready
+- Owner leaving: final re-auditor (lane 3a-2, fresh, did not fix or audit earlier)
+- Next role: orchestrator (commit the exact bytes, then Marketplace intake); optional fix-scientific-skill for OC-012 (text-only)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/omics-classifiers
 - Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-omics-classifiers
 - Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dir untracked by design)
-- Candidate tree hash: 906900fae480655dca3808442d858f84b17aace68513ed281607842a0151276f (files=7, bytes=50806); `tools/skill_preflight.py --offline` PASS before and after; no `__pycache__` left in the Skill dir
-- Applicable audit: none for this identity (audits/skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003, score 85, failed, superseded)
+- Candidate tree hash: 906900fae480655dca3808442d858f84b17aace68513ed281607842a0151276f (files=7, bytes=50806); `tools/skill_preflight.py --offline` PASS before and after; no `__pycache__` left
+- Applicable audit: audits/skills/bio-machine-learning-omics-classifiers/candidate@906900fae480-reaudit2-lane3-20261003 (supersedes candidate@ac3c92e83a1c-reaudit-lane3-20261003)
 
 ## Completed this phase
 
-- rf_xgboost_classifier.py row refreshed: AUC 0.944 / 0.729 / 0.834, XGB best round 223, 39 s and 38 s, two runs byte-identical.
-- Fix-2 prose claims staged as rerunnable generators in `derived\omics-classifiers-claims` (README section "Fix-2 claims", `run_fix2_claims.py`); all numbers reproduced.
-- Path handling recorded both ways: from the Skill dir (relative) OK; foreign cwd with absolute path OK; foreign cwd relative fails as the Skill says.
-- 7 of 7 SKILL.md blocks (Golub 77 s, synthetic 54 s) and all four scripts rc 0 under `-W error::FutureWarning`, no warnings.
-- No package or freeze change; fingerprint unchanged.
+- Readiness: candidate-ready for the identity above. Score 88 (Production Ready), static 88, execution average 87.9, Layer 1 35.1/40, Layer 2 52.7/60, assertions 31/33 (93.9%), both veto gates PASS, no P0/P1.
+- OC-001..OC-011 all verified resolved on the current bytes with own generators (RF 0.876 vs 0.891 and 0.821 vs 0.836, 6/6; logistic unchanged; test-split perturbation leaves XGBoost round, selection and predictions bit-identical; round-0 warning fires at n=300; Brier 0.1985 / 0.2089 / 0.2356 at n=20).
+- All four scripts and 7/7 SKILL.md blocks (Golub, synthetic) rc 0 under `-W error::FutureWarning`; relative path OK from the Skill dir, absolute OK from a foreign cwd, foreign relative fails as the text says.
+- Record published and views regenerated; `npm run audits:check` passes.
 
 ## Required next actions
 
-1. FULL independent re-audit of the identity above, rerunning from staging: `python -W error::FutureWarning DC\run_fix2_claims.py <Skill dir>` (about 5 min) plus the earlier `time_runs.py` claims as needed (`DC` = `F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\derived\omics-classifiers-claims`).
-2. Standing caveats: sample-size rule from synthetic bases; no public multi-batch cohort; Golub near-separable; LightGBM, CatBoost, linear SVM, DLDA not executed (Skill labels them).
-3. Known small gap: the "warnings raised: 0" line in calibration_check.py demo 2 is the sigmoid branch at n=20 (the warning branch is exercised by `DC\check_recalibrate_paths.py`); the loud best-round-0 warning in rf_xgboost_classifier.py is not reached at n=600 (fixer showed it firing at n=300, `fix2-lane3-20261003\evidence\oc010_warn_check_n300.out`).
+1. Orchestrator: commit the Skill bytes at the identity above, then intake.
+2. Optional text-only fix OC-012 (P2) would change the identity and needs a delta re-audit.
 
 ## Open findings and blockers
 
-None open from the fix ledger (OC-007..OC-011 fixed, dispositions in `F:\OpenScience\audits\bio-machine-learning-omics-classifiers\fix2-lane3-20261003\edits.json` and evidence). No blockers.
+| ID | Severity | State | Evidence | Required disposition |
+|---|---|---|---|---|
+| OC-012 | P2 | open, non-blocking | `F:\OpenScience\audits\bio-machine-learning-omics-classifiers\reaudit2-lane3-20261003\evidence\xgb_threads.log`, `golub_oc3_oc6.log`, `batch.log` | XGBoost demo round is 160 / 133 / 397 / 223 for n_jobs 1 / 2 / 4 / default (AUC 0.83-0.84), but SKILL.md and a script comment quote 223 and 0.577 / 0.601 / 0.632; Golub 1-SE counts 369 and 273 on two further splits vs quoted 45 / 142 / 60; the 0.09-0.10 spread names no setup (0.07-0.11 on an independent generator). State variability or setup. |
+
+No blockers.
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\TOOLS.md (sha256 10db0209615ba7f57514bcd4d89fe2d614552cbf09aeda5864e8dd72d77ea9b9); environment fingerprint UNCHANGED, 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6 (freeze 9ba94225...be0a, live `pip freeze` identical)
-- Interpreter: F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\Scripts\python.exe (3.12, sklearn 1.9.1, xgboost 3.4.1)
-- Run evidence: `DC\out\fix2_*.log`; fix run F:\OpenScience\audits\bio-machine-learning-omics-classifiers\fix2-lane3-20261003\
+- Tool inventory: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\TOOLS.md (sha256 10db0209615ba7f57514bcd4d89fe2d614552cbf09aeda5864e8dd72d77ea9b9); fingerprint 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6, unchanged
+- Run evidence: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\reaudit2-lane3-20261003\ (`evidence\`, `scripts\`); published copy under audits/skills/bio-machine-learning-omics-classifiers/candidate@906900fae480-reaudit2-lane3-20261003
+- Not executed (labelled in the Skill): LightGBM, CatBoost, linear SVM, DLDA. Caveats: sample-size rule from synthetic bases; no public multi-batch cohort; Golub near-separable.
 - Restricted-access items: none
-- Tooling impact: none further (delta refresh complete)
+- Tooling impact: none
 
 ## Worktree safety
 
-- Run-owned changes: TOOLS.md; staging `DC` additions (exp_rf_weights.py, exp_xgb_rounds.py, exp_batch_spread.py, run_cwd_paths.py, run_fix2_claims.py, README section, out\fix2_*.log); this handoff
+- Run-owned changes: the run dir above; records repo: audits/skills/bio-machine-learning-omics-classifiers/candidate@906900fae480-reaudit2-lane3-20261003/, audits/INDEX.md, BACKLOG.md, STATUS.md, STATUS.html (regenerated); this handoff
 - Pre-existing/user-owned changes: records untracked test/validate.bats; shelf .vscode/; sibling Skill dirs (untouched)
 - Records state: uncommitted
 - Product commits/pushes: none

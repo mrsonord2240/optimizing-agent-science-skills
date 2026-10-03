@@ -109,7 +109,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 89 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@a86f2698a953-delta-dv1-20261003/viewer.md) |
 | `bio-machine-learning-atlas-mapping` | Data Analysis | 87 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-machine-learning-atlas-mapping/candidate@8b4d96ad2465-final-reaudit-lane3b-20261003/viewer.md) |
 | `bio-machine-learning-biomarker-discovery` | Data Analysis | 81 | Beta Only | 0 / 1 / 5 | [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md) |
-| `bio-machine-learning-omics-classifiers` | Data Analysis | 85 | Limited Release | 0 / 0 / 5 | [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md) |
+| `bio-machine-learning-omics-classifiers` | Data Analysis | 88 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-machine-learning-omics-classifiers/candidate@906900fae480-reaudit2-lane3-20261003/viewer.md) |
 | `bio-machine-learning-survival-analysis` | Data Analysis | 87 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-machine-learning-survival-analysis/candidate@eac9a589b7bd-reaudit-delta-20261003/viewer.md) |
 | `bio-splicing-quantification` | Data Analysis | 85 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-splicing-quantification/candidate@247bcf26db18-run-reaudit-2/viewer.md) |
 
