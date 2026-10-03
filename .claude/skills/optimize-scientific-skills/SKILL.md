@@ -46,7 +46,8 @@ Use the following worker Skills by exact name:
 Worker-contract delivery is part of dispatch. Resolve the selected worker
 Skill's actual `SKILL.md` as a sibling of this orchestrator Skill and include
 that absolute path in the worker brief. Set the worker's model explicitly from
-the model table in [relay operations](references/relay-operations.md). The worker's first action must be to
+the model table in [relay operations](references/relay-operations.md); the
+default is Sonnet, never Haiku. The worker's first action must be to
 read the complete file successfully. Merely naming the Skill is insufficient:
 a fresh agent may start from a repository that does not expose the orchestrator's
 Skill registry. If the contract cannot be read, the worker must report that

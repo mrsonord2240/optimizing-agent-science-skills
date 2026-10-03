@@ -8,6 +8,9 @@ description: Independently re-audit one fixed scientific agent Skill with risk-b
 Certify or reject one exact fixed candidate independently. Do not rely on the
 fixer's conclusions as evidence.
 
+Any subagent you spawn runs on Sonnet unless the brief names another model;
+never Haiku.
+
 ## Establish independence and method
 
 Verify that you did not perform the candidate's fix or initial audit. Check

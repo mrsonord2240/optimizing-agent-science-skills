@@ -25,13 +25,13 @@ every dispatch; never let a worker inherit the orchestrator's model.
 | Work | Claude | Codex |
 |---|---|---|
 | Identity, hygiene, frontmatter, ID-collision checks | none: `tools/skill_preflight.py` | none |
-| Applying already-specified text edits whose result the preflight fully verifies | Haiku | Luna |
-| Every phase worker: normalize, tooling, initial audit, fix, delta and final re-audit | Sonnet | Terra |
+| Every worker, including mechanical text edits: normalize, tooling, initial audit, fix, delta and final re-audit | Sonnet | Terra |
 | Escalation after the same phase's handoff was rejected twice for quality | Opus | the next tier up |
 
-Haiku normalize workers failed on 2026-09-30 (wrong identity hashes, CRLF,
-nested LICENSE, a product commit), so phase workers start at Sonnet. Record any
-escalation and its reason in the lane table.
+Never use Haiku or Luna for anything that involves a decision. Haiku normalize
+workers failed on 2026-09-30 (wrong identity hashes, CRLF, nested LICENSE, a
+product commit), so every worker starts at Sonnet. Record any escalation and
+its reason in the lane table.
 
 ## Batching
 

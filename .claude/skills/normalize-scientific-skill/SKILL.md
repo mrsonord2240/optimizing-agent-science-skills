@@ -7,6 +7,9 @@ description: Normalize one scientific agent Skill, or a relay-assigned batch, be
 
 Normalize one exact Skill without performing its behavioral audit or fix pass.
 
+Any subagent you spawn runs on Sonnet unless the brief names another model;
+never Haiku.
+
 ## Start safely
 
 Verify the assigned Skill, origin repository/path/commit, working

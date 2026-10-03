@@ -8,6 +8,9 @@ description: Prepare or refresh the reproducible tools, environments, public inp
 Make one normalized Skill executable for later workers. Do not audit its
 quality, repair its instructions, or change product bytes.
 
+Any subagent you spawn runs on Sonnet unless the brief names another model;
+never Haiku.
+
 ## Load context
 
 Verify the candidate identity, surface inventory, working path and branch,

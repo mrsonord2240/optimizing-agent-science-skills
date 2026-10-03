@@ -6,7 +6,8 @@ description: Conduct a bounded diagnostic audit of one normalized scientific age
 # Audit Scientific Skill
 
 Audit one exact normalized candidate to identify and prioritize work. This is a
-comprehensive but bounded diagnostic pass; independent re-audit later focuses
+comprehensive but bounded diagnostic pass. Any subagent you spawn runs on
+Sonnet unless the brief names another model; never Haiku. Independent re-audit later focuses
 on corrections, affected regressions, and representative core workflows.
 
 ## Load context and method

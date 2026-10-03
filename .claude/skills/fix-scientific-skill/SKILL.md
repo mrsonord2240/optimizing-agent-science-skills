@@ -8,6 +8,9 @@ description: Repair one audited scientific agent Skill against a durable finding
 Resolve the assigned audit findings without scoring or certifying your own
 work. Keep the phase resumable even when it spans many turns.
 
+Any subagent you spawn runs on Sonnet unless the brief names another model;
+never Haiku.
+
 ## Load the exact assignment
 
 Read the complete active audit report, ordered finding ledger, `TOOLS.md`, and
