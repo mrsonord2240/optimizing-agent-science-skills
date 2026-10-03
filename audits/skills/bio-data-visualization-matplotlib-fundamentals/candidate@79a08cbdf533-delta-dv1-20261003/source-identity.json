@@ -1,0 +1,55 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "data-visualization/matplotlib-fundamentals",
+    "subtree": "0c0d40a5684ac9995d1d383c658265df9208c892",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "normalize/dv-lane1",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "F:\\OpenScience\\wt\\normalize-dv-lane1\\skills\\bio-data-visualization-matplotlib-fundamentals",
+    "content_sha256": "79a08cbdf5339dbf6f824d9532cc4720ef00102a9985831c5c56c051c8150611",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-data-visualization-ggplot2-fundamentals/; ?? skills/bio-data-visualization-matplotlib-fundamentals/; ?? skills/bio-data-visualization-volcano-and-ma-plots/",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 24925
+    }
+  },
+  "files": [
+    {
+      "path": "references/chart-recipes.md",
+      "bytes": 1772,
+      "sha256": "40f030d3324e53496f947ddd8cfce81220d1fc2ead164d058680ea0b884b533e"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 4312,
+      "sha256": "beea486948019190e27bcbf0056fd3abd18068b25d727211b8d1c4a64a0ad011"
+    },
+    {
+      "path": "scripts/matplotlib_phd.py",
+      "bytes": 5723,
+      "sha256": "fcd7894115f6b88c5933d3809c297e103b425b056b1d3e2fdbbfd5cc799cfe53"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 9049,
+      "sha256": "227b0d06acda92ccb6f977a86e7fc37656ac0060c42f711d97f87a0133a87657"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4069,
+      "sha256": "eb8851413a30d312248c402244a98e6ced41d850ec4fb56489a9016a0e936c85"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ]
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

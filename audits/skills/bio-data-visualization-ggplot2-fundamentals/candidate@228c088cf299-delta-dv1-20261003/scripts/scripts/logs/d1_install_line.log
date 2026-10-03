@@ -1,0 +1,6 @@
+install line: install.packages(c('ggplot2', 'scales', 'ggrepel', 'ggtext', 'viridis', 'scico', 'ggrastr', 'patchwork', 'dplyr')) 
+named: ggplot2 scales ggrepel ggtext viridis scico ggrastr patchwork dplyr 
+script loads (library/require/::): ggplot2 patchwork ggrepel dplyr 
+script packages missing from install line: none 
+all named packages loadable in the staged environment: TRUE 
+RESULT PASS 

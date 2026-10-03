@@ -1,0 +1,77 @@
+DESeq2 1.46.0  dds genes: 29391  resultsNames: Intercept,cell_N061011_vs_N052611,cell_N080611_vs_N052611,cell_N61311_vs_N052611,condition_treated_vs_control 
+[PASS] coef condition_treated_vs_control exists in dds
+Loading required package: ggrepel
+
+Attaching package: 'dplyr'
+
+The following object is masked from 'package:Biobase':
+
+    combine
+
+The following object is masked from 'package:matrixStats':
+
+    count
+
+The following objects are masked from 'package:GenomicRanges':
+
+    intersect, setdiff, union
+
+The following object is masked from 'package:GenomeInfoDb':
+
+    intersect
+
+The following objects are masked from 'package:IRanges':
+
+    collapse, desc, intersect, setdiff, slice, union
+
+The following objects are masked from 'package:S4Vectors':
+
+    first, intersect, rename, setdiff, setequal, union
+
+The following objects are masked from 'package:BiocGenerics':
+
+    combine, intersect, setdiff, union
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+using 'apeglm' for LFC shrinkage. If used in published research, please cite:
+    Zhu, A., Ibrahim, J.G., Love, M.I. (2018) Heavy-tailed prior distributions for
+    sequence count data: removing the noise and preserving large differences.
+    Bioinformatics. https://doi.org/10.1093/bioinformatics/bty895
+warnings from volcano_phd.R (unique, first 100 chars):
+[1] "Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead.\n"
+[2] "The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.\nℹ Please use the `linewid" 
+volcano_phd.R ran to the end. files: ev_phd01.png, ma_plot.pdf, volcano.pdf 
+res rows 29391  padj NA 11397  non-NA 17994 
+table: Up 451  Down 366  total 817 
+p_volcano points plotted: 17994  (non-NA padj: 17994 )
+[PASS] every non-NA-padj gene is plotted
+plotted Up 451  Down 366 
+[PASS] plotted Up/Down counts equal table counts
+hline yintercept: 1.30103  -log10(0.05) = 1.30103 
+[PASS] hline equals -log10(fdr)
+[PASS] every coloured (Up/Down) point lies on/above the line (min y 1.3491, n=817)
+[PASS] every point above the line with |x|>1 is coloured Up/Down (n above line and |x|>1: 817)
+[PASS] every point below the line is NS (n below line: 14000)
+NS genes with padj<0.05 but |LFC|<=1: 3177 ; NS genes with |LFC|>1 and padj>=0.05: 0 
+[PASS] y plotted is -log10(padj)
+max y plotted (uncapped): 131.4 
+labels drawn: 13  e.g. BRCA1,SAMHD1,ZBTB16,DUSP1,MYC,TP53,SPARCL1,VCAM1,KLF15,CACNB2,PER1,MAOA,GPX3 
+rownames sample: TSPAN6,DPM1,SCYL3   TP53/MYC/BRCA1 in rownames: TRUE/TRUE/TRUE 
+volcano.pdf        555573 B
+ma_plot.pdf        685915 B
+EnhancedVolcano points: 17994  distinct colours: #0072B2 #999999 #D55E00 
+[PASS] EnhancedVolcano draws Up #D55E00 and Down #0072B2 (distinct)
+[PASS] EnhancedVolcano colour counts equal Up/Down table counts
+EnhancedVolcano y axis label: -log[10] ~ "adjusted" ~ italic(P) 
+RESULT PASS 
+
+real	0m33.748s
+user	0m0.000s
+sys	0m0.045s

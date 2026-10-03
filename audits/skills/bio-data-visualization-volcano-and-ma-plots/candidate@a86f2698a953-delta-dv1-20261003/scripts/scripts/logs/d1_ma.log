@@ -1,0 +1,19 @@
+F:\OpenScience\audit-envs\data-visualization\py-extra\sanbomics\sanbomics\plots.py:255: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+rows 29391 non-NA padj 17994 padj<0.05 3994
+points per collection [25397, 3994]
+[PASS] every row with baseMean>0 is drawn (grey + orange == rows)
+[PASS] orange (significant) count == padj<0.05 (3994)
+MA scatter on 17994 points: vector 278 KB, rasterized 31 KB  (claim 444 KB / 23 KB)
+(claim text says 17,994 points; 23/444 KB were measured on all 29,391 rows at 3.5x3 in; r5b below repeats that)
+[PASS] sanbomics.plots.volcano exists
+sanbomics.tools import: ModuleNotFoundError No module named 'pkg_resources'
+signature: (data, log2fc='log2FoldChange', pvalue='padj', symbol='symbol', baseMean=None, pval_thresh=0.05, log2fc_thresh=0.75, to_label=5, color_dict=None, shape_dict=None, fontsize=10, colors=['dimgrey', 'lightgrey', 'black'], top_right_frame=False, figsize=(5, 5), legend_pos=(1.4, 1), point_sizes=(15, 150), save=False, shapes=None, shape_order=None)
+[PASS] pvalue='padj' is the default and a 'symbol' column is a parameter
+per-point facecolours (rgb: points): {(np.float64(0.827), np.float64(0.827), np.float64(0.827)): 16675, (np.float64(0.412), np.float64(0.412), np.float64(0.412)): 1309, (np.float64(0.0), np.float64(0.0), np.float64(0.0)): 10}  collections: [17994]
+with sanbomics defaults (padj<0.05, |LFC|>0.75): Up 701 Down 618
+[PASS] sanbomics draws all 1319 DE points (Up 701 + Down 618) in one dark-grey class (+ black 'picked'), not Up/Down colours (SKILL.md)
+legend texts: ['DE', 'not DE', 'picked']
+RESULT PASS
+ma_plot() as shipped on all 29391 rows, 3.5x3 in: vector 444 KB, rasterized 23 KB
+points ma_plot() draws: 29391 of which padj NA (drawn grey): 11397

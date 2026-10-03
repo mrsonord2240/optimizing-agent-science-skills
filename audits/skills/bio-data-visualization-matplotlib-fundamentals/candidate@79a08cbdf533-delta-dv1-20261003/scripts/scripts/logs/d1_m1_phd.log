@@ -1,0 +1,27 @@
+matplotlib 3.11.2 seaborn 0.13.2 numpy 2.5.3
+warnings during script: ['Pandas4Warning: The copy keyword is deprecated and will be removed in a future version. Copy-on-Write is active in pandas sinc @ data.py:109']
+[FAIL] script ran without warnings
+files written: ['heatmap.pdf', 'multipanel.pdf', 'pca.pdf', 'volcano_sns.pdf', 'volcano_so.pdf']
+[PASS] exactly five PDFs written
+[PASS] pca.pdf page (89.0, 70.0) mm vs 89 x 70
+[PASS] multipanel.pdf page (180.0, 110.0) mm vs 180 x 110
+[PASS] heatmap.pdf page (89.0, 90.0) mm vs 89 x 90
+[PASS] volcano_sns.pdf page (89.0, 70.0) mm vs 89 x 70
+[PASS] volcano_so.pdf page (89.0, 70.0) mm vs 89 x 70
+[PASS] Plot.plot()._figure reachable; exactly one figure legend
+legend bbox (fig fractions) x 0.815-0.988 y 0.406-0.594; axes tight bbox x1 0.750; axes right edge 0.748; fig [89. 70.] mm
+[PASS] legend bbox inside the page
+[PASS] legend clear of the axes (incl. tick labels)
+legend title: significance | entries: ['NS', 'Down', 'Up']
+[PASS] legend lists significance classes
+legend handle colours: {'NS': '#999999', 'Down': '#0072b2', 'Up': '#d55e00'}
+[PASS] legend handle colours equal the palette
+[PASS] drawn points use the palette colours only
+drawn facecolours: ['#0072b2', '#999999', '#d55e00']
+[PASS] drawn facecolours subset of palette
+visible text sizes (pt): [6.0, 7.0]
+[PASS] all visible text 5-7 pt (Nature body-text range stated in the Skill)
+digests run1 {'heatmap.pdf': 'ba42e36043655e9e', 'multipanel.pdf': '18fb26b16c010281', 'pca.pdf': '0e5bc252cccac581', 'volcano_sns.pdf': '2f8dc546e6205d4d', 'volcano_so.pdf': '6f2caf43b0f5dfe2'}
+digests run2 {'heatmap.pdf': 'ba42e36043655e9e', 'multipanel.pdf': '18fb26b16c010281', 'pca.pdf': '0e5bc252cccac581', 'volcano_sns.pdf': '2f8dc546e6205d4d', 'volcano_so.pdf': '6f2caf43b0f5dfe2'}
+[PASS] second run reproduces every PDF (modulo creation date/ID)
+RESULT FAIL

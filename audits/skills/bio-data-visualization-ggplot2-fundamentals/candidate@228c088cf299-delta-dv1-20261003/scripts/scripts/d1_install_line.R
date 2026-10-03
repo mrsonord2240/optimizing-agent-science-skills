@@ -1,0 +1,15 @@
+# GG-012: every package named by the (new) usage-guide install line, and every package scripts/publication_figures.R loads, must be named and load.
+a <- commandArgs(TRUE); skill <- a[1]
+ug <- readLines(file.path(skill, "usage-guide.md"), warn = FALSE)
+l <- grep("install.packages", ug, value = TRUE)[1]; cat("install line:", l, "\n")
+pk <- regmatches(l, gregexpr("'[A-Za-z0-9.]+'", l))[[1]]; pk <- gsub("'", "", pk); cat("named:", pk, "\n")
+sc <- readLines(file.path(skill, "scripts/publication_figures.R"), warn = FALSE)
+lib_lines <- grep("(library|require|requireNamespace)\\(", sc, value = TRUE)
+loaded <- unique(gsub("[^A-Za-z0-9.]", "", regmatches(lib_lines, regexpr("\\(['\"]?[A-Za-z0-9.]+", lib_lines))))
+ns_lines <- grep("[A-Za-z0-9.]+::", sc, value = TRUE)
+ns <- if (length(ns_lines)) unique(gsub("::", "", unlist(regmatches(ns_lines, gregexpr("[A-Za-z0-9.]+::", ns_lines))))) else character()
+loaded <- unique(c(loaded, ns))
+cat("script loads (library/require/::):", loaded, "\n")
+miss <- setdiff(loaded, pk); cat("script packages missing from install line:", if (length(miss)) miss else "none", "\n")
+ok <- all(sapply(pk, requireNamespace, quietly = TRUE)); cat("all named packages loadable in the staged environment:", ok, "\n")
+cat("RESULT", if (length(miss) == 0 && ok) "PASS" else "FAIL", "\n")

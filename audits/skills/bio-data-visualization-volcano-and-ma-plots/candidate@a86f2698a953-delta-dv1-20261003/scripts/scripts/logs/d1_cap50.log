@@ -1,0 +1,4 @@
+genes with -log10(padj) > 50, any LFC: 39 
+  of which |LFC| > 1 (coloured Up/Down): 39 
+  of which |LFC| <= 1 (grey NS but padj<0.05): 0 
+genes with -log10(padj) > 30: any 118  coloured 115 

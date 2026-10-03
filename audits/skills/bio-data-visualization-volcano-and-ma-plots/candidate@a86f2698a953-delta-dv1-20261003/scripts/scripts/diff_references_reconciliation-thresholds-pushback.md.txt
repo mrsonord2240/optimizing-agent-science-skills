@@ -1,0 +1,2 @@
+-| Volcano y-axis cap | Optional; airway reaches -log10(padj) 131 and is readable uncapped | If used, mark capped genes (triangles) and state the cap; clipping hid 49 significant genes at 50 |
++| Volcano y-axis cap | Optional; airway reaches -log10(padj) 131 and is readable uncapped | If used, mark capped genes (triangles) and state the cap; clipping hid 39 significant genes at 50 |

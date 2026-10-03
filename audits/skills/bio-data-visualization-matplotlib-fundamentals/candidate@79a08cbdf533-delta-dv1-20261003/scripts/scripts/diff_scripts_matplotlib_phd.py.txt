@@ -1,0 +1,5 @@
+-# (extent) and move it inside the page after plot().
++# (extent) and move it inside the page after plot(). Limits: p._figure is a private seaborn attribute (verified on seaborn
++# 0.13.2 only), and the fixed 22% fits short legend text only; a 29-character title covered 13 mm of the data. Use a smaller
++# extent[2] or a shorter title and check the legend bbox, or the public route: Plot.on(fig), move fig.legends[0],
++# fig.subplots_adjust(right=0.76) (measured inside the page).

@@ -346,7 +346,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (159)
+## P2 (156)
 
 ### `bio-machine-learning-omics-classifiers` — OC-005: XGBoost early stopping: val set reuse and degenerate at tiny n
 
@@ -628,22 +628,6 @@ None open.
 - Root cause: Zero-read motif peaks give zero background SD in sparse cells; not investigated at full scale.
 - Fix: Optionally test on whole-genome PBMC 5k fragments and add a minimum-fragment cell filter before addDeviationsMatrix if NA recurs.
 
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-009 Stale quoted numbers in references and comments
-
-- Skill: 87, Production Ready · candidate `fa3ec8783a79` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@fa3ec8783a79-reaudit-dv1-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: failure-modes.md and reconciliation-thresholds-pushback.md say a cap of 50 hid 49 significant genes (39 measured now that y is padj); SKILL.md says median \|LFC\| 0.77 (0.7648); the volcano_phd.R save comment says 29,391 vector points gave about 1 MB (17,994 are drawn; 0.56 and 0.69 MB); SKILL.md ties the 23/444 KB MA sizes to 17,994 points though ma_plot() draws 29,391.
-- Root cause: Numbers were measured before the axis moved from raw p to padj and the NA rows were dropped, and were not re-measured.
-- Fix: Replace 49 with 39, 0.77 with 0.76, the comment with 17,994 points and 0.56/0.69 MB, and state 29,391 rows for the MA sizes.
-
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-010 y_cap labels pile onto the cap and overlap
-
-- Skill: 87, Production Ready · candidate `fa3ec8783a79` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@fa3ec8783a79-reaudit-dv1-20261003/viewer.md)
-- Observed in inputs: 2
-- Problem: volcano_plot(res, y_cap = 30) with default top_n labels places every high-rank label at y = 30, where ggrepel with max.overlaps = Inf prints them on top of each other; usage-guide suggests exactly this cap.
-- Root cause: Capped genes share one y value and the repel has no free space above the panel edge.
-- Fix: Document label_genes with capped genes excluded or spread horizontally (direction = 'x', ylim expansion), or default top_n labels to genes below the cap.
-
 ### `bio-ensembl-rest` — Compara example not reproduced on final bytes
 
 - Skill: 87, Production Ready · candidate `dabba949803e` from [mrsonord2240/optimized-scientific-skills@29f5446](https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-ensembl-rest) · [viewer](skills/bio-ensembl-rest/mrsonord2240-optimized-scientific-skills@29f5446/viewer.md)
@@ -860,29 +844,13 @@ None open.
 - Root cause: The references name alternatives without a verified local execution route.
 - Fix: Add a supported environment recipe or an explicit unavailable-here note with a tested fallback.
 
-### `bio-data-visualization-ggplot2-fundamentals` — GG-010 create_volcano stops with a cryptic error when a label among the smallest padj is NA
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-010 y_cap labels pile onto the cap and overlap
 
-- Skill: 89, Production Ready · candidate `be703ae7f695` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@be703ae7f695-reaudit-dv2-20261003/viewer.md)
-- Observed in inputs: 3
-- Problem: With the new default top_n = NULL the helper evaluates max(nchar(lead)); a NA label (an unmapped gene symbol, the usual result of an org.Hs.eg.db lookup) makes the result NA and `if` fails with 'missing value where TRUE/FALSE needed' on ggplot2 4.0.3 and 3.5.2; with an explicit top_n the same data builds.
-- Root cause: The second-loop heuristic does not handle NA in the label column.
-- Fix: Local code change of one line (max(nchar(lead), na.rm = TRUE), or treat NA as long) and, optionally, one sentence in SKILL.md telling the agent to fill unmapped symbols with the Ensembl ID before labelling.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-011 The zero-overlap envelope omits composite height and dataset, and 'no collisions' means label boxes only
-
-- Skill: 89, Production Ready · candidate `be703ae7f695` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@be703ae7f695-reaudit-dv2-20261003/viewer.md)
+- Skill: 89, Production Ready · candidate `a86f2698a953` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@a86f2698a953-delta-dv1-20261003/viewer.md)
 - Observed in inputs: 2
-- Problem: The Resources line says composites collide-free 'at 183 mm', but the claim was measured at 183 x 120 and 183 x 150 mm on the airway data; a 183 x 90 mm composite with the default airway symbols has 1 overlapping pair (STEAP2~MAOA) and a re-ranked Ensembl set (3 extreme-LFC IDs) has 3 pairs at 183 x 120 mm. Threshold lines and points also cross labels in the clean rows (183 x 120 Ensembl composite), which a reader may take as collisions.
-- Root cause: Envelope phrased by width only; label placement depends on where the top genes fall.
-- Fix: Text-only: state 'measured on the airway DESeq2 results at 183 x 120 mm and taller', say the count is label-label boxes only, and keep 'open the figure'.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-012 usage-guide prerequisites omit packages the shipped script loads
-
-- Skill: 89, Production Ready · candidate `be703ae7f695` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@be703ae7f695-reaudit-dv2-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: usage-guide.md installs ggplot2, scales, ggrepel, ggtext, viridis, scico and ggrastr, but scripts/publication_figures.R calls library(patchwork) and library(dplyr); on a fresh R the documented source() step fails. SKILL.md's version line also keeps a stray "axes='collect'" note for a feature the Skill does not use.
-- Root cause: The install line predates the helper script's dependencies.
-- Fix: Text-only: add patchwork and dplyr to the install.packages line and drop the unused axes='collect' remark.
+- Problem: volcano_plot(res, y_cap = 30) with default top_n labels places every high-rank label at y = 30, where ggrepel with max.overlaps = Inf prints them on top of each other; usage-guide suggests exactly this cap.
+- Root cause: Capped genes share one y value and the repel has no free space above the panel edge.
+- Fix: Document label_genes with capped genes excluded or spread horizontally (direction = 'x', ylim expansion), or default top_n labels to genes below the cap.
 
 ### `bio-microbiome-taxonomy-assignment` — DADA2 example exits with a post-output segmentation fault
 
@@ -908,13 +876,21 @@ None open.
 - Root cause: The Skill intentionally focuses runnable coverage on FUSION, MetaXcan, and FOCUS.
 - Fix: For each retained optional method, either add a minimal verified invocation or label it explicitly as a handoff/reference-only route.
 
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-010 seaborn.objects legend recipe discloses neither its private-attribute use nor its fixed 22 % reserve
+### `bio-data-visualization-ggplot2-fundamentals` — GG-010 create_volcano stops with a cryptic error when a label among the smallest padj is NA
 
-- Skill: 90, Production Ready · candidate `f1efaf7eef6c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@f1efaf7eef6c-reaudit-dv2-20261003/viewer.md)
+- Skill: 90, Production Ready · candidate `228c088cf299` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@228c088cf299-delta-dv1-20261003/viewer.md)
 - Observed in inputs: 3
-- Problem: Section 7 reserves the right 22 % of the page and moves fig.legends[0] through Plot.plot()._figure, a private seaborn attribute verified on seaborn 0.13.2 only; with a longer legend title ('Differential expression class' with longer labels) the legend spans x 0.604-0.988 and covers 13 mm of the plot area (axes end at 0.750), and a 51-character title spans 0.299-0.988. Nothing in SKILL.md or the script says so.
-- Root cause: The recipe was verified for the three short example labels only and the dependency on seaborn internals is left implicit.
-- Fix: Text-only: add to the script comment and SKILL.md a line that the recipe uses a private seaborn attribute (verified on 0.13.2), that 22 % fits legend text up to about 'Downregulated', and that longer titles need a smaller extent[2] or a shorter title with the legend bbox checked; optionally name the public route Plot.on(fig) + fig.legends[0] + fig.subplots_adjust(right=0.76), which measured inside the page and clear of the axes.
+- Problem: With the new default top_n = NULL the helper evaluates max(nchar(lead)); a NA label (an unmapped gene symbol, the usual result of an org.Hs.eg.db lookup) makes the result NA and `if` fails with 'missing value where TRUE/FALSE needed' on ggplot2 4.0.3 and 3.5.2; with an explicit top_n the same data builds.
+- Root cause: The second-loop heuristic does not handle NA in the label column.
+- Fix: Local code change of one line (max(nchar(lead), na.rm = TRUE), or treat NA as long) and, optionally, one sentence in SKILL.md telling the agent to fill unmapped symbols with the Ensembl ID before labelling.
+
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-011 the named public legend route omits margins and clips the x label
+
+- Skill: 90, Production Ready · candidate `79a08cbdf533` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@79a08cbdf533-delta-dv1-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: SKILL.md and the script comment name the public route as Plot.on(fig), move fig.legends[0], fig.subplots_adjust(right=0.76). Run exactly so on an 89 x 70 mm figure the legend sits inside the page and clear of the axes (x 0.815-0.988, axes end 0.760), but the axes tight box reaches y = -0.007 and the x-axis label is cut at the page edge (ink on the last pixel row, scripts/figures/right076_only.png). The measured route in the certifying run also set left = 0.13, bottom = 0.17 and top = 0.97 and is clean (44 px bottom margin).
+- Root cause: The disclosure wording kept only the right-margin argument of the measured subplots_adjust call.
+- Fix: Text-only: write the route as fig.subplots_adjust(left=0.13, bottom=0.17, right=0.76, top=0.97) in SKILL.md and in the script comment, or name only the legend move and say the margins must be set so the x label stays inside the page.
 
 ### `bio-reference-operations` — Reject wholly out-of-range consensus windows
 

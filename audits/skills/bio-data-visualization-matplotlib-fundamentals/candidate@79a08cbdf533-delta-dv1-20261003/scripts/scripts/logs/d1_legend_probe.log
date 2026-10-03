@@ -1,0 +1,5 @@
+matplotlib 3.11.2 seaborn 0.13.2
+a1_29char_title_shipped_labels     title chars 29 | legend x 0.604-0.988 | axes tight x1 0.750 | overlap into axes 13.0 mm
+a2_29char_title_long_labels        title chars 29 | legend x 0.604-0.988 | axes tight x1 0.750 | overlap into axes 13.0 mm
+a3_shipped                         title chars 12 | legend x 0.815-0.988 | axes tight x1 0.750 | overlap into axes 0.0 mm
+public route right=0.76 only: legend x 0.815-0.988 | axes tight x 0.033-0.760 y -0.007-0.880 | legend inside page True | clear of axes True | axes+labels inside page False

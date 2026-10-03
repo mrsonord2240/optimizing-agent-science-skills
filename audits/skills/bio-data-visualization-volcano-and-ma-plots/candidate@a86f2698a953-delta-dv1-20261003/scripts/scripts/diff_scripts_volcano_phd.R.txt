@@ -1,0 +1,2 @@
+-# 6. SAVE -- cairo_pdf embeds TrueType (29,391 vector points gave ~1 MB PDFs on the airway data;
++# 6. SAVE -- cairo_pdf embeds TrueType (17,994 drawn vector points gave 0.56 and 0.69 MB PDFs on the airway data;
