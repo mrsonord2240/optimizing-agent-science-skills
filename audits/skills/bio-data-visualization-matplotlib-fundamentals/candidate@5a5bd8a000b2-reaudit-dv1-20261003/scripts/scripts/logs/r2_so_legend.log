@@ -1,0 +1,10 @@
+A_default_legend legends 1 legend bbox [(348, 408)] fig px width 350 legend fully inside page: False
+   page mm 89.0 70.0
+B_constrained_legend legends 1 legend bbox [(348, 408)] fig px width 350 legend fully inside page: False
+   page mm 89.0 70.0
+C_tight_legend legends 1 legend bbox [(348, 408)] fig px width 350 legend fully inside page: False
+   page mm 89.0 70.0
+D_extent_legend legends 1 legend bbox [(348, 408)] fig px width 350 legend fully inside page: False
+   page mm 89.0 70.0
+E_move_legend bbox x 286 346 page px 350 inside: True
+E axes right edge px 315 legend left px 286

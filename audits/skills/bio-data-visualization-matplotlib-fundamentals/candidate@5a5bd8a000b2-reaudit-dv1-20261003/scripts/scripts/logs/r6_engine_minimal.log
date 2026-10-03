@@ -1,0 +1,5 @@
+matplotlib 3.11.2
+EXCEPTION single axes + colorbar, engine set after: ZeroDivisionError: float division by zero
+EXCEPTION 1x2 axes, colorbar on one, engine set after: ZeroDivisionError: float division by zero
+OK        1x2 axes, no colorbar, engine set after
+OK        1x2 axes, engine set BEFORE adding the colorbar

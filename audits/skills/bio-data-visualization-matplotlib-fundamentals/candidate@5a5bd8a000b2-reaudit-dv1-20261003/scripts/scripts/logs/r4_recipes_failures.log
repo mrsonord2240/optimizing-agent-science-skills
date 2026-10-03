@@ -1,0 +1,36 @@
+matplotlib 3.11.2 seaborn 0.13.2
+2 recipe blocks
+11 recipe snippets: ['# Scatter -- always rasteriz', '# Line', '# Bar', '# Box / violin (prefer seabo', '# Histogram', '# Heatmap (prefer seaborn fo', '# Log scale', '# Scientific notation', '# Date axis', '# Tick frequency', '# Grid']
+[PASS] snippet '# Scatter -- always rasterized' ran without warnings; warnings=[]
+[PASS] snippet '# Line' ran without warnings; warnings=[]
+[PASS] snippet '# Bar' ran without warnings; warnings=[]
+[PASS] snippet '# Box / violin (prefer seaborn' ran without warnings; warnings=[]
+[PASS] snippet '# Histogram' ran without warnings; warnings=[]
+[PASS] snippet '# Heatmap (prefer seaborn for ' ran without warnings; warnings=[]
+[PASS] snippet '# Log scale' ran without warnings; warnings=[]
+[PASS] snippet '# Scientific notation' ran without warnings; warnings=[]
+[PASS] snippet '# Date axis' ran without warnings; warnings=[]
+[FAIL] snippet '# Tick frequency' ran
+     ValueError The number of FixedLocator locations (5), usually from a call to set_ticks, does not match the number of labels (3).
+[PASS] snippet '# Grid' ran without warnings; warnings=[]
+[PASS] recipes.pdf page (180.0, 110.0) == 180 x 110 mm
+   labels= -> TypeError Axes.boxplot() got an unexpected keyword argument 'labels'
+[PASS] boxplot(labels=) raises on 3.11.2 as the recipe note says
+100k points: vector 1.52 MB, rasterised 166.9 KB, ratio 9x
+(note: this block sets savefig.dpi=300 and alpha=.6; r5 reproduces 24 KB at default dpi without alpha)
+[FAIL] claim '100000 points = 1.5 MB vector vs 24 KB raster (63x)' reproduced under THIS block's settings (dpi 300, alpha .6)
+zorder.pdf bytes 35903 image objects: 1
+[PASS] ax.set_rasterization_zorder(1) rasterises zorder<1 artists (>=1 image, small pdf)
+[PASS] control: no set_rasterization_zorder -> no image object
+[PASS] fig.set_rasterization_zorder does not exist
+tight_layout + colorbar -> clipped, warnings: (False, [])
+set_layout_engine('constrained') after the colorbar exists -> ZeroDivisionError: float division by zero
+[FAIL] failure-modes.md 'or fig.set_layout_engine(constrained) after creation' works with a colorbar present (r6 isolates it)
+    'FacetGrid' object has no attribute 'set_xlabel'
+[PASS] FacetGrid.set_xlabel raises AttributeError
+[PASS] FacetGrid.set_axis_labels works
+no bbox (89.0, 70.0)
+bbox_inches='tight' (91.96, 72.96)
+[PASS] bbox tight gives ~92 mm (claim '~92 mm')
+[PASS] without it exactly 89
+RESULT FAIL

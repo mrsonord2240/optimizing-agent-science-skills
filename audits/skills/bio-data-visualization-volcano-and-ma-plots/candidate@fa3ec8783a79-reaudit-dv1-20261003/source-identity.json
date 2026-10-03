@@ -1,0 +1,65 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "data-visualization/volcano-and-ma-plots",
+    "subtree": "e76b37f2d2c898ac96b16cd42665acb9f3c14ef2",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "normalize/dv-lane1",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "F:\\OpenScience\\wt\\normalize-dv-lane1\\skills\\bio-data-visualization-volcano-and-ma-plots",
+    "content_sha256": "fa3ec8783a79b7c7a36fcf2d941d4fcc1aca6ab2ec3a8925e72fe6fa3a9af008",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-data-visualization-ggplot2-fundamentals/; ?? skills/bio-data-visualization-matplotlib-fundamentals/; ?? skills/bio-data-visualization-volcano-and-ma-plots/",
+    "content_manifest": {
+      "file_count": 7,
+      "bytes": 37956
+    }
+  },
+  "files": [
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 5630,
+      "sha256": "edace425e0a4f7cd3a4644c856cc0243b026bbf3a28f12c98ddb214f3fc84826"
+    },
+    {
+      "path": "references/reconciliation-thresholds-pushback.md",
+      "bytes": 3575,
+      "sha256": "146c307647f145d91c059f339079ed488402ef91134b7eaeb53151a4d29e47c0"
+    },
+    {
+      "path": "scripts/ma_plot.py",
+      "bytes": 872,
+      "sha256": "fd69af3e725ce1935639406d1d01591e6fc673f18573c51f660b6c2d90176162"
+    },
+    {
+      "path": "scripts/volcano_phd.R",
+      "bytes": 5539,
+      "sha256": "c9f49baa90e4ca37426e07826448e3acd26d2ff674ddf6d53f29d6c1a13138fe"
+    },
+    {
+      "path": "scripts/volcano_plot.R",
+      "bytes": 3156,
+      "sha256": "22ce74cc2be9e8054a4d463722eb292e7ef076f505bf9f506089972343809331"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 13094,
+      "sha256": "2977c87f66a1035ecec230f0fcfed30b59085b77e4cb7174e14a03fd5169b97e"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 6090,
+      "sha256": "794ead387a38f1585e54f985b963d15e63e7ce67e832931a8ce57c217be2c1eb"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ]
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

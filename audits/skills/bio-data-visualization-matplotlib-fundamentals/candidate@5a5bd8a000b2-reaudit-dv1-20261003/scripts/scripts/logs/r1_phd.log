@@ -1,0 +1,16 @@
+pca.pdf (89.0, 70.0) mm; want (89, 70)
+[PASS] pca.pdf page (89.0, 70.0) within 0.3 mm of 89x70
+multipanel.pdf (180.0, 110.0) mm; want (180, 110)
+[PASS] multipanel.pdf page (180.0, 110.0) within 0.3 mm of 180x110
+heatmap.pdf (89.0, 90.0) mm; want (89, 90)
+[PASS] heatmap.pdf page (89.0, 90.0) within 0.3 mm of 89x90
+volcano_sns.pdf (89.0, 70.0) mm; want (89, 70)
+[PASS] volcano_sns.pdf page (89.0, 70.0) within 0.3 mm of 89x70
+volcano_so.pdf (89.0, 70.0) mm; want (89, 70)
+[PASS] volcano_so.pdf page (89.0, 70.0) within 0.3 mm of 89x70
+files ['heatmap.pdf', 'multipanel.pdf', 'pca.pdf', 'volcano_sns.pdf', 'volcano_so.pdf']
+[PASS] exactly the five PDFs written
+text font sizes in open figures (pt): [6.0, 7.0]
+[PASS] all text 6-7 pt
+pdf.fonttype 42 ps 42 savefig.bbox None
+RESULT PASS

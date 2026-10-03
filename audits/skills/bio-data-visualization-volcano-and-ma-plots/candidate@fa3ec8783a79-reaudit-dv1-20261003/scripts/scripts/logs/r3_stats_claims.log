@@ -1,0 +1,36 @@
+lfcShrink default type in this DESeq2: c("apeglm", "ashr", "normal") 
+[PASS] default lfcShrink type is 'apeglm' in DESeq2 1.46.0 (SKILL.md)
+[PASS] ashr accepts coef= as well as contrast= (table row)
+apeglm with contrast= -> Error in lfcShrink(dds, contrast = c("condition", "treated", "control"),  : 
+  type='apeglm' shrinkage only for use with 'coef'
+ 
+[PASS] apeglm with contrast= is rejected (table row 'no support for contrast=')
+apeglm svalue cols: baseMean,log2FoldChange,lfcSE,svalue 
+ashr   svalue cols: baseMean,log2FoldChange,lfcSE,svalue 
+[PASS] svalue=TRUE (apeglm, ashr): has svalue, no pvalue/padj
+[PASS] default apeglm/ashr results have no svalue column
+[PASS] SKILL.md column list 'baseMean, log2FoldChange, lfcSE, svalue' matches apeglm
+normal svalue=TRUE -> Error in lfcShrink(dds, coef = "condition_treated_vs_control", type = "normal",  : 
+  object 'coefAlphaSpaces' not found
+ 
+[PASS] type='normal' with svalue=TRUE errors in 1.46.0
+s<0.005: 4684 genes; padj<0.05: 3994; shared 3842  (claim 4,684 / 3,994 / 3,842)
+[PASS] s-value claim '4,684 vs 3,994 genes, 3,842 shared' (apeglm)
+baseMean<5 genes: 11646; median |LFC| MLE 0.76, apeglm 0.01, ashr 0.02
+[FAIL] claim median |LFC| at baseMean<5: 0.77 -> 0.01 (apeglm), 0.02 (ashr)
+apeglm |LFC| > MLE for 108 of 29391 genes; ashr 0; max |LFC| MLE 9.51 -> apeglm 10.99; largest increase 1.48; median baseMean of raised genes 1444
+[PASS] claim: apeglm exceeded MLE in 108 of 29,391; ashr 0; max 9.51 -> 10.99; largest increase 1.48; median baseMean 1444
+selectLab asked: SCYL3, NOT_A_GENE, FGR  | labelled: SCYL3, FGR 
+[PASS] a listed gene failing pCutoff/FCcutoff (SCYL3: padj 0.91, LFC 0.031) is still labelled
+[PASS] a name absent from lab is silently ignored (no error, not drawn)
+EnhancedVolcano points actually drawn: 17994  non-NA padj: 17994  all rows: 29391 
+[PASS] EnhancedVolcano draws only the non-NA-padj rows (claim 'drops padj = NA')
+drawn text with selectLab = [NS gene, absent, NA-padj gene]: SCYL3, Volcano plot, total = 29391 variables 
+[PASS] a listed gene whose padj is NA is not drawn as a label
+
+FORESTGREEN      GREY30        RED2   ROYALBLUE 
+          1       25396         817        3177 
+default `col`: shared-colour points (padj<.05 and |LFC|>1): 817 
+[PASS] default EnhancedVolcano gives one colour to both Up and Down (claim)
+exact median |LFC| baseMean<5: MLE 0.7648, apeglm 0.0120, ashr 0.0214; n=11646
+RESULT FAIL 

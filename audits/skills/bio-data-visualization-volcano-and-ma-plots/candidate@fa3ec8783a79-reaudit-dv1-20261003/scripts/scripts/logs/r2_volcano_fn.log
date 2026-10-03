@@ -1,0 +1,28 @@
+table non-NA padj 17994  sig Up 451  Down 366  total sig 817 
+messages: 11397 genes with padj = NA are not drawn
+ 
+[PASS] padj=NA count is reported by message
+[PASS] no cap: points plotted 17994 == non-NA padj 17994
+[PASS] no cap: plotted Up/Down equal table
+[PASS] no cap: hline = -log10(0.05)
+[PASS] no cap: y is -log10(padj), max = 131.4 as stated ('airway reaches 131')
+[PASS] no cap: every coloured point is on/above the line and every grey point with padj>=0.05 is below it
+[PASS] labels drawn include TP53/MYC/BRCA1 (BRCA1,MYC,TP53)
+cap 30: triangles 118  significant among them 115 
+[PASS] cap 30: all genes still plotted (none dropped)
+[PASS] cap 30: Up/Down counts unchanged vs table
+[PASS] cap 30: max plotted y == 30 and capped genes are exactly those with -log10(padj) > 30
+[PASS] cap 30: stated '118 triangles, 115 significant'
+[PASS] cap 30: legend keeps a 'capped at 30' entry
+[PASS] cap 30: hline still equals -log10(fdr)
+significant genes above y=50: 39 
+[FAIL] claim 'clipping hid 49 significant genes at 50'
+absent-label messages: 11397 genes with padj = NA are not drawn
+ | WARN: label_genes not found in rownames (or padj is NA): NOT_A_GENE 
+[PASS] absent label gene produces a warning naming it
+[PASS] fdr=0.01: hline = -log10(0.01) and coloured points on/above it
+[PASS] fdr=0.01, lfc=1.5: vlines at +-1.5
+[PASS] fdr/lfc variant Up count equals table
+[PASS] plain data.frame input works
+[PASS] ggbreak scale_y_break draws on the volcano and saves
+RESULT FAIL 

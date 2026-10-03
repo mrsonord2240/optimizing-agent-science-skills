@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-matplotlib-fundamentals",
+    "description": "Build publication-quality figures with matplotlib using the object-oriented Figure/Axes API, constrained_layout, rcParams customization, TrueType (Type-42) font embedding for journal submission, and CVD-safe palettes. Covers seaborn integration, common chart types, axis formatting, and the small gotchas that distinguish reproducible matplotlib from notebook scratch. Use when producing publication figures in Python — RNA-seq scatter, single-cell embeddings, generic biological plotting.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or results; the volcano example uses clearly labelled synthetic stand-ins, and the real airway DESeq2 table gave 541 Up, 497 Down, 17,200 NS."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Plotting guidance only; no clinical or prescriptive content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Colour-to-category binding verified per drawn point on 18,238 airway genes in three row orders (0 mismatches); no methodological fallacy found."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "scripts/matplotlib_phd.py and all five SKILL.md python blocks run verbatim on 3.11.2; one chart-recipes.md fragment (set_xticks vs three labels) raises ValueError, a localized literal defect recorded as MPL-008, not an unrunnable-code failure."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Covers rcParams, OO API, layout, fonts, saving and seaborn; page sizes and colour binding now correct, but the Tick frequency recipe and the tight_layout/set_layout_engine failure-mode entry are wrong (MPL-008, MPL-009)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Shipped script and SKILL.md blocks run clean; the recommended set_layout_engine fix raises ZeroDivisionError once a colorbar exists (MPL-009)."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Compact SKILL.md routed to two references; guardrails still repeat across SKILL.md, usage-guide and failure-modes."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Dict-palette and no-bbox guardrails are explicit and verified; the seaborn.objects example ships without a colour key (MPL-007)."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Readable prompts and tips; the pyplot mixing in the Color block is gone."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local file writes only; no credentials, network or shell strings."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "One example script mirrors SKILL.md; no automated check ties documented claims to behaviour, which is how MPL-008 and MPL-009 survived."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Precise trigger, routed references, version note; escape-hatch guidance for non-matplotlib or interactive output is thin."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 20,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scripts/matplotlib_phd.py unchanged: rcParams, 89 mm scatter, 2x3 grid, Crameri heatmap, seaborn scatter, seaborn.objects",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All five PDFs exact mm and TrueType; seaborn.objects figure opened and has no colour key.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The five PDFs have page sizes equal to the stated mm (89x70, 180x110, 89x90, 89x70, 89x70).",
+            "result": "PASS",
+            "note": "MediaBox measured 89.0x70.0, 180.0x110.0, 89.0x90.0, 89.0x70.0, 89.0x70.0 mm."
+          },
+          {
+            "text": "pdffonts reports embedded TrueType only and no Type 3 rows for every PDF.",
+            "result": "PASS",
+            "note": "Every row CID TrueType, emb yes; ArialMT and Arial-BoldMT (Arial resolved on Windows)."
+          },
+          {
+            "text": "All rendered text is within the stated 5-7 pt range.",
+            "result": "PASS",
+            "note": "Text artists across open figures are 6.0 and 7.0 pt only."
+          },
+          {
+            "text": "The multipanel, heatmap and seaborn scatter figures are legible and unclipped with correct tags, symmetric colorbar and class legend.",
+            "result": "PASS",
+            "note": "Rendered at 150 dpi and opened: tags a-f bold, vik colorbar symmetric, legend NS/Down/Up in grey/blue/orange."
+          },
+          {
+            "text": "volcano_so.pdf is interpretable without outside information.",
+            "result": "FAIL",
+            "note": "legend=False leaves three unlabelled colours; reader cannot tell Up from Down from NS (MPL-007)."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Every SKILL.md python block verbatim on the real airway DESeq2 table (18,238 genes) with rows reordered three ways",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All five blocks ran verbatim in Up-first, NS-first and shuffled order; colours bound by name every time.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All five SKILL.md python blocks execute verbatim without error or warning in each row order.",
+            "result": "PASS",
+            "note": "3 orders x 5 blocks clean; stand-ins x, y, data, panel_data supplied only for undefined names."
+          },
+          {
+            "text": "Every drawn seaborn point carries the colour of its own class.",
+            "result": "PASS",
+            "note": "18,238 facecolors compared to the dict palette per row: 0 mismatches in all three orders."
+          },
+          {
+            "text": "Legend text-to-colour mapping equals the dict palette in each order, for seaborn and seaborn.objects.",
+            "result": "PASS",
+            "note": "NS grey, Down #0072B2, Up #D55E00 in all orders."
+          },
+          {
+            "text": "scatter.pdf is 89 x 70 mm.",
+            "result": "PASS",
+            "note": "Measured 89.0 x 70.0 mm."
+          },
+          {
+            "text": "The Color block (batlow and symmetric RdBu_r with quantile vmax) renders without error.",
+            "result": "PASS",
+            "note": "Ran as block 4; cmcrameri imported."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "SKILL.md Saving block at 89 x 70 mm: PDF, PNG, TIFF, SVG, EPS",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Page and pixel sizes exact; SVG keeps text; EPS saves silently.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "figure.pdf is 89 x 70 mm.",
+            "result": "PASS",
+            "note": "89.0 x 70.0 mm."
+          },
+          {
+            "text": "PNG and TIFF are 1051 px wide (89 mm at 300 dpi) and the TIFF uses tiff_lzw.",
+            "result": "PASS",
+            "note": "1051x826 both; compression tiff_lzw."
+          },
+          {
+            "text": "SVG saved with svg.fonttype none contains <text> elements while the default SVG contains none.",
+            "result": "PASS",
+            "note": "14 <text> vs 0 in the control."
+          },
+          {
+            "text": "EPS saves without warning and keeps the stated page size.",
+            "result": "PASS",
+            "note": "No warnings; BoundingBox 253 x 199 pt (89 x 70 mm)."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "references/chart-recipes.md: all eleven snippets run verbatim onto a 180 x 110 mm figure",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ten of eleven snippets run clean; the Tick frequency snippet raises ValueError.",
+        "basic": 30,
+        "specialized": 47,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scatter, line, bar, boxplot, histogram, heatmap, log, ScalarFormatter, date and grid snippets run without error or warning on 3.11.2.",
+            "result": "PASS",
+            "note": "10 of 10 clean."
+          },
+          {
+            "text": "The Tick frequency snippet runs verbatim.",
+            "result": "FAIL",
+            "note": "set_xticks(np.arange(0, 10, 2)) sets 5 ticks then set_xticklabels gets 3 labels: ValueError (MPL-008)."
+          },
+          {
+            "text": "The stated boxplot labels= to tick_labels= rename is accurate on 3.11.2.",
+            "result": "PASS",
+            "note": "labels= raises TypeError; tick_labels= works."
+          },
+          {
+            "text": "The assembled recipe figure is exactly 180 x 110 mm with TrueType fonts.",
+            "result": "PASS",
+            "note": "180.0 x 110.0 mm; CID TrueType."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "references/failure-modes.md claims re-measured: rasterization, Type 3, bbox, large-N size, FacetGrid, layout engines",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Most claims reproduce; the layout-engine entry does not.",
+        "basic": 29,
+        "specialized": 48,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "ax.set_rasterization_zorder(1) rasterizes zorder<1 artists and fig.set_rasterization_zorder does not exist.",
+            "result": "PASS",
+            "note": "1 image object, 36 KB PDF; control without it has none; hasattr(fig) False."
+          },
+          {
+            "text": "Default pdf.fonttype=3 gives Type 3 and 42 gives TrueType by pdffonts.",
+            "result": "PASS",
+            "note": "type3.pdf Type 3; type42.pdf CID TrueType."
+          },
+          {
+            "text": "bbox_inches='tight' yields about 92 mm, and without it the page is exactly 89 mm.",
+            "result": "PASS",
+            "note": "91.96 x 72.96 mm vs 89.0 x 70.0 mm."
+          },
+          {
+            "text": "The large-N and FacetGrid claims reproduce (1.5 MB vs 24 KB; set_xlabel AttributeError).",
+            "result": "PASS",
+            "note": "1517 KB vs 24 KB at default savefig dpi without alpha (166.9 KB at dpi 300 with alpha 0.6, so the ratio is condition-dependent); AttributeError confirmed."
+          },
+          {
+            "text": "The tight_layout entry reproduces its symptom and its fix (fig.set_layout_engine('constrained') after creation) works with a colorbar.",
+            "result": "FAIL",
+            "note": "tight_layout with ax= colorbar shows no clipping or overlap; set_layout_engine after the colorbar raises ZeroDivisionError (MPL-009)."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 51.2,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Page sizes, font types, text sizes and colour-to-category binding verified on rendered output: exact mm, TrueType only, 0 colour mismatches in 18,238 airway points across three row orders.",
+    "Guardrails (no bbox_inches=tight, dict palettes with hue_order, set_rasterization_zorder on Axes, svg.fonttype none) are now correct and each reproduced by execution.",
+    "Single runnable script writes five figures at stated mm and runs clean on matplotlib 3.11.2, seaborn 0.13.2 with real-data blocks also verbatim-runnable.",
+    "Progressive disclosure is clean: short SKILL.md, failure modes and chart recipes in references, version-rename notes tested."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "MPL-007 seaborn.objects example ships with no colour key",
+      "observed_in": [
+        1
+      ],
+      "problem": "scripts/matplotlib_phd.py volcano_so.pdf sets legend=False, leaving Up, Down and NS as three unlabelled colours; the default legend does fall outside the 89 mm page (bbox 348-408 px on a 350 px page) for every layout engine tried.",
+      "root_cause": "The overflow was worked around by deleting the legend instead of repositioning it.",
+      "fix": "Keep the legend and move it on-page, e.g. .layout(size=..., extent=[0, 0, 0.78, 1]).plot(), then reposition fig.legends[0] (verified inside the page in scripts/r2_so_legend.py), or state that a caption must name the colours."
+    },
+    {
+      "priority": "P2",
+      "title": "MPL-008 Tick frequency recipe raises ValueError",
+      "observed_in": [
+        4
+      ],
+      "problem": "references/chart-recipes.md sets five ticks with np.arange(0, 10, 2) and then three labels, which raises ValueError on matplotlib 3.11.2; the snippet also uses np without an import.",
+      "root_cause": "The recipe was written as an illustration and never executed.",
+      "fix": "Use equal counts, e.g. ax.set_xticks(np.arange(0, 6, 2)) with three labels, and add import numpy as np to the block."
+    },
+    {
+      "priority": "P2",
+      "title": "MPL-009 tight_layout failure mode not reproduced; fix crashes",
+      "observed_in": [
+        5
+      ],
+      "problem": "failure-modes.md says tight_layout clips labels and overlaps a colorbar added with ax=; in 3.11.2 it does neither. Its alternative fig.set_layout_engine('constrained') after creation raises ZeroDivisionError when a colorbar already exists.",
+      "root_cause": "The entry restates a historic tight_layout limitation and an untested alternative.",
+      "fix": "Reword the trigger to axes added with fig.add_axes, and change the alternative to set the engine before adding colorbars or pass layout='constrained' to plt.subplots only."
+    }
+  ]
+}

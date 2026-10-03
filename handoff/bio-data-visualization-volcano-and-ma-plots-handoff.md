@@ -1,56 +1,47 @@
-# Handoff: bio-data-visualization-volcano-and-ma-plots / reaudit-scientific-skill
+# Handoff: bio-data-visualization-volcano-and-ma-plots / orchestrator
 
-- Updated: 2026-10-03
+- Updated: 2026-10-03T19:00:00-07:00
 - Lane: 1
-- Status: ready-for-phase
-- Owner leaving: fix-scientific-skill worker (lane 1c)
-- Next role: reaudit-scientific-skill
+- Status: candidate-ready
+- Owner leaving: reaudit-scientific-skill worker (lane 1 re-audit, fresh auditor)
+- Next role: orchestrator (commit to shelf; optional text fixes for VOL-009/VOL-010 first, which would require a new re-audit or delta pass)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:data-visualization/volcano-and-ma-plots
 - Working tree: F:\OpenScience\wt\normalize-dv-lane1\skills\bio-data-visualization-volcano-and-ma-plots
-- Branch/worktree: normalize/dv-lane1 @ 29f5446 (Skill dir untracked by design)
-- Candidate tree hash: sha256-manifest-v1 fa3ec8783a79b7c7a36fcf2d941d4fcc1aca6ab2ec3a8925e72fe6fa3a9af008 (files=7, bytes=37956); skill_preflight --offline and full PASS (warn: no Skill-root LICENSE, intentional)
-- Previous identity: b94e14b191a0a1f2c6138fe10108d39b44b52efd299c47ae5a850e4e425ccb76 (files=7, bytes=33343)
-- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-data-visualization-volcano-and-ma-plots\candidate@b94e14b191a0-initial-dv1-20261003\report.json (Beta Only, 70)
+- Branch/worktree: normalize/dv-lane1 @ 29f5446 (Skill dir untracked by design; no product commit)
+- Candidate tree hash: sha256-manifest-v1 fa3ec8783a79b7c7a36fcf2d941d4fcc1aca6ab2ec3a8925e72fe6fa3a9af008 (files=7, bytes=37956); preflight PASS at start and end, bytes unchanged
+- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-data-visualization-volcano-and-ma-plots\candidate@fa3ec8783a79-reaudit-dv1-20261003\ (run dir F:\OpenScience\audits\bio-data-visualization-volcano-and-ma-plots\reaudit-dv1-20261003)
 
-## Completed this phase
+## Re-audit result
 
-- All eight findings fixed and executed on the airway dds; figures opened. Fix log: F:\OpenScience\audits\bio-data-visualization-volcano-and-ma-plots\fix-dv1-20261003\fix-log.md
-- Changed: SKILL.md, usage-guide.md, references\failure-modes.md, references\reconciliation-thresholds-pushback.md, scripts\volcano_phd.R, scripts\volcano_plot.R (ma_plot.py unchanged)
-- Evidence: fix-dv1-20261003\logs\ (f1 scripts run, f3 API facts, f5/f6 sanbomics, f7/f8 raster sizes) and \out\ (figures)
+- Decision: candidate-ready. Final 87 (Production Ready), static 87, execution avg 86.8, L1 34.2, L2 52.6, assertions 22/24 = 91.7 percent, no veto, no P0.
+- Prior VOL-001..008: all resolved, independently reproduced on the real airway dds (817/817 significant plotted with and without y_cap; line = colour boundary in -log10(padj); EnhancedVolcano Up/Down differ; svalue/sanbomics/selectLab/apeglm-vs-ashr statements hold).
+- Failed/blocked surfaces: none blocked; edgeR glmTreat paragraph and usage-guide static-only (prose). Heavy-optional: none.
 
-## Finding dispositions
+## Open findings (P2, non-blocking)
 
-| ID | Sev | State | Evidence (under fix-dv1-20261003) |
-|---|---|---|---|
-| VOL-001 | P1 | fixed | no cap by default; y_cap marks capped genes as triangles; 817/817 significant plotted (out\volcano_phd_view.png, volcano_plot_fn_cap.png) |
-| VOL-002 | P1 | fixed | y = -log10(padj); hline equals colour boundary (logs\f1.log PASS) |
-| VOL-003 | P2 | fixed | EnhancedVolcano colCustom Up/Down, ylab adjusted P (out\enhancedvolcano_fixed.png) |
-| VOL-004 | P2 | fixed | svalue=TRUE works for apeglm and ashr, drops padj; normal errors (logs\f3.log) |
-| VOL-005 | P2 | fixed | sanbomics.plots.volcano verified (logs\f5.log, f6.log) |
-| VOL-006 | P2 | fixed | selectLab threshold claim removed; absent names ignored (logs\f3.log) |
-| VOL-007 | P2 | fixed | stated observed: apeglm raised 108 genes, ashr none (logs\f3.log) |
-| VOL-008 | P2 | fixed | 5MB+/crash claims removed, measured sizes (logs\f7.log, f8.log) |
-
-New small defects fixed inline: zero-length repel segments drew dark blobs over labelled points (min.segment.length 0.3); padj=NA drop reported; missing label genes warn.
+| ID | Evidence | Required disposition |
+|---|---|---|
+| VOL-009 | scripts\logs\r2b_cap50.log, r3_stats_claims.log, r5_ma_python.log | stale numbers: 49 hidden genes is 39 (failure-modes.md, reconciliation-thresholds-pushback.md); median 0.77 is 0.7648; volcano_phd.R save comment (29,391 points, ~1 MB) should read 17,994 points, 0.56/0.69 MB; MA 23/444 KB belongs to 29,391 rows, not 17,994. Text-only |
+| VOL-010 | scripts\figures\vol_cap30_labels_overlap.png | volcano_plot(res, y_cap=30) with default top_n labels overprints the capped labels at y=30; usage-guide recommends this cap. Document label_genes below the cap or spread labels (small script change) |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS-bio-data-visualization-volcano-and-ma-plots.md ; fingerprint sha256 8923551f7fdd6c7e0d23acaa651c76b899b97a6c94500f4e0fe61dd1fd81f721
-- Rerun: `bash F:/OpenScience/audit-envs/data-visualization/r.sh scripts/f1.R <skilldir> <outdir>` from F:\OpenScience\audits\bio-data-visualization-volcano-and-ma-plots\fix-dv1-20261003
+- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS-bio-data-visualization-volcano-and-ma-plots.md (fingerprint 8923551f7fdd6c7e0d23acaa651c76b899b97a6c94500f4e0fe61dd1fd81f721, unchanged)
+- Rerun: `bash F:/OpenScience/audit-envs/data-visualization/r.sh <run>\scripts\r1_core.R <skilldir> <outdir>` (r2, r3, r4, r6 per headers); Python r5 needs PYTHONPATH=...\py-extra\sanbomics; pdfinfo/pdffonts via WSL scripts
 - Restricted-access items: none
-- Tooling impact: none (no new dependency/runtime/input; ggrastr 1.0.2 already staged, only an optional mention)
+- Tooling impact: none
 
 ## Worktree safety
 
-- Run-owned changes: the Skill dir above; fix-dv1-20261003 run dir; this handoff
-- Pre-existing/user-owned changes: records untracked test/validate.bats; shelf untracked .vscode/ (untouched); sibling Skill dirs untouched
+- Run-owned changes: run dir above; published record dir under audits\skills; regenerated audits INDEX/BACKLOG/STATUS (audits:index, audits:check clean)
+- Pre-existing/user-owned: records test/validate.bats, shelf .vscode/, sibling ggplot2 and matplotlib Skill dirs untouched
 - Records state: uncommitted
 - Product commits/pushes: none
 
 ## Transition assertion
 
 - Next-phase prerequisites met: yes
-- If no: n/a
+- Orchestrator: commit exact bytes (identity above) to make the Skill ready; any edit to resolve VOL-009/VOL-010 changes the identity and returns it to re-audit

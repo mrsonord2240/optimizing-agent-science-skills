@@ -1,0 +1,13 @@
+matplotlib 3.11.2
+tight                    89x40 mm: drew OK; clipped=False; warnings=[]
+tight                    89x70 mm: drew OK; clipped=False; warnings=[]
+at_creation              89x40 mm: drew OK; clipped=False; warnings=[]
+at_creation              89x70 mm: drew OK; clipped=False; warnings=[]
+engine_before_colorbar   89x40 mm: drew OK; clipped=False; warnings=[]
+engine_before_colorbar   89x70 mm: drew OK; clipped=False; warnings=[]
+engine_after_colorbar    89x40 mm: EXCEPTION ZeroDivisionError: float division by zero
+engine_after_colorbar    89x70 mm: EXCEPTION ZeroDivisionError: float division by zero
+savefig.dpi=figure rasterized=False: 1517 KB
+savefig.dpi=figure rasterized=True : 24 KB
+savefig.dpi=300    rasterized=False: 1517 KB
+savefig.dpi=300    rasterized=True : 66 KB
