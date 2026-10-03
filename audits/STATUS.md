@@ -110,7 +110,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | `bio-machine-learning-atlas-mapping` | Data Analysis | 84 | Limited Release | 0 / 1 / 1 | [viewer](skills/bio-machine-learning-atlas-mapping/candidate@ba864911e88a-reaudit-lane3b-20261003/viewer.md) |
 | `bio-machine-learning-biomarker-discovery` | Data Analysis | 81 | Beta Only | 0 / 1 / 5 | [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md) |
 | `bio-machine-learning-omics-classifiers` | Data Analysis | 77 | Beta Only | 0 / 4 / 2 | [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md) |
-| `bio-machine-learning-survival-analysis` | Data Analysis | 77 | Limited Release | 0 / 2 / 3 | [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md) |
+| `bio-machine-learning-survival-analysis` | Data Analysis | 86 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-machine-learning-survival-analysis/candidate@c60f873f52f6-reaudit-lane3b-20261003/viewer.md) |
 | `bio-splicing-quantification` | Data Analysis | 85 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-splicing-quantification/candidate@0c0354add99b-run-reaudit-1/viewer.md) |
 
 Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.

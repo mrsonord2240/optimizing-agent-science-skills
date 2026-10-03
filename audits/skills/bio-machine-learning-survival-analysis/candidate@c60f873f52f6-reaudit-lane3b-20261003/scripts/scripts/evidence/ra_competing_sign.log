@@ -1,0 +1,21 @@
+== unchanged bytes vs the audited (initial) identity
+  scripts/competing_risks_cif.py: current 3a315ddf91c31792 audited 3a315ddf91c31792 -> IDENTICAL
+  references/failure-modes.md: current 033956d160e6bb62 audited 033956d160e6bb62 -> IDENTICAL
+== hand table: (t,cause) (1,1)(2,2)(3,1)(4,0 censored)(5,2)
+  lifelines warnings on this (tie-free) table: none
+  t=1: hand CIF1 0.2000 lifelines AJ 0.2000 sksurv 0.2000 | hand CIF2 0.0000 sksurv 0.0000 | hand 1-KM 0.2000 lifelines 1-KM 0.2000
+  t=2: hand CIF1 0.2000 lifelines AJ 0.2000 sksurv 0.2000 | hand CIF2 0.2000 sksurv 0.2000 | hand 1-KM 0.2000 lifelines 1-KM 0.2000
+  t=3: hand CIF1 0.4000 lifelines AJ 0.4000 sksurv 0.4000 | hand CIF2 0.2000 sksurv 0.2000 | hand 1-KM 0.4667 lifelines 1-KM 0.4667
+  t=4: hand CIF1 0.4000 lifelines AJ 0.4000 sksurv 0.4000 | hand CIF2 0.2000 sksurv 0.2000 | hand 1-KM 0.4667 lifelines 1-KM 0.4667
+  t=5: hand CIF1 0.4000 lifelines AJ 0.4000 sksurv 0.4000 | hand CIF2 0.6000 sksurv 0.6000 | hand 1-KM 0.4667 lifelines 1-KM 0.4667
+  row0 (all causes) at t=5: 1.0 (= 0.4+0.6 = 1.0 expected)
+  PASS hand table: lifelines AJ == sksurv == hand; 1-KM >= CIF everywhere (strict at t=3: 0.4667 vs 0.4)
+== script data (seed 0, n=3000): lifelines AJ vs sksurv over a grid, and 1-KM >= CIF
+  max |lifelines - sksurv| over 40 horizons = 2.50e-16; 1-KM<CIF violations = 0; at t=3: AJ 0.2499 1-KM 0.5167
+== lifelines AJ tie warning
+  ties -> ['Tied event times were detected. The Aalen-Johansen estimator cannot handle tied event time']
+== attribute search: Fine-Gray / CIF-Brier names in lifelines / sksurv / pycox
+  module names containing fine/gray/subdist: none
+== lifelines concordance sign trap (GBSG2, held-out)
+  lifelines concordance_index(time, partial_hazard, event) = 0.3370; with -partial_hazard = 0.6630; wrong+right = 1.0000; sksurv concordance_index_censored(risk=partial hazard) = 0.6630
+  PASS: SKILL.md says negate for lifelines; sksurv takes risk directly (higher = higher risk)

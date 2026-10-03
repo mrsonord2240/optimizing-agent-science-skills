@@ -1,0 +1,4 @@
+Competing event (cause 2) is 63% of subjects
+1 - KM incidence of cause 1 at t=3.0 (WRONG): 0.517
+Aalen-Johansen CIF of cause 1 at t=3.0 (RIGHT): 0.250
+1 - KM overestimates incidence by 0.267 (it ignores competing risk)

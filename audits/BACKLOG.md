@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (46)
+## P1 (44)
 
 ### `bio-machine-learning-omics-classifiers` — OC-001: class_weight=balanced contradicts the Skill calibration stance
 
@@ -41,22 +41,6 @@ None open.
 - Problem: The calibration snippet uses method="isotonic" in a Skill aimed at tens-to-hundreds of samples. With 20 calibration samples (Golub) isotonic returns exactly 0 or 1 for every test sample and a test Brier of 0.000, while sigmoid gives 22 distinct probabilities and Brier 0.010. At 600 calibration samples both help (0.187 -> 0.166-0.168).
 - Root cause: Isotonic is a step function that needs roughly hundreds of calibration samples; the snippet gives no minimum n and no sigmoid default.
 - Fix: Default the snippet to method="sigmoid" for small n, give the isotonic minimum (state it conditionally), and warn that exact 0/1 outputs are a failure sign, not perfection.
-
-### `bio-machine-learning-survival-analysis` — SA-001 KM baseline IBS in cox_regression.py is miscomputed
-
-- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 2, 1
-- Problem: km_surv = np.mean(ttr[etr] > t) averages over event-only training subjects, dropping censored patients. The printed baseline IBS is 0.290 versus 0.236 from a true KM on the script's data (GBSG2 with the same formula: 0.263 vs 0.178), overstating the margin by which a model beats 'no covariates'. On a tiny table the formula gives 0.50 at t=1 where the hand KM is 0.80.
-- Root cause: Naive survival-fraction formula used instead of kaplan_meier_estimator.
-- Fix: Replace with kaplan_meier_estimator(y_tr['event'], y_tr['time']) evaluated at times, and add the same line to the SKILL.md IBS example. Changes runnable bytes (script) plus text.
-
-### `bio-machine-learning-survival-analysis` — SA-002 Coxnet snippet predicts at the least-penalized alpha
-
-- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 5, 2, 1
-- Problem: CoxnetSurvivalAnalysis(l1_ratio=0.9, alpha_min_ratio=0.01, fit_baseline_model=True) fits a 100-alpha path and predict() uses the smallest alpha. With n=150, p=1000 that kept 161 nonzero coefficients and gave held-out Uno C 0.708, against 0.790 (6 nonzero) for a CV-selected alpha. Nothing in the snippet or script selects alpha although the Skill demands tuning inside nested CV.
-- Root cause: The snippet and script never choose alpha (no CV, no alpha argument), so the path end point is used silently.
-- Fix: Select alpha by cross-validation (GridSearchCV over alphas or an explicit alpha argument) in the snippet and cox_regression.py, and state which alpha predict and predict_survival_function use. Changes runnable bytes (script) plus text.
 
 ### `bio-machine-learning-biomarker-discovery` — BD-001: Stability snippet is scale-dependent and not null-calibrated
 
@@ -378,7 +362,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (162)
+## P2 (160)
 
 ### `bio-machine-learning-omics-classifiers` — OC-005: XGBoost early stopping: val set reuse and degenerate at tiny n
 
@@ -395,30 +379,6 @@ None open.
 - Problem: logistic_regression.py promises that a batch-aware split exposes the artifact but never runs one; rf_xgboost_classifier.py prints fixed captions ("compressed toward 0.5", "pushed toward extremes"); the usage-guide tip states both as general rules while SKILL.md says the direction depends on the learner and loss.
 - Root cause: Narrative text written independently of the measured output and not reconciled with the later SKILL.md note.
 - Fix: Add a LeaveOneGroupOut result to logistic_regression.py (or trim the docstring); derive the probability-range captions from the numbers or word them conditionally; rewrite the usage-guide tip to match the SKILL.md note.
-
-### `bio-machine-learning-survival-analysis` — SA-003 Evaluation snippet is not copy-runnable
-
-- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 1
-- Problem: The evaluation block raises NameError on t_horizon; y_train, y_test, X_train, X_test are never built, and the fitting block creates y from the full df, which an agent may then use for training and testing.
-- Root cause: Snippets extracted from a script without their setup lines.
-- Fix: Add a split step defining X_train/X_test/y_train/y_test and t_horizon (for example the 90th percentile of training event times) and drop the full-data y. Text only.
-
-### `bio-machine-learning-survival-analysis` — SA-004 Competing-risks claims lack an implementation
-
-- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 3
-- Problem: The taxonomy says RSF handles competing risks ('Yes (per-cause CIF)'), but scikit-survival 0.28 has no CIF or competing-risks metric. Fine-Gray, cause-specific CIF Brier and Wolbers concordance have no named package or code. lifelines Aalen-Johansen warns about tied event times (jittered), which the Skill does not mention.
-- Root cause: Method properties were taken from R (randomForestSRC, cmprsk) while the Skill's primary tool is scikit-survival.
-- Fix: Qualify the RSF row as not available in scikit-survival, name the R or Python implementation for each recommended competing-risks step, and note tie handling. Text only.
-
-### `bio-machine-learning-survival-analysis` — SA-005 Prose-only methods unlabelled; dependency note imprecise
-
-- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: Fine-Gray, landmarking, calibration curves with ICI/E50/E90, nested-CV selection and the pycox DeepSurv/DeepHit models are described without code or a statement that they were not run. The version note says to isolate both scikit-survival and lifelines from a pandas 3 stack (only lifelines caps pandas; scikit-survival runs on pandas 3.0.6) and says the bundled scripts ran against pycox 0.3 (neither imports it).
-- Root cause: Compatibility note was written for the combined test environment.
-- Fix: Mark these methods 'described, not executed or bundled', attribute the pandas <3 cap to lifelines alone (competing_risks_cif.py only), and drop pycox from the scripts-tested list. Text only.
 
 ### `bio-machine-learning-biomarker-discovery` — BD-002: scoring/legacy-attribute choice unexplained; it sets signature size
 
@@ -691,6 +651,14 @@ None open.
 - Problem: 430 lines load SV/CNV/mtDNA catalogs and pushback tables for one-variant queries.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
+
+### `bio-machine-learning-survival-analysis` — Common Errors row misstates the time-grid limit
+
+- Skill: 86, Production Ready · candidate `c60f873f52f6` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@c60f873f52f6-reaudit-lane3b-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: The row says AUC/IBS times fail 'beyond largest uncensored test time'; sksurv accepts times up to the largest test time of any status and raises at or above it.
+- Root cause: The bound was paraphrased from the usual case where the last test subject is an event.
+- Fix: Reword the cause to 'at or beyond the largest test follow-up time (event or censored)' and keep the clip-to-follow-up solution. Text only.
 
 ### `bio-phylo-species-trees` — Add a leaf-name consistency check before ASTRAL
 

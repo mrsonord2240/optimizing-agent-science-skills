@@ -1,0 +1,17 @@
+fit_coxnet_cv signature: (X_train, y_train, l1_ratio=0.9, n_splits=5, seed=0)
+[GBSG2] fit/predict calls inside fit_coxnet_cv: 507; rows outside the training set: 0; test-only rows seen: 0
+   test permuted: alpha 0.396820 vs 0.396820; coef identical: True
+   test replaced by noise/random labels: alpha 0.396820 vs 0.396820; coef identical: True
+   test emptied to 5 rows: alpha 0.396820 vs 0.396820; coef identical: True
+   positive control (70% of train): alpha 0.399259 nonzero 4 vs 3
+GBSG2: (np.float64(0.3968202775431158), 3)
+[p>>n n=150 p=1000] fit/predict calls inside fit_coxnet_cv: 507; rows outside the training set: 0; test-only rows seen: 0
+   test permuted: alpha 0.182652 vs 0.182652; coef identical: True
+   test replaced by noise/random labels: alpha 0.182652 vs 0.182652; coef identical: True
+   test emptied to 5 rows: alpha 0.182652 vs 0.182652; coef identical: True
+   positive control (70% of train): alpha 0.253035 nonzero 3 vs 6
+p>>n: (np.float64(0.18265193972053645), 6)
+alpha=0.3968, nonzero coefficients: 3 of 9
+alpha=0.3968, nonzero coefficients: 3 of 9
+SKILL.md fit block: clean-test alpha 0.396820, corrupted-test alpha 0.396820, coef identical True
+PASS SA-002 by construction and test

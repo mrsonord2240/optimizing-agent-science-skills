@@ -1,0 +1,12 @@
+data=synthetic  n_train=420  n_test=180  p=40  censored in train=43%
+elastic-net Cox: CV-selected alpha=0.0736, 6 of 40 coefficients nonzero
+
+model                UnoC  meanAUC    IBS
+elastic-net Cox     0.803    0.858  0.129
+random forest       0.784    0.837  0.170
+
+Kaplan-Meier baseline IBS (no covariates): 0.215
+
+real	0m3.968s
+user	0m0.015s
+sys	0m0.030s

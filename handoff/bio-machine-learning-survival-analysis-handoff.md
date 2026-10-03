@@ -1,45 +1,43 @@
-# Handoff: bio-machine-learning-survival-analysis / prepare-scientific-skill-tooling (delta)
+# Handoff: bio-machine-learning-survival-analysis / orchestrator commit and intake
 
 - Updated: 2026-10-03
 - Lane: 3 (batch 3b-2)
-- Status: ready-for-phase
-- Owner leaving: prepare-scientific-skill-tooling worker (delta, lane 3b-2)
-- Next role: reaudit-scientific-skill (full mode: runnable bytes changed)
+- Status: candidate-ready
+- Owner leaving: reaudit-scientific-skill worker (final mode, independent)
+- Next role: orchestrator (commit the exact bytes, then local Marketplace intake). SA-006 is an optional text-only fix; if applied the identity changes and needs delta mode.
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/survival-analysis
-- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis (untracked by design; no product commit)
-- Candidate tree hash: c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39 (files=5, bytes=33891); `tools/skill_preflight.py --offline` PASS before and after this phase; Skill bytes untouched, no __pycache__
-- Previous audit (2dc45fa24b13...) is stale for these bytes; no usable exact audit exists
+- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis (untracked by design; branch normalize/ml-lane3 off 29f5446)
+- Candidate tree hash: c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39 (files=5, bytes=33891); `tools/skill_preflight.py --offline` PASS before and after; no Skill bytes touched, no __pycache__
+- Applicable audit: audits\skills\bio-machine-learning-survival-analysis\candidate@c60f873f52f6-reaudit-lane3b-20261003 (supersedes the initial 2dc45fa24b13 record)
 
 ## Completed this phase
 
-- TOOLS.md refreshed in place (delta mode): F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md, sha256 4a6085401794e7b5f4dea829cdcca688faa191caa3340ae3d5c2aa136ada4c1b
-- cox_regression.py both modes light: synthetic 6.5 s, gbsg2 6.4 s, 0 stderr; fit_coxnet_cv at p>>n 3.3 s (the earlier >15 min approach is gone)
-- p>>n (n=150, p=1000) reproduced from staging: default path-end 161 nonzero / Uno C 0.708; CV alpha 0.1827, 6 nonzero / 0.791
-- SKILL.md snippets exec unmodified, 5.8 s; sksurv `cumulative_incidence_competing_risks` == lifelines AJ (0.2499), 4.2 s
-- Staged: audit-envs\cheminformatics-hit-triage-analyst\derived\survival-pgtn\ (make_pgtn.py, run_pgtn.py, time_runs.py, pgtn.npz); indexed in audit-envs\INDEX.md (machine-learning row) and the root TOOLS.md addendum
+- Verdict: candidate-ready. Final 86 (Production Ready), static 87, execution average 85.4 (Layer 1 34.6/40, Layer 2 50.8/60), assertions 23/24; skill and research veto PASS; no open P0 or P1.
+- SA-001..SA-005 all resolved by independent retest: KM baseline equals hand table, a numpy KM and lifelines; GBSG2 IBS 0.1775 vs an independent numpy Graf IBS 0.1775 (old 0.2627). Alpha selection verified train-only by data-flow spy and test-set permutation (alpha 0.3968 GBSG2, 0.1827 p>>n unchanged); p>>n 161 nonzero / Uno C 0.708 -> 6 / 0.791.
+- Both SKILL.md python blocks run verbatim; sksurv cumulative_incidence_competing_risks == lifelines AJ == hand table; competing_risks_cif.py and failure-modes.md hash-identical to the audited bytes; lifelines sign trap 0.337 / 0.663.
+- Record published and views regenerated; `npm run audits:check` passes.
 
-## Required next actions
+## Open findings
 
-1. Fresh auditor re-audits the new identity using TOOLS.md. p>>n rerun: `<survival-venv python> derived\survival-pgtn\run_pgtn.py <Skill>\scripts` (pgtn.npz already built; `make_pgtn.py` rebuilds it).
-2. Not executed, Skill must keep them labelled: Fine-Gray (cmprsk), CIF-based Brier (riskRegression), randomForestSRC, landmarking. pycox smoke-tested only (30 epochs CPU), not rerun.
+| ID | Severity | State | Evidence | Required disposition |
+|---|---|---|---|---|
+| SA-006 | P2 | open, new | viewer.md input 4; evidence/ra_times_range.log | Reword Common Errors row: times fail at or beyond the largest test follow-up time (event or censored), not "beyond largest uncensored test time". Text only, optional |
 
 ## Environment and evidence
 
-- Environment fingerprint UNCHANGED: 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6 (fingerprint-inputs and both freezes re-hashed identical); no package change
-- Logs: F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3\logs\ (cox_delta_synthetic/gbsg2, cox_delta_timing, pgtn_make, pgtn_run, snippets_delta, competing_delta)
-- Fix evidence: F:\OpenScience\audits\bio-machine-learning-survival-analysis\fix-lane3b-20261003\
+- Tool inventory: F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md (sha256 4a6085401794...); environment fingerprint 20291632e93a... and both freezes re-hashed identical
+- Run evidence: F:\OpenScience\audits\bio-machine-learning-survival-analysis\reaudit-lane3b-20261003\ (scripts/ra_*.py, scripts/evidence/*.log)
+- Not executed, labelled in the Skill: Fine-Gray (cmprsk), CIF Brier (riskRegression), randomForestSRC, landmarking, calibration curves, nested CV, boosting, SVM, Cox-Time. pycox smoke rerun only (0.615 / 0.620), DeepHit competing-risk mode not run. Harrell-vs-Uno evidence reused from the initial audit.
+- Tooling note: TOOLS.md still quotes the old survival_real.py lifelines figures 0.308/0.692; measured 0.337/0.663 (cosmetic).
 - Blockers, restricted access: none
-- Tooling impact: delta complete
 
 ## Worktree safety
 
-- Run-owned changes: TOOLS.md, derived\survival-pgtn\, INDEX.md and root TOOLS.md rows, smoke logs, this handoff
-- Pre-existing/user-owned untouched: records test/validate.bats, shelf .vscode/, sibling Skill dirs
-- No process killed. Prior fixer incident (three unidentified python.exe PIDs force-killed) stands as recorded
-- Product commits/pushes: none
+- Run-owned: reaudit-lane3b-20261003\ run dir, the new record dir, regenerated audits\INDEX.md, BACKLOG.md, STATUS.md, STATUS.html, this handoff
+- Untouched: records test/validate.bats, shelf .vscode/, sibling Skill dirs; no process killed; no commit or push
 
 ## Transition assertion
 

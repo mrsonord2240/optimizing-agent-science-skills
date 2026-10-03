@@ -1,0 +1,15 @@
+== Part 1: hand table (time,event): (1,1)(2,0)(3,1)(4,0)(5,0)
+  t=0.5: hand 1.000000 numpy-KM 1.000000 Skill km_baseline_surv 1.000000 naive np.mean(t[e]>t) 1.0000
+  t=1: hand 0.800000 numpy-KM 0.800000 Skill km_baseline_surv 0.800000 naive np.mean(t[e]>t) 0.5000
+  t=2: hand 0.800000 numpy-KM 0.800000 Skill km_baseline_surv 0.800000 naive np.mean(t[e]>t) 0.5000
+  t=3: hand 0.533333 numpy-KM 0.533333 Skill km_baseline_surv 0.533333 naive np.mean(t[e]>t) 0.0000
+  t=4: hand 0.533333 numpy-KM 0.533333 Skill km_baseline_surv 0.533333 naive np.mean(t[e]>t) 0.0000
+  t=5: hand 0.533333 numpy-KM 0.533333 Skill km_baseline_surv 0.533333 naive np.mean(t[e]>t) 0.0000
+  PASS hand table
+== GBSG2: n_train=480 n_test=206 censored train=56%
+  max|S_skill - S_numpyKM| = 0.00e+00; max|S_skill - S_lifelinesKM| = 1.55e-15
+  IBS: Skill-KM(sksurv metric) 0.1775 | own numpy IBS on own KM 0.1775 | lifelines KM 0.1775 | naive event-only (old defect) 0.2627
+== synthetic: n_train=420 n_test=180 censored train=43%
+  max|S_skill - S_numpyKM| = 0.00e+00; max|S_skill - S_lifelinesKM| = 8.88e-16
+  IBS: Skill-KM(sksurv metric) 0.2148 | own numpy IBS on own KM 0.2148 | lifelines KM 0.2148 | naive event-only (old defect) 0.2576
+  PASS SA-001: baseline censoring-aware; matches independent KM and independent IBS

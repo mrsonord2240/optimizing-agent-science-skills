@@ -1,0 +1,5 @@
+test max time all 2556 (event=False), largest uncensored 2093, train max 2659
+AUC just below largest uncensored (t=2092): 0.738
+AUC between largest uncensored and max test time (t=2324): 0.742
+AUC at max test time (t=2556): ERROR ValueError: all times must be within follow-up time of test data: [8.0; 2556.0[
+AUC above max test time (t=2566): ERROR ValueError: all times must be within follow-up time of test data: [8.0; 2556.0[
