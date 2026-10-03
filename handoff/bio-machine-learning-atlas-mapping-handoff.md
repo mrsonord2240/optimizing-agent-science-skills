@@ -1,56 +1,58 @@
-# Handoff: bio-machine-learning-atlas-mapping / audit-scientific-skill
+# Handoff: bio-machine-learning-atlas-mapping / fix-scientific-skill
 
-- Updated: 2026-10-03T12:30:00-04:00
-- Lane: 3
+- Updated: 2026-10-03T14:15:00-04:00
+- Lane: 3 (batch 3b)
 - Status: ready-for-phase
-- Owner leaving: tooling worker (lane 3, machine-learning batch)
-- Next role: audit-scientific-skill
+- Owner leaving: initial-audit worker (lane 3b)
+- Next role: fix-scientific-skill
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/atlas-mapping
 - Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-atlas-mapping
 - Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dirs untracked by design)
-- Candidate tree hash: d4048dcc887b51c820dba4669bf05620829970e083f7512d24a2539953ad48a6 (files=5, bytes=30516), re-verified with `tools/skill_preflight.py --offline` after tooling (PASS)
-- Applicable audit: none
+- Candidate tree hash: d4048dcc887b51c820dba4669bf05620829970e083f7512d24a2539953ad48a6 (files=5, bytes=30516), re-verified with `tools/skill_preflight.py --offline` after the audit (PASS, no pycache)
+- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-machine-learning-atlas-mapping\candidate@d4048dcc887b-initial-lane3b-20261003\report.json (identity above; score 77, Limited Release, no veto)
 
 ## Completed this phase
 
-- Both scripts and the saved-model-path snippets run on CPU in the single-cell venv (scvi-tools 1.5.1); `scarches_annotation.py` ran unmodified end to end in 1m29s (not heavy: no GPU, under 2 min).
-- Built a small real reference/query pair (PBMC 1k v3 with CellTypist silver labels vs PBMC3k v1): accuracy 0.975 against the PBMC3k annotation, 1.6% flagged Unknown.
-- Added PBMC3k raw/processed to ML public-data and the derived pair under derived\atlas-pair (README rows, script `make_atlas_pair.py`).
-
-## Coverage map (per surface)
-
-- `scripts/scarches_annotation.py`: executed unmodified (`logs/atlas_scarches_asis.log`, `atlas_scarches_score.log`).
-- `scripts/ood_gating_demo.py`: executed (synthetic).
-- SKILL.md snippets 1-3 (saved-model surgery, scANVI save, `predict(soft=True)`, kNN gate): executed (`logs/atlas_saved_model_surgery.log`).
-- Symphony/Azimuth (prose only, R) not exercised; scPoli/popV/treeArches/scGPT/Geneformer heavy-optional (not tooled): Skill must label them not executed.
+- Static review plus 5 executed inputs on CPU: scarches_annotation.py unmodified x2 (acc 0.965/0.967), saved-model snippets, ood_gating_demo.py, held-out B cells, held-out Monocytes.
+- Held-out Monocytes: only 2.7% gated, 95.4% confidently labelled DC; held-out B cells 87.4% gated (AM-001).
+- `predict(soft=True)` reproduces as a DataFrame (2638 x 8) (AM-003).
+- Published record with 15 scripts/evidence files; views regenerated, `npm run audits:check` passes.
+- No audit-local repair; no Skill bytes changed.
 
 ## Required next actions
 
-1. Audit batching: **light** (every required surface runs on CPU in under 2 minutes; inputs under 30 MB).
-2. Audit against the exact identity above; run from saved scripts in F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3 (logs in its `logs` folder).
-3. Do not edit Skill bytes in the audit; findings go to the ledger. Needed-but-missing inputs: request a tooling-delta pass.
+1. Fix AM-001 (P1, runnable bytes + text): scope the gate claim; add a held-out-type spike-in check; relabel the demo's "softmax" as kNN probability.
+2. Fix AM-005 (runnable bytes): seed `scvi.settings.seed`, write the annotated query h5ad in scarches_annotation.py.
+3. Fix AM-002, AM-003, AM-004 (text only): label prose-only/heavy methods not executed; document predict(soft=True) as DataFrame; make snippets self-contained and document h5ad input fields.
+4. Report tooling impact: AM-001/AM-005 change scripts, so request a tooling delta (rerun the held-out harness).
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| none | - | - | - | Notes for audit: `predict(soft=True)` returned a DataFrame (2638 x 8), not an ndarray as the normalizer noted; check SKILL.md wording. Reference labels are CellTypist silver labels, not curated. |
+| AM-001 | P1 | open | audits\skills\...\scripts\evidence\heldout_Monocytes.json, heldout_B_cells.json | scope claim, add spike-in check script (runnable bytes) |
+| AM-002 | P2 | open | report.json (static) | text only |
+| AM-003 | P2 | open | scripts\evidence\saved_model_surgery.log | text only |
+| AM-004 | P2 | open | scripts\evidence\saved_model_surgery.log | text only (docstring/comment) |
+| AM-005 | P2 | open | scripts\evidence\canonical_a.json vs canonical_b.json | runnable bytes |
+
+Deferred (static-only): Symphony, Azimuth (prose, R); heavy-optional (not tooled): scPoli, popV, treeArches/scHPL, scGPT/Geneformer. Blocked: none.
 
 ## Environment and evidence
 
 - Tool inventory: F:\OpenScience\audits\bio-machine-learning-atlas-mapping\TOOLS.md (sha256 2004cafd57d3d4dcbc1bf03b9c312ccdb1f61d222ee7b64d94c8442b6e1f8c96)
-- Environment fingerprint: sha256 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6 of F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3\fingerprint-inputs.txt (hashes of four pip freezes); ecosystem root F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst (INDEX row `machine-learning`), addendum in its TOOLS.md and `public-data\README.md`
-- Run evidence: F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3\logs\
+- Environment fingerprint: sha256 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6; runtime single-cell-transcriptomics-analyst venv (scvi-tools 1.5.1, CPU)
+- Run evidence: F:\OpenScience\audits\bio-machine-learning-atlas-mapping\initial-lane3b-20261003\ (report.json, viewer.md, finding-ledger.md, scripts\, logs\, work\)
 - Restricted-access items: none
-- Tooling impact: none (no Skill bytes changed; staging additions only: PBMC3k + derived atlas pair)
+- Tooling impact: not applicable to this phase (no Skill bytes changed); fixes for AM-001/AM-005 will change runnable bytes
 
 ## Worktree safety
 
-- Run-owned changes: staging under F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst (smoke\ml-lane3, derived, public-data, tools\pycox-venv, freeze, TOOLS.md, INDEX.md); records `audits/skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-tooling-20261003/TOOLS.md`; this handoff
-- Pre-existing/user-owned changes: records untracked `test/validate.bats`; shelf untracked `.vscode/`; other workers' handoffs; none touched
+- Run-owned changes: the run directory above; records `audits/skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/`; regenerated audits/INDEX.md, BACKLOG.md, STATUS.md, STATUS.html; this handoff
+- Pre-existing/user-owned changes: records untracked `test/validate.bats`; shelf untracked `.vscode/`; sibling workers' records and handoffs; none touched
 - Records state: uncommitted paths above
 - Product commits/pushes: none
 

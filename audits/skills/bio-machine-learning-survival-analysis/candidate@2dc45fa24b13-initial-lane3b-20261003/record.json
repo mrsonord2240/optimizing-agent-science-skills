@@ -1,0 +1,73 @@
+{
+  "skill_id": "bio-machine-learning-survival-analysis",
+  "version": "candidate@2dc45fa24b13-initial-lane3b-20261003",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/survival-analysis",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis",
+    "subtree": "14de0450cb651dfaf9ee1706bd758889e244187d"
+  },
+  "candidate": {
+    "identity": "2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-survival-analysis",
+    "files": [
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 1989,
+        "sha256": "033956d160e6bb622c13dba97128d7800f60c02af624907df6d256c4e830536e"
+      },
+      {
+        "path": "scripts/competing_risks_cif.py",
+        "bytes": 1704,
+        "sha256": "3a315ddf91c31792b7a4a146ed6e282255327844fad774db672963b28bc49f89"
+      },
+      {
+        "path": "scripts/cox_regression.py",
+        "bytes": 2658,
+        "sha256": "196397a5c34f83af1f1d9ee07b0030fcdcd99acb0a62bfd44e23502e620c98dd"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 17221,
+        "sha256": "f4ea1aa30ffef0548dca14e0fd646dad76bad528ecc7c3e3ad203c25d6838b20"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 4351,
+        "sha256": "a921a67ed1e6e0e0c5f7eb86523798a3e834fcef9c937efa704434f32a2635e7"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 20
+  }
+}

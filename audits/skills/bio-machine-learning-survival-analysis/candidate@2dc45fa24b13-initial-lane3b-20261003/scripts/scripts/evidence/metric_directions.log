@@ -1,0 +1,4 @@
+lifelines C on HELD-OUT: +ph 0.337  -ph 0.663
+sksurv Harrell C (risk=ph): 0.663  (risk=-ph): 0.337
+sksurv Uno C (risk=ph): 0.647  (risk=-ph): 0.353
+heavy administrative censoring of test set (cut 836 d, events 57/206): Harrell 0.687  Uno(tau=835) 0.683

@@ -1,0 +1,60 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/survival-analysis",
+    "subtree": "14de0450cb651dfaf9ee1706bd758889e244187d",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-survival-analysis",
+    "content_sha256": "2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-machine-learning-atlas-mapping/; ?? skills/bio-machine-learning-biomarker-discovery/; ?? skills/bio-machine-learning-omics-classifiers/; ?? skills/bio-machine-learning-survival-analysis/",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 27923
+    }
+  },
+  "files": [
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 1989,
+      "sha256": "033956d160e6bb622c13dba97128d7800f60c02af624907df6d256c4e830536e"
+    },
+    {
+      "path": "scripts/competing_risks_cif.py",
+      "bytes": 1704,
+      "sha256": "3a315ddf91c31792b7a4a146ed6e282255327844fad774db672963b28bc49f89"
+    },
+    {
+      "path": "scripts/cox_regression.py",
+      "bytes": 2658,
+      "sha256": "196397a5c34f83af1f1d9ee07b0030fcdcd99acb0a62bfd44e23502e620c98dd"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 17221,
+      "sha256": "f4ea1aa30ffef0548dca14e0fd646dad76bad528ecc7c3e3ad203c25d6838b20"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4351,
+      "sha256": "a921a67ed1e6e0e0c5f7eb86523798a3e834fcef9c937efa704434f32a2635e7"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ],
+    "tools_md_sha256": "f74308bb8b2fd623cc27e8529cd61ce9f7a8045cbf5844f119e963cf63453e63",
+    "tools_md_path": "F:\\OpenScience\\audits\\bio-machine-learning-survival-analysis\\TOOLS.md",
+    "environment_fingerprint_sha256": "20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6",
+    "environment": "Native Windows venvs under F:\\OpenScience\\audit-envs\\cheminformatics-hit-triage-analyst\\tools: survival-venv (scikit-survival 0.28.0, lifelines 0.30.3, scikit-learn 1.9.1, numpy 2.5.3, pandas 2.3.3) and pycox-venv (pycox 0.3.0, torch 2.14.1 CPU, scikit-survival 0.28.0, pandas 3.0.6); data: GBSG2 bundled in scikit-survival (686 patients), synthetic",
+    "audit_local_repair": "none; no Skill bytes changed"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

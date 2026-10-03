@@ -1,0 +1,73 @@
+{
+  "skill_id": "bio-machine-learning-atlas-mapping",
+  "version": "candidate@d4048dcc887b-initial-lane3b-20261003",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/atlas-mapping",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping",
+    "subtree": "9f657dd85ae1791817b7ec962c3da32f24228b1d"
+  },
+  "candidate": {
+    "identity": "d4048dcc887b51c820dba4669bf05620829970e083f7512d24a2539953ad48a6",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "d4048dcc887b51c820dba4669bf05620829970e083f7512d24a2539953ad48a6",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-atlas-mapping",
+    "files": [
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 5965,
+        "sha256": "4fd59ee9f4f13413f992f9215e2531e87604c660d56905fd2f7ba80ebfc2a0cd"
+      },
+      {
+        "path": "scripts/ood_gating_demo.py",
+        "bytes": 2507,
+        "sha256": "c7d73eaf127436779468483bbd9092e4adeb9e7f19a758fbfda4a240a14ec99d"
+      },
+      {
+        "path": "scripts/scarches_annotation.py",
+        "bytes": 2265,
+        "sha256": "7f4b719de7221f3a91439e7e88c19301ab39e3fd84a532da750563025c5b3b72"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 15621,
+        "sha256": "c64c4cf85b56a5961ab6fda4e061e59834a04ed6fb48f185546faf50f2c8f42a"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 4158,
+        "sha256": "eea956c1b7b8c983cfabc7d8c4eb307e0602ce58b52c834fda4c4a5f66a8964d"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 15
+  }
+}

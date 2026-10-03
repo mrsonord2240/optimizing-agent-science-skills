@@ -1,0 +1,12 @@
+{
+ "tag": "b",
+ "acc_all": 0.9666413949962093,
+ "unknown_pct": 0.01288855193328279,
+ "acc_non_unknown": 0.9792626728110599,
+ "mean_unc_correct": 0.002453408282756646,
+ "mean_unc_wrong": 0.1441313624399825,
+ "outputs_written_by_script": [
+  "query.h5ad",
+  "reference_labeled.h5ad"
+ ]
+}

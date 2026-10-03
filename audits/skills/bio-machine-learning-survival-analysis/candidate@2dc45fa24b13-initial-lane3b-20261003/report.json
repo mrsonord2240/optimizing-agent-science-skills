@@ -1,0 +1,358 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-survival-analysis",
+    "description": "Builds and validates predictive time-to-event models on clinical and omics data with penalized Cox, random survival forests, gradient-boosted and deep survival models, and prediction-grade evaluation (Uno's C, time-dependent AUC, integrated Brier, calibration, competing risks).",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values or citations; the documented traps (lifelines C as 1-C, 1-KM versus Aalen-Johansen, Harrell versus Uno under censoring) reproduce against hand-computed and simulated truth."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Prediction-modelling guidance with TRIPOD+AI and external-validation requirements; no diagnostic or prescriptive medical conclusions."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The shipped Kaplan-Meier baseline IBS is miscomputed (SA-001) and the default Coxnet prediction uses the least-penalized alpha (SA-002); both are P1 defects that overstate benefit but do not invert a conclusion: the models still beat the true KM baseline on GBSG2 (IBS 0.161 vs 0.178) and on the synthetic data (0.159 vs 0.236)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Both scripts ran warning-free on CPU in seconds; the evaluation snippet needs t_horizon and y_train/y_test supplied (SA-003), which is a documentation gap rather than unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Prediction-versus-inference scope is well drawn and the metrics are used with correct direction; the KM baseline in the shipped script is wrong, the Coxnet default silently under-penalizes, and the RSF competing-risks claim does not hold for scikit-survival."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Scripts have no input or time-range guards (times must lie inside test follow-up) and the evaluation snippet fails with NameError as written; the Common Errors table covers the main sksurv traps."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is 185 lines with failure modes in a reference file; the model taxonomy table is dense; both scripts run in seconds."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Strong error prevention (C-index-only warning, IPCW training-y order, bool event) with accurate sign-trap guidance; code blocks rely on undefined names and mix full-data and split targets."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Description and usage-guide prompts match how users phrase prognostic-model requests; the boundary with clinical-biostatistics/survival-analysis is explicit."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network access or shell execution; synthetic data only in scripts."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Clean split into SKILL.md, failure-modes reference and two small scripts; metric logic is duplicated between snippet and script, which is how the baseline bug diverged from sksurv's own KM."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise description with sibling-Skill hand-offs, good progressive disclosure, seeded scripts; many recommended methods (Fine-Gray, landmarking, calibration curves, nested CV) are prose only and not labelled as not executed."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 17,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "SKILL.md fit and evaluation blocks run verbatim on GBSG2 (686 patients), stratified held-out split",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fitting block ran; evaluation block fails as written (t_horizon undefined) and, once supplied, gives held-out Uno C 0.668, mean AUC(t) 0.728, IBS 0.161 against proper KM-only IBS 0.178; RSF Uno C 0.688.",
+        "basic": 32,
+        "specialized": 44,
+        "total": 76,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Fitting block (Surv.from_arrays, Coxnet with baseline, RSF) runs on real data",
+            "result": "PASS",
+            "note": "ran on 480 training patients"
+          },
+          {
+            "text": "Evaluation block copy-runs as written once the split exists",
+            "result": "FAIL",
+            "note": "NameError: t_horizon is undefined; y_train/y_test are also not built by any block"
+          },
+          {
+            "text": "Held-out Uno C is in a plausible range for GBSG2",
+            "result": "PASS",
+            "note": "0.668 Coxnet, 0.688 RSF"
+          },
+          {
+            "text": "Model IBS beats the proper Kaplan-Meier-only IBS on held-out data",
+            "result": "PASS",
+            "note": "0.161 vs 0.178 from kaplan_meier_estimator"
+          },
+          {
+            "text": "IPCW metrics receive the training y first and are evaluated on the held-out set",
+            "result": "PASS",
+            "note": "concordance_index_ipcw(y_train, y_test, ...) on the 30% test split"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "scripts/cox_regression.py (synthetic, Coxnet vs RSF, Uno C, AUC(t), IBS vs KM baseline)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs warning-free in seconds with held-out split: Coxnet Uno C 0.775 / IBS 0.159, RSF 0.756 / 0.193. The printed KM baseline IBS 0.290 is wrong: the script averages (time > t) over event-only subjects; hand-checked KM and sksurv KM give IBS 0.236 (GBSG2: 0.263 vs 0.178).",
+        "basic": 28,
+        "specialized": 40,
+        "total": 68,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script runs end to end without warnings and is seeded",
+            "result": "PASS",
+            "note": "rc 0 under -W default; rng seed 0 and random_state set"
+          },
+          {
+            "text": "Metrics are computed on a held-out split with the training y first",
+            "result": "PASS",
+            "note": "train_test_split 40% test; IPCW calls take y_tr first"
+          },
+          {
+            "text": "Models recover the planted signal (Uno C well above 0.5)",
+            "result": "PASS",
+            "note": "0.775 and 0.756 with 5 of 40 features prognostic"
+          },
+          {
+            "text": "Printed Kaplan-Meier baseline IBS equals the IBS of a true KM curve",
+            "result": "FAIL",
+            "note": "0.290 printed vs 0.236 with kaplan_meier_estimator; tiny hand table: formula 0.50 vs hand KM 0.80 at t=1"
+          },
+          {
+            "text": "Risk-score direction is correct (higher = higher risk) for every metric call",
+            "result": "PASS",
+            "note": "model.predict used as risk; survival matrix used for IBS"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Competing risks: scripts/competing_risks_cif.py plus tiny hand-computed table, 1-KM vs Aalen-Johansen",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Script: 1-KM 0.517 vs CIF 0.250 with 63% competing events. Six-subject table: hand CIF1 and hand 1-KM equal lifelines at every time (t=6: CIF 0.5833 vs 1-KM 1.0000); lifelines warns that tied event times cannot be handled and jitters them, which the Skill does not mention.",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Script runs and shows 1-KM above the Aalen-Johansen CIF",
+            "result": "PASS",
+            "note": "0.517 vs 0.250"
+          },
+          {
+            "text": "lifelines AalenJohansenFitter equals hand-computed CIF at every time on the tiny table",
+            "result": "PASS",
+            "note": "6 of 6 times match to 1e-6"
+          },
+          {
+            "text": "1-KM >= CIF at every time (the Skill's stated inequality)",
+            "result": "PASS",
+            "note": "0.1667 to 1.0000 versus 0.1667 to 0.5833"
+          },
+          {
+            "text": "Skill names a runnable implementation for each competing-risks method it recommends (cause-specific Cox, Fine-Gray, CIF-based Brier, Wolbers concordance)",
+            "result": "FAIL",
+            "note": "Only the Aalen-Johansen demo is runnable; scikit-survival has no CIF or competing-risks metric (sksurv_competing_check.py)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Metric-direction traps and deep models: lifelines/sksurv C signs, Harrell vs Uno under censoring, pycox DeepSurv/DeepHit on CPU, dependency metadata",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "lifelines held-out C 0.337 with +partial hazard vs 0.663 with the negation (sum 1.0), matching sksurv; Harrell 0.734 vs Uno 0.727 vs truth 0.723 at 74% censoring, so the upward-bias claim holds; pycox DeepSurv C-td 0.615 and DeepHit 0.620 on CPU (cuda False). sksurv 0.28 needs scikit-learn <1.10 and pandas >=2.2 (no cap); lifelines 0.30.3 alone needs pandas <3.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "lifelines concordance sign trap reproduces on held-out data",
+            "result": "PASS",
+            "note": "+ph 0.337, -ph 0.663; sksurv Harrell gives the mirror image"
+          },
+          {
+            "text": "Harrell C is biased upward under heavy censoring and Uno is closer to the uncensored truth",
+            "result": "PASS",
+            "note": "truth 0.723, Harrell 0.734, Uno 0.727 at 74% censoring"
+          },
+          {
+            "text": "pycox DeepSurv (compute_baseline_hazards then predict_surv_df) and DeepHit run on CPU",
+            "result": "PASS",
+            "note": "C-td 0.615 and 0.620, 30 epochs, torch cuda unavailable"
+          },
+          {
+            "text": "Skill's pandas/scikit-learn constraint statements match installed package metadata",
+            "result": "PASS",
+            "note": "sksurv scikit-learn <1.10 >=1.9; lifelines pandas <3.0; sksurv itself runs on pandas 3.0.6"
+          },
+          {
+            "text": "Version note attributes the pandas cap and the bundled-script test environment precisely",
+            "result": "FAIL",
+            "note": "Says to install both packages apart from a pandas 3 stack though only lifelines caps pandas, and says scripts ran against pycox though neither script imports it"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "p>>n penalized Cox: default predict() of the Skill's Coxnet configuration vs CV-selected alpha (n=150 train, p=1000, 5 prognostic)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "predict() defaults to the smallest alpha on the 100-alpha path: 161 nonzero coefficients and held-out Uno C 0.708, versus 6 nonzero and 0.790 with CV-selected alpha (oracle 0.802). On GBSG2 the two agree (0.668 vs 0.669), so the defect only bites in p>>n, the Skill's stated use case.",
+        "basic": 26,
+        "specialized": 39,
+        "total": 65,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The documented configuration, used as shown, yields a sparse penalized signature in p>>n",
+            "result": "FAIL",
+            "note": "161 of 1000 coefficients nonzero at the default (smallest) alpha"
+          },
+          {
+            "text": "Held-out Uno C of the default prediction is within 0.02 of a CV-tuned alpha",
+            "result": "FAIL",
+            "note": "0.708 vs 0.790"
+          },
+          {
+            "text": "A CV-selected alpha recovers near-oracle held-out discrimination",
+            "result": "PASS",
+            "note": "0.790 vs oracle 0.802 with 6 nonzero coefficients"
+          },
+          {
+            "text": "Evaluation uses held-out data with no selection leakage",
+            "result": "PASS",
+            "note": "alpha chosen by 5-fold CV inside the training set only"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 45.2,
+    "score": 77,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Sharp prediction-versus-inference scope boundary and a decision-grade evaluation set (Uno C with tau, AUC(t), IBS vs KM, calibration) that matches current practice",
+    "Direction and ordering traps are accurate and reproduce: lifelines C needs the negated partial hazard, IPCW metrics take the training y first, 1-KM overestimates versus the Aalen-Johansen CIF (hand-verified)",
+    "Dependency statements for scikit-survival 0.28 (scikit-learn <1.10) and lifelines 0.30 (pandas <3) match installed metadata; pycox DeepSurv/DeepHit execute on CPU",
+    "Scripts are seeded, warning-free, evaluate on held-out data, and run in seconds"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "SA-001 KM baseline IBS in cox_regression.py is miscomputed",
+      "observed_in": [
+        2,
+        1
+      ],
+      "problem": "km_surv = np.mean(ttr[etr] > t) averages over event-only training subjects, dropping censored patients. The printed baseline IBS is 0.290 versus 0.236 from a true KM on the script's data (GBSG2 with the same formula: 0.263 vs 0.178), overstating the margin by which a model beats 'no covariates'. On a tiny table the formula gives 0.50 at t=1 where the hand KM is 0.80.",
+      "root_cause": "Naive survival-fraction formula used instead of kaplan_meier_estimator.",
+      "fix": "Replace with kaplan_meier_estimator(y_tr['event'], y_tr['time']) evaluated at times, and add the same line to the SKILL.md IBS example. Changes runnable bytes (script) plus text."
+    },
+    {
+      "priority": "P1",
+      "title": "SA-002 Coxnet snippet predicts at the least-penalized alpha",
+      "observed_in": [
+        5,
+        2,
+        1
+      ],
+      "problem": "CoxnetSurvivalAnalysis(l1_ratio=0.9, alpha_min_ratio=0.01, fit_baseline_model=True) fits a 100-alpha path and predict() uses the smallest alpha. With n=150, p=1000 that kept 161 nonzero coefficients and gave held-out Uno C 0.708, against 0.790 (6 nonzero) for a CV-selected alpha. Nothing in the snippet or script selects alpha although the Skill demands tuning inside nested CV.",
+      "root_cause": "The snippet and script never choose alpha (no CV, no alpha argument), so the path end point is used silently.",
+      "fix": "Select alpha by cross-validation (GridSearchCV over alphas or an explicit alpha argument) in the snippet and cox_regression.py, and state which alpha predict and predict_survival_function use. Changes runnable bytes (script) plus text."
+    },
+    {
+      "priority": "P2",
+      "title": "SA-003 Evaluation snippet is not copy-runnable",
+      "observed_in": [
+        1
+      ],
+      "problem": "The evaluation block raises NameError on t_horizon; y_train, y_test, X_train, X_test are never built, and the fitting block creates y from the full df, which an agent may then use for training and testing.",
+      "root_cause": "Snippets extracted from a script without their setup lines.",
+      "fix": "Add a split step defining X_train/X_test/y_train/y_test and t_horizon (for example the 90th percentile of training event times) and drop the full-data y. Text only."
+    },
+    {
+      "priority": "P2",
+      "title": "SA-004 Competing-risks claims lack an implementation",
+      "observed_in": [
+        3
+      ],
+      "problem": "The taxonomy says RSF handles competing risks ('Yes (per-cause CIF)'), but scikit-survival 0.28 has no CIF or competing-risks metric. Fine-Gray, cause-specific CIF Brier and Wolbers concordance have no named package or code. lifelines Aalen-Johansen warns about tied event times (jittered), which the Skill does not mention.",
+      "root_cause": "Method properties were taken from R (randomForestSRC, cmprsk) while the Skill's primary tool is scikit-survival.",
+      "fix": "Qualify the RSF row as not available in scikit-survival, name the R or Python implementation for each recommended competing-risks step, and note tie handling. Text only."
+    },
+    {
+      "priority": "P2",
+      "title": "SA-005 Prose-only methods unlabelled; dependency note imprecise",
+      "observed_in": [
+        4
+      ],
+      "problem": "Fine-Gray, landmarking, calibration curves with ICI/E50/E90, nested-CV selection and the pycox DeepSurv/DeepHit models are described without code or a statement that they were not run. The version note says to isolate both scikit-survival and lifelines from a pandas 3 stack (only lifelines caps pandas; scikit-survival runs on pandas 3.0.6) and says the bundled scripts ran against pycox 0.3 (neither imports it).",
+      "root_cause": "Compatibility note was written for the combined test environment.",
+      "fix": "Mark these methods 'described, not executed or bundled', attribute the pandas <3 cap to lifelines alone (competing_risks_cif.py only), and drop pycox from the scripts-tested list. Text only."
+    }
+  ]
+}

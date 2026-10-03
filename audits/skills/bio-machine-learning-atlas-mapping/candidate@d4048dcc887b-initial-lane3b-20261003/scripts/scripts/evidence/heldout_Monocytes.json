@@ -1,0 +1,36 @@
+{
+ "dropped": "Monocytes",
+ "query_n": 2638,
+ "dist_threshold": 5.262070319493614,
+ "heldout_type_cells": {
+  "n": 630,
+  "pct_unknown_knn_gate": 0.026984126984126985,
+  "pct_softmax_ge_0.5": 0.9888888888888889,
+  "mean_softmax_max": 0.892491340637207,
+  "mean_knn_uncertainty": 0.013441027698739028,
+  "pct_dist_gate_flagged": 0.0,
+  "pct_predicted_confident_wrong_label(not Unknown)": 0.973015873015873,
+  "top_predicted": {
+   "DC": 601,
+   "Unknown": 17,
+   "T cells": 11,
+   "Megakaryocytes/platelets": 1
+  }
+ },
+ "other_cells": {
+  "n": 2008,
+  "pct_unknown_knn_gate": 0.01195219123505976,
+  "pct_softmax_ge_0.5": 0.9965139442231076,
+  "mean_softmax_max": 0.9685625433921814,
+  "mean_knn_uncertainty": 0.006685891829842534,
+  "pct_dist_gate_flagged": 0.0,
+  "pct_predicted_confident_wrong_label(not Unknown)": 0.9880478087649402,
+  "top_predicted": {
+   "T cells": 1381,
+   "B cells": 344,
+   "ILC": 208,
+   "DC": 38
+  }
+ },
+ "overall_unknown_pct": 0.0155420773313116
+}

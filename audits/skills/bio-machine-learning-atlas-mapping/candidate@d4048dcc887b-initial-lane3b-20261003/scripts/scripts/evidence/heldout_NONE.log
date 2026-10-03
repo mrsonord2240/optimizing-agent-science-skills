@@ -1,0 +1,54 @@
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\utilities\_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\loops\fit_loop.py:321: The number of training batches (9) is smaller than the logging interval Trainer(log_every_n_steps=10). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+reference label counts: {'T cells': 557, 'Monocytes': 355, 'B cells': 183, 'ILC': 63, 'DC': 28, 'Megakaryocytes/platelets': 19, 'Plasma cells': 9, 'pDC': 8}
+INFO     Training for 20 epochs.                                               
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\utilities\_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\loops\fit_loop.py:321: The number of training batches (9) is smaller than the logging interval Trainer(log_every_n_steps=10). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+INFO     Found 100.0% reference vars in query data.                            
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\scvi\data\_manager.py:224: UserWarning: Missing labels key cell_type. Filling in with unlabeled category Unknown.
+  field_registry[_constants._STATE_REGISTRY_KEY] = field.transfer_field(
+INFO     Training for 100 epochs.                                              
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\utilities\_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\loops\fit_loop.py:538: Found 85 module(s) in eval mode at the start of training. This may lead to unexpected behavior during training. If this is intentional, you can ignore this warning.
+Flagged Unknown (OOD / novel): 1.3%
+predicted_label
+T cells                     1447
+Monocytes                    621
+B cells                      343
+ILC                          141
+DC                            39
+Unknown                       34
+Megakaryocytes/platelets      13
+Name: count, dtype: int64
+predict(soft=True) type: DataFrame (2638, 8)
+{
+ "dropped": "NONE",
+ "query_n": 2638,
+ "dist_threshold": 4.979183023055394,
+ "other_cells": {
+  "n": 2638,
+  "pct_unknown_knn_gate": 0.01288855193328279,
+  "pct_softmax_ge_0.5": 0.9973464746019712,
+  "mean_softmax_max": 0.9816752076148987,
+  "mean_knn_uncertainty": 0.00935419443787868,
+  "pct_dist_gate_flagged": 0.0003790750568612585,
+  "pct_predicted_confident_wrong_label(not Unknown)": 0.9871114480667172,
+  "top_predicted": {
+   "T cells": 1447,
+   "Monocytes": 621,
+   "B cells": 343,
+   "ILC": 141
+  }
+ },
+ "overall_unknown_pct": 0.01288855193328279
+}

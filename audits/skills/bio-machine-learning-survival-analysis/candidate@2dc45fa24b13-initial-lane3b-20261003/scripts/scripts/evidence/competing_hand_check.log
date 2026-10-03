@@ -1,0 +1,9 @@
+  t  hand CIF1  lifelines AJ  hand 1-KM  lifelines 1-KM
+  1     0.1667        0.1667     0.1667          0.1667
+  2     0.1667        0.1667     0.1667          0.1667
+  3     0.3333        0.3333     0.3750          0.3750
+  4     0.3333        0.3333     0.3750          0.3750
+  5     0.3333        0.3333     0.3750          0.3750
+  6     0.5833        0.5833     1.0000          1.0000
+hand values match lifelines; 1-KM >= CIF at every t: True
+AJ CIF1(6) on tied data across jitter seeds: [0.5625, 0.5625, 0.5625] warnings: ['Tied event times were detected. The Aalen-Johansen estimator cannot handle tied event times.\n       ']

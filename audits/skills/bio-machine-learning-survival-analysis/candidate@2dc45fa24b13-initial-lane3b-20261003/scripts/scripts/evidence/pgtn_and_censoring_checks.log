@@ -1,0 +1,9 @@
+path: 100 alphas, alpha_max 0.334, alpha_min 0.003
+default predict() = smallest alpha     nonzero  161  held-out Uno C 0.708
+alpha_max/2 (sparser)                  nonzero  116  held-out Uno C 0.733
+CV-selected alpha 0.191               nonzero    6  held-out Uno C 0.790
+oracle (true linear predictor) held-out Uno C 0.802
+ censored  truth C  Harrell  Uno(tau)   (mean of 5 reps)
+     0.08    0.714    0.715     0.715
+     0.49    0.717    0.728     0.722
+     0.74    0.723    0.734     0.727

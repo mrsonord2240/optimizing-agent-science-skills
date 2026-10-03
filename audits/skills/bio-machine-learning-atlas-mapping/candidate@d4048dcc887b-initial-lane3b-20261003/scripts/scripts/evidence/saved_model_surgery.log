@@ -1,0 +1,42 @@
+Seed set to 0
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\utilities\_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\loops\fit_loop.py:321: The number of training batches (9) is smaller than the logging interval Trainer(log_every_n_steps=10). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+scvi-tools 1.5.1
+INFO     File reference_model/model.pt already downloaded                      
+INFO     Found 100.0% reference vars in query data.                            
+INFO     File reference_model/model.pt already downloaded                      
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\utilities\_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\loops\fit_loop.py:538: Found 42 module(s) in eval mode at the start of training. This may lead to unexpected behavior during training. If this is intentional, you can ignore this warning.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+scVI query latent (2638, 30)
+INFO     Training for 20 epochs.                                               
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\utilities\_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\loops\fit_loop.py:321: The number of training batches (9) is smaller than the logging interval Trainer(log_every_n_steps=10). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+INFO     File ref_scanvi/model.pt already downloaded                           
+INFO     Found 100.0% reference vars in query data.                            
+INFO     File ref_scanvi/model.pt already downloaded                           
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\scvi\data\_manager.py:224: UserWarning: Missing labels key cell_type. Filling in with unlabeled category Unknown.
+  field_registry[_constants._STATE_REGISTRY_KEY] = field.transfer_field(
+INFO     Training for 30 epochs.                                               
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\utilities\_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\trainer\connectors\data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=23` in the `DataLoader` to improve performance.
+F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\lightning\pytorch\loops\fit_loop.py:538: Found 85 module(s) in eval mode at the start of training. This may lead to unexpected behavior during training. If this is intentional, you can ignore this warning.
+== predict(soft=True) ==
+type: DataFrame shape: (2638, 8)
+columns: ['B cells', 'DC', 'ILC', 'Megakaryocytes/platelets', 'Monocytes', 'Plasma cells', 'T cells', 'pDC']
+row sums min/max: 0.9999997019767761 1.000000238418579
+idxmax(axis=1) == predict(): True
+proba.max() -> Series (per-class column maxima, len 8); proba.max(axis=1) -> per-cell vector len 2638
+proba[:, 0] raises: InvalidIndexError
+flagged Unknown 2.6%  accuracy vs PBMC3k annotation 0.964

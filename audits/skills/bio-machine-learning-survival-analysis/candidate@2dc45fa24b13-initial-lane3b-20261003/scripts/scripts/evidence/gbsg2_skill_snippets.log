@@ -1,0 +1,8 @@
+F:\OpenScience\audits\bio-machine-learning-survival-analysis\initial-lane3b-20261003\scripts\gbsg2_skill_snippets.py:13: ResourceWarning: unclosed file <_io.TextIOWrapper name='F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-survival-analysis\\SKILL.md' mode='r' encoding='utf-8'>
+  blocks = re.findall(r"```python\n(.*?)```", open(SK, encoding="utf-8").read(), re.S)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+fitting block ran; note block builds y from the FULL df: True
+evaluation block as written fails: NameError name 't_horizon' is not defined
+Uno C: 0.668  mean AUC(t): 0.728  IBS: 0.161
+proper KM-only IBS 0.178 (model IBS above must be lower to add value)
+RSF Uno C: 0.688

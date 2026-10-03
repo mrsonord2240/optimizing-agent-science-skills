@@ -1,0 +1,10 @@
+== survival-venv
+scikit-survival 0.28.0 ['numpy>=2.0.0', 'pandas>=2.2.0', 'scikit-learn<1.10,>=1.9.0']
+lifelines 0.30.3 ['numpy>=1.14.0', 'pandas<3.0,>=2.1']
+pycox not installed
+pandas 2.3.3 scikit-learn 1.9.1
+== pycox-venv
+scikit-survival 0.28.0 ['numpy>=2.0.0', 'pandas>=2.2.0', 'scikit-learn<1.10,>=1.9.0']
+lifelines not installed
+pycox 0.3.0 ['scikit-learn>=0.21.2']
+pandas 3.0.6 scikit-learn 1.9.1

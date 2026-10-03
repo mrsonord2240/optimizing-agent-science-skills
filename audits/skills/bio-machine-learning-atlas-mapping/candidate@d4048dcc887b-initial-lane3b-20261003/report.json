@@ -1,0 +1,356 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-atlas-mapping",
+    "description": "Maps query single-cell data onto reference atlases and transfers cell-type labels using scArches surgery (scVI/scANVI), Symphony, Azimuth, CellTypist, scPoli, popV, and foundation models, with explicit out-of-distribution and label-transfer uncertainty.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations or values; the cited methods and thresholds (HLCA 0.2 uncertainty, scIB 0.6/0.4 weighting, CellTypist log1p CP10k input) match the literature and the executed outputs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-use single-cell annotation; no diagnostic or prescriptive medical conclusions in any output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The headline claim that the kNN-uncertainty gate makes labels trustworthy is overstated (held-out Monocytes: 97.3% confidently mislabelled as DC, finding AM-001), but the Skill itself prescribes spiked-in unseen-type validation and per-reference recalibration, so this is a P1 overclaim, not an inverted conclusion."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Both scripts and the saved-model snippets ran on CPU (scvi-tools 1.5.1) without errors; scarches_annotation.py ran unmodified in about 90 s."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 79,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Core scArches/scANVI mapping and gating are covered and executable; the OOD-gate claim is stronger than the evidence (AM-001), and Symphony, Azimuth, scPoli, popV, treeArches and foundation models are prose only with no code or install steps."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "No shared-gene or input-contract check in the script (it silently needs layers['counts'], obs['batch'], obs['cell_type']); failure modes are documented in references/failure-modes.md."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is 176 lines with failure modes routed to a reference; the method taxonomy table is dense but useful; scripts run in about 90 s on CPU."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Strong error prevention (projection-not-oracle framing, prepare_query_anndata warning); snippets are not self-contained (ref_vae and adata_ref undefined) and predict(soft=True) return type is unstated."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Trigger text and usage-guide prompts match how users ask; script inputs are fixed filenames in the working directory with no CLI arguments."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network calls, or shell execution; scripts read local h5ad files only and write nothing."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Sensible split into SKILL.md, failure-modes reference and two scripts; the gate logic is duplicated across SKILL.md, scarches_annotation.py and the demo; no seed or test assertions in the real-data script."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Precise description with scope pointers to sibling Skills and good progressive disclosure; the real-data script is unseeded and non-persisting, so re-runs differ slightly and produce no artefact."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 76.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 14,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scArches scANVI transfer + kNN gate, PBMC 1k v3 reference to PBMC3k query (script unmodified)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Two unmodified runs (about 90 s each, CPU): accuracy 0.965 and 0.967 against PBMC3k annotation (silver reference labels), Unknown 1.8% and 1.3%; mean uncertainty 0.003 for correct vs 0.14-0.19 for wrong calls; results differ between runs (no seed) and nothing is saved.",
+        "basic": 34,
+        "specialized": 45,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script runs unmodified end to end on a realistic reference/query pair",
+            "result": "PASS",
+            "note": "rc 0 twice; reference scVI+scANVI, surgery and gate completed"
+          },
+          {
+            "text": "Transferred labels agree with the independent PBMC3k annotation (accuracy >= 0.9)",
+            "result": "PASS",
+            "note": "0.965 and 0.967; 0.98 among non-Unknown cells"
+          },
+          {
+            "text": "Gate separates wrong from right calls (mean transfer_uncertainty higher for wrong calls)",
+            "result": "PASS",
+            "note": "0.003 vs 0.19 and 0.002 vs 0.14"
+          },
+          {
+            "text": "Repeated runs on identical inputs give identical flagged fraction and accuracy",
+            "result": "FAIL",
+            "note": "Unknown 1.82% vs 1.29%, accuracy 0.9647 vs 0.9666; scvi.settings.seed is never set"
+          },
+          {
+            "text": "Script persists predicted labels, latent and uncertainty for the user",
+            "result": "FAIL",
+            "note": "Only stdout counts; no file written beyond the inputs"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SKILL.md snippets 1-3 via saved-model directories (SCVI.load, prepare_query_anndata, load_query_data, SCANVI save/load, predict(soft=True), kNN gate)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran with 30/20/30 epochs on CPU: scVI query latent (2638, 30); scANVI surgery; predict(soft=True) is a pandas DataFrame (2638 x 8, columns are reference labels, rows sum to 1, idxmax equals predict()); 2.6% flagged Unknown, accuracy 0.964.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Saved-model surgery route (directory arguments) runs end to end",
+            "result": "PASS",
+            "note": "SCVI and SCANVI save, prepare_query_anndata('dir'), load_query_data('dir') all succeeded"
+          },
+          {
+            "text": "predict(soft=True) rows are probabilities that agree with the hard labels",
+            "result": "PASS",
+            "note": "row sums 1.0000; idxmax(axis=1) equals predict()"
+          },
+          {
+            "text": "SKILL.md states the return type of predict(soft=True)",
+            "result": "FAIL",
+            "note": "Says only 'per-class probabilities'; it is a DataFrame, so proba.max() returns per-class maxima and proba[:, 0] raises InvalidIndexError"
+          },
+          {
+            "text": "Snippets are copy-runnable as written",
+            "result": "FAIL",
+            "note": "ref_vae and adata_ref are undefined in the SKILL.md snippets; the audit script had to define them"
+          },
+          {
+            "text": "Gated accuracy against the independent annotation is >= 0.8",
+            "result": "PASS",
+            "note": "0.964 with 2.6% flagged Unknown"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Held-out cell type: remove B cells from the reference, map PBMC3k, inspect the 342 query B cells",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "87.4% of held-out B cells gated Unknown (kNN uncertainty mean 0.38); 12.6% still labelled T/DC/Monocytes. A softmax >= 0.5 filter would have passed 83.6% of them. The distance gate flagged 0%.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Script runs unmodified on a reference lacking one cell type",
+            "result": "PASS",
+            "note": "rc 0; reference had 7 labels"
+          },
+          {
+            "text": "At least 80% of held-out-type cells are gated to Unknown",
+            "result": "PASS",
+            "note": "87.4% (299 of 342)"
+          },
+          {
+            "text": "At least 95% of held-out-type cells are not confidently assigned an in-reference label",
+            "result": "FAIL",
+            "note": "43 cells (12.6%) keep a T cell, DC or Monocytes label"
+          },
+          {
+            "text": "The softmax max would have been the wrong gate (passes most held-out cells)",
+            "result": "PASS",
+            "note": "83.6% of held-out B cells have softmax max >= 0.5 (mean 0.71)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Synthetic OOD demo scripts/ood_gating_demo.py (novel far cluster, distance gate vs kNN probability)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Deterministic (seeded): 100% of novel cells pass a 0.5 'softmax' filter, 100% flagged by the distance gate, 0% of known cells wrongly flagged. The 'softmax' here is kNN predict_proba, and the extreme separation does not transfer: on the real held-out types the same distance idea flagged 0%.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Demo runs without error and is reproducible",
+            "result": "PASS",
+            "note": "seed 0; identical output on rerun, no warnings"
+          },
+          {
+            "text": "Distance gate flags the novel cluster and spares known cells",
+            "result": "PASS",
+            "note": "novel flagged 100%, known flagged 0%"
+          },
+          {
+            "text": "Probability filter demonstrated is the classifier softmax claimed in the docstring",
+            "result": "FAIL",
+            "note": "It is KNeighborsClassifier.predict_proba, a different quantity from scANVI soft output"
+          },
+          {
+            "text": "Demo conclusion transfers to the real-data pair",
+            "result": "FAIL",
+            "note": "Real held-out Monocytes: distance gate flagged 0 of 630"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Held-out cell type: remove Monocytes from the reference, map PBMC3k, inspect the 630 query monocytes",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Silent failure: only 2.7% gated Unknown; 95.4% (601) confidently labelled DC (mean softmax max 0.89, mean kNN uncertainty 0.013); distance gate flagged 0. In-distribution cells over-flagged only 1.2%. Caveat: silver 1,222-cell reference with only 28 DC.",
+        "basic": 24,
+        "specialized": 37,
+        "total": 61,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script runs unmodified on a reference lacking Monocytes",
+            "result": "PASS",
+            "note": "rc 0"
+          },
+          {
+            "text": "At least 80% of held-out-type cells are gated to Unknown",
+            "result": "FAIL",
+            "note": "2.7% (17 of 630)"
+          },
+          {
+            "text": "A distance-based gate calibrated on the reference flags a majority of held-out cells",
+            "result": "FAIL",
+            "note": "0 of 630 above the 99th-percentile 15-NN threshold"
+          },
+          {
+            "text": "In-distribution query cells are not over-flagged",
+            "result": "PASS",
+            "note": "1.2% Unknown among other cells"
+          },
+          {
+            "text": "Skill documentation tells the user to validate OOD detection on spiked-in unseen types",
+            "result": "PASS",
+            "note": "failure-modes.md 'Good integration metrics, wrong labels' fix names it, but no shipped script does"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 31.6,
+    "dynamic_weighted": 45.7,
+    "score": 77,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Clear projection-not-annotation framing with a method taxonomy, decision tree and failure-modes reference that match how the tools actually behave",
+    "Real-data template runs unmodified on CPU in about 90 s and its gate separates wrong from right calls (0.003 vs 0.14-0.19 uncertainty)",
+    "Saved-model surgery route (directory arguments) and the documented weight_decay=0.0 pattern execute correctly on scvi-tools 1.5.1",
+    "Version, threshold and citation statements (HLCA 0.2, scIB 0.6/0.4, log1p CP10k) are accurate"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "AM-001 OOD gate misses a held-out type; claim overstated",
+      "observed_in": [
+        3,
+        4,
+        5
+      ],
+      "problem": "With Monocytes removed from the reference, the shipped weighted-kNN gate flagged 2.7% of the 630 query monocytes and 95.4% were confidently labelled DC; a reference-calibrated distance gate flagged 0%. With B cells removed it gated 87.4%. SKILL.md calls the gate the step that makes labels trustworthy, and the demo's synthetic far cluster hides this.",
+      "root_cause": "Neighbor-agreement uncertainty only detects cells between reference types; a novel type adjacent to one reference label looks certain, and the demo labels kNN predict_proba as softmax.",
+      "fix": "Scope the claim (the gate is a heuristic that catches between-type cells, not guaranteed novelty detection), add a short held-out-type spike-in check script and recommend running it per reference, and relabel the demo's 'softmax' as kNN probability. Changes runnable bytes (new or edited script) plus text."
+    },
+    {
+      "priority": "P2",
+      "title": "AM-002 Prose-only and heavy methods not labelled not executed",
+      "observed_in": [],
+      "problem": "Symphony, Azimuth, scPoli, popV, treeArches/scHPL and scGPT/Geneformer appear in the taxonomy and decision tree with performance and OOD claims but no code, install line or statement that they were not run.",
+      "root_cause": "Version Compatibility lists only the tested packages and never says the rest are untested.",
+      "fix": "Add one line under Version Compatibility naming these methods as described from the literature and not executed or bundled. Text only."
+    },
+    {
+      "priority": "P2",
+      "title": "AM-003 predict(soft=True) type not stated (DataFrame)",
+      "observed_in": [
+        2
+      ],
+      "problem": "In scvi-tools 1.5.1 predict(soft=True) returns a pandas DataFrame (2638 x 8, columns are labels). SKILL.md only says 'per-class probabilities'; proba.max() then returns per-class maxima and proba[:, 0] raises.",
+      "root_cause": "Return type was assumed to be an ndarray.",
+      "fix": "State that it is a DataFrame indexed by cell with label columns and show proba.max(axis=1) / idxmax(axis=1). Text only."
+    },
+    {
+      "priority": "P2",
+      "title": "AM-004 Snippets and script input contract incomplete",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "SKILL.md snippets use ref_vae and adata_ref without defining them, and scarches_annotation.py requires layers['counts'], obs['batch'] and obs['cell_type'] (and shared genes) without saying so.",
+      "root_cause": "Snippets were extracted from the script without their setup lines or the data contract.",
+      "fix": "Define ref_vae/adata_ref in the snippets (or point to the script) and document the required h5ad fields in the script docstring and SKILL.md. Text only (docstring/comment edits, no behavior change)."
+    },
+    {
+      "priority": "P2",
+      "title": "AM-005 Script unseeded and persists nothing",
+      "observed_in": [
+        1
+      ],
+      "problem": "Two unmodified runs on identical inputs gave 1.82% vs 1.29% Unknown and accuracy 0.9647 vs 0.9666; the script writes no predictions, latent or uncertainty to disk.",
+      "root_cause": "No scvi.settings.seed and the template only prints.",
+      "fix": "Set scvi.settings.seed and write the annotated query h5ad (predicted_label, transfer_uncertainty, latent). Changes runnable bytes."
+    }
+  ]
+}

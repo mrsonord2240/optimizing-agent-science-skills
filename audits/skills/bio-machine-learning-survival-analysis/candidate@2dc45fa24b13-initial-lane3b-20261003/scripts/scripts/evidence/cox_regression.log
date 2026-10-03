@@ -1,0 +1,5 @@
+model                UnoC  meanAUC    IBS
+elastic-net Cox     0.775    0.845  0.159
+random forest       0.756    0.817  0.193
+
+Kaplan-Meier baseline IBS (no covariates): 0.290

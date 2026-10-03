@@ -1,0 +1,11 @@
+F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\tools\survival-venv\Lib\site-packages\sklearn\model_selection\_validation.py:855: UserWarning: all coefficients are zero, consider decreasing alpha.
+  estimator.fit(X_train, y_train, **fit_params)
+F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\tools\survival-venv\Lib\site-packages\sklearn\model_selection\_validation.py:855: UserWarning: all coefficients are zero, consider decreasing alpha.
+  estimator.fit(X_train, y_train, **fit_params)
+alphas_ in path: 100 max 28.653634387615416 min 0.2865363438761554
+coef_ shape (9, 100) nonzero at alpha_max / alpha_min: 0 3 of 9
+predict signature: (X, alpha=None)
+predict() default equals smallest-alpha end of path: True ; equals largest alpha (null model): False
+Uno C with default predict: 0.668
+CV best alpha 0.34513404061163694 nonzero 3
+Uno C with CV-selected alpha: 0.669

@@ -1,0 +1,36 @@
+{
+ "dropped": "B cells",
+ "query_n": 2638,
+ "dist_threshold": 4.8118877687454065,
+ "heldout_type_cells": {
+  "n": 342,
+  "pct_unknown_knn_gate": 0.8742690058479532,
+  "pct_softmax_ge_0.5": 0.8362573099415205,
+  "mean_softmax_max": 0.7137783765792847,
+  "mean_knn_uncertainty": 0.3842484921742573,
+  "pct_dist_gate_flagged": 0.0,
+  "pct_predicted_confident_wrong_label(not Unknown)": 0.12573099415204678,
+  "top_predicted": {
+   "Unknown": 299,
+   "T cells": 30,
+   "DC": 9,
+   "Monocytes": 4
+  }
+ },
+ "other_cells": {
+  "n": 2296,
+  "pct_unknown_knn_gate": 0.0156794425087108,
+  "pct_softmax_ge_0.5": 0.997822299651568,
+  "mean_softmax_max": 0.9882123470306396,
+  "mean_knn_uncertainty": 0.010104322423567784,
+  "pct_dist_gate_flagged": 0.0,
+  "pct_predicted_confident_wrong_label(not Unknown)": 0.9843205574912892,
+  "top_predicted": {
+   "T cells": 1438,
+   "Monocytes": 636,
+   "ILC": 149,
+   "Unknown": 36
+  }
+ },
+ "overall_unknown_pct": 0.1269901440485216
+}

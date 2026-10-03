@@ -1,0 +1,18 @@
+== Part 1: tiny table (time, event): (1,1)(2,0)(3,1)(4,0)(5,0); KM by hand
+t=1: hand KM 0.8000  sksurv KM 0.8000  Skill-script formula np.mean(t[e]>t) 0.5000
+t=2: hand KM 0.8000  sksurv KM 0.8000  Skill-script formula np.mean(t[e]>t) 0.5000
+t=3: hand KM 0.5333  sksurv KM 0.5333  Skill-script formula np.mean(t[e]>t) 0.0000
+t=4: hand KM 0.5333  sksurv KM 0.5333  Skill-script formula np.mean(t[e]>t) 0.0000
+== Part 2: script's own synthetic data (runpy, unmodified)
+model                UnoC  meanAUC    IBS
+elastic-net Cox     0.775    0.845  0.159
+random forest       0.756    0.817  0.193
+
+Kaplan-Meier baseline IBS (no covariates): 0.290
+horizon grid: [0.017 0.069 0.121 0.173 0.226 0.278 0.33  0.382 0.434 0.486 0.538 0.59 ]
+naive 'KM'  : [0.894 0.722 0.591 0.505 0.434 0.399 0.364 0.323 0.318 0.278 0.253 0.227]
+proper KM   : [0.941 0.842 0.762 0.707 0.66  0.635 0.608 0.576 0.572 0.54  0.519 0.498]
+IBS naive (as printed by script) 0.290   IBS proper KM 0.236
+censored fraction in training = 0.45
+== Part 3: same formula on GBSG2
+GBSG2 IBS naive 0.263  proper KM 0.178
