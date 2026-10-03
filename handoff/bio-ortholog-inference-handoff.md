@@ -1,37 +1,42 @@
-# Handoff: bio-ortholog-inference / reaudit-scientific-skill
+# Handoff: bio-ortholog-inference / fix-scientific-skill (fix-run-2)
 
 - Updated: 2026-10-03
 - Lane: 2
-- Status: not candidate-ready (score 84 < 85)
-- Owner leaving: independent re-auditor (lane 2)
-- Next role: fix-scientific-skill (two small P2 items), then a fresh re-audit
+- Status: ready-for-phase
+- Next role: prepare-scientific-skill-tooling (delta mode; tooling impact changed), then reaudit-scientific-skill
+- Tooling impact: changed. Surfaces: Compara batch_compara (new `status` column, fixed column set, rows for empty symbols) and examples/compara_orthologs.py (new output). No new dependency, runtime, input or service.
 
-## Rejected candidate
+## Candidate
 
-- Identity (preflight --offline PASS before and after): sha256-manifest-v1 aa32b51586699da5ed4708ce63e6cbc9eb19751ed79f94b5ff5d73208e252495, files=7, bytes=34073
-- Path: F:\OpenScience\wt\dbaccess-ortholog-inference\skills\bio-ortholog-inference (branch fix/dbaccess-ortholog-inference at 2f38178; Skill dir untracked, uncommitted; no pycache)
-- Published record: audits\skills\bio-ortholog-inference\candidate@aa32b5158669-reaudit-run\ (supersedes the initial audit f6d4ccc5903d)
-- Run dir and evidence: F:\OpenScience\audits\bio-ortholog-inference\reaudit-run\ (scripts\evidence\)
-
-## Readiness metrics
-
-Score 84, Limited Release. Static 82, execution average 85.4, Layer 1 34.6, Layer 2 50.8, assertions 23/25 (92%). No veto, no open P0. Fails only the final-score gate (85).
+- Identity (preflight --offline PASS): sha256-manifest-v1 6e3122b03b95f6b9666a03f538ff5e07657ad733c2f0b9a2c7f1de1749993bbb, files=7, bytes=35212
+- Path: F:\OpenScience\wt\dbaccess-ortholog-inference\skills\bio-ortholog-inference (untracked, uncommitted by design; no pycache)
+- Prior rejected identity: aa32b51586699da5ed4708ce63e6cbc9eb19751ed79f94b5ff5d73208e252495 (84, Limited Release)
+- Evidence: F:\OpenScience\audits\bio-ortholog-inference\fix-run-2\
 
 ## Findings
 
-- OI-01 to OI-08: verified-fixed (ledger: reaudit-run\finding-ledger.md). B1 OMA flakiness: not reproduced (OMA 200 on every call). B2 eggNOG: still blocked (403 / TLS), not executed.
-- New, P2: OI-09 SKILL.md `/homology/id/<ensembl_gene_id>` returns 404; write `/homology/id/<species>/<ensembl_gene_id>`.
-- New, P2: OI-10 examples\compara_orthologs.py hides batch symbols that failed (MDM2 read timeout, error column) or returned nothing (BRCA1); print them after the table.
-- New, P2: eggNOG redirect note stale (eggnog6.embl.de now fails TLS; eggnogdb.org/api 403).
+- OI-01..OI-08: fixed (earlier ledger, unchanged).
+- OI-09: fixed. SKILL.md line 86 now `/homology/id/<species>/<ensembl_gene_id>`. Tree sweep: no other occurrence. Live: route.txt (species form 200, bare form 404).
+- OI-10: fixed at client level. scripts/ortholog_clients.py `batch_compara` returns one or more rows per input symbol with `status` = found / no ortholog returned / request failed (message in `error`); fixed column set so an all-failed batch still has `type`. examples/compara_orthologs.py prints per-symbol outcome and a PARTIAL BATCH flag. Evidence: stub.txt (no network), compara_run2.txt (live: MDM2 request failed, BRCA1 no ortholog returned, flagged partial).
+- eggNOG note: fixed in SKILL.md line 103 and usage-guide.md line 74 (eggnogdb.org/api 403; eggnog6.embl.de TLS failure; still unverified).
 
-## Surfaces not executed or failed
+## Changed files
 
-- eggNOG API: refuses scripted access.
-- PANTHER: liveness only (no client function, as documented).
-- Ensembl homology was slow (45 s read timeouts on BRCA1/MDM2 to zebrafish); service-side. The final-bytes compara_orthologs.py run exited 0 on the first attempt.
+SKILL.md, usage-guide.md, scripts/ortholog_clients.py, examples/compara_orthologs.py
 
-## Worktree state
+## Execution record
 
-- Run-owned: audits\skills\bio-ortholog-inference\candidate@aa32b5158669-reaudit-run\ (untracked), reaudit-run dir, this handoff, regenerated audits\ views
-- Pre-existing/user-owned: test\validate.bats (untouched)
-- No staging, commit or push in any repository.
+- stub.txt: batch_compara statuses on a local fake (found / request failed / no ortholog returned; all-failed batch keeps columns).
+- compara_run1.txt: killed by my 500 s timeout (Ensembl slow), no verdict. compara_run2.txt: exit 0, partial batch reported correctly.
+- kegg.txt exit 0; cross.txt exit 0 (Compara, OMA, OrthoDB all returned for TP53).
+- No edit after these runs except this handoff.
+
+## Remaining
+
+- Ensembl homology intermittently slow (45 s read timeouts); service-side.
+- eggNOG API refuses scripts; not executed. PANTHER liveness only.
+- SKILL.md snippet at line ~52 filters on `type`, still valid with the new table.
+
+## Worktree safety
+
+Only the four files above edited in the Skill tree. test\validate.bats, published records and other Skills untouched. No staging, commit or push.
