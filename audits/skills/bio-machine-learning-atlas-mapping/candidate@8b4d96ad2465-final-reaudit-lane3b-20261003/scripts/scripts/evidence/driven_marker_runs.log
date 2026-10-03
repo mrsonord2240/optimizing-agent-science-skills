@@ -1,0 +1,30 @@
+$ label_marker_check.py --markers markers.json
+    label  n_query  n_markers  retained  flagged
+Monocytes      636          2     0.808    False
+  B cells      343          2     0.897    False
+       DC       31          1     1.000    False
+NOT CHECKED (no verdict, treat as unverified): ['T cells (n=1408, 0 usable markers)', 'ILC (n=163, 0 usable markers)', 'Megakaryocytes/platelets (n=13, 0 usable markers)']
+Flagged labels: none  (retained < 0.6; a flagged label is untrustworthy even when the gate passed it)
+UNVERIFIED: 1584 of 2594 labelled cells (61.1%) carry a label with no marker verdict. This is not a pass; report them as unverified.
+
+$ label_marker_check.py --markers empty.json  (empty {})
+Empty DataFrame
+Columns: []
+Index: []
+NOT CHECKED (no verdict, treat as unverified): ['T cells (n=1408, 0 usable markers)', 'Monocytes (n=636, 0 usable markers)', 'B cells (n=343, 0 usable markers)', 'ILC (n=163, 0 usable markers)', 'DC (n=31, 0 usable markers)', 'Megakaryocytes/platelets (n=13, 0 usable markers)']
+Traceback (most recent call last):
+  File "F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-atlas-mapping\scripts\label_marker_check.py", line 65, in <module>
+    print(f'Flagged labels: {res.loc[res.flagged, "label"].tolist() or "none"}  (retained < {a.min_retained}; '
+                                     ^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\Lib\site-packages\pandas\core\generic.py", line 6194, in __getattr__
+    return object.__getattribute__(self, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DataFrame' object has no attribute 'flagged'
+rc=1
+
+$ label_marker_check.py (no flag)
+usage: label_marker_check.py [-h] [--reference REFERENCE] [--query QUERY]
+                             --markers MARKERS [--min-retained MIN_RETAINED]
+                             [--min-cells MIN_CELLS] [--out OUT]
+label_marker_check.py: error: the following arguments are required: --markers
+rc=2

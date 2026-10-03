@@ -1,0 +1,19 @@
+{
+ "latent_scVI": [
+  2638,
+  30
+ ],
+ "latent_scANVI": [
+  2638,
+  30
+ ],
+ "proba_type": "DataFrame",
+ "proba_shape": [
+  2638,
+  8
+ ],
+ "rows_sum_to_1": true,
+ "unknown_frac": 0.01288855193328279,
+ "acc_vs_truth_all": 0.9719484457922669,
+ "acc_nonunknown": 0.9846390168970814
+}

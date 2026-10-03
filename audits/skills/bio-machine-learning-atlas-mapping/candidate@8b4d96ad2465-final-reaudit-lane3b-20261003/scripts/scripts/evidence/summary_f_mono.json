@@ -1,0 +1,123 @@
+{
+ "case": "mono",
+ "n_target": 630,
+ "pct_unknown_knn_gate": 0.015873015873015872,
+ "top_pred": {
+  "DC": 604,
+  "T cells": 13,
+  "Unknown": 10,
+  "Megakaryocytes/platelets": 3
+ },
+ "query_annotated_sha256": "7b61d6ca6d6a5938da9ebb8318d9ee82a6fe75bb60ad11da9a92394b1dce04e9",
+ "markers_present_in_1604": {
+  "T cells": {
+   "present": [
+    "CD247",
+    "BCL11B",
+    "GIMAP5",
+    "ZAP70",
+    "CCR7",
+    "CD7",
+    "CD8A",
+    "CD8B"
+   ],
+   "absent": []
+  },
+  "Monocytes": {
+   "present": [
+    "CD14",
+    "LYZ",
+    "S100A8",
+    "S100A9",
+    "LST1"
+   ],
+   "absent": [
+    "FCN1",
+    "CST3"
+   ]
+  },
+  "B cells": {
+   "present": [
+    "MS4A1",
+    "CD79A",
+    "CD79B",
+    "CD74",
+    "BANK1",
+    "CD19"
+   ],
+   "absent": []
+  },
+  "ILC": {
+   "present": [
+    "NKG7",
+    "GNLY",
+    "KLRD1",
+    "GZMB",
+    "PRF1",
+    "CTSW"
+   ],
+   "absent": []
+  },
+  "DC": {
+   "present": [
+    "FCER1A",
+    "CD1C",
+    "CLEC10A",
+    "HLA-DQA1"
+   ],
+   "absent": [
+    "HLA-DPB1",
+    "CST3"
+   ]
+  },
+  "Megakaryocytes/platelets": {
+   "present": [
+    "PPBP",
+    "PF4",
+    "GNG11",
+    "TUBB1",
+    "SPARC"
+   ],
+   "absent": [
+    "CAVIN2"
+   ]
+  },
+  "Plasma cells": {
+   "present": [
+    "MZB1"
+   ],
+   "absent": [
+    "JCHAIN",
+    "XBP1",
+    "SDC1"
+   ]
+  },
+  "pDC": {
+   "present": [
+    "LILRA4",
+    "IL3RA",
+    "IRF7",
+    "TCF4",
+    "CLEC4C"
+   ],
+   "absent": []
+  }
+ },
+ "marker_noflag_rc": 2,
+ "marker_noflag_stderr": [
+  "                             [--min-cells MIN_CELLS] [--out OUT]",
+  "label_marker_check.py: error: the following arguments are required: --markers"
+ ],
+ "marker_noflag_stdout": "",
+ "marker_curated_rc": 0,
+ "marker_curated": [
+  "label  n_query  n_markers  retained  flagged",
+  "T cells     1407          8     0.696    False",
+  "     DC      641          4     0.160     True",
+  "B cells      338          6     0.789    False",
+  "    ILC      197          6     0.886    False",
+  "NOT CHECKED (no verdict, treat as unverified): ['Megakaryocytes/platelets (n=17, 5 usable markers)']",
+  "Flagged labels: ['DC']  (retained < 0.6; a flagged label is untrustworthy even when the gate passed it)",
+  "UNVERIFIED: 17 of 2600 labelled cells (0.7%) carry a label with no marker verdict. This is not a pass; report them as unverified."
+ ]
+}

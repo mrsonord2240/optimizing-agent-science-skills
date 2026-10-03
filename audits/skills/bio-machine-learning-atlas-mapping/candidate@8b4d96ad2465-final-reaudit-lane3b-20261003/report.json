@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-atlas-mapping",
+    "description": "Maps query single-cell data onto reference atlases and transfers cell-type labels using scArches surgery (scVI/scANVI), Symphony, Azimuth, CellTypist, scPoli, popV, and foundation models, with explicit out-of-distribution and label-transfer uncertainty.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 6
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every measured claim reproduced: kNN gate 1.67% / 1.59% / 76.3% Unknown, 604 of 630 held-out monocytes called DC, curated marker check DC 0.160 and 0.525 with nothing flagged at baseline, distance gate 0.0% at p99 and 25.4% / 99.4% at p95 with 7.7% / 14.3% overall false flags."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-use single-cell annotation; no diagnostic or prescriptive medical conclusions."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The limitation (a missing type adjacent to a reference type is confidently mislabelled and no latent gate catches it) is stated in the opening insight, a measured table, the thresholds table and the usage guide; the only shipped verdict path requires curated markers, and labels it cannot check are reported as UNVERIFIED with a count. The marker cutoff is disclosed as set a priori and checked on one PBMC pair only."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped scripts and the SKILL.md python blocks ran as written on CPU (scvi-tools 1.5.1) with no errors; label_marker_check.py with no flag exits 2 with a usage error and no verdict."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Core scArches/scANVI mapping, kNN gate and a curated-marker agreement check are covered and executable; Symphony, Azimuth, scPoli, popV, treeArches and foundation models are labelled prose-only/not executed; the gate itself remains blind to a missing adjacent type, which is documented as limited."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Seeded and deterministic (labels identical 2638/2638, latent diff 0.0); no-flag marker check fails closed (rc 2, no verdict); no shared-gene guard in the scripts; marker check dies with an AttributeError traceback when no label receives a verdict (AM-008)."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is long but navigable; failure modes routed to a reference file."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Limitation stated up front, in a measured table and in the usage guide; marker check is mandatory and its UNVERIFIED line makes unchecked labels visible; the per-label table shows markers used but not markers listed."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Triggers and usage-guide prompts fit user wording; usage guide now names the marker check."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network or shell; scripts read local h5ad/JSON and write h5ad/TSV in the working directory."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Clean split into SKILL.md, failure-modes, curated markers JSON and three scripts with input contracts in docstrings; gate logic duplicated across SKILL.md, script and demo."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Precise description with sibling scope pointers and progressive disclosure; bundled curated markers cover PBMC and a 1604-gene set only, so other tissues need agent-authored markers."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 29
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scripts/scarches_annotation.py unmodified on the staged PBMC pair, run twice (seeded), then label_marker_check.py with curated markers",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Two independent runs: 2638/2638 labels identical, latent X_scANVI and transfer_uncertainty max diff 0.0, 1.67% Unknown, query_annotated.h5ad (2638x1604; adds predicted_label, transfer_uncertainty) written. Curated check at baseline: T 0.703 (8 of 8 markers), Monocytes 0.900, B 0.784, ILC 0.916, DC 0.955, nothing flagged; UNVERIFIED 13 of 2594 (Megakaryocytes/platelets, n=13 under 20).",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script runs unmodified from the staged inputs and writes query_annotated.h5ad",
+            "result": "PASS",
+            "note": "rc 0 twice; 2638x1604, obs has predicted_label and transfer_uncertainty"
+          },
+          {
+            "text": "Identical seeded reruns",
+            "result": "PASS",
+            "note": "labels 1.0 identical, latent maxdiff 0.0, uncertainty maxdiff 0.0"
+          },
+          {
+            "text": "Gate result matches SKILL.md baseline (1.7% Unknown)",
+            "result": "PASS",
+            "note": "1.668%"
+          },
+          {
+            "text": "Curated check raises no false flag at baseline and now verifies T cells",
+            "result": "PASS",
+            "note": "none flagged; T 0.703 on 8/8 markers"
+          },
+          {
+            "text": "Run ends by pointing to the curated check; unchecked labels counted",
+            "result": "PASS",
+            "note": "final print line names label_marker_check.py --markers; UNVERIFIED 13 of 2594 printed"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SKILL.md python blocks 1-3 executed as written (200/100/20/100 epochs) against a saved reference_model/",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Blocks ran in order without edits (86 s, 131 s, 0 s). scVI query latent (2638, 30), scANVI latent (2638, 30), predict(soft=True) returned a DataFrame (2638, 8) with rows summing to 1, kNN gate flagged 1.3% Unknown, accuracy vs PBMC3k annotation 0.985 on non-Unknown cells.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Block 1 (scVI surgery) runs as written",
+            "result": "PASS",
+            "note": "query latent (2638, 30)"
+          },
+          {
+            "text": "Block 2 (scANVI transfer) runs as written",
+            "result": "PASS",
+            "note": "X_scANVI (2638, 30)"
+          },
+          {
+            "text": "predict(soft=True) is described as a DataFrame and is one",
+            "result": "PASS",
+            "note": "DataFrame (2638, 8), rows sum to 1"
+          },
+          {
+            "text": "Block 3 (kNN gate) runs and flags a plausible fraction",
+            "result": "PASS",
+            "note": "1.3% Unknown"
+          },
+          {
+            "text": "Labels agree with the silver truth outside Unknown",
+            "result": "PASS",
+            "note": "0.985 (0.972 overall)"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Held-out Monocytes: reference without Monocytes, map PBMC3k, curated markers, own distance gate",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "kNN gate 1.59% Unknown, 604 of 630 held-out monocytes called DC. Own distance gate: 0.0% at p99, 25.4% of monocytes at p95 with 7.7% of all query cells flagged. Curated markers flag DC at 0.160 (641 cells); T 0.696, B 0.789, ILC 0.886 pass. UNVERIFIED 17 of 2600. No-flag run: rc 2, usage error, empty stdout.",
+        "basic": 34,
+        "specialized": 53,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "SKILL.md measured table reproduces (1.6% gated, DC 95.9%, distance gate 0.0%)",
+            "result": "PASS",
+            "note": "1.59%, 604/630, 0.0% at p99"
+          },
+          {
+            "text": "Curated check flags the adjacent mislabel",
+            "result": "PASS",
+            "note": "DC 0.160 flagged"
+          },
+          {
+            "text": "No-flag run yields no verdict",
+            "result": "PASS",
+            "note": "rc 2, usage error, stdout empty"
+          },
+          {
+            "text": "Disclosed p95 cost of loosening the distance gate reproduces",
+            "result": "PASS",
+            "note": "25.4% of monocytes, 7.7% overall"
+          },
+          {
+            "text": "Unchecked labels are counted",
+            "result": "PASS",
+            "note": "Megakaryocytes/platelets n=17, UNVERIFIED 17 of 2600"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Held-out B cells: reference without B cells, map PBMC3k, curated markers, own distance gate",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "kNN gate 76.3% Unknown (261/342), 68 called DC; own distance gate 0.0% at p99, 99.4% of B cells at p95 with 14.3% overall flags. Curated DC retained 0.525 FLAGGED (94 cells); T 0.701, Monocytes 0.901, ILC 0.916 pass. UNVERIFIED 12 of 2321.",
+        "basic": 34,
+        "specialized": 53,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "SKILL.md table reproduces (76.3% Unknown, DC 19.9%)",
+            "result": "PASS",
+            "note": "261/342, 68/342"
+          },
+          {
+            "text": "Curated check flags the mislabelled neighbour",
+            "result": "PASS",
+            "note": "DC 0.525 flagged"
+          },
+          {
+            "text": "Other labels are not falsely flagged",
+            "result": "PASS",
+            "note": "T 0.701, Mono 0.901, ILC 0.916"
+          },
+          {
+            "text": "Disclosed p95 cost reproduces",
+            "result": "PASS",
+            "note": "99.4% of B cells, 14.3% overall"
+          },
+          {
+            "text": "Unchecked labels are counted",
+            "result": "PASS",
+            "note": "UNVERIFIED 12 of 2321"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "scripts/ood_gating_demo.py synthetic far-cluster demonstration",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rc 0, 4 s: novel cluster passes a 0.5 kNN-probability filter but is caught by the distance gate (81 Unknown), known cells 0% flagged; docstring states this is the easy case only.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Demo runs without error",
+            "result": "PASS",
+            "note": "rc 0"
+          },
+          {
+            "text": "Distance gate flags the novel cluster and spares known cells",
+            "result": "PASS",
+            "note": "81 Unknown; known wrongly flagged 0%"
+          },
+          {
+            "text": "Probability filter labelled as a stand-in for softmax",
+            "result": "PASS",
+            "note": "comment and docstring"
+          },
+          {
+            "text": "Demo states the real-data adjacent-type case is not caught",
+            "result": "PASS",
+            "note": "docstring limit sentence"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Stress",
+        "label": "Agent-driven marker check from SKILL.md instructions: own markers.json with genes absent from the 1604-gene set, an empty marker file, and the no-flag call",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Own markers (CD3D/CD3E/IL7R/CD2 for T, JCHAIN/XBP1/SDC1/MZB1 for Plasma, CST3/HLA-DPB1 for DC): T cells, ILC, Megakaryocytes get 0 usable markers and are listed NOT CHECKED, UNVERIFIED 1584 of 2594 (61.1%) printed; DC is judged on one marker (retained 1.000, n_markers=1) with no listed-versus-used count and no low-count warning; the line 'Flagged labels: none' is still printed. Empty {} markers: all labels NOT CHECKED, then an AttributeError traceback (rc 1) instead of a message, and the UNVERIFIED line is lost. No-flag: rc 2, no verdict.",
+        "basic": 29,
+        "specialized": 44,
+        "total": 73,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "No-flag call gives no verdict",
+            "result": "PASS",
+            "note": "rc 2, usage error"
+          },
+          {
+            "text": "Labels with no usable markers are never passed silently",
+            "result": "PASS",
+            "note": "NOT CHECKED list plus UNVERIFIED 61.1% on own markers"
+          },
+          {
+            "text": "Per-label table shows how many markers backed each verdict",
+            "result": "PASS",
+            "note": "n_markers column (DC 1, Monocytes 2, B cells 2)"
+          },
+          {
+            "text": "A label judged on very few markers is flagged or its listed count shown",
+            "result": "PASS",
+            "note": "visible only as n_markers=1; no listed count, no warning (judged adequate but weak, see AM-008)"
+          },
+          {
+            "text": "When no label receives a verdict the script ends with a message, not a traceback",
+            "result": "FAIL",
+            "note": "AttributeError 'DataFrame' object has no attribute 'flagged', rc 1 (fails closed, UNVERIFIED line not printed) (AM-008)"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 51.4,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "No-flag and absent-marker paths fail closed: rc 2 usage error with no verdict, and every unchecked label is listed with a counted UNVERIFIED line",
+    "Limitation is stated up front, in a measured table and in the usage guide, and every measured number (kNN gate, distance gate at p99 and p95, curated DC 0.160 / 0.525) reproduced in this independent run",
+    "Seeded, persisting, deterministic real-data template; SKILL.md snippets run as written on scvi-tools 1.5.1",
+    "Prose-only (Symphony, Azimuth) and heavy-optional methods (scPoli, popV, treeArches, foundation models) are explicitly labelled not executed"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "AM-008 Marker check: no message when nothing is checkable, and no listed-versus-used marker count",
+      "observed_in": [
+        6
+      ],
+      "problem": "With a marker file that matches no predicted label (empty {} or genes absent from the gene set for every label) label_marker_check.py prints NOT CHECKED then dies with AttributeError (rc 1) and never prints the UNVERIFIED line. Separately a label can be judged on one marker (DC retained 1.000 on 1 of 3 listed) with only the n_markers column as evidence.",
+      "root_cause": "res.flagged is read on an empty DataFrame; n_markers counts markers used but the number listed is not recorded or compared.",
+      "fix": "Guard the empty result (print the UNVERIFIED line and exit non-zero with a message), add an n_listed column and warn when n_markers is below 3. Small script change; the SKILL.md wording needs no change."
+    }
+  ]
+}

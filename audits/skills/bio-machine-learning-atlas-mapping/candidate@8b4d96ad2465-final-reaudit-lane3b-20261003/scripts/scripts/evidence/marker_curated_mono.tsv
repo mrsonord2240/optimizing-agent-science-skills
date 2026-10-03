@@ -1,0 +1,5 @@
+label	n_query	n_markers	retained	flagged
+T cells	1407	8	0.696	False
+DC	641	4	0.16	True
+B cells	338	6	0.789	False
+ILC	197	6	0.886	False

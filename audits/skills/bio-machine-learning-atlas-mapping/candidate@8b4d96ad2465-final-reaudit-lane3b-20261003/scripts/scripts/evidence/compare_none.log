@@ -1,0 +1,4 @@
+shape (2638, 1604) obs cols ['louvain', 'batch', 'truth_coarse', '_scvi_batch', 'cell_type', '_scvi_labels', 'predicted_label', 'transfer_uncertainty']
+labels identical 1.0 n 2638
+latent maxdiff 0.0
+uncert maxdiff 0.0

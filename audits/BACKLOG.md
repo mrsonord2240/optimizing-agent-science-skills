@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (44)
+## P1 (43)
 
 ### `bio-machine-learning-omics-classifiers` — OC-001: class_weight=balanced contradicts the Skill calibration stance
 
@@ -57,14 +57,6 @@ None open.
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
-
-### `bio-machine-learning-atlas-mapping` — AM-006 Default marker-check mode gives false reassurance (residual of AM-001)
-
-- Skill: 84, Limited Release · candidate `ba864911e88a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@ba864911e88a-reaudit-lane3b-20261003/viewer.md)
-- Observed in inputs: 3, 4, 6
-- Problem: Run with no --markers, label_marker_check.py prints 'Flagged labels: none' on the Monocytes hold-out (DC 0.730; 95.9% of held-out cells called DC) and flags the wrong label (T cells 0.563) on the B-cell hold-out, with no warning. SKILL.md documents this in prose and shows --markers in its command, but the script itself is silent, so an agent that omits the flag gets a confident wrong all-clear. Even with curated markers the largest label (T cells) is NOT CHECKED on the shipped pair, and curated markers exist only for PBMC.
-- Root cause: The default derives markers from the reference, which cannot contain markers of a missing neighbour (the derived DC markers are LYZ, FTH1, HLA-DRB1, CPVL: generic myeloid); the script treats the unreliable mode as an ordinary default.
-- Fix: Make --markers required (or, if the default stays, print a loud UNRELIABLE banner and qualify 'Flagged labels: none'); state in the usage text that markers must come from prior knowledge. Small localized script change plus one SKILL.md sentence; no method change.
 
 ### `bio-data-visualization-ggplot2-fundamentals` — GG-004 Long-ID volcano labels still collide where the Skill promises clean
 
@@ -492,14 +484,6 @@ None open.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
 
-### `bio-machine-learning-atlas-mapping` — AM-007 Residual overclaims and omissions around the gate and the check
-
-- Skill: 84, Limited Release · candidate `ba864911e88a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@ba864911e88a-reaudit-lane3b-20261003/viewer.md)
-- Observed in inputs: 3, 4, 6
-- Problem: The section header still reads 'Out-of-Distribution Gating (the step that makes labels trustworthy)'; usage-guide steps 5-6 and Tips present the gate and 'marker sanity checks' without the limitation or scripts/label_marker_check.py; the table column 'reference-calibrated distance gate 0.0%' omits its threshold (p99 of reference self-distances; at p95 it flags 25% of monocytes and 99% of B cells at 8-14% false flags overall); the bundled curated T-cell markers cannot be used on the shipped pair.
-- Root cause: The fix added a limitation subsection without revisiting the surrounding headings and the usage guide.
-- Fix: Retitle the header, add the check and its limitation to usage-guide.md, state the distance-gate threshold in the table note, and note that curated T-cell markers need a gene set that contains them. Text only.
-
 ### `bio-atac-seq-co-accessibility` — COACC-014 cryptic halt on a zero-read cell
 
 - Skill: 85, Production Ready · candidate `f7b386a41a3f` from [mrsonord2240/optimized-scientific-skills@2f38178](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2f381782596c6569fe5a8357556856512b7fbb6c/skills/bio-atac-seq-co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/mrsonord2240-optimized-scientific-skills@2f38178/viewer.md)
@@ -731,6 +715,14 @@ None open.
 - Problem: examples/interaction_query.py overwrites signed_effect and mechanism with the last SIGNOR record for a pair, so exported edge attributes differ between runs (MDM2->CDKN1A: destabilization/binding in one run, repression/empty in another).
 - Root cause: Records repeat per site/paper and are applied in server order with last-write-wins.
 - Fix: Collect effects and mechanisms per edge as sorted sets (or keep the first by a deterministic key) and say so in the example.
+
+### `bio-machine-learning-atlas-mapping` — AM-008 Marker check: no message when nothing is checkable, and no listed-versus-used marker count
+
+- Skill: 87, Production Ready · candidate `8b4d96ad2465` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@8b4d96ad2465-final-reaudit-lane3b-20261003/viewer.md)
+- Observed in inputs: 6
+- Problem: With a marker file that matches no predicted label (empty {} or genes absent from the gene set for every label) label_marker_check.py prints NOT CHECKED then dies with AttributeError (rc 1) and never prints the UNVERIFIED line. Separately a label can be judged on one marker (DC retained 1.000 on 1 of 3 listed) with only the n_markers column as evidence.
+- Root cause: res.flagged is read on an empty DataFrame; n_markers counts markers used but the number listed is not recorded or compared.
+- Fix: Guard the empty result (print the UNVERIFIED line and exit non-zero with a message), add an n_listed column and warn when n_markers is below 3. Small script change; the SKILL.md wording needs no change.
 
 ### `bio-ortholog-inference` — OI-11 Batch statuses undocumented in SKILL.md; snippet drops failed symbols
 

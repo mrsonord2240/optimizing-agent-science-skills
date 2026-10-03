@@ -1,0 +1,10 @@
+Novel cells passing a 0.5 kNN-probability filter (WRONG): 100%
+Novel cells caught by distance OOD gate (RIGHT):  100%
+Known cells wrongly flagged Unknown:              0%
+predicted_label
+Unknown    81
+Tcell      80
+Myeloid    80
+Bcell      79
+Name: count, dtype: int64
+rc=0
