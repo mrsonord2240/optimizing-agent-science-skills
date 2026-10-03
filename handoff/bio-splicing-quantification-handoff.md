@@ -1,37 +1,45 @@
-# Handoff: bio-splicing-quantification / reaudit-scientific-skill (delta mode)
+# Handoff: bio-splicing-quantification / orchestrator (commit, intake)
 
 - Updated: 2026-10-03
-- Status: fixed, awaiting delta re-audit
-- Owner leaving: text-only fix worker (fix-textbatch-20261003)
-- Next role: reaudit-scientific-skill, delta mode (revert each changed file to confirm the certified bytes reappear)
+- Lane: 2 (delta re-audit lane D2)
+- Status: candidate-ready
+- Owner leaving: delta re-audit worker D2 (fresh auditor)
+- Next role: orchestrator (commit exact bytes to make them ready); fix-scientific-skill for SQ-12 and SQ-14 when scheduled
 
-## Identities
+## Source identity
 
-- Working tree: F:\OpenScience\wt\norm-bio-splicing-quantification\skills\bio-splicing-quantification
-- Certified identity (keep): 0c0354add99bca532a1c7168b94a08a1923249a1a7adfddd7f7e9997953355bf, files=5, bytes=42079
-- Certifying record (keep): F:\optimizing-agent-science-skills\audits\skills\bio-splicing-quantification\candidate@0c0354add99b-run-reaudit-1
-- New candidate identity: 247bcf26db1833bc443dc9d651595ef84068f43a2593067f7c3bda72bd7e7adc, files=5, bytes=42306; `skill_preflight --offline` PASS (expected no-Skill-root-LICENSE warning)
+- Working tree: F:\OpenScience\wt\norm-bio-splicing-quantification\skills\bio-splicing-quantification (untracked by design)
+- Candidate identity: 247bcf26db1833bc443dc9d651595ef84068f43a2593067f7c3bda72bd7e7adc, files=5, bytes=42306 (preflight PASS before and after)
+- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-splicing-quantification\candidate@247bcf26db18-run-reaudit-2 (supersedes candidate@0c0354add99b-run-reaudit-1)
 
-## Dispositions
+## Completed this phase
 
-| ID | State | Note |
-|---|---|---|
-| SQ-13 | fixed (text only) | see fix log |
-| SQ-12 (needs code) | open, untouched | needs code; waits for a later run |
+- Delta qualified: 4 of 5 files byte-identical to the certified manifest; reversing the one SQ-13 sentence reproduces SKILL.md sha256 899e98ff...b622f exactly.
+- Score 85 (static 84, execution 86.4, assertions 35/37, L1 34.9, L2 51.6); narrow margin over the 85 gate.
+- SQ-13 resolved (719 of 958 chrX SE rows at 148/74, max 148/74, PSI formula still reproduces IncLevel).
+- New P2 SQ-14 (text only): the new clause "reached only for exons at least read-length long" is inexact (SkipFormLen is 74 in all 958 rows including a 1 nt exon; a 74 nt exon already gives 148).
 
-Other previously open findings: unchanged, see certifying record.
+## Open findings
 
-## Changed files (before/after sha256 in the fix log)
+| ID | Severity | State | Evidence | Required disposition |
+|---|---|---|---|---|
+| SQ-12 | P2 | open, untouched | run-reaudit-1 report | code fix in parse_rmats_output for a header-only file |
+| SQ-14 | P2 | open, new | run-reaudit-2\viewer.md | reword condition: IncFormLen maxima for exons >= readLength - 1; SkipFormLen stays readLength - 1 |
+| other P2s | P2 | unchanged | certified record | as recorded |
 
-- SKILL.md: JC IncFormLen/SkipFormLen stated as maxima for exons at least read-length long; per-event rMATS lengths must be used (719 of 958 chrX SE rows are 148/74)
+## Environment and evidence
 
-## Evidence
-
-- Fix log: F:\OpenScience\audits\bio-splicing-quantification\fix-textbatch-20261003\fix-log.md
-- No scripts executed beyond syntax checks; no executable statement changed.
-
-## Safety
-
+- TOOLS.md: F:\OpenScience\audits\bio-splicing-quantification\TOOLS.md (environments unchanged)
+- Run evidence: F:\OpenScience\audits\bio-splicing-quantification\run-reaudit-2\ (reused rMATS outputs of run-reaudit-1)
+- Not executed: as certified (MAJIQ V3, VAST-TOOLS, Shiba and others, labelled); IRFinder smoke not run
 - Tooling impact: none
-- Touched only this Skill directory (plus this handoff and the fix log); no commit or push
-- Untouched: records test/validate.bats, shelf .vscode/
+
+## Worktree safety
+
+- Run-owned changes: run-reaudit-2 run dir, published record, this handoff, regenerated audit views
+- Pre-existing/user-owned: records test/validate.bats, shelf .vscode/
+- Product commits/pushes: none
+
+## Transition assertion
+
+- Next-phase prerequisites met: yes

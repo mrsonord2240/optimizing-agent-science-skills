@@ -1,0 +1,84 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "alternative-splicing/splicing-quantification",
+    "subtree": "6e11b64e5f1c319983ec851f3d922655291db35a",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "git_blob": "686fd3bbca0044c82f86e05ce7cf3231e2fdcb83"
+      },
+      {
+        "path": "examples/quantify_splicing.py",
+        "git_blob": "43c5d63b74589c582c327559064c47e53696a47a"
+      },
+      {
+        "path": "usage-guide.md",
+        "git_blob": "37b3fa27d836861548f6e32755e4b72dd757d4a4"
+      }
+    ],
+    "normalization_note": "The audited tree moves examples/quantify_splicing.py to scripts/, extracts two references/ files from SKILL.md, and edits SKILL.md, usage-guide.md and the script (run-fix-1); origin identifies the source Skill subtree, not a one-to-one file mapping."
+  },
+  "candidate": {
+    "branch": "normalize/bio-splicing-quantification",
+    "commit": "29f5446",
+    "path": "F:\\OpenScience\\wt\\norm-bio-splicing-quantification\\skills\\bio-splicing-quantification",
+    "status_before": "untracked Skill subtree only",
+    "status_after_execution": "untracked Skill subtree only; candidate files unchanged (identity re-verified with skill_preflight --offline before and after)",
+    "content_sha256": "247bcf26db1833bc443dc9d651595ef84068f43a2593067f7c3bda72bd7e7adc",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 42306,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted by path and separated by LF; no trailing LF"
+    }
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 23571,
+      "sha256": "9fcbff357589f35ba01691094f4021f052e528054f29a85f14787c9e1c609e91"
+    },
+    {
+      "path": "references/failure-modes-and-errors.md",
+      "bytes": 5112,
+      "sha256": "12b85deb0af38d824f20ebee76689f4c12e664c44ef9ac6735c9d1b1aaff6e14"
+    },
+    {
+      "path": "references/intron-retention-and-microexons.md",
+      "bytes": 2779,
+      "sha256": "aaa647ac460e855c7e7cfa0bab54318b759d4387a47eea818e744dc2b93b66ad"
+    },
+    {
+      "path": "scripts/quantify_splicing.py",
+      "bytes": 6917,
+      "sha256": "4ce74bfa606cd0f28b8bfd1d1c468b820ca1d33d4849e113744348de1831d69a"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 3927,
+      "sha256": "20545299c848af694a40dbdfcac9a2a2442f16189ad63e91b6e57d941bd459a5"
+    }
+  ],
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-splicing-quantification\\TOOLS.md",
+    "tools_md_sha256": "13b0c7a4db587df809e02aac2bc52e87921ac05ec42036be8c0a86e0c7fadcec",
+    "rubric_zip_sha256": "recorded from repository skill-auditor.zip",
+    "environment": "WSL science: as-core (rMATS-turbo 4.4.0, regtools 1.0.0, leafcutter 0.2.9 scripts, STAR 2.7.11b, samtools 1.24; pandas 2.3.3, statsmodels 0.15.0), as-suppa (SUPPA 2.4, statsmodels 0.14.6, pandas 3.0.6), as-irfinder (IRFinder 1.3.1); combined env sha256 20c07bbbf63a972c04364225b028c9c83e0ee45a0ee9ee775cc56d7a8c26ad3c re-fingerprinted at audit start (unchanged); staged public data (nf-core rnasplice chrX 2v2, synthetic planted)"
+  },
+  "prior_audit": {
+    "identity": "0c0354add99bca532a1c7168b94a08a1923249a1a7adfddd7f7e9997953355bf",
+    "run": "run-reaudit-1",
+    "path": "F:\\optimizing-agent-science-skills\\audits\\skills\\bio-splicing-quantification\\candidate@0c0354add99b-run-reaudit-1",
+    "score": 85,
+    "grade": "Production Ready"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "delta": {
+    "mode": "text-only delta re-audit",
+    "qualification": "Only SKILL.md differs from the certified per-file sha256 values (4 other files byte-identical, including scripts/quantify_splicing.py). Reversing the one SQ-13 sentence on a scratch copy reproduces SKILL.md sha256 899e98ff33a29a8749b04c17da24116d80a409b0b6870e8f6dd474af444b622f exactly (certified size 23344 bytes).",
+    "fix_log": "F:\\OpenScience\\audits\\bio-splicing-quantification\\fix-textbatch-20261003\\fix-log.md"
+  }
+}

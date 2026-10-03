@@ -1,0 +1,18 @@
+python blocks in SKILL.md: 1
+Total SE events: 958
+Reliable events (>=20 reads in every replicate): 20
+snippet OK; rows 20
+      ID geneSymbol  mean_PSI_group1  mean_PSI_group2  mean_PSI  min_reads_per_replicate
+15    15        UXT            1.000            1.000    1.0000                     23.0
+107  107       RBM3            1.000            1.000    1.0000                     41.0
+109  109       RBM3            0.000            0.024    0.0120                     22.0
+110  110       RBM3            0.000            0.024    0.0120                     22.0
+233  233       NONO            0.914            0.969    0.9415                     25.0
+real JC SE formula check n=1465 maxabs=0.0005 distinct(IncFormLen,SkipFormLen) n=58 first=[('101', '74'), ('102', '74'), ('104', '74')]
+real JCEC SE formula check n=1549 maxabs=0.0005 distinct(IncFormLen,SkipFormLen) n=258 first=[('101', '74'), ('102', '74'), ('1022', '74')]
+planted JC SE formula check n=6 maxabs=0.0003 distinct(IncFormLen,SkipFormLen) n=1 first=[('98', '49')]
+planted JCEC SE formula check n=6 maxabs=0.0004 distinct(IncFormLen,SkipFormLen) n=1 first=[('149', '49')]
+JC SE rows 958 148/74: 719 max inc 148 max skip 74
+exons >=75 with inc!=148: 0
+exon len 74 -> {('148', '74')} ; exon len 1 -> {('75', '74')}
+rows with SkipFormLen != 74: 0
