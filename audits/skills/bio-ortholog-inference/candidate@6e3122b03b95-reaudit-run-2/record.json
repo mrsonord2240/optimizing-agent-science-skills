@@ -1,0 +1,84 @@
+{
+  "skill_id": "bio-ortholog-inference",
+  "version": "candidate@6e3122b03b95-reaudit-run-2",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/ortholog-inference",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference",
+    "subtree": "97db68da2fc40ebf988b217031d6b2ff648ea105"
+  },
+  "candidate": {
+    "identity": "6e3122b03b95f6b9666a03f538ff5e07657ad733c2f0b9a2c7f1de1749993bbb",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/dbaccess-ortholog-inference",
+    "commit": "2f38178",
+    "content_sha256": "6e3122b03b95f6b9666a03f538ff5e07657ad733c2f0b9a2c7f1de1749993bbb",
+    "path": "F:\\OpenScience\\wt\\dbaccess-ortholog-inference\\skills\\bio-ortholog-inference",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 14232,
+        "sha256": "617da6e5864192ec64ce3289a700738ccf3f9e2565ce698939f6c166c5df2d99"
+      },
+      {
+        "path": "examples/compara_orthologs.py",
+        "bytes": 1944,
+        "sha256": "7b6cbb7776e1a29b52db136172bbfd92b9612401dc3b2912a19c2487d3b6e730"
+      },
+      {
+        "path": "examples/cross_resource.py",
+        "bytes": 2740,
+        "sha256": "433683e2b7e2c5b776d0fb65288849cdf8add8c5a704ae6cb43ad004f097be2b"
+      },
+      {
+        "path": "examples/kegg_orthology.py",
+        "bytes": 1415,
+        "sha256": "9e8750f741a565c57ceb7c64386bbeb08851c8581c19037996299c2f793d5531"
+      },
+      {
+        "path": "scripts/ortholog_clients.py",
+        "bytes": 8451,
+        "sha256": "1271b75f8eebdff7d80589a940f9505bd77e71a17833e5b10c6e6aaed5c530af"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 5365,
+        "sha256": "5331aeb313a314481e519ed21a59431c9cece625274ba9e4f818ef03fe43b725"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Independent final re-auditor agent, lane 2 (not the fixer, tooler or prior auditor)",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs",
+    "auditor_independent": true
+  },
+  "supersedes": "candidate@aa32b5158669-reaudit-run",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 13
+  }
+}

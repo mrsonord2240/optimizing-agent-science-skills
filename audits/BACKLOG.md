@@ -410,7 +410,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (158)
+## P2 (157)
 
 ### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
 
@@ -596,30 +596,6 @@ None open.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
 
-### `bio-ortholog-inference` — OI-09 SKILL.md homology/id route needs a species
-
-- Skill: 84, Limited Release · candidate `aa32b5158669` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference) · [viewer](skills/bio-ortholog-inference/candidate@aa32b5158669-reaudit-run/viewer.md)
-- Observed in inputs: 5
-- Problem: The Compara section lists /homology/id/<ensembl_gene_id>, which returns 404; the working route is /homology/id/<species>/<id>.
-- Root cause: Route copied without a live check; the sibling ensembl-rest Skill fixed the same row.
-- Fix: Write /homology/id/<species>/<ensembl_gene_id> in SKILL.md.
-
-### `bio-ortholog-inference` — OI-10 Batch example hides failed and empty symbols
-
-- Skill: 84, Limited Release · candidate `aa32b5158669` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference) · [viewer](skills/bio-ortholog-inference/candidate@aa32b5158669-reaudit-run/viewer.md)
-- Observed in inputs: 1
-- Problem: compara_orthologs.py prints only the 1:1 rows and a count; MDM2 (read timeout, in the error column) and BRCA1 (no rows) are invisible, so 1:1 calls: 2 reads as a complete answer for five genes.
-- Root cause: The example never prints the error column or the symbols without calls that batch_compara returns.
-- Fix: Print symbols with an error (with the message) and symbols with no rows after the table.
-
-### `bio-ortholog-inference` — eggNOG redirect note is stale
-
-- Skill: 84, Limited Release · candidate `aa32b5158669` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference) · [viewer](skills/bio-ortholog-inference/candidate@aa32b5158669-reaudit-run/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md says eggnog6.embl.de/api redirects to eggnogdb.org/api; today the old host fails TLS verification and eggnogdb.org/api returns 403.
-- Root cause: Service moved after the note was written.
-- Fix: State both failure modes or only that scripted access is refused.
-
 ### `bio-atac-seq-co-accessibility` — COACC-014 cryptic halt on a zero-read cell
 
 - Skill: 85, Production Ready · candidate `f7b386a41a3f` from [mrsonord2240/optimized-scientific-skills@2f38178](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2f381782596c6569fe5a8357556856512b7fbb6c/skills/bio-atac-seq-co-accessibility) · [viewer](skills/bio-atac-seq-co-accessibility/mrsonord2240-optimized-scientific-skills@2f38178/viewer.md)
@@ -779,6 +755,22 @@ None open.
 - Problem: examples/interaction_query.py overwrites signed_effect and mechanism with the last SIGNOR record for a pair, so exported edge attributes differ between runs (MDM2->CDKN1A: destabilization/binding in one run, repression/empty in another).
 - Root cause: Records repeat per site/paper and are applied in server order with last-write-wins.
 - Fix: Collect effects and mechanisms per edge as sorted sets (or keep the first by a deterministic key) and say so in the example.
+
+### `bio-ortholog-inference` — OI-11 Batch statuses undocumented in SKILL.md; snippet drops failed symbols
+
+- Skill: 87, Production Ready · candidate `6e3122b03b95` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference) · [viewer](skills/bio-ortholog-inference/candidate@6e3122b03b95-reaudit-run-2/viewer.md)
+- Observed in inputs: 1
+- Problem: The three batch_compara statuses appear only in the docstring and example. The SKILL.md snippet filters on type == ortholog_one2one, so a user copying it would lose failed and empty symbols silently, the gap OI-10 closed in the example.
+- Root cause: The status column was added to the client and example but not to the SKILL.md snippet or prose.
+- Fix: Add one sentence naming the statuses and a status check (or a count of non-found symbols) to the SKILL.md snippet.
+
+### `bio-ortholog-inference` — OI-12 Unknown symbol reported as request failed
+
+- Skill: 87, Production Ready · candidate `6e3122b03b95` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference) · [viewer](skills/bio-ortholog-inference/candidate@6e3122b03b95-reaudit-run-2/viewer.md)
+- Observed in inputs: 5
+- Problem: batch_compara(["TP53","NOTAGENE123"]) labels NOTAGENE123 request failed (HTTP 400 text in the error column); Ensembl returns 400 for an unrecognised symbol. A user may read it as a transient outage and retry.
+- Root cause: All requests.RequestException classes share one status.
+- Fix: Document that a 400 in the error column means an unknown or renamed symbol (resolve_symbol first), or give 4xx its own status such as symbol not found.
 
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 

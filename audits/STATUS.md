@@ -109,7 +109,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 76 | Beta Only | 0 / 3 / 6 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md) |
 | `bio-ensembl-rest` | Data Analysis | 87 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-ensembl-rest/candidate@dabba949803e-reaudit-run/viewer.md) |
 | `bio-interaction-databases` | Data Analysis | 87 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-interaction-databases/candidate@f4d95b083e70-delta-reaudit-run/viewer.md) |
-| `bio-ortholog-inference` | Data Analysis | 84 | Limited Release | 0 / 0 / 3 | [viewer](skills/bio-ortholog-inference/candidate@aa32b5158669-reaudit-run/viewer.md) |
+| `bio-ortholog-inference` | Data Analysis | 87 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-ortholog-inference/candidate@6e3122b03b95-reaudit-run-2/viewer.md) |
 | `bio-uniprot-access` | Data Analysis | 88 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-uniprot-access/candidate@7a203a5063ea-delta-reaudit-run/viewer.md) |
 
 Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.

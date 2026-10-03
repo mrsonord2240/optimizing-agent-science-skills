@@ -1,0 +1,2 @@
+homology/id/human/ENSG00000141510?type=orthologues;target_species=mouse 200
+homology/id/ENSG00000141510?type=orthologues 404

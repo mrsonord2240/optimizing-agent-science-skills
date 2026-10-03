@@ -1,0 +1,16 @@
+=== Compara: TP53 human -> mouse ===
+  UNAVAILABLE (RequestException): 4 attempts failed for https://rest.ensembl.org/homology/symbol/human/TP53: HTTPSConnectionPool(host='rest.ensembl.org', port=443): Read timed out. (read timeout=45)
+
+=== OMA: TP53 (UniProt P04637) human -> mouse, 1:1 ===
+  OMA 1:1 orthologs: 130; mouse: ['P53_MOUSE']
+
+=== OrthoDB: TP53 (full-text search, group verified by human member) ===
+  Verified group 4289813at2759 (tumor protein p53, Eukaryota); mouse members: ['22059', 'Trp53']
+
+=== Interpretation ===
+Disagreement across resources is informative -- not error.
+Compara is tree-reconciled (best for vertebrates).
+OMA is strict (high precision, lower recall).
+OrthoDB is broad (broad coverage, more ambiguous calls).
+For publication-grade calls, intersect 2+ resources; inspect disagreements case by case.
+exit 0
