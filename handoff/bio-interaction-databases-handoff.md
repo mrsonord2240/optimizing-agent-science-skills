@@ -1,43 +1,34 @@
-# Handoff: bio-interaction-databases / reaudit-scientific-skill
+# Handoff: bio-interaction-databases / fix-scientific-skill (fix-run-2)
 
 - Updated: 2026-10-03
 - Lane: 1
-- Status: candidate-ready (independent final re-audit)
-- Next role: orchestrator (commit the bytes to make them `ready`, then intake)
+- Status: ready-for-phase
+- Next role: reaudit-scientific-skill
+- Tooling impact: none (no dependency, runtime, version, wrapper, service, executable path or surface changed; two behaviors inside existing functions)
 
-## Candidate identity (unchanged before and after the run)
+## Candidate identity
 
-- sha256-manifest-v1 `7430509d403cde092a4c2e1d02a12f7bc00c7183597ebfaafa3335254b02c5f5`, files=6, bytes=41606; `skill_preflight.py --offline` PASS
-- Tree: `F:\OpenScience\wt\dbaccess-interaction-databases\skills\bio-interaction-databases` (untracked, uncommitted by design, sparse worktree, no pycache)
+- sha256-manifest-v1 `16290147ab41129829074d65394467e2df7131b08099d0f2a4d42497af154024`, files=6, bytes=42142; `skill_preflight.py --offline` PASS
+- Prior audited identity: `7430509d403c...` (85, Production Ready). This candidate needs a fresh re-audit.
+- Tree: `F:\OpenScience\wt\dbaccess-interaction-databases\skills\bio-interaction-databases` (untracked, uncommitted by design, no pycache)
 
-## Result
+## Finding ledger
 
-- Final 85 (static 84, execution average 86.0), Production Ready, margin thin (85.2); L1 34.3, L2 51.7, assertions 33/35, no veto, no open P0
-- Report: `audits\skills\bio-interaction-databases\candidate@7430509d403c-reaudit-run\report.json` (viewer.md beside it)
-- Run dir and raw evidence: `F:\OpenScience\audits\bio-interaction-databases\reaudit-run\` (scripts, evidence)
-- Views regenerated (`audits:index`, `audits:check` clean)
+- IDM-001..009: fixed (verified by the prior re-audit; untouched)
+- IDM-010: fixed. `_add_edge` drops self-interactions (`a == b`), so `aggregate_networks` and `summary` stay in [0,1]. Docstring and SKILL.md aggregate bullet say self-interactions are dropped. Files: `scripts\interaction_clients.py`, `SKILL.md`.
+- IDM-011: fixed. `signor_for_gene` raises ValueError when a non-empty answer has no 28+ column rows; 'No result found.' still returns an empty frame with a warning. Docstring and SKILL.md SIGNOR paragraph updated. Files: same two.
 
-## Initial findings
+## Verification (final bytes)
 
-IDM-001..IDM-009: all verified-fixed on the final bytes against live services (details in the viewer). None open, none regressed.
+- Evidence: `F:\OpenScience\audits\bio-interaction-databases\fix-run-2\` (`verify.py`, `verify_output.txt`, `ex_*.txt`)
+- TP53+MDM2 with real BioGRID key: 1 edge (STRING, OmniPath, BioGRID), no self-loops, density 1.0
+- SIGNOR: 'No result found.' gives 0 rows plus warning; 'Service temporarily unavailable' and HTML 502 body raise ValueError; live TP53 returns 333 rows
+- Both examples exit 0; key scan of Skill and run dir: 0 hits
 
-## New findings (both P2, not blocking)
+## Not executed
 
-- IDM-010: `aggregate_networks` admits BioGRID self-interactions as self-loops; `summary()` reports density 3.0 for TP53+MDM2 (pre-existing, not caused by the fix). Evidence `evidence\selfloops.txt`.
-- IDM-011: non-empty unparseable SIGNOR answer returns an empty frame with no warning. Evidence `evidence\signor_junk.txt`.
+Unchanged from the prior re-audit (Reactome, HuRI, HuMAP, ConsensusPathDB, DIP, PhosphoSitePlus, IntAct client, R clients: static only).
 
-## Executed and not executed
+## Worktree safety
 
-- Executed on final bytes: both examples (exit 0), STRING, UniProt, SIGNOR, OmniPath (healthy today), BioGRID with the real key, key-leak retest with real and fake keys (message, Skill traceback frames, chained exceptions: no URL or key); real key scan of Skill, run dir, report: 0 hits
-- Not executed (static only, no client ships): Reactome, HuRI, HuMAP, ConsensusPathDB, DIP, PhosphoSitePlus, IntAct client, R clients
-- OmniPath commercial screen is source-level only (documented); surviving sources still need terms review
-
-## Worktree state
-
-- Skill tree untracked and untouched; records repo has the new untracked record directory and regenerated `audits` views, nothing staged or committed
-- `test\validate.bats` untracked and pre-existing, untouched
-- Environment: `F:\OpenScience\audit-envs\database-access` (py3.12.13, requests 2.34.2, pandas 3.0.5, networkx 3.7), nothing installed or downloaded
-
-## Next
-
-Orchestrator: commit the Skill bytes (optionally fix IDM-010/011 first via fix-scientific-skill, which would require a new re-audit), then intake.
+Nothing staged, committed or pushed; `test\validate.bats`, `fix-run\`, other Skills untouched.
