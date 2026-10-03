@@ -1,54 +1,40 @@
-# Handoff: bio-machine-learning-atlas-mapping / prepare-scientific-skill-tooling (delta)
+# Handoff: bio-machine-learning-atlas-mapping / prepare-scientific-skill-tooling (delta) -> reaudit
 
-- Updated: 2026-10-03T16:00:00-04:00
+- Updated: 2026-10-03
 - Lane: 3 (batch 3b-1)
 - Status: ready-for-phase
-- Owner leaving: fix-scientific-skill worker (lane 3b-1)
-- Next role: prepare-scientific-skill-tooling (delta mode), then reaudit-scientific-skill
+- Owner leaving: tooling worker (delta, lane 3b-1)
+- Next role: reaudit-scientific-skill (fresh auditor)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/atlas-mapping
-- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-atlas-mapping
-- Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dirs untracked by design)
-- Candidate tree hash: ba864911e88a7d48e4576f9f7f4f1668ef0ed85ddd429c151bbb6ebfc39cd094 (files=7, bytes=39154), `skill_preflight.py` PASS, no pycache
-- Applicable audit: audits\skills\bio-machine-learning-atlas-mapping\candidate@d4048dcc887b-initial-lane3b-20261003\ (identity d4048dcc887b, 77, Limited Release); now superseded by the bytes above
+- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-atlas-mapping (branch normalize/ml-lane3, Skill dirs untracked by design)
+- Candidate tree hash: ba864911e88a7d48e4576f9f7f4f1668ef0ed85ddd429c151bbb6ebfc39cd094 (files=7, bytes=39154), `skill_preflight.py` PASS before and after, no pycache. Skill bytes not edited.
+- Prior audit (identity d4048dcc887b, 77, Limited Release) is superseded by these bytes.
 
-## Completed this phase
+## Completed this phase (tooling delta)
 
-- Changed: SKILL.md, references/failure-modes.md, scripts/scarches_annotation.py (seed, writes query_annotated.h5ad, input contract), scripts/ood_gating_demo.py (relabel, scope); new scripts/label_marker_check.py, references/pbmc-markers.json.
-- AM-001 via route 2: no gate defensible on Monocyte hold-out (kNN 1.6% gated, distance 0.0%, DC 95.9%); limitation + measured table + marker-agreement check documented.
-- Executed on the staged real pair (4 full runs, 6 marker checks, demo). Fix log: F:\OpenScience\audits\bio-machine-learning-atlas-mapping\fix-lane3b-20261003\fix-log.md
+- TOOLS.md refreshed in place: F:\OpenScience\audits\bio-machine-learning-atlas-mapping\TOOLS.md (sha256 0818c47cd78b8dc26256c0fd3e0d28c04a1602c0ef60b5cbd2c74669aad225d1)
+- Environment fingerprint UNCHANGED: 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6 (single-cell freeze re-hashed read-only, identical b82090ff...). No package touched.
+- Executed from staged inputs (4 runs, all rc 0): scarches_annotation.py seeded, two baseline runs identical (labels 2638/2638, latent diff 0.0, `query_annotated.h5ad` written); Monocytes-removed; B-removed; label_marker_check.py (curated and reference-derived) on each; ood_gating_demo.py (100% / 0%). All numbers reproduce the fix log.
+- Staged and indexed (ecosystem `machine-learning`): `derived\atlas-pair-holdout\{reference_no_monocytes,reference_no_bcells}.h5ad` + `make_holdouts.py` under `F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\`; README rows and INDEX.md row updated. Baseline = existing `derived\atlas-pair\reference_labeled.h5ad`.
+- Rerun harness: F:\OpenScience\audits\bio-machine-learning-atlas-mapping\tooling-delta-lane3b-20261003\run_case.py (`none|mono|bcell <tag>`; reads staged files only); evidence in the same dir (summary_*.json, logs\, work\).
 
 ## Required next actions
 
-1. Tooling delta: record new surface `scripts/label_marker_check.py` (+ `references/pbmc-markers.json`), changed scripts; rerun `fix-lane3b-20261003/scripts/run_holdout.py`. No new dependency.
-2. Re-audit by a fresh auditor on the new identity; check the marker-check numbers (Monocytes/B-cell hold-outs) and the claim table in SKILL.md.
+1. Re-audit on the new identity; run SKILL.md snippets as written (not covered by this pass beyond the scripts), and rerun `run_case.py` cases.
+2. Check AM-001 claim table in SKILL.md against the numbers: kNN gate no-holdout 1.67%, Monocytes removed 1.59% Unknown (604/630 called DC), B removed 76.3% Unknown; curated markers flag DC at 0.160 (Mono) and 0.525 (B), nothing at baseline; derived markers miss Monocytes (DC 0.730), falsely flag T cells for B removed (0.563), T cells 0.605 at baseline. T cells NOT CHECKED with curated markers (absent from 1604-HVG set).
 
 ## Open findings and blockers
 
-| ID | Severity | State | Evidence | Disposition |
-|---|---|---|---|---|
-| AM-001 | P1 | fixed (limitation documented + marker check) | fix-log.md, holdout_*.json, logs\marker_*.log | gate itself not improved; for re-audit |
-| AM-002 | P2 | fixed | SKILL.md | not-executed label added |
-| AM-003 | P2 | fixed | SKILL.md | DataFrame documented |
-| AM-004 | P2 | fixed | SKILL.md, script docstring | snippet self-contained |
-| AM-005 | P2 | fixed | holdout_none1/none2.json | seeded, identical output |
-
-Caveats: marker check is group-level, curated T-cell markers absent from HVG set (NOT CHECKED), 0.6 threshold validated only on one PBMC pair. Blockers: none.
-
-## Environment and evidence
-
-- Tool inventory: F:\OpenScience\audits\bio-machine-learning-atlas-mapping\TOOLS.md (sha256 2004cafd57d3d4dcbc1bf03b9c312ccdb1f61d222ee7b64d94c8442b6e1f8c96)
-- Run evidence: F:\OpenScience\audits\bio-machine-learning-atlas-mapping\fix-lane3b-20261003\ (fix-log.md, holdout_*.json, logs\, scripts\, work\)
-- Restricted-access items: none
-- Tooling impact: changed (scarches_annotation.py and ood_gating_demo.py edited; label_marker_check.py new surface; no new dependency)
+Findings AM-001..AM-005 as dispositioned in the fix log (F:\OpenScience\audits\bio-machine-learning-atlas-mapping\fix-lane3b-20261003\fix-log.md); AM-001 gate not improved, limitation documented. Blockers: none. Restricted-access items: none.
+Not executed by design (Skill must label): scPoli, popV, treeArches/scHPL, foundation models (heavy-optional); Symphony, Azimuth (prose only).
 
 ## Worktree safety
 
-- Run-owned changes: the Skill dir above; the run dir above; this handoff
-- Pre-existing/user-owned changes: records test/validate.bats; shelf .vscode/; sibling workers' Skill dirs; none touched
-- Records state: uncommitted
+- Run-owned changes: tooling-delta-lane3b-20261003\, TOOLS.md, derived\atlas-pair-holdout\, README/INDEX rows, this handoff
+- Pre-existing/user-owned: records test/validate.bats; shelf .vscode/; sibling Skill dirs; untouched
 - Product commits/pushes: none
 
 ## Transition assertion
