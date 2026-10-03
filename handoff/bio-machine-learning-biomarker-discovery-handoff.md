@@ -1,58 +1,50 @@
-# Handoff: bio-machine-learning-biomarker-discovery / prepare-scientific-skill-tooling (delta)
+# Handoff: bio-machine-learning-biomarker-discovery / reaudit-scientific-skill (full mode)
 
-- Updated: 2026-10-03T16:05:00-07:00
+- Updated: 2026-10-03T16:10:00-07:00
 - Lane: 3
 - Status: ready-for-phase
-- Owner leaving: fix worker (lane 3a-1)
-- Next role: prepare-scientific-skill-tooling (delta mode), then reaudit-scientific-skill
+- Owner leaving: tooling-delta worker (lane 3a-1)
+- Next role: reaudit-scientific-skill (full mode)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/biomarker-discovery
-- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-biomarker-discovery
-- Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dir untracked by design)
-- Candidate tree hash: c64a3bcb57681c24d76debd7fe4788b3bd3fc5377b358595d62df7d955aaf3c7 (files=6, bytes=36037); `tools/skill_preflight.py` PASS (only warn: no Skill-root LICENSE)
-- Superseded identity (audited): e0d8efc0e1b0610d8c273b1e3837670cd94969cdec2b38614f6796efe08fed71; audit at audits/skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003
+- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-biomarker-discovery (untracked by design)
+- Branch/worktree: normalize/ml-lane3 from 29f5446
+- Candidate tree hash: c64a3bcb57681c24d76debd7fe4788b3bd3fc5377b358595d62df7d955aaf3c7 (files=6, bytes=36037); `tools/skill_preflight.py --offline` PASS (warn only: no Skill-root LICENSE)
+- Applicable audit: audits/skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003 (audited identity e0d8efc0..., superseded; fixes BD-001..BD-006 in fix-lane3-20261003)
 
 ## Completed this phase
 
-- All six findings fixed; changed files: SKILL.md, usage-guide.md, scripts/lasso_biomarker.py, scripts/boruta_feature_selection.py, new scripts/stability_selection.py.
-- Every SKILL.md python block (6) executed as written under `-W error::FutureWarning` on real Golub (1,000 top-variance probes, label-free filter); both scripts rc 0, no warnings.
-- Evidence dir: F:\OpenScience\audits\bio-machine-learning-biomarker-discovery\fix-lane3-20261003\ (evidence/, scripts/).
-
-## Finding dispositions
-
-| ID | State | Result (evidence under fix-lane3-20261003/evidence) |
-|---|---|---|
-| BD-001 | fixed | New `stability_selection()`: standardize per subsample, fixed per-subsample budget q (MB bound q=sqrt(EV(2pi-1)p)=37 at p=7129) instead of C. Full Golub raw: 5 stable vs 0 stable in each of 10 permuted-label runs (max freq 0.23-0.48). Standardized input: same 5. Unit-rescaled input: 6 (one marginal probe flips, max freq diff 0.08; docstring says so). Old procedure (audit): 61-64 real, 35 permuted. bd001.json |
-| BD-002 | fixed | scoring pinned to `accuracy`, stated with measured sizes (1,000 probes, scaler in pipeline, cv=5): neg_log_loss 601 (16 on permuted labels), roc_auc 203 (0), accuracy 148 (0); held-out AUC 0.991/0.983/0.991. Synthetic 5-true-of-2000: 56/57/57 selected. Single dataset/partition caveat in text. scoring_1000.json |
-| BD-003 | fixed | StandardScaler first in the pipeline (AUC 0.990); label now "In-pipeline CV AUC (k fixed)"; nested GridSearchCV snippet added. |
-| BD-004 | fixed | seed arg (default_rng); NaN index when nothing selected, caller prints "no features selected". |
-| BD-005 | fixed | boruta script now fits a CV L1 pipeline and prints what it keeps (4/5 vs Boruta 5/5); lasso script prints numbers, no stale "~0.7+" comment. |
-| BD-006 | fixed | `MRMRSelect` in-fold transformer snippet; runs (Golub 5-fold AUC 0.987 real, 0.41 permuted, t4 run). |
-
-Added to the workflow: permuted-label null count reported next to the real stable count; unit-rescaling check in lasso_biomarker.py.
+- Tooling delta done: new `scripts/stability_selection.py`, changed `lasso_biomarker.py` / `boruta_feature_selection.py`, SKILL.md blocks 0-5 all run rc 0 under `-W error::FutureWarning` at 1,000 and at full 7,129 probes; nothing timed out.
+- Refreshed TOOLS.md (below) with per-surface wall times, light/heavy call, three findings for the re-auditor.
+- Staged `derived\biomarker-discovery\` (top-1,000 subset, 10 permuted-label sets + snippet permutation, runner scripts) and extended the INDEX.md `machine-learning` row.
+- Joblib `WinError 6` did not recur. Environment unchanged; nothing installed or removed.
 
 ## Required next actions
 
-1. prepare-scientific-skill-tooling delta: register new surface `scripts/stability_selection.py` (import + lasso_biomarker.py), changed `scripts/*.py`, SKILL.md blocks 0-5 (pipeline, nested, MRMRSelect, Boruta, enet, stability). No new dependency.
-2. Re-audit with the harness at fix-lane3-20261003/scripts/run_skill_snippets.py (cwd = Skill dir; arg 1000 probes). Full 7,129-probe saga fits are too slow (>10 min per scoring).
+1. Re-audit all six BD findings against c64a3bcb... Rerun every claim from staging: `python F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\derived\biomarker-discovery\run_all.py <Skill dir> <1000|full> <logdir>` (README beside it).
+2. Weigh the tooling findings (details in TOOLS.md "Findings"):
+   - `stability_selection(seed=0)` is not reproducible: liblinear has no `random_state`; identical calls differ in frequency by up to 0.10 and in stable count (rescaled run 5 vs 4). Docstring/SKILL.md imply seeded. Fixer's "rescaled = 6" not reproduced (4/5/5).
+   - Permuted null is not always 0 (1 stable on the snippet's permutation at full size; seed 109 at 1,000 probes).
+   - SKILL.md gives no wall time for saga/Boruta at p=7,129; only the p>20k pre-filter row and "measured on 1,000 probes".
+
+## Open findings and blockers
+
+None blocking. Candidate findings above are for the re-auditor to grade.
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-machine-learning-biomarker-discovery\TOOLS.md
-- Environment: audit-envs\cheminformatics-hit-triage-analyst (Python 3.12.13, sklearn 1.9.1, numpy 2.5.3, pandas 3.0.5, mrmr-selection 0.2.8, Boruta 0.4.3); unchanged
-- Restricted-access items: none
-- Tooling impact: changed (new script surface scripts/stability_selection.py; changed snippets and both scripts)
-
-## Notes
-
-- One mRMR pipeline run printed a joblib `OSError: [WinError 6]` at interpreter exit once (not reproduced; results printed first).
-- A background 7,129-probe scoring run I started was killed by me (PID 99552/80212, confirmed own command line and start time).
+- Tool inventory: F:\OpenScience\audits\bio-machine-learning-biomarker-discovery\TOOLS.md (sha256 e6d2297cad470fb9ea90924265a46c049c40ab5b86f6fd2aa6ab6c7c27494377)
+- Environment fingerprint: 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6 (unchanged; venv freeze 9ba94225...be0a hash matches freeze\pip-freeze-shared.txt)
+- Wall times (1,000 / full): blocks 0-5 2/7, 14/96, 28/84, 68/104, 34/263, 5/41 s; stability table 22/306 s; lasso 6 s, boruta 6 s (synthetic). All light.
+- Run evidence: F:\OpenScience\audits\bio-machine-learning-biomarker-discovery\tooling-delta-20261003\logs\; fix evidence in fix-lane3-20261003\
+- Restricted-access items: none. R glmnet prose only, not executed.
+- Tooling impact: changed (handled in this phase)
 
 ## Worktree safety
 
-- Run-owned changes: Skill dir above (5 changed/new files); fix-lane3-20261003 evidence; this handoff
+- Run-owned changes: TOOLS.md; tooling-delta-20261003\logs; audit-envs\derived\biomarker-discovery\; INDEX.md row (one clause); this handoff. Skill bytes unchanged (a stray `scripts\__pycache__` from my helper was removed; hash re-verified).
 - Pre-existing/user-owned changes: records test/validate.bats; shelf .vscode/; sibling Skill dirs untouched
 - Product commits/pushes: none
 
