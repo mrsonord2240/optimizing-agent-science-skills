@@ -1,57 +1,45 @@
 # Handoff: bio-machine-learning-survival-analysis / prepare-scientific-skill-tooling (delta)
 
-- Updated: 2026-10-03T16:00:00-04:00
+- Updated: 2026-10-03
 - Lane: 3 (batch 3b-2)
 - Status: ready-for-phase
-- Owner leaving: fix-scientific-skill worker (lane 3b-2)
-- Next role: prepare-scientific-skill-tooling (delta mode), then reaudit-scientific-skill
+- Owner leaving: prepare-scientific-skill-tooling worker (delta, lane 3b-2)
+- Next role: reaudit-scientific-skill (full mode: runnable bytes changed)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/survival-analysis
-- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis
-- Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dir untracked by design; no product commit)
-- Candidate tree hash: c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39 (files=5, bytes=33891), `tools/skill_preflight.py` PASS (full and --offline-equivalent run, no pycache)
-- Previous identity: 2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b
-- Applicable audit: audits\skills\bio-machine-learning-survival-analysis\candidate@2dc45fa24b13-initial-lane3b-20261003\ (audited the previous identity; stale for these bytes)
+- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis (untracked by design; no product commit)
+- Candidate tree hash: c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39 (files=5, bytes=33891); `tools/skill_preflight.py --offline` PASS before and after this phase; Skill bytes untouched, no __pycache__
+- Previous audit (2dc45fa24b13...) is stale for these bytes; no usable exact audit exists
 
 ## Completed this phase
 
-- All five findings fixed; fix log and ledger: F:\OpenScience\audits\bio-machine-learning-survival-analysis\fix-lane3b-20261003\fix-log.md
-- SA-001: GBSG2 KM-baseline IBS 0.263 -> 0.178, equals lifelines/hand KM. SA-002: p>>n (n=150, p=1000) 161 nonzero / Uno C 0.708 -> CV alpha, 6 nonzero / 0.791; GBSG2 0.668 -> 0.669.
-- SKILL.md snippets execute as written (logs\run_skill_snippets.log); competing-risks and prose-only claims corrected.
-- Changed files: scripts/cox_regression.py, SKILL.md, usage-guide.md.
+- TOOLS.md refreshed in place (delta mode): F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md, sha256 4a6085401794e7b5f4dea829cdcca688faa191caa3340ae3d5c2aa136ada4c1b
+- cox_regression.py both modes light: synthetic 6.5 s, gbsg2 6.4 s, 0 stderr; fit_coxnet_cv at p>>n 3.3 s (the earlier >15 min approach is gone)
+- p>>n (n=150, p=1000) reproduced from staging: default path-end 161 nonzero / Uno C 0.708; CV alpha 0.1827, 6 nonzero / 0.791
+- SKILL.md snippets exec unmodified, 5.8 s; sksurv `cumulative_incidence_competing_risks` == lifelines AJ (0.2499), 4.2 s
+- Staged: audit-envs\cheminformatics-hit-triage-analyst\derived\survival-pgtn\ (make_pgtn.py, run_pgtn.py, time_runs.py, pgtn.npz); indexed in audit-envs\INDEX.md (machine-learning row) and the root TOOLS.md addendum
 
 ## Required next actions
 
-1. Tooling delta: re-smoke scripts/cox_regression.py (`--data synthetic|gbsg2`, new surface flag) and the SKILL.md snippet block; update TOOLS.md surface rows (old KM IBS 0.290 and "snippets 0.178 KM-only" figures are superseded).
-2. Reaudit the new identity with a fresh auditor (full mode: runnable bytes changed).
-
-## Findings
-
-| ID | Severity | State | Evidence |
-|---|---|---|---|
-| SA-001 | P1 | fixed | fix-lane3b-20261003\logs\verify_fixes.log |
-| SA-002 | P1 | fixed | same log, parts C-E |
-| SA-003 | P2 | fixed | logs\run_skill_snippets.log |
-| SA-004 | P2 | fixed | logs\competing_impl_check.log |
-| SA-005 | P2 | fixed | SKILL.md Version Compatibility and Model Taxonomy |
-
-Deferred: none. Blocked: none. R packages (cmprsk, riskRegression, randomForestSRC) are named, not installed or executed.
+1. Fresh auditor re-audits the new identity using TOOLS.md. p>>n rerun: `<survival-venv python> derived\survival-pgtn\run_pgtn.py <Skill>\scripts` (pgtn.npz already built; `make_pgtn.py` rebuilds it).
+2. Not executed, Skill must keep them labelled: Fine-Gray (cmprsk), CIF-based Brier (riskRegression), randomForestSRC, landmarking. pycox smoke-tested only (30 epochs CPU), not rerun.
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md (sha256 f74308bb8b2fd623cc27e8529cd61ce9f7a8045cbf5844f119e963cf63453e63); survival-venv, no new dependency
-- Run evidence: F:\OpenScience\audits\bio-machine-learning-survival-analysis\fix-lane3b-20261003\ (scripts\, logs\, fix-log.md)
-- Restricted-access items: none
-- Tooling impact: changed (scripts/cox_regression.py algorithm and CLI; SKILL.md snippets)
+- Environment fingerprint UNCHANGED: 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6 (fingerprint-inputs and both freezes re-hashed identical); no package change
+- Logs: F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3\logs\ (cox_delta_synthetic/gbsg2, cox_delta_timing, pgtn_make, pgtn_run, snippets_delta, competing_delta)
+- Fix evidence: F:\OpenScience\audits\bio-machine-learning-survival-analysis\fix-lane3b-20261003\
+- Blockers, restricted access: none
+- Tooling impact: delta complete
 
 ## Worktree safety
 
-- Run-owned changes: the Skill dir above, the run directory, this handoff
-- Pre-existing/user-owned: records untracked test/validate.bats; shelf .vscode/; sibling Skill dirs untouched
-- Incident: three unidentified python.exe PIDs (50840, 46632, 59468) were force-killed while stopping my own slow job; owner unknown, may include sibling workers' runs
-- Records state: uncommitted; Product commits/pushes: none
+- Run-owned changes: TOOLS.md, derived\survival-pgtn\, INDEX.md and root TOOLS.md rows, smoke logs, this handoff
+- Pre-existing/user-owned untouched: records test/validate.bats, shelf .vscode/, sibling Skill dirs
+- No process killed. Prior fixer incident (three unidentified python.exe PIDs force-killed) stands as recorded
+- Product commits/pushes: none
 
 ## Transition assertion
 
