@@ -1,0 +1,61 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/uniprot-access",
+    "subtree": "1c4d604cb066b2afd2435bade70b7381093d5a6a",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "fix/dbaccess-uniprot-access",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "path": "F:\\OpenScience\\wt\\dbaccess-uniprot-access\\skills\\bio-uniprot-access",
+    "content_sha256": "ea100b041cafcbf60a8d1202d6ca09387fff80515d37b45d5998162fb799bcb1",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-uniprot-access/ (untracked, uncommitted by design)",
+    "content_manifest": {
+      "file_count": 6,
+      "bytes": 30291
+    }
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 13199,
+      "sha256": "80aa0fcd82e707688089a5e71c640e8e439a0be6f29e824913e5cc8b209cf098"
+    },
+    {
+      "path": "examples/isoforms_and_xrefs.py",
+      "bytes": 1448,
+      "sha256": "e252eb4c41ef9765d8d9a594d028e077d726f7a99c038c2119fff6b9ef632add"
+    },
+    {
+      "path": "examples/uniprot_query.py",
+      "bytes": 1562,
+      "sha256": "297bb13b29fa5b753334bb2d116ef658146ef29a138dc3e06a78f6bf3233e062"
+    },
+    {
+      "path": "scripts/uniprot_client.py",
+      "bytes": 8003,
+      "sha256": "3c26b2ae854c3486486217cd2430989c61ceb8e6226c00467c16a7e564a94724"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 5014,
+      "sha256": "bc8073257ff8626b128795f5231865871fcb05ffa5ce3f00bc25e1c7a510dbab"
+    }
+  ],
+  "prior_audited_identity": "7f82b9d5aae0ba064038b97d399123a2be4d845124d1d4cf13a0918dd4e48240",
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "environment": "database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397",
+    "service": "UniProt release 2026_03 (X-UniProt-Release)",
+    "preflight": "skill_preflight.py --offline PASS before and after"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

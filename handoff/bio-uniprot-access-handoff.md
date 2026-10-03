@@ -1,66 +1,41 @@
-# Handoff: bio-uniprot-access / fix-scientific-skill
+# Handoff: bio-uniprot-access / reaudit-scientific-skill
 
 - Updated: 2026-10-03
-- Lane: 2
-- Status: ready-for-phase
-- Owner leaving: fix worker (Sonnet), lane 2, batch database-access light
-- Next role: reaudit-scientific-skill (tooling delta done 2026-10-03)
+- Lane: 1 (re-audit worker)
+- Status: candidate-ready (independent final re-audit)
+- Next role: orchestrator (commit the bytes to make them `ready`, then intake)
 
-## Source identity
+## Candidate identity (unchanged before and after the run)
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/uniprot-access
-- Working tree: F:\OpenScience\wt\dbaccess-uniprot-access\skills\bio-uniprot-access (untracked by design)
-- Branch/worktree: fix/dbaccess-uniprot-access at 2f38178
-- Audited candidate: 7f82b9d5aae0ba064038b97d399123a2be4d845124d1d4cf13a0918dd4e48240 (audit score 61, Beta Only)
-- New candidate identity: ea100b041cafcbf60a8d1202d6ca09387fff80515d37b45d5998162fb799bcb1 (sha256-manifest-v1, files=6, bytes=30291); preflight --offline PASS, no pycache
+- sha256-manifest-v1 `ea100b041cafcbf60a8d1202d6ca09387fff80515d37b45d5998162fb799bcb1`, files=6, bytes=30291; `skill_preflight.py --offline` PASS
+- Tree: `F:\OpenScience\wt\dbaccess-uniprot-access\skills\bio-uniprot-access` (untracked, uncommitted by design, no pycache)
 
-## Finding ledger
+## Result
 
-| ID | Sev | State | Change / evidence |
-|---|---|---|---|
-| UNI-001 | P1 | fixed | map_ids reads /idmapping/stream (44 rows incl BRCA2), merges unmapped inputs into failedIds, FAILED raises, Swiss-Prot target documented; verify.py |
-| UNI-002 | P1 | fixed | download_proteome uses uniprotkb/stream?query=proteome:UPID&format=fasta&compressed=true (UP000000625: 4403 records, valid gzip); endpoint table fixed |
-| UNI-003 | P1 | fixed | isoforms_and_xrefs.py joins ids; example exits 0 |
-| UNI-004 | P1 | fixed | xref:pdb -> database:pdb (904 hits); ft_active_site -> ft_act_site (accepted live) |
-| UNI-005 | P2 | fixed | search_tsv(with_total=True) + truncation warning; example prints N of total; KW-0418; corpus sizes 576K / 149M (2026_03) |
-| UNI-006 | P2 | fixed | inactive entry raises ValueError with reason; failure-mode text corrected (secondary redirects, deleted = 200 Inactive) |
-| UNI-007 | P2 | fixed | uniref_cluster: identity=50 (int), representative=P04637, representative_member_id=P53_HUMAN |
-| UNI-008 | P2 | fixed | _request helper: 60 s timeout, retry 429/5xx with Retry-After, connection retries; poll uses monotonic clock and FAILED check. stream_tsv still buffers in memory (documented; not needed for readiness) |
-| UNI-009 | P2 | fixed | upstream MIT LICENSE copied byte-identical to Skill root (text-only batch) |
+- Final 86 (static 85, execution average 87.0), Production Ready; L1 34.8, L2 52.2, assertions 29/30, no veto, no open P0
+- Report: `audits\skills\bio-uniprot-access\candidate@ea100b041caf-reaudit-run\report.json` (viewer.md beside it)
+- Run dir and raw evidence: `F:\OpenScience\audits\bio-uniprot-access\reaudit-run\`
+- Views regenerated (`audits:index`, `audits:check` clean)
 
-Claim-family sweep done (rg for xref:pdb, active_site, 250M, 570K, fasta.gz, results/{jobId}, 404 or 301, KeyError): survivors are intentional warnings (SKILL.md) and the client docstring.
+## Initial findings
 
-## Changed files
+UNI-001..UNI-009: all verified-fixed on the final bytes against UniProt 2026_03 (details in the viewer). None open, none regressed.
 
-scripts/uniprot_client.py, SKILL.md, usage-guide.md, examples/isoforms_and_xrefs.py, examples/uniprot_query.py, LICENSE (added, UNI-009).
+## New finding (P2, not blocking)
 
-## Execution record
+- UNI-010: `download_proteome('UP000005640')` returns 147,520 entries (20,416 reviewed + 127,104 TrEMBL), 37.8 MB gzip; the example prints "~20 MB compressed; ~80 MB unpacked; ~20K proteins" and no text says TrEMBL is included. Function works and equals the server count. Evidence `evidence\proteome.txt`, `evidence\proteome_counts.txt`.
 
-- F:\OpenScience\audits\bio-uniprot-access\fix-run\verify.py and verify_output.txt: 15 checks, ALL OK against UniProt 2026_03 (live), env database-access-venv py3.12.13, requests 2.34.2, pandas 3.0.5; both examples run end to end, resolve_obsolete regression passes, retry helper tested with a stubbed 429.
-- Original audit evidence: F:\OpenScience\audits\bio-uniprot-access\initial-audit-run\ (scripts there not rerun; verify.py covers the same claims with assertions)
+## Executed and not executed
 
-## Tooling impact: changed
+- Every surface executed on final bytes: all client functions, both examples (exit 0), retry helper (stubbed 429/503/connection errors), stuck and FAILED ID-mapping jobs (stubbed status), E. coli and human proteome downloads (temporary files deleted)
+- Not executed: none
 
-No new dependency, runtime, model or data. Runnable surfaces changed: map_ids, resolve_obsolete, search_tsv, fetch_entry_json, uniref_cluster, download_proteome (new route), both examples.
+## Worktree state
 
-## Tooling (delta, 2026-10-03)
+- Skill tree untracked and untouched; records repo has the new untracked record directory and regenerated `audits` views, nothing staged or committed
+- `test\validate.bats` untracked and pre-existing, untouched
+- Environment: `F:\OpenScience\audit-envs\database-access` (py3.12.13, requests 2.34.2, pandas 3.0.5), nothing installed
 
-- TOOLS.md: F:\OpenScience\audits\bio-uniprot-access\TOOLS.md (refreshed; stale proteome, map_ids truncation and example-failure rows replaced). Shared: F:\OpenScience\audit-envs\database-access\TOOLS.md (service table refreshed).
-- Fingerprint verified live: database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397.
-- Identity unchanged (preflight --offline PASS): ea100b041cafcbf60a8d1202d6ca09387fff80515d37b45d5998162fb799bcb1, files=6, bytes=30291.
-- Installed: nothing. Downloaded: nothing. Live spot check: fetch_entry_json, search_tsv, map_ids (BRCA2 present), resolve_obsolete, uniref_cluster all pass.
-- Not made ready: none. Human proteome (~20 MB) not staged; UP000000625 used.
+## Next
 
-## Blockers
-
-None.
-
-## Worktree safety
-
-- Run-owned changes: the five Skill files above (untracked), fix-run dir above
-- Pre-existing/user-owned: F:\optimizing-agent-science-skills\test\validate.bats (untouched)
-- Product commits/pushes/staging: none. Other lanes' worktrees untouched.
-
-## Transition assertion
-
-- Next-phase prerequisites met: yes
+Orchestrator: commit the Skill bytes (optionally fix UNI-010 first via fix-scientific-skill, which would require a new re-audit), then intake.

@@ -1,0 +1,78 @@
+{
+  "skill_id": "bio-interaction-databases",
+  "version": "candidate@7430509d403c-reaudit-run",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/interaction-databases",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/interaction-databases",
+    "subtree": "249aaeefc35d2b75f343c8539fa076adb8f12c17"
+  },
+  "candidate": {
+    "identity": "7430509d403cde092a4c2e1d02a12f7bc00c7183597ebfaafa3335254b02c5f5",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/dbaccess-interaction-databases",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "content_sha256": "7430509d403cde092a4c2e1d02a12f7bc00c7183597ebfaafa3335254b02c5f5",
+    "path": "F:\\OpenScience\\wt\\dbaccess-interaction-databases\\skills\\bio-interaction-databases",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 17017,
+        "sha256": "1baa8ea7e3a6c109d9affd03b4daa53ab19dd224d48f3021d13894808821ed02"
+      },
+      {
+        "path": "examples/interaction_query.py",
+        "bytes": 3920,
+        "sha256": "cfc42c5c05fedf3a738f6aef07a62ed3f04ec284d80e495b797816e6a5964195"
+      },
+      {
+        "path": "examples/string_network.py",
+        "bytes": 2366,
+        "sha256": "7c2cbcc92df4f0238ab4cded0eded94615b3291e46f05297680dfec92e312245"
+      },
+      {
+        "path": "scripts/interaction_clients.py",
+        "bytes": 11412,
+        "sha256": "8e7f6071dcd2a0b393b148829ba73942fb3993084617d61af0f0bb1c896eb528"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 5826,
+        "sha256": "6fceab3986b5bba20db599e8d11e9870a2d753ada0bfcc25d1a7540f67b91ade"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@588996fc143f-initial-audit-run",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 5
+  }
+}
