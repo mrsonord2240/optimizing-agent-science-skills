@@ -16,7 +16,10 @@ Verify the assigned Skill, origin repository/path/commit, working
 repository/path/branch, lane, phase, and ownership. Inspect Git status in every
 repository you may touch. Treat pre-existing modified and untracked files as
 user-owned; use a run-owned branch or isolated worktree and stop for any
-unisolated overlap. Keep provider-source checkouts read-only.
+unisolated overlap. A worktree you create is a sparse checkout holding only the
+assigned Skills (`git worktree add --no-checkout`, then
+`git sparse-checkout set --cone skills/<skill-id>`, then `git checkout`), never
+the whole shelf. Keep provider-source checkouts read-only.
 
 Work only on the Skills your brief assigns (one, or a batch the relay allows) and this phase only. Do not reset, clean, rebase, overwrite,
 delete, or reconcile unrelated work. Do not commit a product repository, push,

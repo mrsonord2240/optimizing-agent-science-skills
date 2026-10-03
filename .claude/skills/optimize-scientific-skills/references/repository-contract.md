@@ -35,6 +35,22 @@ that cannot be isolated safely.
 Make only changes needed for the assigned phase. Never bypass authentication,
 payment, licensing, registration, or other access controls.
 
+## Keep worktrees sparse
+
+A worktree holds only the Skills being optimized in it, never a copy of the
+whole shelf. Create it without a checkout and set the cone before populating:
+
+```powershell
+git -C F:\optimized-scientific-skills worktree add --no-checkout -b <branch> F:\OpenScience\wt\<name> <start-commit>
+git -C F:\OpenScience\wt\<name> sparse-checkout set --cone skills/<skill-id> [...]
+git -C F:\OpenScience\wt\<name> checkout
+```
+
+Cone mode keeps the repository's root files and the named Skill directories
+only. Add a second Skill to the cone only when the same optimization needs to
+edit or read it. A worker that finds a full checkout reports it; it does not
+copy other Skills in.
+
 ## Product and publication boundaries
 
 Phase workers do not commit product repositories. The orchestrator forms at
