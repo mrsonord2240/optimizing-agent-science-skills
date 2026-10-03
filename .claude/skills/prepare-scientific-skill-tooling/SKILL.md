@@ -39,11 +39,18 @@ registration or a paid license. List it in `TOOLS.md` as
 the Skill must label it as not executed. Build a heavy core surface, and stage
 its inputs once for the ecosystem.
 
+Stage per ecosystem (the upstream category), not per Skill. The ecosystem root
+is `F:\OpenScience\audit-envs\<ecosystem>\`, with inputs under `public-data\`
+and a README there holding one row per file: source URL, bytes, sha256, and
+licence. Before any download or environment build, read that README and the
+ecosystem's existing `TOOLS.md` files, verify a matching entry is live, and
+reuse it; add only what is missing. Put inputs derived from a download under
+`derived\` with the script that made them. Never create a per-Skill or per-run
+staging directory, and never delete staging at the end of a run.
+
 When the brief assigns several Skills of one ecosystem, build each shared
-environment and public input once, write one `TOOLS.md` per Skill that links the
-shared rows, and stage shared inputs under
-`F:\OpenScience\audit-envs\<ecosystem>\public-data\` with a README recording
-source URL, bytes, and sha256.
+environment and public input once and write one `TOOLS.md` per Skill that links
+the shared rows.
 
 For a delta pass, compare the fix handoff and diff with the prior inventory.
 Verify unaffected surfaces retain a live environment; rebuild only what the

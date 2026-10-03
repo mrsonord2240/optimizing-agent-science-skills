@@ -55,9 +55,31 @@ Otherwise it is **light**.
 | Delta re-audit | any | up to 3 |
 | Final re-audit | light Skills | up to 3; heavy: 1 |
 
-Stage shared public inputs once per ecosystem under
-`F:\OpenScience\audit-envs\<ecosystem>\public-data\` with a README recording
-source URL, bytes, and sha256, and reuse them across Skills.
+## Shared staging
+
+Environments and public inputs are built once per ecosystem and reused by every
+Skill, phase, and later run. This is the largest saving in the relay; protect it.
+
+- The ecosystem is the upstream category (`atac-seq`, `alignment-files`). Its
+  root is `F:\OpenScience\audit-envs\<ecosystem>\`, with inputs under
+  `public-data\`. Reuse the existing directory for a category; never create a
+  per-Skill or per-run staging directory.
+- `public-data\README.md` is the index: one row per file with source URL,
+  bytes, sha256, and licence. Put inputs derived from a download (slices,
+  indexes, planted truth sets) under `derived\` with the script that made them.
+- Before any download or environment build, read that README and the
+  ecosystem's existing `TOOLS.md` files. Reuse a matching entry; add a row only
+  for what is missing.
+- Staging outlives the run. Do not delete or rebuild it at close.
+- Only a tooling worker adds to staging or changes an environment. An audit,
+  fix, or re-audit worker that needs a new input reports it for a tooling-delta
+  pass instead of fetching into its run directory.
+- Every brief for a tooling, audit, fix, or re-audit worker names the ecosystem
+  staging path.
+
+When choosing work, fill a run from as few ecosystems as the queue allows, and
+prefer an ecosystem that is already staged, so one tooling pass serves the
+whole claim.
 
 ## Scheduling
 

@@ -65,7 +65,8 @@ whose validity depended on it. Correct the whole invalidated claim family in
 the same pass or record each intentional survivor with evidence. Do not stop at
 the line named by the finding.
 
-Use the prepared tooling. If the fix needs a new dependency, runtime, version,
+Use the prepared tooling and take inputs from the ecosystem staging that
+`TOOLS.md` names; do not download into the run directory. If the fix needs a new dependency, runtime, version,
 wrapper, model, dataset, service, or executable path, record that fact and do
 only the minimum safe implementation work needed; environment installation and
 validation belongs to a subsequent tooling-delta worker.

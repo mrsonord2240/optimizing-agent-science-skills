@@ -190,7 +190,8 @@ an existing `TOOLS.md` covers the exact runnable-surface inventory and its
 recorded environment fingerprint is verified live. Tooling must be ready
 before an initial audit or, when a usable initial audit is reused, before a fix.
 Batch tooling by ecosystem so shared environments and public inputs are built
-once. Do not tool heavy optional surfaces (defined in the tooling worker
+once, and reuse what earlier runs already staged, under the shared staging
+rules in relay operations. Do not tool heavy optional surfaces (defined in the tooling worker
 Skill); they stay labelled as not executed in the Skill.
 
 ### 4. Audit, fix, and certify

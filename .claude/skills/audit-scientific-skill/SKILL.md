@@ -39,7 +39,9 @@ do not restart a broad migration inside the audit.
 
 ## Execute representative end-to-end workflows
 
-Use the prepared environment without installing a new stack. Run the most
+Use the prepared environment without installing a new stack, and take inputs
+from the ecosystem staging that `TOOLS.md` names. Do not download into the run
+directory; record a missing input in the handoff for a tooling-delta pass. Run the most
 common public workflow end to end, from realistic input through inspected
 scientific output. Run a second end-to-end workflow when it exercises a
 materially different supported mode, runtime, algorithm, or integration and a

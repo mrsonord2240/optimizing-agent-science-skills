@@ -62,8 +62,9 @@ validation documentation. Test an invalid or adversarial value only when silent
 acceptance could plausibly corrupt scientific results, report false success,
 cross a security or destructive boundary, or corrupt a public output contract.
 
-Do not install missing tooling. Route an invalidated environment back to a
-tooling-delta pass. For a paid, private, authenticated, licensed,
+Do not install missing tooling or download inputs; take inputs from the
+ecosystem staging that `TOOLS.md` names. Route an invalidated environment or a
+missing input back to a tooling-delta pass. For a paid, private, authenticated, licensed,
 registration-bound, unavailable, or resource-infeasible surface, record the
 exact after-action item and do not count it as executed.
 
