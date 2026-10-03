@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-ortholog-inference",
+  "candidate_version": "candidate@6e3122b03b95-reaudit-run-2",
+  "candidate_identity": "6e3122b03b95f6b9666a03f538ff5e07657ad733c2f0b9a2c7f1de1749993bbb",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+  "provider_path": "skills/bio-ortholog-inference",
+  "provider_tree": "2d45424925a473458825418ec8e22b4694b72e31",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "6e3122b03b95f6b9666a03f538ff5e07657ad733c2f0b9a2c7f1de1749993bbb",
+  "file_count": 7,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 14232,
+      "sha256": "617da6e5864192ec64ce3289a700738ccf3f9e2565ce698939f6c166c5df2d99"
+    },
+    {
+      "path": "examples/compara_orthologs.py",
+      "bytes": 1944,
+      "sha256": "7b6cbb7776e1a29b52db136172bbfd92b9612401dc3b2912a19c2487d3b6e730"
+    },
+    {
+      "path": "examples/cross_resource.py",
+      "bytes": 2740,
+      "sha256": "433683e2b7e2c5b776d0fb65288849cdf8add8c5a704ae6cb43ad004f097be2b"
+    },
+    {
+      "path": "examples/kegg_orthology.py",
+      "bytes": 1415,
+      "sha256": "9e8750f741a565c57ceb7c64386bbeb08851c8581c19037996299c2f793d5531"
+    },
+    {
+      "path": "scripts/ortholog_clients.py",
+      "bytes": 8451,
+      "sha256": "1271b75f8eebdff7d80589a940f9505bd77e71a17833e5b10c6e6aaed5c530af"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 5365,
+      "sha256": "5331aeb313a314481e519ed21a59431c9cece625274ba9e4f818ef03fe43b725"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

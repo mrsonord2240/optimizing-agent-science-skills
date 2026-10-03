@@ -1,0 +1,47 @@
+[PASS] OI-02 retry 503,503 then 200: (200, 3)  (0.0s)
+[PASS] OI-02 429 with Retry-After then 200: (200, 2)  (0.0s)
+[EXC ] OI-02 persistent 500 raises RequestException after max_retries: RequestException: 4 attempts failed for http://127.0.0.1:61364/always500: 500 from http://127.0.0.1:61364/always500  (0.0s)
+       always500 hits: 4
+[PASS] OI-02 404 raises HTTPError; allow_404 returns: 404  (0.0s)
+[PASS] 404 without allow_404 raises HTTPError: 404 Client Error: Not Found for url: http://127.0.0.1:61364/gone
+[EXC ] OI-02 unreachable host raises RequestException: RequestException: 2 attempts failed for http://127.0.0.1:9/x: HTTPConnectionPool(host='127.0.0.1', port=9): Max retries exceeded with url: /x (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=9): Failed to establish a new connection: [WinError 10061] No conne  (4.1s)
+[PASS] Compara resolve TP53: ENSG00000141510  (1.2s)
+[EXC ] OI-03 TP53 human->mouse row schema: RequestException: 4 attempts failed for https://rest.ensembl.org/homology/symbol/human/TP53: HTTPSConnectionPool(host='rest.ensembl.org', port=443): Read timed out. (read timeout=45)  (196.6s)
+[PASS] compara_one2one Trp53 mouse->human: {'source_id': 'ENSMUSG00000059552', 'source_pid': 77.9487, 'target_species': 'homo_sapiens', 'target_id': 'ENSG00000141510', 'target_pid': 77.3537, 'type': 'ortholog_one2one', 'taxonomy_level': 'Euarchontoglires', 'confi  (6.8s)
+[EXC ] MARCH1 -> HTTP 400: HTTPError: 400 Client Error: Bad Request for url: https://rest.ensembl.org/lookup/symbol/human/MARCH1  (0.2s)
+[PASS] MARCHF1 resolves: ENSG00000145416  (0.7s)
+[PASS] batch_compara 2 genes zebrafish: [{'symbol': 'TP53', 'target_id': 'ENSDARG00000035559', 'type': 'ortholog_one2one', 'taxonomy_level': 'Euteleostomi'}, {'symbol': 'ATM', 'target_id': 'ENSDARG00000002385', 'type': 'ortholog_one2one', 'taxonomy_level': 'Ch  (106.3s)
+[FAIL] SKILL.md route /homology/id/<gene id> without species: 404  (0.9s)
+[PASS] route /homology/id/human/<gene id>: 200  (0.7s)
+[PASS] OI-04 search tumor protein p53 contains exact-name group: [{'id': '4289813at2759', 'name': 'tumor protein p53', 'level_name': 'Eukaryota', 'gene_count': '800'}, {'id': '1534948at33208', 'name': 'tumor protein p53', 'level_name': 'Metazoa', 'gene_count': '799'}, {'id': '742841at  (1.0s)
+[PASS] OI-04 search TP53 first hit is not the p53 group (documented trap): [{'id': '4837993at2759', 'name': 'phosphoglycerate mutase', 'level_name': 'Eukaryota', 'gene_count': '15435'}, {'id': '4219792at2759', 'name': 'TP53-target gene 3 protein', 'level_name': 'Eukaryota', 'gene_count': '21'},  (0.4s)
+[PASS] OI-01 p53 group mouse members: ['22059', 'Trp53', 'Trp53', 'Trp53', 'Trp53', 'Trp53']  (0.2s)
+[PASS] OI-01 p53 group human members: ['TP53', '7157']  (0.2s)
+[PASS] OI-04 group_has_gene TP53 in p53 group: True  (0.2s)
+[PASS] OI-04 group_has_gene rejects BRCA1 in p53 group: False  (0.2s)
+[PASS] OI-04 TIGAR-ranked group rejected for TP53: [False, False]  (0.8s)
+[PASS] OI-01 null data -> [] (p53 group at a species with no member): []  (0.2s)
+[PASS] orthodb_groups returns ids: ['733642at2759', '4931607at2759', '1835377at33208']  (0.4s)
+[PASS] OI-06 /tab?id= returns TSV: pub_og_id	og_name	level_taxid	organism_taxid	organism_name	pub_gene_id	description
+4289813at2759	tumor protein p53	2759	  (0.6s)
+[PASS] OI-06 /tab?query= is 404: 404  (5.1s)
+[PASS] OrthoDB /group: {'id': '4289813at2759', 'name': 'tumor protein p53', 'tax_id': 2759, 'public_id': '4289813at2759', 'level_name': 'Eukaryota', 'interpro_domains': [{'id': 'IPR008967', 'name': 'IPR008967', 'type': 'interpro', 'count': 255  (0.2s)
+[FAIL] OMA TP53 1:1: [('A0A6P8IM60', 'ACTTE', 6105), ('A0A913YJX1', 'EXADI', 2652724), ('XP_032239870.1', 'NEMVE', 45351), ('A0AAD9V0L3', 'ACRCE', 6130), ('A0A3P7K7U3', 'LITSI', 42156)]  (8.2s)
+[PASS] OMA BRCA1 P38398 -> [] (documented as no call): []  (5.0s)
+[PASS] OMA hog for P04637: HOG:F0782425.2c.7a  (2.3s)
+[PASS] KEGG hsa:7157 -> K04451: ['K04451']  (1.4s)
+[PASS] KEGG genes_for_ko: 548  (4.6s)
+[PASS] KEGG ko_info: ENTRY       K04451                      KO
+SYMBOL      TP53,  (0.5s)
+[PASS] OI-07 PANTHER matchortho P04637 -> mouse: {"search": {
+    "product": {
+        "version": 19,
+        "content": "PANTHERDB"
+    },
+    "mapping": {"mapped": {
+        "target_gene_symbol": "Tp53",
+        "persistent_id": "PTN002479088",
+        "target_persis  (0.6s)
+[PASS] HomoloGene retired (efetch db=homologene): <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE eEfetchResult PUBLIC "-//NLM//DTD efetch 20131226//EN" "https://eutils.ncbi.nlm.nih.gov/eutils/dtd/2  (0.4s)
+exit 0

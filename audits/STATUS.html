@@ -255,7 +255,7 @@
         <h1>Scientific Skill Refinement</h1>
         <div class="snapshot" aria-label="Snapshot identity">
           <span>Corpus snapshot</span>
-          <strong>2026-09-30</strong>
+          <strong>2026-10-03</strong>
           <span>GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a</span>
         </div>
       </div>
@@ -287,8 +287,8 @@
         </div>
         <dl class="metric">
           <dt>Ready on shelf</dt>
-          <dd>183</dd>
-          <small>32.6% of the in-scope corpus</small>
+          <dd>187</dd>
+          <small>33.3% of the in-scope corpus</small>
         </dl>
         <dl class="metric">
           <dt>Untouched</dt>
@@ -297,19 +297,19 @@
         </dl>
         <dl class="metric">
           <dt>Needs resolution</dt>
-          <dd>12</dd>
+          <dd>8</dd>
           <small>Audited, but not provider-ready</small>
         </dl>
       </div>
-      <div class="state-strip" role="img" aria-label="183 ready, 12 audited but not ready, 366 untouched, 1 out of scope">
-        <span class="ready" style="width:32.562277580071175%"></span>
-        <span class="pending" style="width:2.135231316725979%"></span>
+      <div class="state-strip" role="img" aria-label="187 ready, 8 audited but not ready, 366 untouched, 1 out of scope">
+        <span class="ready" style="width:33.27402135231316%"></span>
+        <span class="pending" style="width:1.4234875444839856%"></span>
         <span class="untouched" style="width:65.12455516014235%"></span>
         <span class="out" style="width:0.1779359430604982%"></span>
       </div>
       <div class="legend" aria-label="Status legend">
-        <span><i class="ready"></i>Ready 183</span>
-        <span><i class="pending"></i>Audited, not ready 12</span>
+        <span><i class="ready"></i>Ready 187</span>
+        <span><i class="pending"></i>Audited, not ready 8</span>
         <span><i class="untouched"></i>Untouched 366</span>
         <span><i class="out"></i>Out of scope 1</span>
       </div>
@@ -360,15 +360,15 @@
             <h3>Data Analysis</h3>
             <span>187 known</span>
           </div>
-          <div class="category-track" role="img" aria-label="175 ready, 12 audited but not ready, 0 untouched, 0 out of scope">
-            <span class="segment ready" style="width:93.58288770053476%" title="Ready: 175"></span>
-            <span class="segment pending" style="width:6.417112299465241%" title="Audited, not ready: 12"></span>
+          <div class="category-track" role="img" aria-label="179 ready, 8 audited but not ready, 0 untouched, 0 out of scope">
+            <span class="segment ready" style="width:95.72192513368985%" title="Ready: 179"></span>
+            <span class="segment pending" style="width:4.27807486631016%" title="Audited, not ready: 8"></span>
             <span class="segment untouched" style="width:0%" title="Untouched: 0"></span>
             <span class="segment out" style="width:0%" title="Out of scope: 0"></span>
           </div>
           <dl class="category-counts">
             <div><dt>Audited</dt><dd>187</dd></div>
-            <div><dt>Ready</dt><dd>175</dd></div>
+            <div><dt>Ready</dt><dd>179</dd></div>
             <div><dt>Untouched</dt><dd>0</dd></div>
           </dl>
         </article>
@@ -530,10 +530,10 @@
               <td data-label="Excluded">3</td>
               <td data-label="Total">20</td>
             </tr>
-            <tr class="area-partial" style="--share:37%" title="11 of 15 done">
+            <tr class="area-complete" title="15 of 15 done">
               <td data-label="Area"><strong>database-access</strong></td>
-              <td data-label="Done">11</td>
-              <td data-label="Started">4</td>
+              <td data-label="Done">15</td>
+              <td data-label="Started">0</td>
               <td data-label="Untouched">0</td>
               <td data-label="Excluded">0</td>
               <td data-label="Total">15</td>
@@ -924,8 +924,8 @@
             </tr>
             <tr>
               <td data-label="Area"><strong>Total</strong></td>
-              <td data-label="Done"><strong>183</strong></td>
-              <td data-label="Started"><strong>9</strong></td>
+              <td data-label="Done"><strong>187</strong></td>
+              <td data-label="Started"><strong>5</strong></td>
               <td data-label="Untouched"><strong>366</strong></td>
               <td data-label="Excluded"><strong>4</strong></td>
               <td data-label="Total"><strong>562</strong></td>
@@ -941,7 +941,7 @@
         <p class="pretext-copy" data-pretext contenteditable="plaintext-only">This is the immediate resolution queue. A high score alone does not make a Skill ready: provider state, fix completion, re-audit status, and open findings still govern promotion.</p>
       </div>
       <div class="queue-tools">
-        <p class="queue-summary" id="queue-count" aria-live="polite">Showing 12 Skills</p>
+        <p class="queue-summary" id="queue-count" aria-live="polite">Showing 8 Skills</p>
         <div class="search-field">
           <label for="queue-search">Filter the queue</label>
           <input id="queue-search" type="search" placeholder="Skill, category, grade, state, or P1" autocomplete="off">
@@ -999,62 +999,6 @@
             <span class="finding p0 zero">P0 0</span>
             <span class="finding p1">P1 3</span>
             <span class="finding p2">P2 6</span>
-          </td>
-        </tr>
-        <tr data-queue-row data-search="bio-ensembl-rest data analysis production ready remaining   p2">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-ensembl-rest/candidate@dabba949803e-reaudit-run/viewer.md">bio-ensembl-rest</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">87</strong></td>
-          <td data-label="Grade"><span class="badge positive">Production Ready</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 2 P2 findings">
-            <span class="finding p0 zero">P0 0</span>
-            <span class="finding p1 zero">P1 0</span>
-            <span class="finding p2">P2 2</span>
-          </td>
-        </tr>
-        <tr data-queue-row data-search="bio-interaction-databases data analysis production ready remaining   p2">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-interaction-databases/candidate@f4d95b083e70-delta-reaudit-run/viewer.md">bio-interaction-databases</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">87</strong></td>
-          <td data-label="Grade"><span class="badge positive">Production Ready</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 1 P2 findings">
-            <span class="finding p0 zero">P0 0</span>
-            <span class="finding p1 zero">P1 0</span>
-            <span class="finding p2">P2 1</span>
-          </td>
-        </tr>
-        <tr data-queue-row data-search="bio-ortholog-inference data analysis production ready remaining   p2">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-ortholog-inference/candidate@6e3122b03b95-reaudit-run-2/viewer.md">bio-ortholog-inference</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">87</strong></td>
-          <td data-label="Grade"><span class="badge positive">Production Ready</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 2 P2 findings">
-            <span class="finding p0 zero">P0 0</span>
-            <span class="finding p1 zero">P1 0</span>
-            <span class="finding p2">P2 2</span>
-          </td>
-        </tr>
-        <tr data-queue-row data-search="bio-uniprot-access data analysis production ready remaining   ">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-uniprot-access/candidate@7a203a5063ea-delta-reaudit-run/viewer.md">bio-uniprot-access</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">88</strong></td>
-          <td data-label="Grade"><span class="badge positive">Production Ready</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 0 P2 findings">
-            <span class="finding p0 zero">P0 0</span>
-            <span class="finding p1 zero">P1 0</span>
-            <span class="finding p2 zero">P2 0</span>
           </td>
         </tr>
         <tr data-queue-row data-search="bio-data-visualization-heatmaps-clustering data analysis production ready remaining   ">

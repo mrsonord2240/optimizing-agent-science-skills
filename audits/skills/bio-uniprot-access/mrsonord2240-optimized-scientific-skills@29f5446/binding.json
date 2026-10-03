@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-uniprot-access",
+  "candidate_version": "candidate@7a203a5063ea-delta-reaudit-run",
+  "candidate_identity": "7a203a5063ea1cdad2c32516c1cc1740eb13c1e5008d53c5950e81b8cfdf7f5b",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+  "provider_path": "skills/bio-uniprot-access",
+  "provider_tree": "c3c6a1c31929e42cb2d0b01b412c98ccea17fdc0",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "7a203a5063ea1cdad2c32516c1cc1740eb13c1e5008d53c5950e81b8cfdf7f5b",
+  "file_count": 6,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 13354,
+      "sha256": "ac576b0ec9dcac811a2d70f567e34dbf64307385059133a2152aace023000b7c"
+    },
+    {
+      "path": "examples/isoforms_and_xrefs.py",
+      "bytes": 1470,
+      "sha256": "655751281d008d571f76850444f8fe034561a74e09043ddb3fc3c68ebd514864"
+    },
+    {
+      "path": "examples/uniprot_query.py",
+      "bytes": 1562,
+      "sha256": "297bb13b29fa5b753334bb2d116ef658146ef29a138dc3e06a78f6bf3233e062"
+    },
+    {
+      "path": "scripts/uniprot_client.py",
+      "bytes": 8003,
+      "sha256": "3c26b2ae854c3486486217cd2430989c61ceb8e6226c00467c16a7e564a94724"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 5014,
+      "sha256": "bc8073257ff8626b128795f5231865871fcb05ffa5ce3f00bc25e1c7a510dbab"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

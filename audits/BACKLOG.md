@@ -734,7 +734,7 @@ None open.
 
 ### `bio-ensembl-rest` — Compara example not reproduced on final bytes
 
-- Skill: 87, Production Ready · candidate `dabba949803e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ensembl-rest) · [viewer](skills/bio-ensembl-rest/candidate@dabba949803e-reaudit-run/viewer.md)
+- Skill: 87, Production Ready · candidate `dabba949803e` from [mrsonord2240/optimized-scientific-skills@29f5446](https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-ensembl-rest) · [viewer](skills/bio-ensembl-rest/mrsonord2240-optimized-scientific-skills@29f5446/viewer.md)
 - Observed in inputs: 3
 - Problem: compara_homology.py failed five times in this pass on the unfiltered BRCA1 homology call (500, 503, ReadTimeout), each reported as EnsemblError; its output was verified only from the fixer run on identical bytes.
 - Root cause: The unfiltered BRCA1 call returns about 199 homologies and the Ensembl homology endpoint was degraded.
@@ -742,7 +742,7 @@ None open.
 
 ### `bio-ensembl-rest` — VEP example output is noisy
 
-- Skill: 87, Production Ready · candidate `dabba949803e` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ensembl-rest) · [viewer](skills/bio-ensembl-rest/candidate@dabba949803e-reaudit-run/viewer.md)
+- Skill: 87, Production Ready · candidate `dabba949803e` from [mrsonord2240/optimized-scientific-skills@29f5446](https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-ensembl-rest) · [viewer](skills/bio-ensembl-rest/mrsonord2240-optimized-scientific-skills@29f5446/viewer.md)
 - Observed in inputs: 2
 - Problem: The region and dbSNP sections print one line per transcript (about 48 and 50 lines).
 - Root cause: summarize_consequences prints every transcript consequence.
@@ -750,7 +750,7 @@ None open.
 
 ### `bio-interaction-databases` — IDM-013 Example edge attributes depend on SIGNOR record order
 
-- Skill: 87, Production Ready · candidate `f4d95b083e70` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/interaction-databases) · [viewer](skills/bio-interaction-databases/candidate@f4d95b083e70-delta-reaudit-run/viewer.md)
+- Skill: 87, Production Ready · candidate `f4d95b083e70` from [mrsonord2240/optimized-scientific-skills@29f5446](https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-interaction-databases) · [viewer](skills/bio-interaction-databases/mrsonord2240-optimized-scientific-skills@29f5446/viewer.md)
 - Observed in inputs: 2
 - Problem: examples/interaction_query.py overwrites signed_effect and mechanism with the last SIGNOR record for a pair, so exported edge attributes differ between runs (MDM2->CDKN1A: destabilization/binding in one run, repression/empty in another).
 - Root cause: Records repeat per site/paper and are applied in server order with last-write-wins.
@@ -758,7 +758,7 @@ None open.
 
 ### `bio-ortholog-inference` — OI-11 Batch statuses undocumented in SKILL.md; snippet drops failed symbols
 
-- Skill: 87, Production Ready · candidate `6e3122b03b95` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference) · [viewer](skills/bio-ortholog-inference/candidate@6e3122b03b95-reaudit-run-2/viewer.md)
+- Skill: 87, Production Ready · candidate `6e3122b03b95` from [mrsonord2240/optimized-scientific-skills@29f5446](https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-ortholog-inference) · [viewer](skills/bio-ortholog-inference/mrsonord2240-optimized-scientific-skills@29f5446/viewer.md)
 - Observed in inputs: 1
 - Problem: The three batch_compara statuses appear only in the docstring and example. The SKILL.md snippet filters on type == ortholog_one2one, so a user copying it would lose failed and empty symbols silently, the gap OI-10 closed in the example.
 - Root cause: The status column was added to the client and example but not to the SKILL.md snippet or prose.
@@ -766,7 +766,7 @@ None open.
 
 ### `bio-ortholog-inference` — OI-12 Unknown symbol reported as request failed
 
-- Skill: 87, Production Ready · candidate `6e3122b03b95` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ortholog-inference) · [viewer](skills/bio-ortholog-inference/candidate@6e3122b03b95-reaudit-run-2/viewer.md)
+- Skill: 87, Production Ready · candidate `6e3122b03b95` from [mrsonord2240/optimized-scientific-skills@29f5446](https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-ortholog-inference) · [viewer](skills/bio-ortholog-inference/mrsonord2240-optimized-scientific-skills@29f5446/viewer.md)
 - Observed in inputs: 5
 - Problem: batch_compara(["TP53","NOTAGENE123"]) labels NOTAGENE123 request failed (HTTP 400 text in the error column); Ensembl returns 400 for an unrecognised symbol. A user may read it as a transient outage and retry.
 - Root cause: All requests.RequestException classes share one status.

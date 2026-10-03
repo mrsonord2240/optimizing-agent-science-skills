@@ -1,0 +1,73 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/interaction-databases",
+    "subtree": "249aaeefc35d2b75f343c8539fa076adb8f12c17",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "fix/dbaccess-interaction-databases",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "path": "F:\\OpenScience\\wt\\dbaccess-interaction-databases\\skills\\bio-interaction-databases",
+    "content_sha256": "f4d95b083e70343c570554032b0592bc13d99f578274465d12367b91bf286c2d",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-interaction-databases/ (untracked, uncommitted by design)",
+    "content_manifest": {
+      "file_count": 6,
+      "bytes": 42364
+    }
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 17278,
+      "sha256": "fe7ddf5274a1ce78adf3379f1168f74e82001e544ab552ca4a87508575a577ff"
+    },
+    {
+      "path": "examples/interaction_query.py",
+      "bytes": 3920,
+      "sha256": "cfc42c5c05fedf3a738f6aef07a62ed3f04ec284d80e495b797816e6a5964195"
+    },
+    {
+      "path": "examples/string_network.py",
+      "bytes": 2366,
+      "sha256": "7c2cbcc92df4f0238ab4cded0eded94615b3291e46f05297680dfec92e312245"
+    },
+    {
+      "path": "scripts/interaction_clients.py",
+      "bytes": 11909,
+      "sha256": "9dcbf5561d88aa2313eec17d62544a38c4e536ef635feae4c121b543c17d8c43"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 5826,
+      "sha256": "6fceab3986b5bba20db599e8d11e9870a2d753ada0bfcc25d1a7540f67b91ade"
+    }
+  ],
+  "prior_audited_identity": "16290147ab41129829074d65394467e2df7131b08099d0f2a4d42497af154024",
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "environment": "database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397",
+    "preflight": "skill_preflight.py --offline PASS"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "delta": {
+    "mode": "text-only",
+    "changed_files": [
+      "SKILL.md",
+      "scripts/interaction_clients.py (aggregate_networks docstring only)"
+    ],
+    "unchanged_files_match_certified_sha256": [
+      "LICENSE",
+      "examples/interaction_query.py",
+      "examples/string_network.py",
+      "usage-guide.md"
+    ]
+  }
+}

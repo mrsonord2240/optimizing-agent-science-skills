@@ -1,0 +1,85 @@
+{
+  "skill_id": "bio-uniprot-access",
+  "version": "mrsonord2240-optimized-scientific-skills@29f5446",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "skills/bio-uniprot-access",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-uniprot-access"
+  },
+  "candidate": {
+    "identity": "7a203a5063ea1cdad2c32516c1cc1740eb13c1e5008d53c5950e81b8cfdf7f5b",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/dbaccess-uniprot-access",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "content_sha256": "7a203a5063ea1cdad2c32516c1cc1740eb13c1e5008d53c5950e81b8cfdf7f5b",
+    "path": "F:\\OpenScience\\wt\\dbaccess-uniprot-access\\skills\\bio-uniprot-access",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 13354,
+        "sha256": "ac576b0ec9dcac811a2d70f567e34dbf64307385059133a2152aace023000b7c"
+      },
+      {
+        "path": "examples/isoforms_and_xrefs.py",
+        "bytes": 1470,
+        "sha256": "655751281d008d571f76850444f8fe034561a74e09043ddb3fc3c68ebd514864"
+      },
+      {
+        "path": "examples/uniprot_query.py",
+        "bytes": 1562,
+        "sha256": "297bb13b29fa5b753334bb2d116ef658146ef29a138dc3e06a78f6bf3233e062"
+      },
+      {
+        "path": "scripts/uniprot_client.py",
+        "bytes": 8003,
+        "sha256": "3c26b2ae854c3486486217cd2430989c61ceb8e6226c00467c16a7e564a94724"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 5014,
+        "sha256": "bc8073257ff8626b128795f5231865871fcb05ffa5ce3f00bc25e1c7a510dbab"
+      }
+    ],
+    "provider_commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "provider_tree": "c3c6a1c31929e42cb2d0b01b412c98ccea17fdc0"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@7a203a5063ea-delta-reaudit-run",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 3,
+    "provider_binding": "binding.json"
+  }
+}

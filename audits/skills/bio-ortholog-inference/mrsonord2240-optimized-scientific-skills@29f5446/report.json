@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "skill_name": "bio-ortholog-inference",
+    "description": "Pull pre-computed ortholog calls from OrthoDB, Ensembl Compara, OMA, KEGG Orthology and documented PANTHER/eggNOG routes through a small Python requests client, with guidance on confidence semantics and when to defect to de novo inference.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5,
+    "performed_by": "Independent final re-auditor agent, lane 2 (not the fixer, tooler or prior auditor)",
+    "auditor_independent": true
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Live values match the services: TP53 mouse ENSMUSG00000059552 / Trp53, MARCHF1 ENSG00000145416, KEGG K04451 with 548 members. No fabricated confidence values."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Database retrieval only; no diagnostic or prescriptive output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Resource semantics are not conflated; OrthoDB group verification and 1:1 filtering are sound; a partial batch is now flagged."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three examples exit 0 on the final bytes; remaining items are doc and labelling P2s."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Compara, OrthoDB, OMA and KEGG helpers return correct live values; the route is fixed and batch_compara reports every symbol. An unknown symbol is labelled request failed."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Retry helper and per-symbol batch status reproduced on a local stub and live; the example flags a partial batch."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md is about 190 lines; the decision matrix, per-resource reference and common-errors table partly repeat each other."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Decision matrix, OrthoDB full-text trap and group verification are clear; the SKILL.md batch snippet filters on type and would drop failed symbols silently, and the three statuses are documented only in the docstring and example."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Clear tables; the eggNOG note now states the 403 and the TLS failure and keeps the unverified label."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, HTTPS, read-only public APIs; loopback stub only."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Single client module; still no automated tests."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Specific trigger description, clear defection to de novo tools; PANTHER and eggNOG are documented but not wrapped."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Ensembl Compara single gene, MARCH1 rename, five-gene zebrafish batch with per-symbol status (compara_orthologs.py, final bytes)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0. The example prints each symbol outcome and flags a partial batch. Live Ensembl was slow: MDM2 request failed after 4 x 45 s read timeouts and BRCA1 zebrafish returned no rows; both reported and flagged PARTIAL BATCH (a pass for OI-10).",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "BRCA1 human to mouse returns ortholog_one2one ENSMUSG00000017146 with level and identity",
+            "result": "PASS",
+            "note": "Euarchontoglires, identity 57.6711%."
+          },
+          {
+            "text": "MARCH1 returns HTTP 400 and the example reports the rename; MARCHF1 resolves to ENSG00000145416",
+            "result": "PASS",
+            "note": "Both printed."
+          },
+          {
+            "text": "TP53 and ATM zebrafish 1:1 calls are correct",
+            "result": "PASS",
+            "note": "ENSDARG00000035559 and ENSDARG00000002385."
+          },
+          {
+            "text": "Rows carry taxonomy_level and no confidence value",
+            "result": "PASS",
+            "note": "confidence column empty in every row; docs and example say so."
+          },
+          {
+            "text": "batch_compara returns one row per input symbol with status found / no ortholog returned / request failed, and the example surfaces failed and empty symbols",
+            "result": "PASS",
+            "note": "Local stub: all three statuses and a fixed 11-column set; an all-failed batch keeps the type column. Live example: per-symbol outcome lines for MDM2 (request failed with message) and BRCA1 (no ortholog returned) plus the PARTIAL BATCH flag."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Cross-resource TP53: Compara, OMA 1:1, OrthoDB verified group (cross_resource.py, unchanged file)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0. OMA (130 1:1, P53_MOUSE) and OrthoDB (4289813at2759, Trp53) legs returned; the Compara leg hit a 45 s read timeout this run and was reported UNAVAILABLE without aborting the others. Compara TP53 to ENSMUSG00000059552 was confirmed in the live batch_compara run on the same bytes.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Compara TP53 human to mouse returns ENSMUSG00000059552",
+            "result": "PASS",
+            "note": "live_notagene run: TP53 found, ENSMUSG00000059552, 77.9487%, ortholog_one2one."
+          },
+          {
+            "text": "OMA TP53 P04637 rel_type=1:1 contains P53_MOUSE",
+            "result": "PASS",
+            "note": "130 1:1 orthologs; mouse P53_MOUSE."
+          },
+          {
+            "text": "OrthoDB leg selects the exact-name group and verifies the human member",
+            "result": "PASS",
+            "note": "4289813at2759, mouse members 22059 and Trp53."
+          },
+          {
+            "text": "The TIGAR-ranked first hit for query TP53 is rejected",
+            "result": "PASS",
+            "note": "orthodb_group_has_gene False for the top groups (run_reaudit)."
+          },
+          {
+            "text": "Each leg is isolated so one outage cannot abort the others",
+            "result": "PASS",
+            "note": "Demonstrated live: Compara timed out, OMA and OrthoDB legs still ran, exit 0."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "KEGG Orthology gene to KO to members (kegg_orthology.py, unchanged)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0; K04451, 548 members across 446 species.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "hsa:7157 maps to K04451",
+            "result": "PASS",
+            "note": "Single KO."
+          },
+          {
+            "text": "KO record lists TP53 and pathway entries",
+            "result": "PASS",
+            "note": "map04115 p53 signaling pathway present."
+          },
+          {
+            "text": "Member count and species count are consistent",
+            "result": "PASS",
+            "note": "548 members, 446 species."
+          },
+          {
+            "text": "Output is TSV-parsed plain text, not JSON",
+            "result": "PASS",
+            "note": "No JSON parse path used."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Client retry/timeout guards on the changed module (local HTTP stub), OrthoDB null parser, batch status schema",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Whole-module sweep rerun on the new bytes: get_with_retry and the OrthoDB parser behave as before; batch schema verified.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "503, 503 then 200 succeeds on the third attempt",
+            "result": "PASS",
+            "note": "Stub hit count 3."
+          },
+          {
+            "text": "429 with Retry-After is retried",
+            "result": "PASS",
+            "note": "Stub hit count 2."
+          },
+          {
+            "text": "Persistent 500 raises RequestException after max_retries; unreachable host raises RequestException",
+            "result": "PASS",
+            "note": "4 stub hits then RequestException; refused connection raised."
+          },
+          {
+            "text": "404 raises HTTPError unless allow_404=True",
+            "result": "PASS",
+            "note": "Both paths."
+          },
+          {
+            "text": "orthodb_orthologs returns [] for a group with no member at the level and Trp53 for the p53 group at mouse",
+            "result": "PASS",
+            "note": "[] and 22059/Trp53."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Documented routes and claims: homology/id with species, OrthoDB search and tab, PANTHER, OMA empty, HomoloGene, eggNOG note, unknown-symbol status",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All documented claims reproduce. An unknown symbol (NOTAGENE123) is labelled request failed with the HTTP 400 text in the error column; judged a minor labelling imprecision (P2).",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 6,
+        "assertions_total": 6,
+        "assertions": [
+          {
+            "text": "OrthoDB /search is full text: TP53 ranks phosphoglycerate mutase first, tumor protein p53 reaches 4289813at2759",
+            "result": "PASS",
+            "note": "As documented."
+          },
+          {
+            "text": "OrthoDB /tab uses id= (TSV) and query= returns 404",
+            "result": "PASS",
+            "note": "TSV with header; 404."
+          },
+          {
+            "text": "PANTHER matchortho P04637 returns mouse Tp53",
+            "result": "PASS",
+            "note": "target Tp53, version 19."
+          },
+          {
+            "text": "OMA BRCA1 P38398 returns an empty 200 and the HOG route resolves for P04637",
+            "result": "PASS",
+            "note": "[] and HOG:F0782425.2c.7a."
+          },
+          {
+            "text": "HomoloGene efetch is retired",
+            "result": "PASS",
+            "note": "efetch db=homologene returns an error body."
+          },
+          {
+            "text": "SKILL.md route /homology/id/<species>/<ensembl_gene_id> works as written",
+            "result": "PASS",
+            "note": "curl: /homology/id/human/ENSG00000141510 200; the species-less form 404 and is no longer documented. Tree sweep: no other occurrence."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 52.7,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "OI-09, OI-10 and the eggNOG note are fixed and verified; OI-01 to OI-08 did not regress (whole-module stub, OrthoDB, OMA, KEGG and PANTHER reruns on the new bytes).",
+    "batch_compara returns one row per input symbol with a status and a fixed column set; the example reports partial batches, shown live under Ensembl read timeouts.",
+    "Retry and error behaviour reproduced on a local stub; Compara, OMA, OrthoDB and KEGG return consistent TP53 calls."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "OI-11 Batch statuses undocumented in SKILL.md; snippet drops failed symbols",
+      "observed_in": [
+        1
+      ],
+      "problem": "The three batch_compara statuses appear only in the docstring and example. The SKILL.md snippet filters on type == ortholog_one2one, so a user copying it would lose failed and empty symbols silently, the gap OI-10 closed in the example.",
+      "root_cause": "The status column was added to the client and example but not to the SKILL.md snippet or prose.",
+      "fix": "Add one sentence naming the statuses and a status check (or a count of non-found symbols) to the SKILL.md snippet."
+    },
+    {
+      "priority": "P2",
+      "title": "OI-12 Unknown symbol reported as request failed",
+      "observed_in": [
+        5
+      ],
+      "problem": "batch_compara([\"TP53\",\"NOTAGENE123\"]) labels NOTAGENE123 request failed (HTTP 400 text in the error column); Ensembl returns 400 for an unrecognised symbol. A user may read it as a transient outage and retry.",
+      "root_cause": "All requests.RequestException classes share one status.",
+      "fix": "Document that a 400 in the error column means an unknown or renamed symbol (resolve_symbol first), or give 4xx its own status such as symbol not found."
+    }
+  ]
+}

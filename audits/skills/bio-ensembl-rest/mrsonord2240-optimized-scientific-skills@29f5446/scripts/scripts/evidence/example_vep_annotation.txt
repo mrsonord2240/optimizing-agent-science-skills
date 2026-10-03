@@ -1,0 +1,106 @@
+=== VEP by region (BRCA1 region in GRCh38 coords) ===
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      nonsense_mediated_decay MODIFIER   downstream_gene_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   downstream_gene_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      retained_intron      MODIFIER   downstream_gene_variant
+  BRCA1      retained_intron      MODIFIER   downstream_gene_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      nonsense_mediated_decay MODIFIER   3_prime_UTR_variant,NMD_transcript_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+  RND2       protein_coding       MODIFIER   intron_variant
+  RND2       protein_coding       MODIFIER   intron_variant
+  BRCA1      protein_coding       MODIFIER   3_prime_UTR_variant
+
+=== VEP by dbSNP ID ===
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.42)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0.001)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.21)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.44)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.34)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.22)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.41)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0.003)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.22)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.42)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.21)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.42)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0.001)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.21)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.4)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.2)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.41)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0.003)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.22)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.42)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.22)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.42)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0.001)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.21)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.42)  PolyPhen=benign(0)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.33)  PolyPhen=benign(0.001)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.21)  PolyPhen=benign(0)
+  BRCA2      nonsense_mediated_decay MODIFIER   3_prime_UTR_variant,NMD_transcript_variant
+  BRCA2      nonsense_mediated_decay MODIFIER   3_prime_UTR_variant,NMD_transcript_variant
+  BRCA2      nonsense_mediated_decay MODIFIER   3_prime_UTR_variant,NMD_transcript_variant
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.44)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.34)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.22)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.4)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.33)
+  BRCA2      nonsense_mediated_decay MODERATE   missense_variant,NMD_transcript_variant  SIFT=tolerated(0.2)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.42)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.33)
+  BRCA2      protein_coding       MODERATE   missense_variant  SIFT=tolerated(0.21)
+
+=== VEP by HGVS notation ===
+Traceback (most recent call last):
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\vep_annotation.py", line 39, in <module>
+    res = vep_hgvs('human', 'ENST00000366667:c.803C>T')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 99, in vep_hgvs
+    return get_with_retry(f'{base}/vep/{species}/hgvs/{hgvs}').json()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 61, in get_with_retry
+    raise EnsemblError(f'{max_retries} attempts exhausted (last: {last}) for {url}')
+ensembl_client.EnsemblError: 3 attempts exhausted (last: 500) for https://rest.ensembl.org/vep/human/hgvs/ENST00000366667:c.803C>T
+exit=1

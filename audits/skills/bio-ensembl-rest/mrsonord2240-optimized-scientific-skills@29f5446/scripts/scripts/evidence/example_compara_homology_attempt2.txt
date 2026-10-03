@@ -1,0 +1,15 @@
+=== BRCA1 human -> all Compara orthologs ===
+Traceback (most recent call last):
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\compara_homology.py", line 12, in <module>
+    all_orth = orthologs_by_symbol('human', 'BRCA1')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 116, in orthologs_by_symbol
+    return _homologies(species, symbol, params, base)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 107, in _homologies
+    r = get_with_retry(f'{base}/homology/symbol/{species}/{symbol}', params=params)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 61, in get_with_retry
+    raise EnsemblError(f'{max_retries} attempts exhausted (last: {last}) for {url}')
+ensembl_client.EnsemblError: 3 attempts exhausted (last: 503) for https://rest.ensembl.org/homology/symbol/human/BRCA1
+exit=1

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-30",
+  "generated": "2026-10-03",
   "source": {
     "upstream": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
     "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
     "provider_ref": "main",
-    "provider_skills_tree": "8d214414725a9583bf5975271351bd3d90da0a07"
+    "provider_skills_tree": "17e25937ba6050424e66b28b73c99fb84f76dd98"
   },
   "skills": [
     {
@@ -1031,8 +1031,8 @@
     {
       "id": "bio-ensembl-rest",
       "upstream_path": "database-access/ensembl-rest",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-entrez-fetch",
@@ -1613,8 +1613,8 @@
     {
       "id": "bio-interaction-databases",
       "upstream_path": "database-access/interaction-databases",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-isoform-switching",
@@ -2003,8 +2003,8 @@
     {
       "id": "bio-ortholog-inference",
       "upstream_path": "database-access/ortholog-inference",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-outlier-splicing-detection",
@@ -3017,8 +3017,8 @@
     {
       "id": "bio-uniprot-access",
       "upstream_path": "database-access/uniprot-access",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-variant-annotation",

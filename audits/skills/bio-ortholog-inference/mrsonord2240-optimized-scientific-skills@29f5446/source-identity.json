@@ -1,0 +1,89 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/ortholog-inference",
+    "subtree": "97db68da2fc40ebf988b217031d6b2ff648ea105",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "git_blob": "5dee814103e6f7bf330a6e356b0043604ae87366"
+      },
+      {
+        "path": "examples/compara_orthologs.py",
+        "git_blob": "57d2830e08957bacfef98a0713612f3d1bc587a5"
+      },
+      {
+        "path": "examples/cross_resource.py",
+        "git_blob": "c6645470547ea18c96ddd99d8a6d7137d5507f72"
+      },
+      {
+        "path": "examples/kegg_orthology.py",
+        "git_blob": "2147e27d2a933672368c00610e738afc30c158f4"
+      },
+      {
+        "path": "usage-guide.md",
+        "git_blob": "83fee094004e9208d6854c3751b38f58f1b3fa03"
+      }
+    ],
+    "normalization_note": "The audited tree adds scripts/ortholog_clients.py (externalized client code) and edited SKILL.md and examples; origin identifies the source Skill subtree, not a one-to-one file mapping."
+  },
+  "candidate": {
+    "branch": "fix/dbaccess-ortholog-inference",
+    "commit": "2f38178",
+    "path": "F:\\OpenScience\\wt\\dbaccess-ortholog-inference\\skills\\bio-ortholog-inference",
+    "content_sha256": "6e3122b03b95f6b9666a03f538ff5e07657ad733c2f0b9a2c7f1de1749993bbb",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "untracked Skill subtree only; candidate files unchanged",
+    "content_manifest": {
+      "file_count": 7,
+      "bytes": 35212
+    }
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 14232,
+      "sha256": "617da6e5864192ec64ce3289a700738ccf3f9e2565ce698939f6c166c5df2d99"
+    },
+    {
+      "path": "examples/compara_orthologs.py",
+      "bytes": 1944,
+      "sha256": "7b6cbb7776e1a29b52db136172bbfd92b9612401dc3b2912a19c2487d3b6e730"
+    },
+    {
+      "path": "examples/cross_resource.py",
+      "bytes": 2740,
+      "sha256": "433683e2b7e2c5b776d0fb65288849cdf8add8c5a704ae6cb43ad004f097be2b"
+    },
+    {
+      "path": "examples/kegg_orthology.py",
+      "bytes": 1415,
+      "sha256": "9e8750f741a565c57ceb7c64386bbeb08851c8581c19037996299c2f793d5531"
+    },
+    {
+      "path": "scripts/ortholog_clients.py",
+      "bytes": 8451,
+      "sha256": "1271b75f8eebdff7d80589a940f9505bd77e71a17833e5b10c6e6aaed5c530af"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 5365,
+      "sha256": "5331aeb313a314481e519ed21a59431c9cece625274ba9e4f818ef03fe43b725"
+    }
+  ],
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-ortholog-inference\\TOOLS.md",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "environment": "database-access venv (native Windows, F:\\OpenScience\\audit-envs\\database-access) py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397; live public REST queries, no staged inputs",
+    "preflight_warn": []
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

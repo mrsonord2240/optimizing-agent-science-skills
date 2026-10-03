@@ -1,0 +1,354 @@
+{
+  "meta": {
+    "skill_name": "bio-uniprot-access",
+    "description": "Query UniProt's REST API (rest.uniprot.org) for protein entries, search and stream TSV, async ID mapping, isoforms, cross-references, UniRef clusters and proteome FASTA, with guidance on endpoint choice, query syntax and failure modes.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 6
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All reproduced values (P04637 393 aa / 311 PDB, 44 mapping rows, 625 kinases, UniRef member counts, 4,403 E. coli and 147,520 human proteome records) matched independent raw API calls."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Public sequence and annotation retrieval only; no clinical or prescriptive output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Reviewed versus TrEMBL, stream versus search, isoform and ID-mapping guidance is correct and verified."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All client functions and both examples ran on the certified bytes; the only change since is prose and one print literal, the example re-ran exit 0 and the previously open P2 (UNI-010) is resolved."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Every client function and both examples run and return correct live data; the proteome route is now documented as returning reviewed and TrEMBL entries (UNI-010 resolved)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "One request helper with timeout, bounded retries, Retry-After and a poll timeout; unmapped IDs and truncation are surfaced; stream_tsv buffers in memory (documented)."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md is about 190 lines with endpoint and schema tables that are proportionate to the task."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Endpoint, query syntax, field-name and failure-mode tables are accurate against the live service and warn on the traps that previously failed."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Clear tables and examples; the printed proteome size text now matches the measured download."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no destructive operations; downloads write only to the caller-named path."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Single authoritative client used by both examples; upstream MIT LICENSE shipped; release and size claims dated to 2026_03."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Rich trigger description with the migration and stream-vs-search guidance; version compatibility records the release header."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 30,
+      "total": 30
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Entry parse, bulk search with total, stream, ID mapping (examples/uniprot_query.py)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0 on the final bytes: P04637 parsed (393 aa, 311 PDB, AlphaFold P04637); 500 of 625 kinases with a truncation warning; stream returned 20,431 human Swiss-Prot; Ensembl TP53/PTEN/BRCA2 mapped to P04637/P60484/P51587 with no NOT MAPPED lines.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Example exits 0 and parses P04637 with correct accession, name, gene, length",
+            "result": "PASS",
+            "note": "P53_HUMAN, TP53, 393"
+          },
+          {
+            "text": "Search page reports N of total and warns on truncation",
+            "result": "PASS",
+            "note": "500 of 625, one UserWarning"
+          },
+          {
+            "text": "Stream returns the complete set",
+            "result": "PASS",
+            "note": "stream_tsv kinase set 625 equals X-Total-Results"
+          },
+          {
+            "text": "ID mapping includes BRCA2 (previously dropped by first-page read)",
+            "result": "PASS",
+            "note": "All three genes mapped"
+          },
+          {
+            "text": "PDB count equals an independent cross-reference count",
+            "result": "PASS",
+            "note": "311 = 311"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Isoforms and cross-references (examples/isoforms_and_xrefs.py, list_isoforms, xref_summary)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0 on the final bytes: 9 P04637 isoforms with one canonical, P04637-2 FASTA header correct and sequence differs from canonical; xref PDB list equals entry pdb_ids (311); protein without isoform comment returns [].",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Example exits 0 and lists isoforms with ids as lists",
+            "result": "PASS",
+            "note": "9 isoforms, exactly one canonical"
+          },
+          {
+            "text": "Isoform FASTA is the requested isoform, not the canonical sequence",
+            "result": "PASS",
+            "note": "sp|P04637-2|, sequence differs"
+          },
+          {
+            "text": "xref_summary matches the entry JSON",
+            "result": "PASS",
+            "note": "311 PDB ids identical; Ensembl and AlphaFoldDB present"
+          },
+          {
+            "text": "Protein with no ALTERNATIVE PRODUCTS comment returns an empty list",
+            "result": "PASS",
+            "note": "P69905"
+          },
+          {
+            "text": "Example output is internally consistent",
+            "result": "PASS",
+            "note": "Cross-reference table sorted by count"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "ID mapping job handling: full stream, unmapped inputs, stuck and failed jobs, obsolete accessions",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Client rows (44) equal an independent /idmapping/stream pull while the first results page would give 25; TP53 TrEMBL-inclusive count 18 matches SKILL.md; unmapped input is in failedIds and an all-unmapped batch returns empty results without crashing; stuck job raises TimeoutError and FAILED raises RuntimeError (stubbed status); Q15086 and P04637 both resolve to P04637.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Client rows equal an independent stream pull and exceed the first page",
+            "result": "PASS",
+            "note": "44 vs 25 on page one"
+          },
+          {
+            "text": "Unmapped inputs are reported in failedIds, including an all-unmapped batch",
+            "result": "PASS",
+            "note": "NOTANID1"
+          },
+          {
+            "text": "Swiss-Prot target returns the reviewed accessions",
+            "result": "PASS",
+            "note": "P04637, P60484, P51587"
+          },
+          {
+            "text": "Stuck job times out and FAILED job raises with the job id",
+            "result": "PASS",
+            "note": "Stubbed status responses"
+          },
+          {
+            "text": "resolve_obsolete maps a secondary accession to the primary",
+            "result": "PASS",
+            "note": "Q15086 -> P04637"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant A",
+        "label": "Search syntax, field names and corpus-size claims in SKILL.md",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "database:pdb matches while xref:pdb matches 0; ft_act_site accepted and ft_active_site HTTP 400; corpus sizes 575,748 Swiss-Prot / 149,430,635 TrEMBL at release 2026_03 match the documented ~576K / ~149M; keyword text matches 640 vs 625 for KW-0418; a zero-hit search returns an empty frame.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "database:pdb returns hits and xref:pdb silently returns zero as documented",
+            "result": "PASS",
+            "note": ">500 vs 0"
+          },
+          {
+            "text": "ft_act_site is accepted and ft_active_site is rejected as documented",
+            "result": "PASS",
+            "note": "HTTP 400 on the invalid name"
+          },
+          {
+            "text": "Documented corpus sizes match the live release",
+            "result": "PASS",
+            "note": "575,748 / 149,430,635 at 2026_03"
+          },
+          {
+            "text": "Keyword id versus text claim holds",
+            "result": "PASS",
+            "note": "640 vs 625"
+          },
+          {
+            "text": "Zero-result search returns an empty typed frame instead of crashing",
+            "result": "PASS",
+            "note": "Header-only TSV parsed"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Proteome download route (download_proteome) on E. coli and human",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Certified run: E. coli 4,403 records equal the server count; human 147,520 records (20,416 reviewed + 127,104 TrEMBL), 37.8 MB gzip, 86.65 MB raw. Delta: the example text and SKILL.md row now state those figures; AND reviewed:true on the same stream route returned exactly 20,416 sp records and no tr records (7.5 MB gzip).",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output is valid gzip FASTA and the record count equals the server count",
+            "result": "PASS",
+            "note": "E. coli 4,403 and human 147,520 both equal"
+          },
+          {
+            "text": "Documented old route failure (400) is real",
+            "result": "PASS",
+            "note": "/proteomes/UP000000625.fasta.gz returns 400"
+          },
+          {
+            "text": "Route is the one the Skill documents and the function writes the named file",
+            "result": "PASS",
+            "note": "Both organisms"
+          },
+          {
+            "text": "Example output text on proteome size and protein count matches the real download",
+            "result": "PASS",
+            "note": "~38 MB / ~87 MB / ~147.5K entries printed; real 37.8 MB gz, 86.65 MB raw, 147,520 entries"
+          },
+          {
+            "text": "Human download count matches the server proteinCount",
+            "result": "PASS",
+            "note": "147,520"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "Entry edge cases, UniRef tiers and retry helper",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Secondary accession redirects to primary; deleted accession raises ValueError with reason; malformed accession raises HTTPError after one call; TrEMBL entry and an entry without a gene name parse; UniRef50/90/100 identity and member counts match the server; 429/503 retried honouring Retry-After then exponential backoff, 404 not retried, persistent 503 and connection errors give up after 5 attempts.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Inactive accession raises ValueError naming the reason; secondary redirects",
+            "result": "PASS",
+            "note": "DELETED reason; Q15086 -> P04637"
+          },
+          {
+            "text": "UniRef identity is the numeric tier and member counts match the server",
+            "result": "PASS",
+            "note": "50, 90, 100"
+          },
+          {
+            "text": "Retry helper honours Retry-After, then backs off exponentially, with a 60 s timeout on every call",
+            "result": "PASS",
+            "note": "sleeps 3.0, 2; timeouts 60"
+          },
+          {
+            "text": "Client errors are not retried; persistent server errors stop after 5 attempts",
+            "result": "PASS",
+            "note": "404 one call; 503 five calls"
+          },
+          {
+            "text": "Entries without a gene name or recommended name parse without KeyError",
+            "result": "PASS",
+            "note": "A0A0U2ZQU7 gene None"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 53.2,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All ten findings reproduce as fixed; the last open P2 (UNI-010) is closed by a text-only change verified against the certified measurements and a live reviewed:true check.",
+    "ID mapping now returns the complete stream (44 rows against 25 on the first page) and reports unmapped inputs, with a poll timeout and FAILED handling.",
+    "One request helper gives every call a timeout, Retry-After-aware retries and sane give-up behaviour, verified with stubbed 429/503 and connection errors.",
+    "Documentation claims (xref:pdb versus database:pdb, ft_act_site, corpus sizes, the 400 on the old proteome route) were checked against the live service and hold."
+  ],
+  "recommendations": []
+}

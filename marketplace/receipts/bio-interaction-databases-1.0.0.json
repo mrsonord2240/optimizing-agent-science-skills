@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-interaction-databases",
+  "version": "1.0.0",
+  "result": "pass",
+  "validated_at": "2026-10-03T10:48:52+00:00",
+  "validator_repository": "openscience-skill-marketplace",
+  "validator_commit": "a1d820df61b3c8a72992916178ae8e3836aabe66",
+  "command": "npm run --silent intake:skill -- --manifest <release.config.json> --source F:\\optimized-scientific-skills (four manifests in one invocation)",
+  "optimized_commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+  "source_path": "skills/bio-interaction-databases",
+  "manifest_sha256": "047b1e97725d4e52d199ec2439e998b0a81b85c7afebbf782c68c529cfbc4263",
+  "intake_entry": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "source_path": "skills/bio-interaction-databases",
+    "manifest_sha256": "047b1e97725d4e52d199ec2439e998b0a81b85c7afebbf782c68c529cfbc4263",
+    "content_sha256": "57dd1785253c17255ad876f4a499ab2cb3e56e83aacb61f468e8b307ebc22b9a",
+    "file_count": 6,
+    "total_bytes": 42364,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "skills/bio-interaction-databases/LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      }
+    ]
+  },
+  "entry_count": 4,
+  "stderr": "",
+  "note": "Local unsigned intake compatibility check only; no review, approval, build, submission, registration, release, publication, or remote write was performed."
+}

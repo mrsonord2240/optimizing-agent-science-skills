@@ -6,7 +6,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 - Audit coverage: **195 / 561 (34.8%)** in-scope Skills
 - Untouched: **366**
-- Ready on the optimized shelf: **183**
+- Ready on the optimized shelf: **187**
 - Out of scope: **1**
 
 `Audited` includes every in-scope Skill with a published latest audit, including ready Skills. `Ready` means the provider records a score of at least 85 with a Production Ready grade, deployable exact bytes, no open P0, a completed fix pass, and no pending re-audit. Marketplace intake is a separate gate before a run may call newly completed work done.
@@ -17,9 +17,9 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 |---|---:|---:|---:|---:|---:|
 | Evidence Insight | 1 | 1 | 0 | 1 | 0 |
 | Protocol Design | 7 | 7 | 0 | 7 | 0 |
-| Data Analysis | 187 | 187 | 0 | 175 | 0 |
+| Data Analysis | 187 | 187 | 0 | 179 | 0 |
 | Unclassified | 367 | 0 | 366 | 0 | 1 |
-| **Total** | **562** | **195** | **366** | **183** | **1** |
+| **Total** | **562** | **195** | **366** | **187** | **1** |
 
 `Unclassified` contains Skills for which neither the current audit nor the corpus snapshot supplies an authoritative category. This generator does not guess from directory names.
 
@@ -44,7 +44,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | copy-number | 0 | 0 | 11 | 0 | 11 |
 | crispr-screens | 15 | 0 | 0 | 0 | 15 |
 | data-visualization | 7 | 5 | 5 | 3 | 20 |
-| database-access | 11 | 4 | 0 | 0 | 15 |
+| database-access | 15 | 0 | 0 | 0 | 15 |
 | differential-expression | 1 | 0 | 5 | 0 | 6 |
 | ecological-genomics | 0 | 0 | 6 | 0 | 6 |
 | epidemiological-genomics | 0 | 0 | 5 | 0 | 5 |
@@ -93,7 +93,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | variant-calling | 6 | 0 | 7 | 0 | 13 |
 | workflow-management | 0 | 0 | 5 | 0 | 5 |
 | workflows | 4 | 0 | 37 | 0 | 41 |
-| **Total** | **183** | **9** | **366** | **4** | **562** |
+| **Total** | **187** | **5** | **366** | **4** | **562** |
 
 ## Audited but not ready
 
@@ -107,9 +107,5 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | `bio-data-visualization-multipanel-figures` | Data Analysis | 94.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@3749f31/viewer.md) |
 | `bio-data-visualization-upset-plots` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md) |
 | `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 76 | Beta Only | 0 / 3 / 6 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md) |
-| `bio-ensembl-rest` | Data Analysis | 87 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-ensembl-rest/candidate@dabba949803e-reaudit-run/viewer.md) |
-| `bio-interaction-databases` | Data Analysis | 87 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-interaction-databases/candidate@f4d95b083e70-delta-reaudit-run/viewer.md) |
-| `bio-ortholog-inference` | Data Analysis | 87 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-ortholog-inference/candidate@6e3122b03b95-reaudit-run-2/viewer.md) |
-| `bio-uniprot-access` | Data Analysis | 88 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-uniprot-access/candidate@7a203a5063ea-delta-reaudit-run/viewer.md) |
 
 Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-interaction-databases",
+  "candidate_version": "candidate@f4d95b083e70-delta-reaudit-run",
+  "candidate_identity": "f4d95b083e70343c570554032b0592bc13d99f578274465d12367b91bf286c2d",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+  "provider_path": "skills/bio-interaction-databases",
+  "provider_tree": "0cab988ed9cf33499fe1552f3bad89f2a98a9ffe",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "f4d95b083e70343c570554032b0592bc13d99f578274465d12367b91bf286c2d",
+  "file_count": 6,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1065,
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 17278,
+      "sha256": "fe7ddf5274a1ce78adf3379f1168f74e82001e544ab552ca4a87508575a577ff"
+    },
+    {
+      "path": "examples/interaction_query.py",
+      "bytes": 3920,
+      "sha256": "cfc42c5c05fedf3a738f6aef07a62ed3f04ec284d80e495b797816e6a5964195"
+    },
+    {
+      "path": "examples/string_network.py",
+      "bytes": 2366,
+      "sha256": "7c2cbcc92df4f0238ab4cded0eded94615b3291e46f05297680dfec92e312245"
+    },
+    {
+      "path": "scripts/interaction_clients.py",
+      "bytes": 11909,
+      "sha256": "9dcbf5561d88aa2313eec17d62544a38c4e536ef635feae4c121b543c17d8c43"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 5826,
+      "sha256": "6fceab3986b5bba20db599e8d11e9870a2d753ada0bfcc25d1a7540f67b91ade"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

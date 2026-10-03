@@ -1,0 +1,91 @@
+{
+  "skill_id": "bio-ensembl-rest",
+  "version": "mrsonord2240-optimized-scientific-skills@29f5446",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "skills/bio-ensembl-rest",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/29f5446e431db8eba803796e6f7dfc02f7886743/skills/bio-ensembl-rest"
+  },
+  "candidate": {
+    "identity": "dabba949803e4c58bd3cc906389087520b3e5f5c32702fb6535c749131c0487b",
+    "identity_kind": "sha256-manifest",
+    "branch": "fix/dbaccess-ensembl-rest",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "content_sha256": "dabba949803e4c58bd3cc906389087520b3e5f5c32702fb6535c749131c0487b",
+    "path": "F:\\OpenScience\\wt\\dbaccess-ensembl-rest\\skills\\bio-ensembl-rest",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 1065,
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 11747,
+        "sha256": "6c8630e65ab36a92f7106a1f554c0c1f76d21ccc3deae2f6fb9c6d1b06060950"
+      },
+      {
+        "path": "examples/compara_homology.py",
+        "bytes": 1856,
+        "sha256": "cb964cfccfdbd2badd99ca70425e7e7f02976e289bdb4a76fabb2e48a0747796"
+      },
+      {
+        "path": "examples/lookup_and_overlap.py",
+        "bytes": 1933,
+        "sha256": "dc2546cb78083d5e6dcb370e19fd92123bed67d28dc582569f243e1ecf661544"
+      },
+      {
+        "path": "examples/vep_annotation.py",
+        "bytes": 1941,
+        "sha256": "f83031189307975991d8e0f2ecc023cfb76359ac8a10151bfbbb9230cb698a30"
+      },
+      {
+        "path": "scripts/ensembl_client.py",
+        "bytes": 5328,
+        "sha256": "fd71e6f4e14005f1ca405d456fb6df3ae8ced13757d812f1aa756b1d36213db0"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 4915,
+        "sha256": "d78395e13be506cd228f766ce5d4561d13e509bd99fbb2c2e3edf3e1d38929de"
+      }
+    ],
+    "provider_commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "provider_tree": "3af09faa9fd6be780aa6fdfe80739209b4990b71"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Independent re-auditor agent (not the fixer)",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs",
+    "auditor_independent": true
+  },
+  "supersedes": "candidate@dabba949803e-reaudit-run",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 19,
+    "provider_binding": "binding.json"
+  }
+}

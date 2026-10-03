@@ -1,0 +1,405 @@
+{
+  "meta": {
+    "skill_name": "bio-interaction-databases",
+    "description": "Query protein-protein and gene interaction databases (STRING, BioGRID, IntAct, SIGNOR, OmniPath and others) through a small Python client; decision matrix, STRING channel semantics, license constraints and multi-resource aggregation.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All reproduced values (STRING TP53-MDM2 0.999, BioGRID TP53 3081 rows / 831 pairs, SIGNOR TP53 333 records, OmniPath 344 / 343 rows) matched live services and the documented claims."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Interaction retrieval only; license limits are stated and the commercial screen is disclosed as a source-level aid, not legal clearance."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Physical versus functional, signed versus undirected and throughput guidance are correct and verified; escore is no longer presented as a physical filter."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every client function and both examples ran on the certified bytes; the only change since is prose and one docstring (AST identical otherwise); one minor P2 observation remains (IDM-013)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "All advertised client functions and both examples run and return scientifically correct live data; SIGNOR and the commercial screen now work. Self-interactions are dropped and summary density stays in [0,1]; edge attributes from SIGNOR are last-record-wins in the example (IDM-013)."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Timeouts, STRING pacing, sanitised errors and an empty-answer warning are in place; a non-empty unparseable SIGNOR answer now raises ValueError instead of a silent empty frame; the empty-answer path still warns."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md is about 200 lines with prose for resources that ship no client (Reactome, HuRI, HuMAP) but the surfaces are labelled as documentation."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision matrix, channel semantics, failure-mode and common-error tables are accurate and match live behaviour; the aggregate bullet now names homodimers and points to biogrid_lt_physical."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Docs state what each client does and does not filter; remaining prose about non-executable resources is clearly informational."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Key-bearing URLs and chained exceptions are removed from errors (tested with real and fake keys); the commercial screen is disclosed as source-level only."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "One authoritative client with a shared request helper, upstream MIT LICENSE shipped and cited; examples exercise the client."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Rich trigger description and version compatibility section; some non-executed resources are described without recipes."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 35,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "STRING ID resolution, confidence tiers, channels, physical network, hubs (examples/string_network.py)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0 on the final bytes; queryIndex IDs map back to the input order; 45/35/23 edges at 400/700/900; physical 22 edges subset of functional 35; hubs MDM2, TP53, CDKN1A (degree 9).",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Example exits 0 and resolves all 10 symbols with queryIndex matching input order",
+            "result": "PASS",
+            "note": "All 10 rows map back (checked programmatically)"
+          },
+          {
+            "text": "Edge count is monotonic in threshold",
+            "result": "PASS",
+            "note": "45 >= 35 >= 23"
+          },
+          {
+            "text": "Physical network is a nonempty strict subset of the functional network",
+            "result": "PASS",
+            "note": "22 of 35, zero edges outside the functional set"
+          },
+          {
+            "text": "SKILL.md claim that 5 of 26 escore>0.4 edges are absent from the physical network holds",
+            "result": "PASS",
+            "note": "Reproduced exactly (26, 5)"
+          },
+          {
+            "text": "Scores are 0-1 and STRING calls are paced at least 1 s apart",
+            "result": "PASS",
+            "note": "Two back-to-back calls took 1.66 s"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "STRING + OmniPath + SIGNOR directed graph with provenance (examples/interaction_query.py)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exit 0 on the final bytes; 26 STRING, 20 OmniPath edges inside the query set, 163 SIGNOR records among the query genes; 55 directed edges; string_score 0.716-0.999 only on STRING edges. SIGNOR-derived edge attributes differ between runs (last record wins; IDM-013); the CSV retains 3 SIGNOR self-records in the DiGraph.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Example exits 0 and SIGNOR contributes signed edges",
+            "result": "PASS",
+            "note": "22 signed edges; MDM2 down-regulates TP53 by ubiquitination"
+          },
+          {
+            "text": "CSV has string_score (no max_score) and is empty for non-STRING edges",
+            "result": "PASS",
+            "note": "Zero STRING-less edges carry a score; 3 SIGNOR-only rows are empty"
+          },
+          {
+            "text": "ATM->TP53 edge carries three sources and a phosphorylation mechanism",
+            "result": "PASS",
+            "note": "OmniPath, SIGNOR, STRING; score 0.999"
+          },
+          {
+            "text": "Directed graph keeps direction and does not collapse to undirected",
+            "result": "PASS",
+            "note": "DiGraph, STRING added in both directions"
+          },
+          {
+            "text": "Signed effect values are the SIGNOR free text, not an invented vocabulary",
+            "result": "PASS",
+            "note": "e.g. up-regulates quantity by stabilization"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "BioGRID LT physical interactions with the registered key; key-leak retest with real and fake keys",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "TP53 3081 rows / 831 pairs as documented; fake keys raise \"HTTP 401 Unauthorized\" with no URL, key or chained exception; connection failure and a real-key HTTP 404 produce no URL or key in message or Skill-frame traceback.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Real key returns the documented 3081 per-experiment rows for 831 pairs",
+            "result": "PASS",
+            "note": "Exact match"
+          },
+          {
+            "text": "Only low-throughput physical systems are kept",
+            "result": "PASS",
+            "note": "11 systems, all in PHYSICAL_LT_SYSTEMS"
+          },
+          {
+            "text": "Fake and empty keys raise a clean 401 without URL or key",
+            "result": "PASS",
+            "note": "Two fake keys and one empty key"
+          },
+          {
+            "text": "No chained exception or traceback text contains the URL or key (connection error and real-key 404)",
+            "result": "PASS",
+            "note": "Skill frames and message scanned"
+          },
+          {
+            "text": "Documented 401 behaviour matches the live service",
+            "result": "PASS",
+            "note": "HTTP 401 Unauthorized"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "SIGNOR signed, directed records for TP53 and AKT1 (signor_for_gene)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Client returns 333 TP53 rows identical to the raw 29-column response (field multiset equal); ATM->TP53 phosphorylation, MDM2->TP53 ubiquitination down-regulation; AKT1 rows; \"No result found.\" warns and returns an empty typed frame; non-empty unparseable answers (plain text, HTML, 3-column line) raise ValueError while partially parseable text still yields rows (IDM-011).",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Client rows equal the raw endpoint rows and fields map to the documented columns",
+            "result": "PASS",
+            "note": "333 rows, multiset of 8 mapped columns equal"
+          },
+          {
+            "text": "Known biology is present with correct direction and mechanism",
+            "result": "PASS",
+            "note": "ATM->TP53 phosphorylation (10 records), MDM2->TP53 ubiquitination down-regulates (3)"
+          },
+          {
+            "text": "Unknown protein warns and returns a typed empty frame",
+            "result": "PASS",
+            "note": "P00000 -> 0 rows, one warning"
+          },
+          {
+            "text": "Unknown gene symbol raises a clear ValueError",
+            "result": "PASS",
+            "note": "uniprot_accession ZZZNOTAGENE9"
+          },
+          {
+            "text": "A non-empty unparseable SIGNOR answer is reported rather than returned as a silent empty result",
+            "result": "PASS",
+            "note": "Mocked: Service temporarily unavailable, HTML 502 body and a 3-column line raise ValueError; empty, blank and No result found. return an empty typed frame (warn); a junk line plus a valid row returns 1 row"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "License-aware OmniPath query for a commercial pipeline (license=commercial)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Server license parameter still does not filter (344 = 344 rows); the client screen keeps 343 rows, matching an independent row-level expectation; 30 surviving sources all carry OmniPath purpose commercial; PhosphoSite, HPRD, iPTMnet, ELM and others removed; references filtered by prefix. Screen is source-level only and says so.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Server license parameter is still a no-op (premise of the client screen)",
+            "result": "PASS",
+            "note": "344 rows with and without license=commercial"
+          },
+          {
+            "text": "No source with a non-commercial purpose remains after the screen",
+            "result": "PASS",
+            "note": "30 surviving sources all commercial"
+          },
+          {
+            "text": "Row count equals an independently computed expectation",
+            "result": "PASS",
+            "note": "343 = 343"
+          },
+          {
+            "text": "Academic mode keeps PhosphoSite; invalid license value raises",
+            "result": "PASS",
+            "note": "Both observed"
+          },
+          {
+            "text": "Documentation states the screen is source-level and does not replace per-resource terms",
+            "result": "PASS",
+            "note": "SKILL.md, usage-guide.md and docstring all say so"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Stress",
+        "label": "aggregate_networks / summary / multi_source_edges on TP53+MDM2 with BioGRID",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "TP53-MDM2 edge carries STRING, OmniPath and BioGRID-LT-physical with string_score 0.999; nodes stay inside the query set. Live with the real key: 2 nodes, 1 edge, density 1.0, no self-loops (previously 3 edges, density 3.0); mocked homodimer rows are dropped, partner edges retained, a homodimer-only gene yields no node, and no warning is emitted (IDM-010). Delta: documentation now says self-interactions (homodimers) are excluded, a self-interaction-only gene is not a node, and gene_a == gene_b rows remain in biogrid_lt_physical (live: TP53 30 of 3,081 rows, MDM2 23 of 2,058); live aggregate TP53+MDM2 still 2 nodes, no self-loops.",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Nodes are restricted to the query set (IDM-006)",
+            "result": "PASS",
+            "note": "TP53, MDM2 only; also 3-gene set without BioGRID"
+          },
+          {
+            "text": "Three-source edge carries string_score in 0-1 and no max_score (IDM-005)",
+            "result": "PASS",
+            "note": "0.999"
+          },
+          {
+            "text": "string_score is None exactly for edges without STRING",
+            "result": "PASS",
+            "note": "Checked on a 3-gene set"
+          },
+          {
+            "text": "multi_source_edges returns only the multi-resource edges",
+            "result": "PASS",
+            "note": "Live 1 edge; mocked 2 edges"
+          },
+          {
+            "text": "summary() returns plausible network statistics",
+            "result": "PASS",
+            "note": "Live density 1.0; mocked 3-node graph 0.667; empty graph summary does not crash"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Variant A",
+        "label": "STRING physical versus functional claim, caller_identity and version-pinned host",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "TP53-MDM2 edge 0.999 with a custom caller_identity; physical network is a strict subset; the escore warning in SKILL.md is quantitatively reproduced; version-pinned host answers.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Custom caller_identity is accepted and returns the expected edge",
+            "result": "PASS",
+            "note": "0.999"
+          },
+          {
+            "text": "Physical network claim in SKILL.md reproduced on 10 DNA-damage genes",
+            "result": "PASS",
+            "note": "5 of 26 escore>0.4 edges absent from physical"
+          },
+          {
+            "text": "Pinned version-12-5 host answers",
+            "result": "PASS",
+            "note": "All STRING calls succeeded"
+          },
+          {
+            "text": "Requests carry a timeout",
+            "result": "PASS",
+            "note": "TIMEOUT 60 s in the shared helper"
+          },
+          {
+            "text": "Combined score stays 0-1 for functional and physical outputs",
+            "result": "PASS",
+            "note": "Both checked"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 52.2,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All thirteen findings but one reproduce as fixed; IDM-012 is closed by a docstring and prose change verified against live BioGRID output. Only IDM-013 (P2) remains open.",
+    "SIGNOR now returns 333 TP53 records identical to the raw 29-column response, with known ATM and MDM2 biology and a warning on empty answers.",
+    "The BioGRID access key no longer reaches error text, traceback frames or chained exceptions (real and fake key tests).",
+    "Claims in the documentation were checked quantitatively (5 of 26 escore edges not physical, 3081 rows for 831 pairs, 344 vs 343 OmniPath rows) and hold."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "IDM-013 Example edge attributes depend on SIGNOR record order",
+      "observed_in": [
+        2
+      ],
+      "problem": "examples/interaction_query.py overwrites signed_effect and mechanism with the last SIGNOR record for a pair, so exported edge attributes differ between runs (MDM2->CDKN1A: destabilization/binding in one run, repression/empty in another).",
+      "root_cause": "Records repeat per site/paper and are applied in server order with last-write-wins.",
+      "fix": "Collect effects and mechanisms per edge as sorted sets (or keep the first by a deterministic key) and say so in the example."
+    }
+  ]
+}

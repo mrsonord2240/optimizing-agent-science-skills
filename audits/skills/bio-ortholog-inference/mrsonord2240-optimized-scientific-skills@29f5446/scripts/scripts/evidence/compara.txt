@@ -1,0 +1,21 @@
+=== Single-gene: BRCA1 human -> mouse ===
+  ENSMUSG00000017146  type=ortholog_one2one  level=Euarchontoglires  identity=57.6711%
+
+=== Symbol resolution example (MARCH1 was renamed in 2020) ===
+  MARCH1 not found (renamed to MARCHF1 by HGNC 2020)
+  MARCHF1 -> ENSG00000145416
+
+=== Batch: 5 genes, human -> zebrafish ===
+symbol          target_id taxonomy_level  target_pid
+  TP53 ENSDARG00000035559   Euteleostomi     50.6775
+   ATM ENSDARG00000002385       Chordata     49.4015
+
+Outcome per input symbol:
+  TP53: found (1 calls, 1 1:1)
+  BRCA1: no ortholog returned
+  MYC: found (2 calls, 0 1:1)
+  ATM: found (1 calls, 1 1:1)
+  MDM2: request failed (4 attempts failed for https://rest.ensembl.org/homology/symbol/human/MDM2: HTTPSConnectionPool(host='rest.ensembl.org', port=443): Read timed out. (read timeout=45))
+
+1:1 calls: 2; request failed: 1; no ortholog returned: 1  -> PARTIAL BATCH, do not read as complete
+exit 0

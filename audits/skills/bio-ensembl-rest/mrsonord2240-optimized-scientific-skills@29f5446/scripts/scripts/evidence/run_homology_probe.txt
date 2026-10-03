@@ -1,0 +1,4 @@
+BRCA1->mouse attempt1 EnsemblError 3 attempts exhausted (last: 500) for https://rest.ensembl.org/homology/symbol/human/BRCA1 9.3s
+BRCA1->mouse attempt2 EnsemblError 3 attempts exhausted (last: ReadTimeout) for https://rest.ensembl.org/homology/symbol/human/BRCA1 98.6s
+BRCA1 paralogs OK 0 [] 58.2s
+TP53->mouse OK 1 [('ortholog_one2one', 'ENSMUSG00000059552', None, 77.9487)] 20.0s

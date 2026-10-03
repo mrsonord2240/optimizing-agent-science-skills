@@ -1,0 +1,10 @@
+  symbol                status                                                                                                                          error source_id  source_pid target_species target_id  target_pid              type taxonomy_level  confidence
+0     OK                 found                                                                                                                            NaN         S        50.0          mouse         T        60.0  ortholog_one2one       Mammalia         NaN
+1    BAD        request failed  400 Client Error: Bad Request for url: http://127.0.0.1:58056/homology/symbol/human/BAD?type=orthologues&target_species=mouse       NaN         NaN            NaN       NaN         NaN               NaN            NaN         NaN
+2  EMPTY  no ortholog returned                                                                                                                            NaN       NaN         NaN            NaN       NaN         NaN               NaN            NaN         NaN
+['symbol', 'status', 'error', 'source_id', 'source_pid', 'target_species', 'target_id', 'target_pid', 'type', 'taxonomy_level', 'confidence']
+  symbol          status                                                                                                                          error  source_id  source_pid  target_species  target_id  target_pid  type  taxonomy_level  confidence
+0    BAD  request failed  400 Client Error: Bad Request for url: http://127.0.0.1:58056/homology/symbol/human/BAD?type=orthologues&target_species=mouse        NaN         NaN             NaN        NaN         NaN   NaN             NaN         NaN
+0
+  symbol target_id taxonomy_level  target_pid
+0     OK         T       Mammalia        60.0
