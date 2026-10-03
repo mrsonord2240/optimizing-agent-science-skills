@@ -189,6 +189,9 @@ test("status separates ready, untouched, and out-of-scope Skills", async () => {
   assert.match(rendered, /\| Protocol Design \| 1 \| 1 \| 0 \| 0 \| 0 \|/);
   assert.match(rendered, /\| Unclassified \| 2 \| 0 \| 1 \| 0 \| 1 \|/);
   assert.match(rendered, /`skill-excluded`/);
+  assert.match(rendered, /\| Area \| Done \| Started \| Untouched \| Excluded \| Total \|/);
+  assert.match(rendered, /\| installer \| 0 \| 0 \| 0 \| 1 \| 1 \|/);
+  assert.match(rendered, /\| \*\*Total\*\* \| \*\*1\*\* \| \*\*0\*\* \| \*\*1\*\* \| \*\*2\*\* \| \*\*4\*\* \|/);
 
   const dashboard = renderStatusDashboard(status);
   assert.match(dashboard, /^<!doctype html>/);

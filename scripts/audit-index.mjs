@@ -385,7 +385,29 @@ export function buildStatus({ skills }, corpus) {
     },
     { known: 0, audited: 0, untouched: 0, ready: 0, outOfScope: 0 },
   );
-  return { corpus, rows, categories: categoryRows, totals };
+  const areas = new Map();
+  for (const row of rows) {
+    const area = row.upstream_path.split("/")[0];
+    const counts = areas.get(area) ?? {
+      area,
+      known: 0,
+      done: 0,
+      started: 0,
+      untouched: 0,
+      excluded: 0,
+    };
+    const excluded = row.outOfScope || row.state === "excluded";
+    counts.known += 1;
+    counts.excluded += Number(excluded);
+    counts.done += Number(!excluded && row.ready);
+    counts.started += Number(!excluded && !row.ready && Boolean(row.audit));
+    counts.untouched += Number(!excluded && !row.ready && !row.audit);
+    areas.set(area, counts);
+  }
+  const areaRows = [...areas.values()].sort((a, b) =>
+    a.area.localeCompare(b.area),
+  );
+  return { corpus, rows, categories: categoryRows, areas: areaRows, totals };
 }
 
 export function renderStatus(status) {
@@ -423,6 +445,23 @@ export function renderStatus(status) {
     `| **Total** | **${totals.known}** | **${totals.audited}** | **${totals.untouched}** | **${totals.ready}** | **${totals.outOfScope}** |`,
     "",
     "`Unclassified` contains Skills for which neither the current audit nor the corpus snapshot supplies an authoritative category. This generator does not guess from directory names.",
+    "",
+    "## By upstream area",
+    "",
+    "The area is the first segment of each Skill's upstream path. `Done` is ready on the optimized shelf, `Started` has a published audit but is not ready, and `Excluded` covers excluded and out-of-scope Skills.",
+    "",
+    "| Area | Done | Started | Untouched | Excluded | Total |",
+    "|---|---:|---:|---:|---:|---:|",
+  );
+  const areaTotals = { done: 0, started: 0, untouched: 0, excluded: 0, known: 0 };
+  for (const row of status.areas) {
+    for (const key of Object.keys(areaTotals)) areaTotals[key] += row[key];
+    lines.push(
+      `| ${cell(row.area)} | ${row.done} | ${row.started} | ${row.untouched} | ${row.excluded} | ${row.known} |`,
+    );
+  }
+  lines.push(
+    `| **Total** | **${areaTotals.done}** | **${areaTotals.started}** | **${areaTotals.untouched}** | **${areaTotals.excluded}** | **${areaTotals.known}** |`,
     "",
     "## Audited but not ready",
     "",

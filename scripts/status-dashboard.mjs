@@ -80,6 +80,22 @@ export function renderStatusDashboard(status) {
     })
     .join("");
 
+  const areaTotals = { done: 0, started: 0, untouched: 0, excluded: 0, known: 0 };
+  const areaRows = status.areas
+    .map((row) => {
+      for (const key of Object.keys(areaTotals)) areaTotals[key] += row[key];
+      return `
+            <tr>
+              <td data-label="Area"><strong>${escapeHtml(row.area)}</strong></td>
+              <td data-label="Done">${row.done}</td>
+              <td data-label="Started">${row.started}</td>
+              <td data-label="Untouched">${row.untouched}</td>
+              <td data-label="Excluded">${row.excluded}</td>
+              <td data-label="Total">${row.known}</td>
+            </tr>`;
+    })
+    .join("");
+
   const queueRows = auditedNotReady
     .map((row) => {
       const { final } = row.audit.report;
@@ -433,6 +449,37 @@ export function renderStatusDashboard(status) {
         <p class="pretext-copy" data-pretext contenteditable="plaintext-only">Category comes from the latest audit when available, then from the canonical corpus snapshot. Unclassified Skills remain unclassified rather than being guessed from their directory names.</p>
       </div>
       <div class="category-list">${categoryRows}
+      </div>
+    </section>
+
+    <section aria-labelledby="area-title">
+      <div class="section-heading">
+        <h2 id="area-title">Progress by upstream area</h2>
+        <p class="pretext-copy" data-pretext contenteditable="plaintext-only">The area is the first segment of each Skill's upstream path. Done is ready on the optimized shelf, started has a published audit but is not ready, and excluded covers excluded and out-of-scope Skills.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Area</th>
+              <th scope="col">Done</th>
+              <th scope="col">Started</th>
+              <th scope="col">Untouched</th>
+              <th scope="col">Excluded</th>
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+          <tbody>${areaRows}
+            <tr>
+              <td data-label="Area"><strong>Total</strong></td>
+              <td data-label="Done"><strong>${areaTotals.done}</strong></td>
+              <td data-label="Started"><strong>${areaTotals.started}</strong></td>
+              <td data-label="Untouched"><strong>${areaTotals.untouched}</strong></td>
+              <td data-label="Excluded"><strong>${areaTotals.excluded}</strong></td>
+              <td data-label="Total"><strong>${areaTotals.known}</strong></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
