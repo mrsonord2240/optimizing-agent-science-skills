@@ -8,39 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (42)
-
-### `bio-machine-learning-omics-classifiers` — OC-001: class_weight=balanced contradicts the Skill calibration stance
-
-- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 2
-- Problem: The Core Workflow, decision tree and usage-guide recommend class_weight=balanced for imbalance and call the model well-calibrated, while the XGBoost note says reweighting the prior distorts calibration. At 8% prevalence balanced weighting leaves AUC unchanged but doubles mean predicted risk (logistic 0.12-0.13, RF 0.19-0.21 vs 0.08) and worsens Brier (0.090-0.099 vs 0.073-0.077).
-- Root cause: class_weight reweights the training prior exactly as resampling does, but the Skill treats it as safe and only resampling as harmful.
-- Fix: Drop class_weight=balanced from the risk-model snippet and decision tree (keep it only for hard-label problems), state that class weights shift predicted risk like SMOTE, and point to threshold tuning or post-hoc recalibration; align the usage-guide and failure-modes text.
-
-### `bio-machine-learning-omics-classifiers` — OC-002: Batch-shortcut snippet fails for most real designs and is not LOBO
-
-- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 6
-- Problem: roc_auc scoring on the batch label gives NaN for more than two batches; StratifiedGroupKFold(n_splits=5) raises for fewer than five batches and is group K-fold, not the leave-one-batch-out that the code comment, failure-modes and usage-guide name. On confounded synthetic data LeaveOneGroupOut gives 0.47/0.34/0.52 against random-split 0.82/0.76/0.79.
-- Root cause: Snippet was written for two balanced batches and a roc_auc metric and never exercised on multi-batch data.
-- Fix: Use scoring="roc_auc_ovr" (or balanced accuracy) for the batch-prediction step and LeaveOneGroupOut (guarding groups with a single class) for the honest estimate; state the minimum number of batches and what to do with two.
-
-### `bio-machine-learning-omics-classifiers` — OC-003: neg_log_loss scoring removes sparsity on near-separable omics data
-
-- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 1
-- Problem: The Core Workflow claims the L1 component yields a sparse signature, but under the normalizer scoring=neg_log_loss CV selects C=545-10,000 on Golub and keeps 1,998/2,000 (seed 0), 2,000 (seed 1), 1,068 (seed 2) coefficients non-zero; accuracy gives 83-160 and roc_auc 160-508. Held-out AUC is the same. The change is defensible (proper score, sklearn 1.11 default) and consistent between SKILL.md and rf_xgboost_classifier.py, but the sparsity consequence is unstated.
-- Root cause: Log loss rewards near-unregularised fits when classes separate, so CV drifts to the top of the C grid; the Skill treats the normalizer choice as behaviour-neutral.
-- Fix: State that the scoring metric governs sparsity, show the effect, and recommend roc_auc (or a one-standard-error rule / capped Cs) when a small signature is the goal; keep neg_log_loss when calibrated probabilities are the goal.
-
-### `bio-machine-learning-omics-classifiers` — OC-004: Isotonic calibration hard-wired for tiny n collapses to 0/1
-
-- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: The calibration snippet uses method="isotonic" in a Skill aimed at tens-to-hundreds of samples. With 20 calibration samples (Golub) isotonic returns exactly 0 or 1 for every test sample and a test Brier of 0.000, while sigmoid gives 22 distinct probabilities and Brier 0.010. At 600 calibration samples both help (0.187 -> 0.166-0.168).
-- Root cause: Isotonic is a step function that needs roughly hundreds of calibration samples; the snippet gives no minimum n and no sigmoid default.
-- Fix: Default the snippet to method="sigmoid" for small n, give the isotonic minimum (state it conditionally), and warn that exact 0/1 outputs are a failure sign, not perfection.
+## P1 (38)
 
 ### `bio-machine-learning-biomarker-discovery` — BD-001: Stability snippet is scale-dependent and not null-calibrated
 
@@ -346,23 +314,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (156)
-
-### `bio-machine-learning-omics-classifiers` — OC-005: XGBoost early stopping: val set reuse and degenerate at tiny n
-
-- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: The snippet early-stops on X_val but never says to keep that set out of the performance estimate; with a 15-sample validation set the metric saturates (validation aucpr 1.0, best_iteration 0-18) and test AUC ranges 0.83-1.0 across splits. The bundled script uses a fixed 300 rounds and so never runs the recommended pattern.
-- Root cause: Early stopping is recommended for "tiny n" without a minimum validation size or a three-way-split instruction.
-- Fix: Add one sentence: report on a third untouched split (or nested CV), and say early stopping needs a validation set large enough not to saturate; optionally add early stopping to rf_xgboost_classifier.py.
-
-### `bio-machine-learning-omics-classifiers` — OC-006: Script docstring/captions and usage-guide contradict measured behaviour
-
-- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 7
-- Problem: logistic_regression.py promises that a batch-aware split exposes the artifact but never runs one; rf_xgboost_classifier.py prints fixed captions ("compressed toward 0.5", "pushed toward extremes"); the usage-guide tip states both as general rules while SKILL.md says the direction depends on the learner and loss.
-- Root cause: Narrative text written independently of the measured output and not reconciled with the later SKILL.md note.
-- Fix: Add a LeaveOneGroupOut result to logistic_regression.py (or trim the docstring); derive the probability-range captions from the numbers or word them conditionally; rewrite the usage-guide tip to match the SKILL.md note.
+## P2 (159)
 
 ### `bio-machine-learning-biomarker-discovery` — BD-002: scoring/legacy-attribute choice unexplained; it sets signature size
 
@@ -507,6 +459,46 @@ None open.
 - Problem: scPrinter is named for single-cell and per-base use but no command or test ships; the Skill says so.
 - Root cause: Out of bounded scope (GPU, source install).
 - Fix: Keep the untested label or add a tested minimal workflow later. (NUCPOS-015, deferred)
+
+### `bio-machine-learning-omics-classifiers` — OC-007 RF ranking claim: balanced weights raised RF AUC
+
+- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md says reweighting changes the probability scale 'not the ranking' and the thresholds table says 'no AUC gain'; random forest AUC rose 0.776 -> 0.812 in 6/6 seeds here and 0.648 -> 0.720 in the Skill's own staged run.
+- Root cause: A result established for logistic regression (van den Goorbergh 2022) was generalized to tree ensembles.
+- Fix: Text-only: limit the claim to logistic models, say that for trees class weights can change the ranking, and keep the advice (risk model: do not reweight, tune the threshold, recalibrate if you did) unchanged.
+
+### `bio-machine-learning-omics-classifiers` — OC-008 Snippets import scripts/ by a cwd-relative path
+
+- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
+- Observed in inputs: 7
+- Problem: The batch and calibration blocks raise ModuleNotFoundError unless the working directory is the Skill directory, and the text never says so.
+- Root cause: sys.path.insert(0, 'scripts') is relative.
+- Fix: Text-only: state that the blocks run from the Skill directory, or anchor the path on the Skill's location, and show the failure.
+
+### `bio-machine-learning-omics-classifiers` — OC-009 Prose-only algorithms not labelled as not executed
+
+- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
+- Observed in inputs: 7
+- Problem: LightGBM, CatBoost, linear SVM and DLDA appear in the algorithm table and tips with no code and no statement that they were not run.
+- Root cause: Origin text kept them as recommendations.
+- Fix: Text-only: one sentence marking them literature-based guidance that this Skill's code and measurements do not cover.
+
+### `bio-machine-learning-omics-classifiers` — OC-010 Bundled XGBoost demo stops at round 0 of 2000
+
+- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
+- Observed in inputs: 5
+- Problem: rf_xgboost_classifier.py early-stops on 63 validation samples at round 0, so the XGBoost row (AUC 0.597, spread [0.46, 0.49]) is a null model and cannot show the calibration direction the script advertises.
+- Root cause: The script uses the early-stopping setup that SKILL.md says to avoid at small n.
+- Fix: Script change of a few lines (not text-only): choose rounds by cross-validation as SKILL.md recommends, or label the XGBoost row as not informative and drop its spread line.
+
+### `bio-machine-learning-omics-classifiers` — OC-011 Small text inconsistencies, unstated measurements
+
+- Skill: 85, Limited Release · candidate `ac3c92e83a1c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003/viewer.md)
+- Observed in inputs: 1, 4, 6
+- Problem: usage-guide gives the isotonic threshold as 1,000 samples without the 100 rarer-class events; calibration_check.py demo 2 ends 'warnings raised: 0' without showing the warning path; the 'noisy estimate' caution names 2-3 batches although the measured SD is as large at 6; saga non-zero counts vary by one between runs; recalibration at tens of samples can lose to raw probabilities (Brier 0.2089 vs raw 0.1985 at n=20).
+- Root cause: Sentence-level drift between documents written at different times.
+- Fix: Text-only: align the usage-guide threshold, add a sentence on comparing against raw probabilities at small n, widen the noise caution to any small batch count, and set random_state in the snippets.
 
 ### `bio-splicing-quantification` — parse_rmats_output raises a raw KeyError on an rMATS file with zero events
 

@@ -1,0 +1,75 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/omics-classifiers",
+    "checkout_read_only": "F:\\OpenScience\\bioSkills-Improved\\machine-learning/omics-classifiers"
+  },
+  "candidate": {
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "ac3c92e83a1c6946b20bc052a5443f1ab99e8e97c2dd902360b5a465a263732c",
+    "identity_kind": "sha256-manifest",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-omics-classifiers",
+    "file_count": 7,
+    "bytes": 48515,
+    "status_before": "untracked skill directory (by design)",
+    "status_after_execution": "unchanged: tools/skill_preflight.py --offline reports the same manifest hash before and after the audit; no Skill byte edited"
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "9a6ec094a5e18ec79df1ffa9d7420d2a42a103f88d4b62d2d3437622bc93a978",
+      "bytes": 24675
+    },
+    {
+      "path": "references/failure-modes.md",
+      "sha256": "f2b1fac3c35321b4543d2be26c8e4c63fc60ee8cc07237c551d9a047d50dc559",
+      "bytes": 2913
+    },
+    {
+      "path": "scripts/batch_checks.py",
+      "sha256": "bcc9a59ab72ea5b51b4784323ebc24052e874e5cbba5b3203356c149ddabb308",
+      "bytes": 4073
+    },
+    {
+      "path": "scripts/calibration_check.py",
+      "sha256": "f8fb4129599c285046f90ae20a6c27907bb77f211b17ac7351e7efb7bd69befb",
+      "bytes": 6330
+    },
+    {
+      "path": "scripts/logistic_regression.py",
+      "sha256": "06cf62e8d860827a640158dc1ccf5986025636ebcc09b1ea4cd382a30d6fa5d9",
+      "bytes": 2954
+    },
+    {
+      "path": "scripts/rf_xgboost_classifier.py",
+      "sha256": "07f93626b9806dd61588556eb6a1e5ab9ec368fbe8600faf0db8a7ed27fbc814",
+      "bytes": 3195
+    },
+    {
+      "path": "usage-guide.md",
+      "sha256": "f2b0e773188339ccc6471c3ee95e069fdc33b4bccd77329d858b64c4de56df88",
+      "bytes": 4375
+    }
+  ],
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-machine-learning-omics-classifiers\\TOOLS.md",
+    "tools_md_sha256": "481d854386ebb5cf91301ef6f54c999b3ad032112168ffa641e193ac908c2800",
+    "environment_fingerprint_sha256": "20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6",
+    "environment_root": "F:\\OpenScience\\audit-envs\\cheminformatics-hit-triage-analyst",
+    "pip_freeze_identical_to": "freeze/pip-freeze-shared.txt",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "preflight_warnings": [
+    "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+  ],
+  "audit": {
+    "kind": "final re-audit (full mode), independent of the fixer and the initial auditor",
+    "previous_identity": "1d68da6e6ef86650cbb2f70c8fda804b7bbe5a9792b3c72bf0bf5d4c0173f047",
+    "previous_record": "candidate@1d68da6e6ef8-initial-lane3-20261003",
+    "fix_evidence": "F:\\OpenScience\\audits\\bio-machine-learning-omics-classifiers\\fix-lane3-20261003",
+    "staged_claims": "F:\\OpenScience\\audit-envs\\cheminformatics-hit-triage-analyst\\derived\\omics-classifiers-claims",
+    "raw_evidence": "F:\\OpenScience\\audits\\bio-machine-learning-omics-classifiers\\reaudit-lane3-20261003\\evidence"
+  }
+}

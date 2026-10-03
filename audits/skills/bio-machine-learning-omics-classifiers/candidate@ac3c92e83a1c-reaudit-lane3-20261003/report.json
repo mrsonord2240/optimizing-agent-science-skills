@@ -1,0 +1,439 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-omics-classifiers",
+    "description": "Builds diagnostic and prognostic classifiers on omics feature matrices with regularized logistic regression, random forest, and gradient-boosted trees, handling the p>>n regime, batch shortcut learning, class imbalance, and probability calibration.",
+    "evaluated_on": "2026-10-03",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "auditor_independent": true,
+    "audit_kind": "final re-audit (full mode)"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Citations match titles and venues; every measured number in SKILL.md traced to a rerun (calibration_check.py, early-stopping, Golub scoring, 1-SE, batch self-test) or an independent generator; no invented values."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-use modelling guidance; defers unbiased evaluation to model-validation; no diagnostic or treatment claims."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No selection, scaling, SMOTE, calibration or tuning sees held-out data (by construction and by a test-split perturbation test with negative controls). The RF ranking overclaim is a scoped generalization error, filed P2, and does not invert the recommendation."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All four scripts and seven SKILL.md blocks run under -W error::FutureWarning on Golub and synthetic data; the cwd-relative import fails loudly off the Skill directory (P2)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Linear, tree, batch, imbalance and calibration workflows are covered with verified sklearn 1.9 / xgboost 3.4 API notes and measured claims; gaps: the RF ranking/AUC overclaim, and LightGBM, CatBoost, SVM and DLDA are unlabelled prose."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Guards are loud and correct: one-class held-out batch reported, one-class training fold skipped and listed, degenerate calibrator warns, scoring pinned. Residual: relative scripts path fails with ModuleNotFoundError off the Skill directory; the XGBoost demo stops at round 0."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md is about 250 lines and 24.7 KB with long inline measurement narrative; failure modes are routed out, scripts are referenced."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Decision table, explicit routing and consistent imbalance guidance across four documents; usage-guide states the isotonic threshold without the 100-rarer-class condition and the run location is not stated."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Prompts match how users ask; per-batch mean is distinguished from pooled AUC; measured numbers are tied to named setups."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network, or execution of user strings; array inputs only."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Four small scripts that self-test their own claims; the 40-repeat isotonic and the elastic-net sparsity measurements behind the prose are not shipped; saga fits set no random_state, so non-zero counts drift by one between runs."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger with explicit hand-offs to model-validation, biomarker-discovery and survival-analysis; scope of the isotonic rule is stated."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 29,
+      "total": 33
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Core Workflow fit and lasso + 1-SE snippet on real Golub ALL/AML (own splits 20-22, 2,000 high-variance probes), FutureWarning as error",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Dense elastic net (neg_log_loss) kept 1,004 / 1,199 / 2,000 of 2,000 coefficients, held-out AUC 1.00 on all three splits (prose: 1,059-2,000). Lasso + 1-SE kept 51 / 80 / 166, AUC 1.00 (prose: 45 / 142 / 60 on other splits). scores_ shape (5 folds, 1, 20 Cs), Cs_ ascending; a hand-recomputed fold score matches scores_ to 1e-3 and an independent 1-SE expression picks the identical C on all three splits. Golub is near-separable, so this shows sparsity and API behaviour, not discrimination.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Core Workflow and 1-SE snippets run under -W error::FutureWarning with no warning",
+            "result": "PASS",
+            "note": "ra_scoring.py seeds 20-22 and SKILL.md blocks 0-1 via run_snippets.py on Golub and synthetic: rc 0"
+          },
+          {
+            "text": "The 'dense fit' statement matches behaviour under the pinned neg_log_loss scoring",
+            "result": "PASS",
+            "note": "1,004 / 1,199 / 2,000 non-zero of 2,000; prose range 1,059-2,000 on other splits; sparse-signature claim no longer made for the elastic net"
+          },
+          {
+            "text": "The 1-SE rule is implemented correctly (smallest C whose CV mean is within one SE of the best mean)",
+            "result": "PASS",
+            "note": "independent expression gives the same C on 3/3 splits (1.6238, 1.6238, 4.2813); hand-fit fold score -0.4985 vs scores_ -0.4994"
+          },
+          {
+            "text": "The 1-SE selection and the dense fit see training data only",
+            "result": "PASS",
+            "note": "CV inside X_train (50 rows); X_te (22 rows) first used for AUC; test-split perturbation leaves c_1se unchanged (input 5)"
+          },
+          {
+            "text": "The lasso + 1-SE snippet delivers a short list at unchanged discrimination",
+            "result": "PASS",
+            "note": "51 / 80 / 166 of 2,000 (2.6-8.3%), AUC 1.00 on all three; larger than the prose 45 / 142 / 60 on seed 22, same order"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "OC-001 re-test: class_weight vs calibration on an independent generator (own coefficients, about 9% prevalence, 6 seeds, 30,000-sample test sets)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Logistic mean predicted / observed prevalence: unweighted 0.99x, class_weight='balanced' 3.24x (Brier 0.143 vs 0.069), balanced then recalibrate() on 1,000 held-out samples (about 89 events) 0.98x (Brier 0.070). RF: 1.11x unweighted, 2.43x balanced. The Skill's 4.2x reproduces only in its own calibration_check.py setup (1,500 train, 50 features, 8%): 0.988 / 4.193 / 1.106, Brier 0.070 / 0.177 / 0.072, slopes 0.925 / 0.723 / 0.879. Prose attributes 4.2x to that setup and 2.6x/1.16x to the 300-feature, 500-train RF setup (staged rerun 2.58 / 1.16; the logistic arm of that setup gives 1.60x, not stated in the prose). New: RF AUC is higher with balanced weights in 6/6 seeds (0.812 vs 0.776), contradicting 'reweighting changes the probability scale, not the ranking' and 'no AUC gain' for the model the Skill recommends for nonlinear signal.",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Unweighted logistic stays calibrated at low prevalence",
+            "result": "PASS",
+            "note": "0.99x observed prevalence, 6 seeds"
+          },
+          {
+            "text": "class_weight='balanced' inflates predicted risk as the Skill states",
+            "result": "PASS",
+            "note": "3.24x logistic and 2.43x RF on an independent generator; 4.19x in the Skill's own setup"
+          },
+          {
+            "text": "Recalibration on held-out data restores the probability scale",
+            "result": "PASS",
+            "note": "0.98x (Brier 0.070) vs 3.24x (0.143); Skill's setup 1.106x"
+          },
+          {
+            "text": "SKILL.md, usage-guide, failure-modes and decision tree agree on imbalance handling and attribute each number to its setup",
+            "result": "PASS",
+            "note": "grep: class_weight/scale_pos_weight only as hard-label-only or as prohibited; 4.2x tied to calibration_check.py, 2.6x/1.16x to the 300-feature RF run"
+          },
+          {
+            "text": "'Reweighting changes the probability scale, not the ranking' (and 'for no AUC gain') holds for random forest",
+            "result": "FAIL",
+            "note": "RF AUC balanced 0.812 vs plain 0.776 in 6/6 seeds here; the Skill's own staged RF run shows 0.720 vs 0.648; holds for logistic (0.820 vs 0.826)"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "SMOTE placement and effect (imblearn Pipeline vs resample-before-CV; own generator, noise labels and 8 held-out draws)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Noise labels (12% positive): resample-before-CV AUC 0.780 vs 0.379 inside ImbPipeline (leak shown; the below-0.5 value is small-sample CV noise on 36 positives). Held-out, known logistic model at about 8%: mean AUC gain from SMOTE -0.007 (range -0.013..+0.006); mean predicted / observed prevalence 1.04x plain vs 4.75x SMOTE. The SKILL.md imblearn block runs in the 7-block harness.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Resampling before the split leaks (inflated CV AUC on noise labels)",
+            "result": "PASS",
+            "note": "0.780 vs 0.379 in the Pipeline"
+          },
+          {
+            "text": "The imblearn Pipeline placement removes the leak",
+            "result": "PASS",
+            "note": "AUC at or below chance inside the Pipeline"
+          },
+          {
+            "text": "SMOTE gives no held-out AUC gain for the logistic baseline",
+            "result": "PASS",
+            "note": "mean -0.007 over 8 draws"
+          },
+          {
+            "text": "SMOTE inflates predicted minority risk",
+            "result": "PASS",
+            "note": "4.75x vs 1.04x of observed prevalence"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "OC-004 re-test: recalibrate() branch boundaries, degenerate-calibrator warning through the shipped code, isotonic-vs-sigmoid rule on own RF and logistic bases",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Branches: n=999 sigmoid, n=1000 with 99 rarer-class events sigmoid, n=1000 with 100 isotonic. A separable base at n=1000 (isotonic) returns 2 distinct probabilities, test Brier 0.0001, and the shipped recalibrate() warns ('Calibrator is degenerate (2 distinct probabilities ...)'); the same data shape at n=20 takes sigmoid (6 distinct, no warning). Own generator, 25 repeats, isotonic beat sigmoid in at most 17% of repeats up to n=1,000 for RF and logistic bases at 10% and 30% prevalence (n=3,000: RF 4-24%, logistic 0%); mean gap at n=1,000 +0.0012..+0.0017 (isotonic worse), consistent with the Skill's 'within 0.002 for RF'. calibration_check.py demo 2 prints 'warnings raised: 0' for the sigmoid branch; the warning path is not exercised by any shipped demo, only by this run. At n=20, sigmoid Brier 0.2089 and isotonic 0.2356 are both worse than the raw RF 0.1985 in the shipped demo; the prose does not say recalibration at tens of samples can lose to raw probabilities.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Isotonic is chosen only at >= 1,000 calibration samples and >= 100 rarer-class events",
+            "result": "PASS",
+            "note": "n=999 sigmoid; 1000/99 sigmoid; 1000/100 isotonic (ra_recal.py)"
+          },
+          {
+            "text": "A degenerate calibrator (<= 3 distinct probabilities) triggers the warning through the shipped code path",
+            "result": "PASS",
+            "note": "separable n=1000 isotonic: 2 distinct values, warning raised under default and 'always' filters (ra_recal.py case a)"
+          },
+          {
+            "text": "The Skill states the rule was derived on RF and XGBoost bases only",
+            "result": "PASS",
+            "note": "'Measured on RF and XGBoost bases (50 features, 10% and 50% prevalence, 40 repeats ...)'"
+          },
+          {
+            "text": "The sigmoid-default rule reproduces on an independent RF generator",
+            "result": "PASS",
+            "note": "isotonic wins 0.00-0.17 of repeats for n <= 1,000"
+          },
+          {
+            "text": "The rule also holds for a base it was not derived on (logistic regression)",
+            "result": "PASS",
+            "note": "isotonic wins 0.00-0.17 up to n=1,000; mean gap +0.0013..+0.0017 at n=1,000"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Scope Boundary",
+        "label": "OC-005 re-test: three-way split, test-split perturbation, early-stopping numbers, and the bundled XGBoost demo",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Test split replaced by garbage X and flipped y after splitting: XGBoost best_iteration and predictions, lasso 1-SE C and calibrated outputs identical; negative controls (perturb validation: best_iteration 209 -> 4; perturb calibration set: outputs change) show the check can detect dependence. Rerun of the staged early-stopping experiment is identical to the fix run: 15 validation samples median best round 4.5, validation AUCPR 0.827, test AUC 0.607; 60 samples 0.717 / 0.649; Golub with 15: validation AUCPR 1.0, best round 4-18; CV-chosen rounds test AUC 0.691. The bundled demo's XGBoost stops at round 0 of 2000 on 63 validation samples (test AUC 0.597, Brier 0.248, probabilities in [0.46, 0.49]); a printed note explains this, but the row is a null model and cannot show the XGBoost calibration direction the script says it reveals.",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Train, early-stopping validation and test are disjoint; the reported score is on the test split only",
+            "result": "PASS",
+            "note": "row-level disjointness check; snippet comments say report on (X_te, y_te)"
+          },
+          {
+            "text": "Selection, early stopping, 1-SE and calibration are unaffected by the held-out test split",
+            "result": "PASS",
+            "note": "perturbation test identical; negative controls change"
+          },
+          {
+            "text": "The early-stopping and CV-rounds numbers quoted in SKILL.md reproduce",
+            "result": "PASS",
+            "note": "0.827/0.607, 0.717/0.649, Golub best round 4-18, CV rounds 0.691: identical to the fix run"
+          },
+          {
+            "text": "The bundled rf_xgboost_classifier.py XGBoost row is a meaningful model that shows its probability behaviour",
+            "result": "FAIL",
+            "note": "best round 0 of 2000, AUC 0.597, spread [0.46, 0.49]; the SKILL.md small-n advice (CV-chosen rounds) is not what the script does"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "OC-002 re-test: planted batch effect with known answer (2, 3 and 6 batches, 20 replicates each) plus edge cases",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Batch-only signal (label tracks batch, features carry only a batch offset): random-split AUC 0.72 / 0.66 / 0.81, leave-one-batch-out mean per-batch AUC 0.48 / 0.48 / 0.52 (collapses to chance), pooled 0.22 / 0.52 / 0.73. Real signal only: per-batch 0.83 / 0.82 / 0.89 (survives). Both: 0.76 / 0.78 / 0.88. Across-replicate SD of the per-batch mean is 0.09-0.10 at 2, 3 and 6 batches in batch-only designs (range 0.28-0.75). leave_one_batch_out matches an independent loop to 0.0 on 6 batches. One-class held-out batch: NaN with 'AUC undefined: one class in this batch'; training batches all one class: 'skipped: training batches hold one class', pooled NaN; string/pandas inputs work; a single-sample batch makes batch_predictability raise a clear ValueError; a single batch raises from LeaveOneGroupOut.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Leave-one-batch-out per-batch AUCs equal an independent manual loop",
+            "result": "PASS",
+            "note": "max abs difference 0.0 over 6 batches"
+          },
+          {
+            "text": "Signal that exists only through batch collapses under leave-one-batch-out",
+            "result": "PASS",
+            "note": "mean per-batch 0.48 / 0.48 / 0.52 vs random-split 0.72 / 0.66 / 0.81"
+          },
+          {
+            "text": "Real within-batch signal survives leave-one-batch-out",
+            "result": "PASS",
+            "note": "0.83 / 0.82 / 0.89"
+          },
+          {
+            "text": "One-class held-out batches and one-class training folds are reported, not silently averaged",
+            "result": "PASS",
+            "note": "NaN with note; 'skipped' row; pooled NaN when nothing predicted"
+          },
+          {
+            "text": "The Skill is honest about estimate noise and about pooled AUC rewarding a batch-level shift",
+            "result": "PASS",
+            "note": "prose reads the per-batch mean and warns about pooling and 2-3-batch noise; pooled 0.73 vs per-batch 0.52 at 6 batches confirms; measured SD is as large at 6 batches (0.09), which the prose does not say"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Stress",
+        "label": "Every shipped script and every SKILL.md block as instructed under -W error::FutureWarning; run-location and prose-only-surface checks",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "batch_checks.py 3 s, logistic_regression.py 3 s, rf_xgboost_classifier.py 22 s, calibration_check.py 53 s: rc 0, empty stderr; 7/7 SKILL.md blocks OK on Golub and synthetic. Printed values match the prose (0.82/0.88/0.86 random-split, 0.54/0.70/0.45 per-batch, 0.988/4.193/1.106, Brier 0.070/0.177/0.072). Scripts run from any cwd, but the SKILL.md batch and calibration blocks use sys.path.insert(0, 'scripts') and raise ModuleNotFoundError from any other cwd; the text does not say to run from the Skill directory. LightGBM, CatBoost, linear SVM and DLDA appear only in a table and prose with no code and no 'not executed' label.",
+        "basic": 31,
+        "specialized": 48,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All four scripts exit 0 with no warning under -W error::FutureWarning",
+            "result": "PASS",
+            "note": "script_rc.txt: rc 0 each; .err files empty"
+          },
+          {
+            "text": "All seven SKILL.md python blocks run as written on real (Golub) and synthetic data",
+            "result": "PASS",
+            "note": "run_snippets.py golub / synthetic: 7/7 OK, no warnings"
+          },
+          {
+            "text": "Numbers printed by the scripts match the numbers and captions in SKILL.md and docstrings",
+            "result": "PASS",
+            "note": "batch, calibration and logistic outputs match the cited values"
+          },
+          {
+            "text": "SKILL.md snippets run when the agent's working directory is not the Skill directory, or the text says where to run them",
+            "result": "FAIL",
+            "note": "from /tmp: ModuleNotFoundError: No module named 'batch_checks'; text only says '# the Skill's scripts/ directory'"
+          },
+          {
+            "text": "Algorithms with no code (LightGBM, CatBoost, SVM, DLDA) are labelled as not executed or untested",
+            "result": "FAIL",
+            "note": "no such label in SKILL.md or usage-guide"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 51.4,
+    "score": 85,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All six corrected findings (OC-001..OC-006) hold under independent retest; the batch check is a real leave-one-batch-out that collapses on planted batch-only signal and keeps real signal.",
+    "Claims are measured and tied to named setups; 4.2x, 2.6x/1.16x, 1-SE sizes, and early-stopping figures reproduce.",
+    "Failure guards are loud: one-class batches reported, degenerate calibrator warns, scoring pinned, three-way split with no held-out dependence.",
+    "Imbalance guidance is now consistent across SKILL.md, usage-guide, failure-modes and the decision tree."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "OC-007 RF ranking claim: balanced weights raised RF AUC",
+      "observed_in": [
+        2
+      ],
+      "problem": "SKILL.md says reweighting changes the probability scale 'not the ranking' and the thresholds table says 'no AUC gain'; random forest AUC rose 0.776 -> 0.812 in 6/6 seeds here and 0.648 -> 0.720 in the Skill's own staged run.",
+      "root_cause": "A result established for logistic regression (van den Goorbergh 2022) was generalized to tree ensembles.",
+      "fix": "Text-only: limit the claim to logistic models, say that for trees class weights can change the ranking, and keep the advice (risk model: do not reweight, tune the threshold, recalibrate if you did) unchanged."
+    },
+    {
+      "priority": "P2",
+      "title": "OC-008 Snippets import scripts/ by a cwd-relative path",
+      "observed_in": [
+        7
+      ],
+      "problem": "The batch and calibration blocks raise ModuleNotFoundError unless the working directory is the Skill directory, and the text never says so.",
+      "root_cause": "sys.path.insert(0, 'scripts') is relative.",
+      "fix": "Text-only: state that the blocks run from the Skill directory, or anchor the path on the Skill's location, and show the failure."
+    },
+    {
+      "priority": "P2",
+      "title": "OC-009 Prose-only algorithms not labelled as not executed",
+      "observed_in": [
+        7
+      ],
+      "problem": "LightGBM, CatBoost, linear SVM and DLDA appear in the algorithm table and tips with no code and no statement that they were not run.",
+      "root_cause": "Origin text kept them as recommendations.",
+      "fix": "Text-only: one sentence marking them literature-based guidance that this Skill's code and measurements do not cover."
+    },
+    {
+      "priority": "P2",
+      "title": "OC-010 Bundled XGBoost demo stops at round 0 of 2000",
+      "observed_in": [
+        5
+      ],
+      "problem": "rf_xgboost_classifier.py early-stops on 63 validation samples at round 0, so the XGBoost row (AUC 0.597, spread [0.46, 0.49]) is a null model and cannot show the calibration direction the script advertises.",
+      "root_cause": "The script uses the early-stopping setup that SKILL.md says to avoid at small n.",
+      "fix": "Script change of a few lines (not text-only): choose rounds by cross-validation as SKILL.md recommends, or label the XGBoost row as not informative and drop its spread line."
+    },
+    {
+      "priority": "P2",
+      "title": "OC-011 Small text inconsistencies, unstated measurements",
+      "observed_in": [
+        1,
+        4,
+        6
+      ],
+      "problem": "usage-guide gives the isotonic threshold as 1,000 samples without the 100 rarer-class events; calibration_check.py demo 2 ends 'warnings raised: 0' without showing the warning path; the 'noisy estimate' caution names 2-3 batches although the measured SD is as large at 6; saga non-zero counts vary by one between runs; recalibration at tens of samples can lose to raw probabilities (Brier 0.2089 vs raw 0.1985 at n=20).",
+      "root_cause": "Sentence-level drift between documents written at different times.",
+      "fix": "Text-only: align the usage-guide threshold, add a sentence on comparing against raw probabilities at small n, widen the noise caution to any small batch count, and set random_state in the snippets."
+    }
+  ]
+}
