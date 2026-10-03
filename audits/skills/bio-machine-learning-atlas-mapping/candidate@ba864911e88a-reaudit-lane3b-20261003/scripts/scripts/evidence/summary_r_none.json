@@ -1,0 +1,33 @@
+{
+ "case": "none",
+ "n_target": 2638,
+ "pct_unknown_knn_gate": 0.016679302501895376,
+ "top_pred": {
+  "T cells": 1408,
+  "Monocytes": 636,
+  "B cells": 343,
+  "ILC": 163
+ },
+ "query_annotated_sha256": "3f2450a30fd26a13c66065c2c034e8ac8297ac1ff32dd683598072020796f6a2",
+ "marker_curated": [
+  "label  n_query  n_markers  retained  flagged",
+  "Monocytes      636          5     0.900    False",
+  "  B cells      343          6     0.784    False",
+  "      ILC      163          6     0.916    False",
+  "       DC       31          4     0.955    False",
+  "NOT CHECKED (no verdict, treat as unverified): ['T cells (n=1408, 0 usable markers)', 'Megakaryocytes/platelets (n=13, 5 usable markers)']",
+  "Flagged labels: none  (retained < 0.6; a flagged label is untrustworthy even when the gate passed it)"
+ ],
+ "marker_curated_rc": 0,
+ "marker_derived": [
+  "label  n_query  n_markers  retained  flagged",
+  "  T cells     1408         10     0.605    False",
+  "Monocytes      636         10     0.899    False",
+  "  B cells      343         10     0.867    False",
+  "      ILC      163         10     0.851    False",
+  "       DC       31         10     0.936    False",
+  "NOT CHECKED (no verdict, treat as unverified): ['Megakaryocytes/platelets (n=13, 10 usable markers)']",
+  "Flagged labels: none  (retained < 0.6; a flagged label is untrustworthy even when the gate passed it)"
+ ],
+ "marker_derived_rc": 0
+}

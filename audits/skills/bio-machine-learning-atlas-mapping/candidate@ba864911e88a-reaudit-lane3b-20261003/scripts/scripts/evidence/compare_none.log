@@ -1,0 +1,3 @@
+labels identical: True max latent diff 0.0
+shape (2638, 1604) obs cols ['louvain', 'batch', 'truth_coarse', '_scvi_batch', 'cell_type', '_scvi_labels', 'predicted_label', 'transfer_uncertainty']
+accuracy 0.9632297194844579

@@ -1,0 +1,2 @@
+DC derived markers (no-Mono ref): ['LYZ', 'FTH1', 'HLA-DRB1', 'FGL2', 'HLA-DPA1', 'RAB32', 'KLF4', 'HLA-DRA', 'CPVL', 'LGALS2']
+cell_type counts: {'T cells': 557, 'B cells': 183, 'ILC': 63, 'DC': 28, 'Megakaryocytes/platelets': 19, 'Plasma cells': 9, 'pDC': 8}

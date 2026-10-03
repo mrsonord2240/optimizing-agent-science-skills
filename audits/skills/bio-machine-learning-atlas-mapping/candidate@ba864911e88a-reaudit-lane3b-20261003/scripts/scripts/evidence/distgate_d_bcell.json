@@ -1,0 +1,14 @@
+{
+ "p99": {
+  "threshold": 5.169337072849273,
+  "flagged_all": 0.0,
+  "flagged_heldout_type": 0.0,
+  "n_heldout": 342
+ },
+ "p95": {
+  "threshold": 3.3465047589937837,
+  "flagged_all": 0.14291129643669448,
+  "flagged_heldout_type": 0.9941520467836257,
+  "n_heldout": 342
+ }
+}

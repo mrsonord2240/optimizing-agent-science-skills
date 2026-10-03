@@ -1,0 +1,70 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/atlas-mapping",
+    "subtree": "9f657dd85ae1791817b7ec962c3da32f24228b1d",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-atlas-mapping",
+    "content_sha256": "ba864911e88a7d48e4576f9f7f4f1668ef0ed85ddd429c151bbb6ebfc39cd094",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-machine-learning-atlas-mapping/; ?? skills/bio-machine-learning-biomarker-discovery/; ?? skills/bio-machine-learning-omics-classifiers/; ?? skills/bio-machine-learning-survival-analysis/",
+    "content_manifest": {
+      "file_count": 7,
+      "bytes": 39154
+    }
+  },
+  "files": [
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 6146,
+      "sha256": "353f0e437faa60e08d6066ef268300d4708f036c404771d75c99bf96150d4ec9"
+    },
+    {
+      "path": "references/pbmc-markers.json",
+      "bytes": 487,
+      "sha256": "04e562971a6b695cf4362a8b217e2cd9decf05f7fa7a81ec634f4709a78cf402"
+    },
+    {
+      "path": "scripts/label_marker_check.py",
+      "bytes": 3513,
+      "sha256": "7459ea92ea3bdde04941bd2f12ac0ce6f3329a69bfbeb1e9b735d6e1cf19d632"
+    },
+    {
+      "path": "scripts/ood_gating_demo.py",
+      "bytes": 2567,
+      "sha256": "12681401bc4090f202a0efc0adf3605294701c9122bc00f8fd317b3b510b6cb3"
+    },
+    {
+      "path": "scripts/scarches_annotation.py",
+      "bytes": 3095,
+      "sha256": "4e4349454019035808fac2446d62afa91e86d9823df3912ebda9a11f0e4d5ad5"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 19188,
+      "sha256": "5326988a34ca88a44d33c98fc4ee405908770215fd4360047a2fb17875749d40"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4158,
+      "sha256": "eea956c1b7b8c983cfabc7d8c4eb307e0602ce58b52c834fda4c4a5f66a8964d"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ],
+    "tools_md_path": "F:\\OpenScience\\audits\\bio-machine-learning-atlas-mapping\\TOOLS.md",
+    "tools_md_sha256": "0818c47cd78b8dc26256c0fd3e0d28c04a1602c0ef60b5cbd2c74669aad225d1",
+    "environment_fingerprint_sha256": "20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6",
+    "environment": "Native Windows venv F:\\OpenScience\\audit-envs\\single-cell-transcriptomics-analyst (Python 3.12; scvi-tools 1.5.1, scanpy 1.12.4, anndata 0.13.3.post0, scikit-learn 1.9.1, torch 2.14.0 CPU); inputs from audit-envs\\cheminformatics-hit-triage-analyst\\derived\\atlas-pair and atlas-pair-holdout",
+    "audit_local_repair": "none; no Skill bytes changed"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

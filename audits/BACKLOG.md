@@ -10,14 +10,6 @@ None open.
 
 ## P1 (46)
 
-### `bio-machine-learning-atlas-mapping` — AM-001 OOD gate misses a held-out type; claim overstated
-
-- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 3, 4, 5
-- Problem: With Monocytes removed from the reference, the shipped weighted-kNN gate flagged 2.7% of the 630 query monocytes and 95.4% were confidently labelled DC; a reference-calibrated distance gate flagged 0%. With B cells removed it gated 87.4%. SKILL.md calls the gate the step that makes labels trustworthy, and the demo's synthetic far cluster hides this.
-- Root cause: Neighbor-agreement uncertainty only detects cells between reference types; a novel type adjacent to one reference label looks certain, and the demo labels kNN predict_proba as softmax.
-- Fix: Scope the claim (the gate is a heuristic that catches between-type cells, not guaranteed novelty detection), add a short held-out-type spike-in check script and recommend running it per reference, and relabel the demo's 'softmax' as kNN probability. Changes runnable bytes (new or edited script) plus text.
-
 ### `bio-machine-learning-omics-classifiers` — OC-001: class_weight=balanced contradicts the Skill calibration stance
 
 - Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
@@ -81,6 +73,14 @@ None open.
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
+
+### `bio-machine-learning-atlas-mapping` — AM-006 Default marker-check mode gives false reassurance (residual of AM-001)
+
+- Skill: 84, Limited Release · candidate `ba864911e88a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@ba864911e88a-reaudit-lane3b-20261003/viewer.md)
+- Observed in inputs: 3, 4, 6
+- Problem: Run with no --markers, label_marker_check.py prints 'Flagged labels: none' on the Monocytes hold-out (DC 0.730; 95.9% of held-out cells called DC) and flags the wrong label (T cells 0.563) on the B-cell hold-out, with no warning. SKILL.md documents this in prose and shows --markers in its command, but the script itself is silent, so an agent that omits the flag gets a confident wrong all-clear. Even with curated markers the largest label (T cells) is NOT CHECKED on the shipped pair, and curated markers exist only for PBMC.
+- Root cause: The default derives markers from the reference, which cannot contain markers of a missing neighbour (the derived DC markers are LYZ, FTH1, HLA-DRB1, CPVL: generic myeloid); the script treats the unreliable mode as an ordinary default.
+- Fix: Make --markers required (or, if the default stays, print a loud UNRELIABLE banner and qualify 'Flagged labels: none'); state in the usage text that markers must come from prior knowledge. Small localized script change plus one SKILL.md sentence; no method change.
 
 ### `bio-data-visualization-ggplot2-fundamentals` — GG-004 Long-ID volcano labels still collide where the Skill promises clean
 
@@ -378,39 +378,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (165)
-
-### `bio-machine-learning-atlas-mapping` — AM-002 Prose-only and heavy methods not labelled not executed
-
-- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: —
-- Problem: Symphony, Azimuth, scPoli, popV, treeArches/scHPL and scGPT/Geneformer appear in the taxonomy and decision tree with performance and OOD claims but no code, install line or statement that they were not run.
-- Root cause: Version Compatibility lists only the tested packages and never says the rest are untested.
-- Fix: Add one line under Version Compatibility naming these methods as described from the literature and not executed or bundled. Text only.
-
-### `bio-machine-learning-atlas-mapping` — AM-003 predict(soft=True) type not stated (DataFrame)
-
-- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 2
-- Problem: In scvi-tools 1.5.1 predict(soft=True) returns a pandas DataFrame (2638 x 8, columns are labels). SKILL.md only says 'per-class probabilities'; proba.max() then returns per-class maxima and proba[:, 0] raises.
-- Root cause: Return type was assumed to be an ndarray.
-- Fix: State that it is a DataFrame indexed by cell with label columns and show proba.max(axis=1) / idxmax(axis=1). Text only.
-
-### `bio-machine-learning-atlas-mapping` — AM-004 Snippets and script input contract incomplete
-
-- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: SKILL.md snippets use ref_vae and adata_ref without defining them, and scarches_annotation.py requires layers['counts'], obs['batch'] and obs['cell_type'] (and shared genes) without saying so.
-- Root cause: Snippets were extracted from the script without their setup lines or the data contract.
-- Fix: Define ref_vae/adata_ref in the snippets (or point to the script) and document the required h5ad fields in the script docstring and SKILL.md. Text only (docstring/comment edits, no behavior change).
-
-### `bio-machine-learning-atlas-mapping` — AM-005 Script unseeded and persists nothing
-
-- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
-- Observed in inputs: 1
-- Problem: Two unmodified runs on identical inputs gave 1.82% vs 1.29% Unknown and accuracy 0.9647 vs 0.9666; the script writes no predictions, latent or uncertainty to disk.
-- Root cause: No scvi.settings.seed and the template only prints.
-- Fix: Set scvi.settings.seed and write the annotated query h5ad (predicted_label, transfer_uncertainty, latent). Changes runnable bytes.
+## P2 (162)
 
 ### `bio-machine-learning-omics-classifiers` — OC-005: XGBoost early stopping: val set reuse and degenerate at tiny n
 
@@ -563,6 +531,14 @@ None open.
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
+
+### `bio-machine-learning-atlas-mapping` — AM-007 Residual overclaims and omissions around the gate and the check
+
+- Skill: 84, Limited Release · candidate `ba864911e88a` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@ba864911e88a-reaudit-lane3b-20261003/viewer.md)
+- Observed in inputs: 3, 4, 6
+- Problem: The section header still reads 'Out-of-Distribution Gating (the step that makes labels trustworthy)'; usage-guide steps 5-6 and Tips present the gate and 'marker sanity checks' without the limitation or scripts/label_marker_check.py; the table column 'reference-calibrated distance gate 0.0%' omits its threshold (p99 of reference self-distances; at p95 it flags 25% of monocytes and 99% of B cells at 8-14% false flags overall); the bundled curated T-cell markers cannot be used on the shipped pair.
+- Root cause: The fix added a limitation subsection without revisiting the surrounding headings and the usage guide.
+- Fix: Retitle the header, add the check and its limitation to usage-guide.md, state the distance-gate threshold in the table note, and note that curated T-cell markers need a gene set that contains them. Text only.
 
 ### `bio-atac-seq-co-accessibility` — COACC-014 cryptic halt on a zero-read cell
 

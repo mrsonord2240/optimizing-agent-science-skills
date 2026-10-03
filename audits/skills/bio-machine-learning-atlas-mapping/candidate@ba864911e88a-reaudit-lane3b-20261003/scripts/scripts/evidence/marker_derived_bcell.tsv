@@ -1,0 +1,5 @@
+label	n_query	n_markers	retained	flagged
+T cells	1415	10	0.563	True
+Monocytes	638	10	0.84	False
+ILC	162	10	0.795	False
+DC	94	10	0.796	False
