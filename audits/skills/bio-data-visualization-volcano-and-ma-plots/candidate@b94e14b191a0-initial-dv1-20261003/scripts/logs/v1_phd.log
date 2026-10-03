@@ -1,0 +1,31 @@
+DESeq2 1.46.0  ggplot2 4.0.3  coef: condition_treated_vs_control 
+dds rows 29391  rownames head: TSPAN6,DPM1,SCYL3 
+warnings while sourcing volcano_phd.R: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` | The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.
+ℹ Please use th 
+sig counts (script): Down 366 NS 28574 Up 451  independent Up 451 Down 366 
+[PASS] Up/Down counts equal independent recount
+TP53/MYC/BRCA1 present in rownames: 3 of 3; labelled genes: TP53,MYC,BRCA1,SPARCL1,SAMHD1,CACNB2,GPX3,MAOA,DUSP1,KLF15,ZBTB16,VCAM1,PER1 
+[PASS] requested genes_of_interest appear in the labelled set (or the script says why not)
+hline y = 1.301 ; min -log10(p) among coloured = 2.015 ; grey points above the line = 4860 (|LFC|>1 and above line but grey: 1)
+[FAIL] horizontal line coincides with the colour boundary (SKILL: 'threshold line matches the adjusted p threshold')
+y_cap = 50: 49 points above the cap (49 of them significant), 9 of 13 labelled genes lie above the cap; max -log10 p = 135.7
+[FAIL] no significant point is hidden by the y cap
+genes: 29391; |shrunken| > |MLE| for 108; max |MLE| 9.51 (ALOX15B) vs max |shrunken| 10.99 (ALOX15B)
+baseMean<5 genes: median |MLE| 0.76, median |shrunk| 0.01
+[FAIL] shrinkage never inflates an LFC (|shrunken| <= |MLE|)
+[PASS] shrinkage pulls low-count genes toward zero
+ashr result columns: baseMean,log2FoldChange,lfcSE,pvalue,padj 
+[FAIL] ashr result carries an svalue column (SKILL.md: 'ashr also returns svalue')
+apeglm svalue=TRUE columns: baseMean,log2FoldChange,lfcSE,svalue
+s<0.005 -> 4684 genes; results() padj<0.05 -> 3994 genes; overlap 3842 (reference: 's < 0.005 corresponds approximately to padj < 0.05')
+apeglm with contrast= -> type='apeglm' shrinkage only for use with 'coef' 
+volcano_plot(label_genes=symbols on Ensembl rownames): labelled points = 3 (no warning)
+volcano_plot() default: hline y = 1.301 ; min coloured -log10p = 2.015 ; labels: 10 
+EnhancedVolcano class of Up genes: NS 0 FC 0 P 0 FC_P 451 | of Down genes: NS 0 FC 0 P 0 FC_P 366 
+[FAIL] EnhancedVolcano example colours Up and Down differently (SKILL: 'color by direction')
+selectLab = [passing, failing-threshold, absent 'TP53'] -> labels drawn: TSPAN6,CFLAR,TP53 (pass = CFLAR , fail = TSPAN6 )
+[FAIL] selectLab gene that fails the thresholds is silently unlabeled (Gotcha 1 as documented)
+null device 
+MA: baseMean<5 genes 11646 median |LFC| (shrunken) 0.012 
+PDF sizes: volcano.pdf 1044938 B; ma_plot.pdf 1065474 B 

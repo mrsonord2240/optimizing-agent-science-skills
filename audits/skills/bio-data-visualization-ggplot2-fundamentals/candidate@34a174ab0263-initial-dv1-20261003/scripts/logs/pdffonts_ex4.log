@@ -1,0 +1,6 @@
+wsl: Failed to start the systemd user session for 'sci'. See journalctl for more details.
+== pub_fig.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+Helvetica                            Type 1            Custom           no  no  no      10  0
+Symbol                               Type 1            Symbol           no  no  no      11  0

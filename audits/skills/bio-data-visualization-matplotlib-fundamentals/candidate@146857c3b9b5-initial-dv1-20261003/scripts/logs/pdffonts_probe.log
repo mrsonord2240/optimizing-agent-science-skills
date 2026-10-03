@@ -1,0 +1,18 @@
+== a.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+CEUOPS+DejaVuSans                    Type 3            Custom           yes yes yes     15  0
+GXDUII+DejaVuSans                    Type 3            Custom           yes yes yes     26  0
+== b.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+DYQHWY+DejaVuSans                    Type 3            Custom           yes yes yes     15  0
+== c.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+BHVZUM+DejaVuSans                    Type 3            Custom           yes yes yes     15  0
+== d.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+CEUOPS+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     15  0
+GXDUII+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     22  0

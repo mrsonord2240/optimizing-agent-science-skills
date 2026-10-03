@@ -1,0 +1,19 @@
+== figure_cairo.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+QAYTZI+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+UBGKEP+ArialMT                       CID TrueType      Identity-H       yes yes yes      8  0
+GITBJA+Arial-ItalicMT                TrueType          WinAnsi          yes yes yes      9  0
+== figure_default.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+Helvetica                            Type 1            Custom           no  no  no      10  0
+Helvetica-Oblique                    Type 1            Custom           no  no  no      11  0
+== raster.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+TRZKTB+ArialMT                       TrueType          WinAnsi          yes yes yes      8  0
+== vector.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+TRZKTB+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0

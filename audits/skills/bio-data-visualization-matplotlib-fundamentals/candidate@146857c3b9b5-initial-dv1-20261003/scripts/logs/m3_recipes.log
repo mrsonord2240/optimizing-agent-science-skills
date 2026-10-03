@@ -1,0 +1,25 @@
+F:\OpenScience\audits\bio-data-visualization-matplotlib-fundamentals\initial-dv1-20261003\scripts\m3_recipes.py:90: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  fg.tight_layout()
+The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+matplotlib 3.11.2 seaborn 0.13.2
+scatter.pdf 150864 B 
+figure.png 271032 B 
+figure.svg 260785 B 
+figure.eps 3461273 B 
+tiff (1056, 831) tiff_lzw
+figure.png 1056 x 831 px = 89.4 x 70.4 mm (documented 89 x 70 mm; bbox tight + pad 0.05 in)
+[PASS] Standard Setup rcParams + 89 mm figure save to an 89 mm wide file (within 1 mm)
+svg <text> elements: 0 | glyph <path>/<use> in defs: 55 | svg.fonttype default: path
+[FAIL] SVG save keeps axis text as editable <text> ('SVG for editable vector')
+boxplot median of group A line y = -0.074 (drawn via patch_artist; box facecolour alpha 0.7 )
+[PASS] Recipes build: scatter+colorbar, line+fill, bar, boxplot(tick_labels=), hist(log), imshow RdBu_r symmetric
+boxplot(labels=) -> TypeError Axes.boxplot() got an unexpected keyword argument 'labels'
+FacetGrid.set_xlabel -> AttributeError 'FacetGrid' object has no attribute 'set_xlabel'
+tight_layout  (clipped labels, axes/colorbar overlaps): (np.int64(0), np.int64(2))
+constrained   (clipped labels, axes/colorbar overlaps): (np.int64(0), np.int64(0))
+Figure has set_rasterization_zorder: False | Axes has set_rasterization_zorder: True
+[FAIL] failure-modes.md `fig.set_rasterization_zorder(0)` exists on Figure
+ax.set_rasterization_zorder(0): image XObjects 1
+recipes.eps warnings: none
+non-rasterized alpha scatter -> .eps warnings: none

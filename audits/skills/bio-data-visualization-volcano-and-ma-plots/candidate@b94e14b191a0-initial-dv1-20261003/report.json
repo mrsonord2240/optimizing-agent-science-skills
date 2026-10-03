@@ -1,0 +1,371 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-volcano-and-ma-plots",
+    "description": "Build volcano and MA plots from differential-expression results with LFC shrinkage, FDR thresholds, label placement and axis conventions across EnhancedVolcano, ggplot2 and matplotlib; ships volcano_phd.R, volcano_plot.R and ma_plot.py.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values: counts (451 Up / 366 Down at padj<0.05 and |LFC|>1; 3,994 padj<0.05) equal independent recomputation on the airway dds."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Visualization skill; no clinical or prescriptive output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Shrinkage and FDR guidance is sound; the shipped plots draw an FDR line on a raw-p axis and clip significant points (VOL-001, VOL-002), filed as defects with fixes, not inverted conclusions."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three scripts ran on airway with exit 0 and correct counts; defects are plot-content bugs (VOL-001..VOL-003, VOL-008)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 72,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Strong method content (shrinkage, s-value, label rank); the headline volcano_phd.R clips 49 significant genes and mis-draws the threshold (VOL-001, VOL-002)."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Runs cleanly but requires a pre-built dds and fails silently on clipped data and on EnhancedVolcano colouring (VOL-001, VOL-003)."
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "SKILL.md is long (11.6 KB) with repeated points across SKILL, usage-guide, failure-modes and reconciliation; references are routed."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Operational read-order rule is helpful, but its own rule 3 (threshold matches axis) fails for the shipped script (VOL-002)."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Readable tips; several factual statements are wrong or stale (VOL-004..VOL-007)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local reads and writes only; no credentials or network."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Scripts duplicate the volcano logic with drifting behaviour (cap, colours); no tests."
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Precise trigger, decision tables and failure modes; several claims did not reproduce on current DESeq2 and EnhancedVolcano."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 68.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 10,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scripts/volcano_phd.R end-to-end on the real airway dds (29,391 genes, apeglm shrinkage, volcano, MA, cairo_pdf, EnhancedVolcano)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Counts correct; the volcano clips 49 significant points and 9 of 13 labels pile at the top edge, and the dashed line sits 0.7 log10 units below the colour boundary (VOL-001, VOL-002).",
+        "basic": 28,
+        "specialized": 38,
+        "total": 66,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Up/Down counts equal an independent recount (451 / 366)",
+            "result": "PASS",
+            "note": "Exact match on apeglm results."
+          },
+          {
+            "text": "No significant point is hidden by the y cap",
+            "result": "FAIL",
+            "note": "y_cap = 50 hides 49 significant points (max -log10 p 135.7); opened volcano_phd_view.png."
+          },
+          {
+            "text": "The horizontal dashed line coincides with the colour boundary",
+            "result": "FAIL",
+            "note": "Line at 1.301 on raw p; smallest coloured point 2.015."
+          },
+          {
+            "text": "volcano.pdf and ma_plot.pdf written with cairo_pdf",
+            "result": "PASS",
+            "note": "1.04 MB and 1.07 MB; fonts embedded."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "volcano_plot() function on shrunken airway results with default top-10 and a gene list",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Opened volcano_plot_fn.png: legible Okabe-Ito Up/Down/NS with non-overlapping labels; only the threshold line mismatch remains.",
+        "basic": 32,
+        "specialized": 44,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Top-10 labels are chosen by combined rank among significant genes",
+            "result": "PASS",
+            "note": "10 labels, all significant."
+          },
+          {
+            "text": "Labels do not overlap and use max.overlaps = Inf",
+            "result": "PASS",
+            "note": "Opened figure; no collisions."
+          },
+          {
+            "text": "Gene-list labelling works for TP53, MYC, BRCA1",
+            "result": "PASS",
+            "note": "3 labelled points."
+          },
+          {
+            "text": "Threshold line matches the colour boundary",
+            "result": "FAIL",
+            "note": "1.301 versus 2.015."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Shrinkage method claims on airway: apeglm vs MLE, ashr contrast, svalue, apeglm contrast error",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "apeglm pulls low-count genes to zero (median |LFC| 0.76 to 0.01) but 108 genes grow and the maximum rises 9.51 to 10.99; ashr returns no svalue column (VOL-004, VOL-007).",
+        "basic": 28,
+        "specialized": 38,
+        "total": 66,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Shrinkage pulls low-count genes toward zero",
+            "result": "PASS",
+            "note": "baseMean<5: median |MLE| 0.76, |shrunken| 0.01."
+          },
+          {
+            "text": "Shrinkage never inflates an LFC",
+            "result": "FAIL",
+            "note": "108 genes with |shrunken| > |MLE|; ALOX15B 9.51 to 10.99."
+          },
+          {
+            "text": "lfcShrink(type='ashr') returns an svalue column",
+            "result": "FAIL",
+            "note": "Columns baseMean, log2FoldChange, lfcSE, pvalue, padj; svalue only from apeglm with svalue=TRUE."
+          },
+          {
+            "text": "s < 0.005 approximates padj < 0.05 and apeglm rejects contrast=",
+            "result": "PASS",
+            "note": "4,684 versus 3,994 genes, 3,842 shared; apeglm contrast error reproduced."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "EnhancedVolcano route: SKILL.md call, colours, selectLab gotcha",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Plot renders and labels correctly, but Up and Down share one colour and the selectLab-threshold gotcha does not reproduce (VOL-003, VOL-006).",
+        "basic": 27,
+        "specialized": 36,
+        "total": 63,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "EnhancedVolcano with y='padj' and the Skill's col vector draws and labels the selected genes",
+            "result": "PASS",
+            "note": "Opened enhancedvolcano_skill.png: 13 labels."
+          },
+          {
+            "text": "Up and Down genes are coloured differently (colour by direction)",
+            "result": "FAIL",
+            "note": "451 Up and 366 Down all class FC_P, #D55E00."
+          },
+          {
+            "text": "A selectLab gene failing the thresholds is silently unlabeled",
+            "result": "FAIL",
+            "note": "TSPAN6 (NS) was labelled on EnhancedVolcano 1.24.0."
+          },
+          {
+            "text": "Y axis label matches the plotted quantity",
+            "result": "FAIL",
+            "note": "Axis reads '-Log10 P' while y = padj."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Python route: ma_plot.py on 29,391 real rows, adjustText volcano, sanbomics claim",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "ma_plot and adjustText are correct; the named sanbomics.tools.volcano does not exist and sanbomics.tools fails to import (VOL-005); the 5 MB+ vector claim is not reproduced (VOL-008).",
+        "basic": 29,
+        "specialized": 40,
+        "total": 69,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "ma_plot colours exactly the padj < 0.05 genes orange",
+            "result": "PASS",
+            "note": "3,994 orange, 25,397 grey (padj NA included)."
+          },
+          {
+            "text": "adjustText labels 12 top genes without overlap",
+            "result": "PASS",
+            "note": "0 overlapping pairs; opened adjusttext_volcano.png."
+          },
+          {
+            "text": "sanbomics.tools.volcano exists and imports",
+            "result": "FAIL",
+            "note": "tools.py has no volcano and fails with ModuleNotFoundError: pkg_resources; the function is sanbomics.plots.volcano."
+          },
+          {
+            "text": "Vector scatter of 29,391 points gives a 5 MB+ PDF",
+            "result": "FAIL",
+            "note": "445,526 B vector versus 34,780 B rasterised."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.8,
+    "dynamic_weighted": 40.8,
+    "score": 70,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Counts, labels and shrinkage behaviour reproduced exactly on the real airway dataset.",
+    "volcano_plot() produces a clean, legible Okabe-Ito volcano with combined-rank labels.",
+    "The decision content (apeglm vs ashr, s-value approximation, apeglm needs coef=) is largely verified against current DESeq2 1.46."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "VOL-001 volcano_phd.R clips significant points and their labels with an unconditional y cap",
+      "observed_in": [
+        1
+      ],
+      "problem": "coord_cartesian(ylim = c(0, 50)) is applied regardless of the data: 49 significant genes (max -log10 p 135.7) vanish and 9 of 13 labels, including the top-ranked genes, pile at the top edge; the usage-guide says capped points remain visible at the edge.",
+      "root_cause": "The optional cap is hard-coded and coord_cartesian clips rather than squishes points.",
+      "fix": "Apply the cap only when requested (y_cap = NULL by default), or squish with pmin(neg_log10_p, y_cap) plus a marker/axis break, and state the cap in the caption."
+    },
+    {
+      "priority": "P1",
+      "title": "VOL-002 Shipped volcanoes draw the FDR line on a raw-p axis, contradicting the Skill",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "Both R scripts plot -log10(pvalue) and draw the hline at -log10(fdr): line at 1.301, smallest coloured point at 2.015; SKILL.md says drawing the FDR line on raw p 'creates a meaningless line' and operational rule 3 asks that the line match the axis.",
+      "root_cause": "Raw-p axis kept while the FDR threshold is projected; the script comment calls it approximate.",
+      "fix": "Plot -log10(padj) on y (as for EnhancedVolcano) or draw the line at the smallest -log10(p) among padj < fdr genes and label it."
+    },
+    {
+      "priority": "P2",
+      "title": "VOL-003 EnhancedVolcano example loses direction and mislabels the axis",
+      "observed_in": [
+        4
+      ],
+      "problem": "col = c('grey60','#0072B2','#56B4E9','#D55E00') colours all 451 Up and 366 Down genes the same orange (class FC_P), against 'color by direction' and the ggplot volcano; y = 'padj' is labelled '-Log10 P'.",
+      "root_cause": "EnhancedVolcano classes are NS / FC / P / FC_P, not Up/Down/NS.",
+      "fix": "Use colCustom per direction or document that EnhancedVolcano colours by class; set ylab = expression(-log[10]~adjusted~italic(P))."
+    },
+    {
+      "priority": "P2",
+      "title": "VOL-004 ashr is said to return svalue; it does not",
+      "observed_in": [
+        3
+      ],
+      "problem": "SKILL.md says lfcShrink(type='ashr') returns an svalue column and the usage-guide says to use ashr for s-values; DESeq2 1.46 ashr returns baseMean, log2FoldChange, lfcSE, pvalue, padj only. s-values come from lfcShrink(type='apeglm', svalue = TRUE).",
+      "root_cause": "Version-dependent claim not checked on the current API.",
+      "fix": "State that svalue comes from apeglm with svalue=TRUE (or from ashr::ash lfsr) and correct the decision-tree row."
+    },
+    {
+      "priority": "P2",
+      "title": "VOL-005 sanbomics.tools.volcano does not exist",
+      "observed_in": [
+        5
+      ],
+      "problem": "SKILL.md names sanbomics.tools.volcano; the function is sanbomics.plots.volcano and sanbomics.tools fails to import without pkg_resources.",
+      "root_cause": "Wrong module path.",
+      "fix": "Name sanbomics.plots.volcano (and note the optional dependency) or drop the mention."
+    },
+    {
+      "priority": "P2",
+      "title": "VOL-006 EnhancedVolcano selectLab-threshold gotcha does not reproduce",
+      "observed_in": [
+        4
+      ],
+      "problem": "Gotcha 1 (repeated in SKILL.md, failure-modes.md, usage-guide, the script comment and the error table) says selectLab genes failing pCutoff/FCcutoff are silently unlabeled; on 1.24.0 the failing gene TSPAN6 was labelled.",
+      "root_cause": "Behaviour of an older EnhancedVolcano version carried forward.",
+      "fix": "Remove or version-qualify the gotcha and the manual-layer workaround."
+    },
+    {
+      "priority": "P2",
+      "title": "VOL-007 Shrinkage is described as only pulling toward zero",
+      "observed_in": [
+        3
+      ],
+      "problem": "apeglm raised |LFC| for 108 of 29,391 genes and the maximum from 9.51 (MLE) to 10.99 (ALOX15B), while the text says well-estimated genes are 'essentially untouched' and the unshrunken estimate is always the inflated one.",
+      "root_cause": "Simplified description of the apeglm posterior mode.",
+      "fix": "Add a sentence that apeglm uses a different estimator and can exceed the MLE for a few genes; compare against the MLE before reporting extremes."
+    },
+    {
+      "priority": "P2",
+      "title": "VOL-008 Rasterization guidance is not implemented and its size claim is overstated",
+      "observed_in": [
+        1,
+        5
+      ],
+      "problem": "volcano_phd.R comments say to rasterize above 5000 features and that ggsave raster needs ggplot2 3.5+, but no layer is rasterized (volcano.pdf 1.04 MB); '5MB+ PDFs crash Illustrator' is not reproduced (29,391 vector points = 0.45 MB).",
+      "root_cause": "Aspirational comment and unmeasured claim.",
+      "fix": "Wrap the point layer in ggrastr::rasterise or drop the comment; replace '5MB+' with the measured vector/raster ratio."
+    }
+  ]
+}

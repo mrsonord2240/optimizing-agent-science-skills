@@ -1,0 +1,371 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-ggplot2-fundamentals",
+    "description": "Build publication-quality figures in R with ggplot2 using the grammar of graphics with CVD-safe palettes, cairo_pdf TrueType embedding, tidy evaluation and a theme_classic baseline; ships scripts/publication_figures.R helpers.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values. Volcano class counts (541 Up, 497 Down, 18,734 NS of 19,772 airway genes) and PCA variance labels (57.6 %, 26.5 %) equal independent recomputation."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Plotting skill; no clinical or prescriptive output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. The volcano threshold line is drawn on the wrong quantity (GG-001), filed as a defect, not a conclusion-inverting method error."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All six helpers and every SKILL.md block ran on ggplot2 4.0.3 and 3.5.2; defects are wrong behaviour in shipped code (GG-001..GG-004), filed P1."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 76,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Complete core ggplot2 coverage with a runnable helper script; the shipped helpers contradict the Skill's own rules (GG-001..GG-003) and one block does not render as described (GG-005)."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Helpers run on raw and NA-containing airway results without warnings; create_pca_plot fails cryptically without an undocumented var_explained column and Set1 breaks above 9 groups (GG-008)."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md is compact and routes to two references; the script is small. Some restatement across SKILL, usage-guide and failure-modes."
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Clear idioms and guardrails, but the helper script's styling differs from the stated baseline so an agent gets two inconsistent house styles (GG-003)."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Readable; usage-guide tips include an inert axis-line tip and a nonexistent 'panel.grid.off' term (GG-007)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network or destructive operations; plain local ggsave writes."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Single-purpose helpers; no tests, no seed handling in the jitter (GG-008)."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger description precise, progressive disclosure to two references and a script; failure-modes.md carries claims that do not reproduce (GG-006)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 71.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "create_volcano on real airway DESeq2 results (19,772 genes, 1,534 NA padj)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs without warnings; class counts and top-10 labels correct; the dashed horizontal line is not the colour boundary and labels collide (GG-001, GG-004).",
+        "basic": 31,
+        "specialized": 42,
+        "total": 73,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Volcano colour classes equal an independent classification (541 Up / 497 Down / 18,734 NS)",
+            "result": "PASS",
+            "note": "Exact match on raw results including NA padj."
+          },
+          {
+            "text": "The ten labelled genes are the ten smallest padj",
+            "result": "PASS",
+            "note": "setequal with order(padj)[1:10]."
+          },
+          {
+            "text": "The horizontal dashed line marks the boundary that colours the points",
+            "result": "FAIL",
+            "note": "Line at -log10(0.05)=1.301 on raw p; smallest coloured point is 1.956; 4,692 grey points (232 with |LFC|>1) sit above the line."
+          },
+          {
+            "text": "Rendered labels are legible and non-overlapping at the shipped max.overlaps = 20",
+            "result": "FAIL",
+            "note": "Opened volcano_raw.png: ENSG00000120129 overlaps ENSG00000101347."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "create_boxplot and create_pca_plot on synthetic groups and prcomp(mtcars)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Medians, jitter point count and PCA variance labels are right; palettes depart from the Skill's baseline and jitter is unseeded (GG-003, GG-008).",
+        "basic": 33,
+        "specialized": 43,
+        "total": 76,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Boxplot medians equal the raw per-group medians and 60 jitter points are drawn",
+            "result": "PASS",
+            "note": "all.equal on ggplot_build data."
+          },
+          {
+            "text": "PCA axis labels carry the prcomp variance (PC1 57.6 %, PC2 26.5 %)",
+            "result": "PASS",
+            "note": "String equality with independent recomputation."
+          },
+          {
+            "text": "Helper palettes follow the Skill's CVD-safe Okabe-Ito baseline",
+            "result": "FAIL",
+            "note": "Brewer Set2 and Set1 (red/green) and an NPG pair; none of the Okabe-Ito pair appears."
+          },
+          {
+            "text": "create_pca_plot works for 12 groups and reports a clear error for a missing variance column",
+            "result": "FAIL",
+            "note": "Set1 warns 'n too large' and returns fewer colours; missing var_explained gives 'non-numeric argument to mathematical function'."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "save_publication_figure and SKILL.md export blocks, fonts inspected with pdffonts",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "PNG is 2100 x 1500 at 7 x 5 in; the helper PDF is not cairo_pdf and embeds nothing, contradicting the Skill; the documented snippets embed TrueType.",
+        "basic": 28,
+        "specialized": 38,
+        "total": 66,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The SKILL.md cairo_pdf snippet embeds TrueType fonts",
+            "result": "PASS",
+            "note": "pdffonts: ArialMT TrueType, emb yes."
+          },
+          {
+            "text": "Default ggsave PDF leaves fonts unembedded (rule verified)",
+            "result": "PASS",
+            "note": "pdffonts: Helvetica Type 1, emb no."
+          },
+          {
+            "text": "save_publication_figure follows the Skill's cairo_pdf and mm doctrine",
+            "result": "FAIL",
+            "note": "pub_fig.pdf: Helvetica and Symbol Type 1, emb no; width in inches."
+          },
+          {
+            "text": "89 mm x 300 dpi PNG is 1051 x 827 px",
+            "result": "PASS",
+            "note": "1051 x 826 (rounding), TIFF LZW written."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Run SKILL.md blocks: Grammar in Layers, tidy eval, ggtext, rasterise, theme_pub, reference geoms",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "All blocks build; the Grammar block renders with inert colour, fractional 10^n ticks and a title that duplicates the transform (GG-005).",
+        "basic": 31,
+        "specialized": 42,
+        "total": 73,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Tidy-eval blocks map PC1 and PC2 with .data[[ ]] and {{ }}",
+            "result": "PASS",
+            "note": "Layer data equals input columns."
+          },
+          {
+            "text": "ggtext label block renders a true minus sign with subscripts",
+            "result": "PASS",
+            "note": "Opened ggtext.png; codepoint 8722 (U+2212)."
+          },
+          {
+            "text": "rasterise() keeps vector axes and shrinks a 50,000-point PDF",
+            "result": "PASS",
+            "note": "105,761 B versus 1,845,026 B all-vector."
+          },
+          {
+            "text": "Grammar in Layers block renders as its comments describe",
+            "result": "FAIL",
+            "note": "Opened grammar_block.png: scale_color_manual has no colour mapping; ticks read 10^0.477 and 10^1.48; y title 'Expression (log10)' beside 10^n ticks."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "create_multi_panel 3- and 4-panel figures with real volcano, on ggplot2 4.0.3 and 3.5.2",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Layouts and tags correct on both versions; the volcano labels collapse into an unreadable stack and the theme border is lost under the patchwork `&` operator.",
+        "basic": 30,
+        "specialized": 41,
+        "total": 71,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "3- and 4-panel figures carry tags A-C and A-D and build on both ggplot2 versions",
+            "result": "PASS",
+            "note": "Opened multi3.png, multi4.png (4.0.3) and multi3.png (3.5.2)."
+          },
+          {
+            "text": "Panels keep the theme_publication border used in the standalone plots",
+            "result": "FAIL",
+            "note": "Multi-panel panels have no border; standalone p3 has one."
+          },
+          {
+            "text": "Volcano labels remain legible in the multi-panel figure",
+            "result": "FAIL",
+            "note": "ENSG labels overprint each other in panel A."
+          },
+          {
+            "text": "Results agree between ggplot2 4.0.3 and 3.5.2",
+            "result": "PASS",
+            "note": "Identical counts, labels, and failures on both."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.4,
+    "dynamic_weighted": 43.1,
+    "score": 74,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Helpers computed volcano classes, labels and PCA variance exactly on 19,772 real airway genes.",
+    "Documented export idioms were verified: cairo_pdf embeds TrueType, default pdf() does not, rasterise() shrinks a 50,000-point PDF 17-fold.",
+    "Skill runs identically on ggplot2 3.5.2 and 4.0.3 and states the 4.x S7 caveat."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "GG-001 Volcano threshold line is drawn on the wrong quantity",
+      "observed_in": [
+        1
+      ],
+      "problem": "create_volcano plots -log10(raw pvalue) but draws the horizontal line at -log10(fdr_threshold) while colouring by padj; 4,692 grey points (232 with |LFC|>1) lie above the line and coloured points start at 1.956. The y label renders '− Log10 P − value' with stray spacing.",
+      "root_cause": "FDR cutoff applied to a raw-p axis; expression() label.",
+      "fix": "Remove the hline or place it at the smallest -log10(p) among padj < fdr genes; label with expression(-log[10](italic(p)))."
+    },
+    {
+      "priority": "P1",
+      "title": "GG-002 save_publication_figure violates the Skill's cairo_pdf and mm rule",
+      "observed_in": [
+        3
+      ],
+      "problem": "The helper saves with the default pdf() device in inches; pdffonts shows Helvetica and Symbol Type 1 unembedded.",
+      "root_cause": "Helper written before the cairo_pdf doctrine.",
+      "fix": "Pass device = cairo_pdf and units = 'mm' (journal widths 89/183) in the PDF save."
+    },
+    {
+      "priority": "P1",
+      "title": "GG-003 Example theme, palettes and multi-panel theme disagree with the SKILL baseline",
+      "observed_in": [
+        2,
+        5
+      ],
+      "problem": "theme_publication is theme_bw with a panel border and an NPG pair; boxplot uses Brewer Set2 and PCA Set1 (red/green, 9-colour cap), while SKILL.md prescribes theme_classic and Okabe-Ito. create_multi_panel's `& theme_publication()` removes the border.",
+      "root_cause": "Script styling never reconciled with the Three Modern Defaults.",
+      "fix": "Rebase helpers on the SKILL theme_pub and Okabe-Ito palette; apply the theme to panels with `& theme(...)` or before composition; drop or document the border."
+    },
+    {
+      "priority": "P1",
+      "title": "GG-004 Volcano labels overlap at max.overlaps = 20",
+      "observed_in": [
+        1,
+        5
+      ],
+      "problem": "Rendered labels collide in the standalone volcano and form an illegible stack in multi-panel figures; the Skill's guardrail says max.overlaps = Inf.",
+      "root_cause": "Ensembl-ID labels too long for the top-10 cluster; arbitrary overlap cap.",
+      "fix": "Use max.overlaps = Inf with a seed, min.segment.length, nudges or gene symbols; open the rendered label panel."
+    },
+    {
+      "priority": "P2",
+      "title": "GG-005 Grammar in Layers block does not render as written",
+      "observed_in": [
+        4
+      ],
+      "problem": "scale_color_manual is inert (no colour mapping), label_log() on free log y gives 10^0.477 / 10^1.48 ticks, and the y title 'Expression (log10)' duplicates the transform.",
+      "root_cause": "Block written as a syntax tour and never rendered.",
+      "fix": "Map colour = condition, use breaks_log() or plain labels, retitle 'Expression'."
+    },
+    {
+      "priority": "P2",
+      "title": "GG-006 Failure-mode claims that do not reproduce",
+      "observed_in": [
+        4
+      ],
+      "problem": "aes(color='red') renders #F8766D salmon, not blue; ggrepel's 'N > 10 labels' trigger is wrong (60 labels draw alike at default and Inf; the cap is per-label overlap count) and the Skill states the default 'silently drops labels'.",
+      "root_cause": "Claims written from memory.",
+      "fix": "Correct the colour statement and describe the real overlap-count trigger; tell the agent to count drawn labels."
+    },
+    {
+      "priority": "P2",
+      "title": "GG-007 Usage-guide tips are inert or malformed",
+      "observed_in": [
+        4
+      ],
+      "problem": "'Remove top/right axis lines ... theme(axis.line = element_line())' does nothing (theme_classic has no top/right lines); 'panel.grid.off' is not a ggplot2 term; panel.grid = element_blank() is redundant on theme_classic; {{ x }} with a string silently maps a constant.",
+      "root_cause": "Tips untested against rendered figures.",
+      "fix": "Delete or correct the tips; warn that {{ }} needs bare names."
+    },
+    {
+      "priority": "P2",
+      "title": "GG-008 Helper reproducibility and input contract",
+      "observed_in": [
+        2
+      ],
+      "problem": "create_boxplot jitter is unseeded (differs between builds); create_pca_plot needs an undocumented var_explained column and fails with a cryptic error; Set1 warns above 9 groups.",
+      "root_cause": "No seed and no input contract in the script.",
+      "fix": "Use position_jitter(seed=); document or check pca_df$var_explained; choose a palette that scales."
+    }
+  ]
+}

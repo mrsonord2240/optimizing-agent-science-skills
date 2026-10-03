@@ -1,0 +1,22 @@
+default rcParams + fonttype 3                           ok
++ ps.fonttype                                           FAIL ValueError: bytes must be in range(0, 256)
++ font.family                                           ok
++ font.sans-serif                                       ok
++ font.size                                             ok
++ axes.labelsize                                        ok
++ axes.titlesize                                        ok
++ xtick.labelsize                                       ok
++ ytick.labelsize                                       ok
++ legend.fontsize                                       ok
++ figure.dpi                                            ok
++ savefig.dpi                                           ok
++ savefig.bbox                                          ok
++ savefig.pad_inches                                    ok
++ axes.linewidth                                        ok
++ xtick.major.width                                     ok
++ ytick.major.width                                     ok
++ lines.linewidth                                       ok
++ patch.linewidth                                       ok
+all Standard Setup keys                                 FAIL ValueError: bytes must be in range(0, 256)
+Arial only (font.sans-serif)                            ok
+axes.unicode_minus False + all keys                     ok

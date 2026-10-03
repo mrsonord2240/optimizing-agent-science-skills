@@ -1,0 +1,19 @@
+ggplot2 3.5.2  R 4.4.3 
+warnings building volcano on raw results:  
+[PASS] class counts equal independent (Up 541, Down 497)
+labelled genes: 10 
+[PASS] labels are the 10 smallest padj genes
+hline y=1.301 (=-log10 FDR cutoff) ; smallest -log10(raw p) among coloured points = 1.956 ; grey points above line = 4692 (of which |LFC|>1: 232)
+[FAIL] horizontal threshold equals the colour boundary (min -log10 p of coloured points)
+textrepel grobs (labelled points drawn incl. '' strings): 11 
+[PASS] boxplot medians equal raw group medians
+[PASS] boxplot jitter has all 60 points
+PCA axis labels: PC1 (57.6%) | PC2 (26.5%) (independent PC1 57.6%, PC2 26.5%)
+[PASS] PCA axis labels carry prcomp variance
+create_pca_plot without var_explained column -> ERROR: non-numeric argument to mathematical function 
+create_pca_plot with 12 groups (Set1 max 9): n too large, allowed maximum for palette Set1 is 9
+Returning the palette you asked for with that many colors
+pub_fig.png px: 2100 x 1500  (expect 2100 x 1500)
+Okabe-Ito pair in example palette: FALSE 
+create_boxplot fill palette: Brewer Set2; create_pca_plot: Brewer Set1 (not Okabe-Ito); publication_colors used only by create_volcano
+[FAIL] create_boxplot jitter identical across two builds (seeded)

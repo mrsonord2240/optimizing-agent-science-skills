@@ -1,0 +1,73 @@
+{
+  "skill_id": "bio-data-visualization-ggplot2-fundamentals",
+  "version": "candidate@34a174ab0263-initial-dv1-20261003",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "data-visualization/ggplot2-fundamentals",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals",
+    "subtree": "03298c3bd8f4cdd7d7aa919935f776ca850c7725"
+  },
+  "candidate": {
+    "identity": "34a174ab026364c4b2884a4465ee5bd6b13eb0d80609c9f0ce729ac0746f159a",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/dv-lane1",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "34a174ab026364c4b2884a4465ee5bd6b13eb0d80609c9f0ce729ac0746f159a",
+    "path": "F:\\OpenScience\\wt\\normalize-dv-lane1\\skills\\bio-data-visualization-ggplot2-fundamentals",
+    "files": [
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 2693,
+        "sha256": "80a7e07e8a00813b7d4745b7d8b566896ffbbc9dde82c072ee5963fd0fbf53d6"
+      },
+      {
+        "path": "references/geoms-scales-facets.md",
+        "bytes": 2798,
+        "sha256": "7b0fb494de5fb18da7b738e2474ada2cb0580bad082e0b19e3f3f0b84a008ed0"
+      },
+      {
+        "path": "scripts/publication_figures.R",
+        "bytes": 3634,
+        "sha256": "d9eff31eedc5053e874669bff07bc5b4ab699e8f1b3e62521f6eb5f2692c28f9"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 6997,
+        "sha256": "e25b58a20c5fd9c5f5317f24d2fc419418f08140a5127df33f2d94c442860232"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 4026,
+        "sha256": "d530603792b2908b5c00e88bca9f5cdc4139dd5fd4759765c7d4a464f81d6f1a"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "mrsonord2240-bioSkills@64b3b15",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 16
+  }
+}

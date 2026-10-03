@@ -1,0 +1,13 @@
+exit 0 stderr: none
+heatmap.pdf: 31744 B, page 91.8 x 93.0 mm, image XObjects 2 (documented 89 x 90 mm)
+multipanel.pdf: 131857 B, page 182.7 x 113.0 mm, image XObjects 12 (documented 180 x 110 mm)
+pca.pdf: 106992 B, page 92.0 x 73.0 mm, image XObjects 2 (documented 89 x 70 mm)
+volcano_sns.pdf: 189800 B, page 92.0 x 73.0 mm, image XObjects 2 (documented 89 x 70 mm)
+volcano_so.pdf: 105340 B, page 162.6 x 121.9 mm, image XObjects 0 
+[FAIL] pca.pdf page width equals the documented journal width 89 mm (within 1 mm)
+[FAIL] multipanel.pdf page width equals the documented journal width 180 mm (within 1 mm)
+[FAIL] heatmap.pdf page width equals the documented journal width 89 mm (within 1 mm)
+[FAIL] volcano_sns.pdf page width equals the documented journal width 89 mm (within 1 mm)
+[PASS] heatmap.pdf embeds the imshow as a raster image and keeps text vector
+[PASS] pca.pdf rasterises the scatter (>=1 image XObject)
+files: ['heatmap.pdf', 'multipanel.pdf', 'pca.pdf', 'volcano_sns.pdf', 'volcano_so.pdf']

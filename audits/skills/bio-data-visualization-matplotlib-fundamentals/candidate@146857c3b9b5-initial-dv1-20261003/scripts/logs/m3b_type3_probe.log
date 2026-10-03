@@ -1,0 +1,5 @@
+3.11.2 default pdf.fonttype 3
+ok   default Type 3, negative ticks (U+2212)
+ok   default Type 3, ascii minus
+ok   default Type 3, positive ticks only
+ok   Type 42, negative ticks

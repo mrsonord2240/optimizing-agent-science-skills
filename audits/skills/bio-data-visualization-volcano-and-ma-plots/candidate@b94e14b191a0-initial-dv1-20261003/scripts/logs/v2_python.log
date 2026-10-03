@@ -1,0 +1,10 @@
+rows 29391 baseMean NA 0 padj NA 11397 padj<0.05 3994
+ma_plot: grey 25397 orange 3994
+[PASS] orange points equal padj < 0.05 count (independent)
+[PASS] grey points equal the rest including padj NA
+ma_plot PDF sizes: {'ma_plot_py_raster.pdf': 34780, 'ma_plot_py_vector.pdf': 445526} | ratio 12.8
+[FAIL] vector scatter of 29,391 points gives a 5 MB+ PDF (SKILL.md: 'vector scatter creates 5MB+ PDFs')
+adjustText: 12 labels, overlapping label pairs: 0
+[PASS] adjustText labels do not overlap each other
+import sanbomics.tools -> ModuleNotFoundError No module named 'pkg_resources'
+sanbomics.plots.volcano exists: True

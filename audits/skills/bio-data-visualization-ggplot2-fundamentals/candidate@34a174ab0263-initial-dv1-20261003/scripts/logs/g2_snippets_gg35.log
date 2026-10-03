@@ -1,0 +1,36 @@
+ggplot2 3.5.2 
+layers-block warnings:  
+[PASS] scale_color_manual is inert: no colour aesthetic mapped (points all one colour)
+y tick labels panel 1: NA, 10^0.477, 10^1, 10^1.477, 10^2, NA 
+[FAIL] y axis title 'Expression (log10)' does not duplicate 10^n tick labels
+ggtext y label string codepoints: 8722 108 111 103 (8722 = U+2212 minus)
+[PASS] plot_var(df,'PC1','PC2') maps PC1/PC2
+[PASS] plot_var2(df, PC1, PC2) maps PC1/PC2
+Warning message:
+In geom_point() : All aesthetics have length 1, but the data has 5 rows.
+ℹ Please consider using `annotate()` or provide this layer with data containing
+  a single row.
+plot_var2 with strings: x values unique = 1 (1 => constant string, silently wrong)
+aes_string conditions: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information. 
+89 x 70 mm @300 dpi png px: 1051 x 826 (expect 1051 x 827)
+rasterised pdf 105780 B vs all-vector pdf 1845052 B
+aes(color='red') colour rendered: #F8766D (failure-modes.md says 'blue (or whatever default)'; geom default palette first hue is #F8766D salmon)
+spread N=60 default: 2198 0  | Inf: 2226 0 
+dense  N=60 default: 2287 0  | Inf: 2286 0 
+--- geoms-scales-facets.md blocks ---
+geom_violin(bw='SJ', trim=FALSE)             ok 
+geom_line(linewidth)                         ok 
+geom_line(size) deprecated                   ok Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.
+geom_text(check_overlap)                     ok 
+scale_x_continuous(limits 0-10, label_number 1e-6 M) ok 
+scale_y_continuous(transform='sqrt')         ok 
+scale_color_scico(batlow)                    ok 
+scale_fill_gradient2                         ok 
+scale_x_date                                 ok 
+facet_grid(rows=vars, cols=vars, free_x)     ok 
+[PASS] facet_grid 2x2
+theme_classic panel.grid already blank: FALSE ; axis.line class: element_line (theme_classic has no top/right axis lines to remove, usage-guide tip is inert)
+theme_pub verbatim                           ok 

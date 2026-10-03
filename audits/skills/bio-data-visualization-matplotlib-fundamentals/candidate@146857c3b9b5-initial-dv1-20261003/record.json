@@ -1,0 +1,73 @@
+{
+  "skill_id": "bio-data-visualization-matplotlib-fundamentals",
+  "version": "candidate@146857c3b9b5-initial-dv1-20261003",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "data-visualization/matplotlib-fundamentals",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals",
+    "subtree": "0c0d40a5684ac9995d1d383c658265df9208c892"
+  },
+  "candidate": {
+    "identity": "146857c3b9b509e7fb41764055239b497b5793cf0b386f83542fdfd5c5302d78",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/dv-lane1",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "146857c3b9b509e7fb41764055239b497b5793cf0b386f83542fdfd5c5302d78",
+    "path": "F:\\OpenScience\\wt\\normalize-dv-lane1\\skills\\bio-data-visualization-matplotlib-fundamentals",
+    "files": [
+      {
+        "path": "references/chart-recipes.md",
+        "bytes": 1707,
+        "sha256": "40c8fd8e89401db7a0b5571badc36a52207c42721fe20d8d5124f36495871bf5"
+      },
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 3586,
+        "sha256": "192e994a7aa837da55959f007021f111703ce7d63f032a49447ff635367e9649"
+      },
+      {
+        "path": "scripts/matplotlib_phd.py",
+        "bytes": 4377,
+        "sha256": "f9ab889327a678f2b5aa48d5fa08b6bc2ff2231aa5c6f6f161601a22ef705444"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 7925,
+        "sha256": "0d16c330c5c1e0d8932ca0c5f02f3f0eddff37125d26319f27966aeaa8e7363f"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 3980,
+        "sha256": "ed40f65e9adc0e9b425154838e7fdcdb7cc05d602839a7713481dce3f7ca92e4"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "mrsonord2240-bioSkills@64b3b15",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 22
+  }
+}

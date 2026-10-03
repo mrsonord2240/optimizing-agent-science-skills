@@ -1,0 +1,10 @@
+rows 18238 {'NS': 17200, 'Up': 541, 'Down': 497}
+legend colours (SKILL.md palette order grey, blue, orange): {'NS': '#999999', 'Up': '#0072b2', 'Down': '#d55e00'}
+[PASS] NS is drawn in the documented grey #999999
+[FAIL] Up is drawn in orange and Down in blue (SKILL's Up/Down/NS colours)
+control legend: {'NS': '#999999', 'Down': '#0072b2', 'Up': '#d55e00'}
+[PASS] dict palette + hue_order gives NS grey / Down blue / Up orange
+seaborn.objects legend colours: {'NS': '#999999', 'Up': '#0072b2', 'Down': '#d55e00'}
+[PASS] seaborn.objects list scale maps NS to grey
+18238 real points: rasterized pdf 38984 B vs vector 272530 B
+[PASS] rasterized=True shrinks the 19k-point PDF by >2x

@@ -1,0 +1,83 @@
+{
+  "skill_id": "bio-data-visualization-volcano-and-ma-plots",
+  "version": "candidate@b94e14b191a0-initial-dv1-20261003",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "data-visualization/volcano-and-ma-plots",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots",
+    "subtree": "e76b37f2d2c898ac96b16cd42665acb9f3c14ef2"
+  },
+  "candidate": {
+    "identity": "b94e14b191a0a1f2c6138fe10108d39b44b52efd299c47ae5a850e4e425ccb76",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/dv-lane1",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "b94e14b191a0a1f2c6138fe10108d39b44b52efd299c47ae5a850e4e425ccb76",
+    "path": "F:\\OpenScience\\wt\\normalize-dv-lane1\\skills\\bio-data-visualization-volcano-and-ma-plots",
+    "files": [
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 4945,
+        "sha256": "e409290413028525cbdf25ae9a6b902c4117561fe1aace45ef22fc20529581e7"
+      },
+      {
+        "path": "references/reconciliation-thresholds-pushback.md",
+        "bytes": 3428,
+        "sha256": "63662dbdda06129e13e338cba8fcef5c07bc0d1f230d5bca1c3f5368d58e3cc5"
+      },
+      {
+        "path": "scripts/ma_plot.py",
+        "bytes": 872,
+        "sha256": "fd69af3e725ce1935639406d1d01591e6fc673f18573c51f660b6c2d90176162"
+      },
+      {
+        "path": "scripts/volcano_phd.R",
+        "bytes": 4574,
+        "sha256": "dab7dea47ba85a00dc98306717d0b60dc42271c31dcae45d4836706f3ea08a6d"
+      },
+      {
+        "path": "scripts/volcano_plot.R",
+        "bytes": 2078,
+        "sha256": "a5ea35e90b50bae33043922db00c232fdacd063fd7338a81e9bedf9f19212407"
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 11599,
+        "sha256": "3ae11cf8638c05f753e3fb883cfdde31287681cd4a793d12936390ad62cdc058"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 5847,
+        "sha256": "f0cd0e80687a305980974914081a127fa672d72b7061a16e9a7554fc8dff9836"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "mrsonord2240-bioSkills@019953e",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 13
+  }
+}

@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (55)
+## P1 (50)
 
 ### `bio-splicing-quantification` — SKILL.md inline rMATS snippet raises TypeError
 
@@ -50,109 +50,69 @@ None open.
 - Root cause: Command written from memory; version floor not checked.
 - Fix: Replace with the working IRFinder -m FastQ form, document reference building, and state which IRFinder release was exercised; label IRFinder-S 2.0 unverified if not obtainable. (SQ-05)
 
-### `bio-data-visualization-ggplot2-fundamentals` — ggtext '\u2212' label prints a literal backslash sequence
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-001 volcano_phd.R clips significant points and their labels with an unconditional y cap
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
 - Observed in inputs: 1
-- Problem: The Labels-with-ggtext snippet writes y = '\u2212log<sub>10</sub>(*p*)'; in R source that is backslash-u2212, so the opened PNG shows '\u2212log10(p)' instead of a minus sign.
-- Root cause: A JSON/Python-style escape was pasted into an R single-quoted string.
-- Fix: Use '\u2212' with a single backslash ('−log<sub>10</sub>(*p*)') or the literal character, and add a note to open the rendered label.
+- Problem: coord_cartesian(ylim = c(0, 50)) is applied regardless of the data: 49 significant genes (max -log10 p 135.7) vanish and 9 of 13 labels, including the top-ranked genes, pile at the top edge; the usage-guide says capped points remain visible at the edge.
+- Root cause: The optional cap is hard-coded and coord_cartesian clips rather than squishes points.
+- Fix: Apply the cap only when requested (y_cap = NULL by default), or squish with pmin(neg_log10_p, y_cap) plus a marker/axis break, and state the cap in the caption.
 
-### `bio-data-visualization-ggplot2-fundamentals` — geom_point(rasterize = TRUE) is not a ggplot2 3.5+ feature
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-002 Shipped volcanoes draw the FDR line on a raw-p axis, contradicting the Skill
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 4
-- Problem: The Common Geoms block claims inline rasterisation in ggplot2 3.5+. On 3.5.2 and 4.0.3 it is ignored ('Ignoring unknown parameters: rasterize'), the PDF stays all-vector (1.85 MB, 0 images) and the failure is only a warning.
-- Root cause: Confusion between ggplot2 and ggrastr::geom_point_rast/rasterise.
-- Fix: Delete the inline claim and keep only ggrastr::rasterise(geom_point(), dpi = 300); add that overplotting at large N also needs smaller points, alpha, hexbin or density.
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: Both R scripts plot -log10(pvalue) and draw the hline at -log10(fdr): line at 1.301, smallest coloured point at 2.015; SKILL.md says drawing the FDR line on raw p 'creates a meaningless line' and operational rule 3 asks that the line match the axis.
+- Root cause: Raw-p axis kept while the FDR threshold is projected; the script comment calls it approximate.
+- Fix: Plot -log10(padj) on y (as for EnhancedVolcano) or draw the line at the smallest -log10(p) among padj < fdr genes and label it.
 
-### `bio-data-visualization-ggplot2-fundamentals` — 'Grammar in Layers' block contradicts the Skill's own rules
+### `bio-data-visualization-ggplot2-fundamentals` — GG-001 Volcano threshold line is drawn on the wrong quantity
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2
-- Problem: The block calls scale_color_manual without mapping colour (inert), keeps default boxplot outliers under geom_jitter (drawn twice, against the 'always suppress' rule) and label_log() on default free-y breaks yields labels such as 10^3.48 and 10^2.7.
-- Root cause: Block written as a syntax tour, never rendered.
-- Fix: Map colour = condition, add outlier.shape = NA, and use scale_y_log10() with breaks_log() or plain labels; note the y-axis title 'Expression (log10)' clashes with 10^n tick labels.
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 1
+- Problem: create_volcano plots -log10(raw pvalue) but draws the horizontal line at -log10(fdr_threshold) while colouring by padj; 4,692 grey points (232 with \|LFC\|>1) lie above the line and coloured points start at 1.956. The y label renders '− Log10 P − value' with stray spacing.
+- Root cause: FDR cutoff applied to a raw-p axis; expression() label.
+- Fix: Remove the hline or place it at the smallest -log10(p) among padj < fdr genes; label with expression(-log[10](italic(p))).
 
-### `bio-data-visualization-ggplot2-fundamentals` — Shipped example: threshold line, save function and axis label
+### `bio-data-visualization-ggplot2-fundamentals` — GG-002 save_publication_figure violates the Skill's cairo_pdf and mm rule
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: create_volcano draws the dashed line at -log10(fdr_threshold) on raw p while colouring by padj (1,617 genes above the line are grey); save_publication_figure uses default pdf() in inches (unembedded Helvetica) against the Skill's own cairo_pdf + mm rule; expression(-Log[10]~P-value) draws a spaced '− Log10 P − value'.
-- Root cause: Example was not checked against the doctrine or against the numbers behind the plot.
-- Fix: Drop the horizontal line or compute it as the smallest -log10(p) with padj < fdr; pass device = cairo_pdf and units = 'mm'; label with expression(-log[10](italic(p))).
-
-### `bio-data-visualization-matplotlib-fundamentals` — boxplot(labels=) removed in matplotlib 3.11
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2
-- Problem: The Common Chart Types boxplot line raises TypeError on 3.11.2 ('labels' removed; deprecated in 3.9). The Skill advertises 3.8+.
-- Root cause: API drift not tracked; the version line stops at 3.8+.
-- Fix: Use tick_labels= (3.9+) and say labels= is for 3.8 only; raise the version floor or show both.
-
-### `bio-data-visualization-matplotlib-fundamentals` — fig.set_rasterization_zorder does not exist
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: Failure Modes tells the agent to call fig.set_rasterization_zorder(0); it raises AttributeError. It is Axes.set_rasterization_zorder.
-- Root cause: Wrong object in prose.
-- Fix: Write ax.set_rasterization_zorder(0) and show that artists with zorder below the threshold are rasterized.
-
-### `bio-data-visualization-matplotlib-fundamentals` — False claim: constrained_layout is the default in 3.6+
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: rcParamsDefault['figure.constrained_layout.use'] is False on 3.11.2; without constrained_layout=True no layout engine is applied. An agent trusting the claim would omit it.
-- Root cause: Confusion with availability of the option.
-- Fix: State that constrained_layout must be requested (constrained_layout=True or layout='constrained') and remove the default claim.
-
-### `bio-data-visualization-matplotlib-fundamentals` — List palette maps colours by appearance order, silently
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
 - Observed in inputs: 3
-- Problem: palette=['#999999','#0072B2','#D55E00'] with hue values Up/NS/Down painted Up grey and NS blue (figure opened). A volcano plot with upregulated genes grey is wrong while looking finished.
-- Root cause: Skill and example use a list where a category-keyed dict is needed.
-- Fix: Use palette={'NS':..., 'Up':..., 'Down':...} and hue_order in block 3, the seaborn.objects snippet and the example; add a check that legend colours match.
+- Problem: The helper saves with the default pdf() device in inches; pdffonts shows Helvetica and Symbol Type 1 unembedded.
+- Root cause: Helper written before the cairo_pdf doctrine.
+- Fix: Pass device = cairo_pdf and units = 'mm' (journal widths 89/183) in the PDF save.
 
-### `bio-data-visualization-matplotlib-fundamentals` — Hard-coded, invented PC variance labels
+### `bio-data-visualization-ggplot2-fundamentals` — GG-003 Example theme, palettes and multi-panel theme disagree with the SKILL baseline
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1
-- Problem: 'PC1 (45%)' / 'PC1 (45.2%)' are typed into the examples over data whose real variance was 34.6% (canonical input) or random. An agent may copy them.
-- Root cause: Literal placeholders in code.
-- Fix: Compute from pca.explained_variance_ratio_ in the recipe, or mark the labels as placeholders to replace.
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 2, 5
+- Problem: theme_publication is theme_bw with a panel border and an NPG pair; boxplot uses Brewer Set2 and PCA Set1 (red/green, 9-colour cap), while SKILL.md prescribes theme_classic and Okabe-Ito. create_multi_panel's `& theme_publication()` removes the border.
+- Root cause: Script styling never reconciled with the Three Modern Defaults.
+- Fix: Rebase helpers on the SKILL theme_pub and Okabe-Ito palette; apply the theme to panels with `& theme(...)` or before composition; drop or document the border.
 
-### `bio-data-visualization-matplotlib-fundamentals` — '89 mm' is not what is saved; seaborn.objects recipe ignores the setup
+### `bio-data-visualization-ggplot2-fundamentals` — GG-004 Volcano labels overlap at max.overlaps = 20
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
 - Observed in inputs: 1, 5
-- Problem: With savefig.bbox=tight the saved page is 89.42 mm (Skill rcParams) or 91.96 mm (example, default pad), over Nature's 89 mm column. The example's so.Plot figure is 162.56 x 121.92 mm with 11-12 pt text and no rasterization.
-- Root cause: bbox tight resizes the figure; so.Plot uses its own theme and size.
-- Fix: For exact size use constrained_layout without bbox tight (or set savefig.pad_inches=0 and state the tolerance); for so.Plot add .layout(size=(w,h)) and .theme(mpl.rcParams) then re-check the size.
+- Problem: Rendered labels collide in the standalone volcano and form an illegible stack in multi-panel figures; the Skill's guardrail says max.overlaps = Inf.
+- Root cause: Ensembl-ID labels too long for the top-10 cluster; arbitrary overlap cap.
+- Fix: Use max.overlaps = Inf with a seed, min.segment.length, nudges or gene symbols; open the rendered label panel.
 
-### `bio-data-visualization-volcano-and-ma-plots` — Threshold line drawn on the wrong axis quantity
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-001 Shipped rcParams do not yield the documented 89/180 mm journal widths
 
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
-- Observed in inputs: 1, 4, 5
-- Problem: volcano_plot() and examples/volcano_phd.R plot -log10(pvalue), colour by padj, and draw the hline at -log10(fdr). On airway 1,684 genes that are not FDR-significant (padj>=0.05 or NA) sit above the line and the padj<0.05 boundary is really at 1.95. This is the Skill's own 'Raw p threshold line drawn on adjusted axis' failure mode.
-- Root cause: The function was written for y = raw p while the significance class and the line assume padj; the example's comment calls it 'approximate' instead of fixing it.
-- Fix: Plot y = -log10(padj) (as the EnhancedVolcano block does) or draw the hline at -log10(max pvalue with padj<fdr); label the axis to match; state that the LFC on x is shrunken while p/padj come from the unshrunken Wald test.
+- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: savefig.bbox='tight' re-crops the canvas: matplotlib_phd.py writes 92.0, 91.8 and 182.7 mm pages for 89, 89 and 180 mm figures (default pad 0.1 in is not set); the SKILL.md Standard Setup gives 89.4 mm.
+- Root cause: bbox_inches='tight' overrides figsize; the script omits savefig.pad_inches.
+- Fix: Drop savefig.bbox='tight' (constrained layout already prevents clipping) from both the Standard Setup and script, or document the size change and assert page width.
 
-### `bio-data-visualization-volcano-and-ma-plots` — Shipped y-cap hides the top hits and mangles their labels
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-002 List palettes bind colours to data order, not to Up/Down/NS
 
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
-- Observed in inputs: 4
-- Problem: y_cap = 50 is applied unconditionally in the example. On airway 49 significant genes (max 135) leave the panel and 9 of 13 labels overprint at the top edge; coord_cartesian does not 'render at the edge' as SKILL.md and the usage-guide prompt state.
-- Root cause: coord_cartesian clips the view; the guidance treats it as a squish, and labels are chosen before the cap.
-- Fix: Apply the cap only when max(-log10 p) exceeds it; use pmin(y, cap) with a distinct (triangle) shape for capped points, or exclude off-panel genes from the labels; correct the 'keeps points at the edge' wording.
-
-### `bio-data-visualization-volcano-and-ma-plots` — Not usable on the non-DESeq2 tables it claims; limma called 'shrunken'
-
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
-- Observed in inputs: 5
-- Problem: The description and decision tree cover limma/MSstats/ChIP/ATAC, but volcano_plot() fails on logFC/P.Value/adj.P.Val columns (cryptic case_when error), no column mapping is shown, the axis label is hard-coded '(shrunken)', and limma is described as 'the original shrunken-LFC method' though its logFC equals the plain mean difference to 2e-15.
-- Root cause: The function hard-codes DESeq2 column names and the shrinkage claim confuses variance moderation with LFC shrinkage.
-- Fix: Add x/y/padj/baseMean column arguments (defaults DESeq2), set the x label from an argument, and rewrite the limma rows: eBayes moderates variances, not the LFC, so the plotted LFC is unshrunken.
+- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 2
+- Problem: palette=['#999999','#0072B2','#D55E00'] with hue='significance' draws Up blue and Down orange on real airway data and 'ns' orange in the shipped example; the colour-to-class mapping depends on row order and the same list in seaborn.objects.
+- Root cause: seaborn maps a list palette to hue levels in order of appearance.
+- Fix: Use palette={'NS':..., 'Down':..., 'Up':...} with hue_order in SKILL.md, matplotlib_phd.py and seaborn.objects scale.
 
 ### `bio-outlier-splicing-detection` — AE reproducibility recipe is wrong in SKILL.md and incomplete in the example
 
@@ -500,117 +460,117 @@ None open.
 - Root cause: Prerequisites written for a reader who already knows the tools.
 - Fix: Describe the comma-separated BAM list, name where the clustering script comes from, and add a LICENSE. (SQ-11)
 
-### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-003 EnhancedVolcano example loses direction and mislabels the axis
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: —
-- Problem: aes(color='red') points render #F8766D salmon (not 'blue'); ggrepel drops labels because of overlaps, not N > 10 (60 spread labels all drawn; 400 dense labels: 74 text grobs vs 405 with Inf) and no warning was observed at draw time in a non-interactive run.
-- Root cause: Claims written from memory.
-- Fix: Correct the colour statement, state the real trigger for label loss and tell the agent to count drawn labels.
-
-### `bio-data-visualization-ggplot2-fundamentals` — Minor doctrine and reproducibility gaps
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: usage-guide tip 'remove top/right axis lines with theme(axis.line = element_line())' does nothing (theme_classic has no top/right axes); panel.grid = element_blank() is redundant on 4.0.3; jitter and ggrepel are unseeded; {{ x_var }} with a string silently draws a constant; Set1 in create_pca_plot fails above 9 groups; ggplot2 4.0 builds labels at print time so p$labels is empty.
-- Root cause: Tips not tested against a rendered figure or the current ggplot2.
-- Fix: Remove the axis-line tip, add position_jitter(seed=) and geom_text_repel(seed=), warn about {{ }} with strings, and note get_labs() for ggplot2 4.
-
-### `bio-data-visualization-matplotlib-fundamentals` — Fragments are not self-contained
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2, 4
-- Problem: The tick snippet needs np and mismatches 5 ticks with 3 labels (ValueError); the colour block needs data; the heatmap needs vmax defined; the seaborn.objects snippet never renders.
-- Root cause: Snippets lifted from context.
-- Fix: Import numpy where used, make tick and label counts agree, define vmax/data or say so, end the objects snippet with .save() or .plot().
-
-### `bio-data-visualization-matplotlib-fundamentals` — SVG is 'editable' only after svg.fonttype='none'
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
 - Observed in inputs: 4
-- Problem: Default svg.fonttype=path: 0 <text> elements in the saved SVG, text is outlines.
-- Root cause: Missing rcParam.
-- Fix: Add 'svg.fonttype': 'none' to the rcParams block or reword the claim.
+- Problem: col = c('grey60','#0072B2','#56B4E9','#D55E00') colours all 451 Up and 366 Down genes the same orange (class FC_P), against 'color by direction' and the ggplot volcano; y = 'padj' is labelled '-Log10 P'.
+- Root cause: EnhancedVolcano classes are NS / FC / P / FC_P, not Up/Down/NS.
+- Fix: Use colCustom per direction or document that EnhancedVolcano colours by class; set ylab = expression(-log[10]~adjusted~italic(P)).
 
-### `bio-data-visualization-matplotlib-fundamentals` — Inconsistent and unsourced journal numbers
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-004 ashr is said to return svalue; it does not
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: SKILL.md says lfcShrink(type='ashr') returns an svalue column and the usage-guide says to use ashr for s-values; DESeq2 1.46 ashr returns baseMean, log2FoldChange, lfcSE, pvalue, padj only. s-values come from lfcShrink(type='apeglm', svalue = TRUE).
+- Root cause: Version-dependent claim not checked on the current API.
+- Fix: State that svalue comes from apeglm with svalue=TRUE (or from ashr::ash lfsr) and correct the decision-tree row.
+
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-005 sanbomics.tools.volcano does not exist
+
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md names sanbomics.tools.volcano; the function is sanbomics.plots.volcano and sanbomics.tools fails to import without pkg_resources.
+- Root cause: Wrong module path.
+- Fix: Name sanbomics.plots.volcano (and note the optional dependency) or drop the mention.
+
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-006 EnhancedVolcano selectLab-threshold gotcha does not reproduce
+
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: Gotcha 1 (repeated in SKILL.md, failure-modes.md, usage-guide, the script comment and the error table) says selectLab genes failing pCutoff/FCcutoff are silently unlabeled; on 1.24.0 the failing gene TSPAN6 was labelled.
+- Root cause: Behaviour of an older EnhancedVolcano version carried forward.
+- Fix: Remove or version-qualify the gotcha and the manual-layer workaround.
+
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-007 Shrinkage is described as only pulling toward zero
+
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: apeglm raised \|LFC\| for 108 of 29,391 genes and the maximum from 9.51 (MLE) to 10.99 (ALOX15B), while the text says well-estimated genes are 'essentially untouched' and the unshrunken estimate is always the inflated one.
+- Root cause: Simplified description of the apeglm posterior mode.
+- Fix: Add a sentence that apeglm uses a different estimator and can exceed the MLE for a few genes; compare against the MLE before reporting extremes.
+
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-008 Rasterization guidance is not implemented and its size claim is overstated
+
+- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
 - Observed in inputs: 1, 5
-- Problem: Double column 180 mm (SKILL.md, example) vs 183 mm (usage-guide); Nature 5-7 pt, PDF-rejection and the "50 MB" for 100k vector points are unsourced (measured 2.0 MB / 12 s vs 0.36 MB / 2 s).
-- Root cause: Recall-based numbers.
-- Fix: Cite each publisher rule or hedge; use measured numbers.
+- Problem: volcano_phd.R comments say to rasterize above 5000 features and that ggsave raster needs ggplot2 3.5+, but no layer is rasterized (volcano.pdf 1.04 MB); '5MB+ PDFs crash Illustrator' is not reproduced (29,391 vector points = 0.45 MB).
+- Root cause: Aspirational comment and unmeasured claim.
+- Fix: Wrap the point layer in ggrastr::rasterise or drop the comment; replace '5MB+' with the measured vector/raster ratio.
 
-### `bio-data-visualization-matplotlib-fundamentals` — No guidance for >8 categories or overplotting order
+### `bio-data-visualization-ggplot2-fundamentals` — GG-005 Grammar in Layers block does not render as written
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: Okabe-Ito has 8 colours; seaborn cycles the list for 12 clusters (8 distinct colours, warning only). Marker-gene colouring is drawn in random order.
-- Root cause: Palette section assumes few categories.
-- Fix: Point to color-palettes for >8 levels; add sort-by-value for continuous colouring.
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: scale_color_manual is inert (no colour mapping), label_log() on free log y gives 10^0.477 / 10^1.48 ticks, and the y title 'Expression (log10)' duplicates the transform.
+- Root cause: Block written as a syntax tour and never rendered.
+- Fix: Map colour = condition, use breaks_log() or plain labels, retitle 'Expression'.
 
-### `bio-data-visualization-matplotlib-fundamentals` — Deprecation and warning debt
+### `bio-data-visualization-ggplot2-fundamentals` — GG-006 Failure-mode claims that do not reproduce
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: fig.set_constrained_layout emits PendingDeprecationWarning; seaborn 0.13.2 emits Pandas4Warning on pandas 3; the tight_layout + colorbar clipping claim did not reproduce on 3.11.2.
-- Root cause: Unversioned advice.
-- Fix: Use fig.set_layout_engine('constrained'); note the versions; soften or drop the tight_layout claim.
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: aes(color='red') renders #F8766D salmon, not blue; ggrepel's 'N > 10 labels' trigger is wrong (60 labels draw alike at default and Inf; the cap is per-label overlap count) and the Skill states the default 'silently drops labels'.
+- Root cause: Claims written from memory.
+- Fix: Correct the colour statement and describe the real overlap-count trigger; tell the agent to count drawn labels.
 
-### `bio-data-visualization-matplotlib-fundamentals` — No when-not-to-use / hand-off section
+### `bio-data-visualization-ggplot2-fundamentals` — GG-007 Usage-guide tips are inert or malformed
 
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: —
-- Problem: The Skill does not say to leave R/ggplot users, interactive figures or genome tracks to other Skills.
-- Root cause: Escape hatches only in Related Skills.
-- Fix: Add three lines of scope limits.
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: 'Remove top/right axis lines ... theme(axis.line = element_line())' does nothing (theme_classic has no top/right lines); 'panel.grid.off' is not a ggplot2 term; panel.grid = element_blank() is redundant on theme_classic; {{ x }} with a string silently maps a constant.
+- Root cause: Tips untested against rendered figures.
+- Fix: Delete or correct the tips; warn that {{ }} needs bare names.
 
-### `bio-data-visualization-volcano-and-ma-plots` — EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce
+### `bio-data-visualization-ggplot2-fundamentals` — GG-008 Helper reproducibility and input contract
 
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
 - Observed in inputs: 2
-- Problem: Stated in the Gotcha, failure-mode, Common Errors, usage-guide tip and the example comment. In EnhancedVolcano 1.24.0 GAPDH (padj 0.43) and TP53 (\|LFC\| 0.40) are labelled; the only genes that vanish have NA padj (no y).
-- Root cause: Claim not checked against the installed source (selectLab is matched by lab %in% selectLab only).
-- Fix: Replace it with: selectLab genes with NA padj (or absent from lab) are not drawn; drop the 'build labels manually' workaround and the 'pre-shrink so genes pass' advice.
+- Problem: create_boxplot jitter is unseeded (differs between builds); create_pca_plot needs an undocumented var_explained column and fails with a cryptic error; Set1 warns above 9 groups.
+- Root cause: No seed and no input contract in the script.
+- Fix: Use position_jitter(seed=); document or check pca_df$var_explained; choose a palette that scales.
 
-### `bio-data-visualization-volcano-and-ma-plots` — ashr svalue comment wrong; svalue=TRUE removes pvalue/padj
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-003 failure-modes.md contains a nonexistent method and an exaggerated claim
 
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
-- Observed in inputs: 2
-- Problem: '# ashr also returns svalue column' is false for the shown call; svalue needs svalue=TRUE, which replaces pvalue/padj so volcano_plot() then breaks. (s<0.005 gives 3,921 genes vs 3,993 for padj<0.05, so the stated equivalence itself holds.)
-- Root cause: The svalue argument and its side effect are not mentioned.
-- Fix: Show lfcShrink(..., type = 'ashr', svalue = TRUE), note the replaced columns, and let the volcano function take the significance column as an argument.
-
-### `bio-data-visualization-volcano-and-ma-plots` — Python volcano advertised but not shipped
-
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
 - Observed in inputs: 5
-- Problem: The description and overview name matplotlib + adjustText (and sanbomics.tools.volcano) for volcanos but only ma_plot() has code; the sanbomics package is not installed and unverified.
-- Root cause: Python section stops at the MA function.
-- Fix: Add a short Python volcano (padj classes, combined-rank labels, rasterized scatter, adjust_text) mirroring the R function, or drop the claim; verify or remove the sanbomics mention.
+- Problem: `fig.set_rasterization_zorder(0)` raises AttributeError (it is `ax.set_rasterization_zorder`); '100000 points = 50 MB PDF, 30 s open' is not reproduced (19k points = 0.27 MB); 'default rasterization can include axes' is not demonstrated.
+- Root cause: Claims written from memory.
+- Fix: Use ax.set_rasterization_zorder(0), restate the size effect with a measured ratio, drop the vague mechanism.
 
-### `bio-data-visualization-volcano-and-ma-plots` — Ensembl IDs, unrunnable example and dangling link
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-004 'SVG for editable vector' leaves text as paths
 
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
-- Observed in inputs: 1, 4
-- Problem: DESeq2 output usually has Ensembl rownames, so the example's TP53/MYC/BRCA1 labels match nothing (silently); the example needs an undefined dds with coef 'condition_treated_vs_control'; SKILL.md links [[api_gotchas]], which does not exist.
-- Root cause: No ID-to-symbol step, no example data and an unresolved wiki link.
-- Fix: Add a mapIds/rownames step and a minimal dds constructor to the example, warn when labels are absent from the table, and remove or supply api_gotchas.
+- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: svg.fonttype defaults to 'path': the saved SVG has 0 <text> elements and 55 glyph uses, so text is not editable.
+- Root cause: Saving block does not set svg.fonttype.
+- Fix: Set svg.fonttype='none' (with a note that fonts must be installed) or reword the claim.
 
-### `bio-data-visualization-volcano-and-ma-plots` — Smaller accuracy and consistency items
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-005 Example styling departs from the Skill's own rules
 
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
-- Observed in inputs: 2, 3, 4
-- Problem: (a) '5MB+ PDF' for vector scatter: 0.50 MB measured. (b) EnhancedVolcano y axis reads '-Log10 P' while plotting padj and the Skill does not set ylab. (c) ma_plot() hard-codes '(shrunken)'. (d) SKILL.md cites Dudoit 2002 as 'JASA' but the reference list says Stat Sin. (e) 'horizontal stripe = batch confound' and 'asymmetry = normalization failure' MA heuristics are stated without support. (f) The example's MA colours by 'significance != NS' (padj and \|LFC\|) while the SKILL's plotMA colours by padj only.
-- Root cause: Statements were not tested.
-- Fix: Correct or soften each (measured PDF size, ylab = expression(-log[10]~adj.~p), label argument, citation, hedge heuristics, one colouring rule).
+- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 1
+- Problem: The cluster scatter uses cmap='tab10' (not CVD-safe) against the Okabe-Ito requirement; axes.titlesize=8 exceeds the stated 5-7 pt body-text limit; the grid titles repeat the panel tags a-f.
+- Root cause: Example written before the CVD and size rules.
+- Fix: Colour clusters with the Okabe-Ito list, use titlesize 7, and drop the redundant panel titles.
 
-### `bio-data-visualization-volcano-and-ma-plots` — SKILL.md and usage-guide.md duplicate the same tips
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-006 OO-API Skill mixes pyplot state calls
 
-- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
-- Observed in inputs: —
-- Problem: The eleven usage-guide tips and the Quick Start prompts restate SKILL.md failure modes almost word for word (~880 words), and all of it loads with a 325-line SKILL.md.
-- Root cause: No split between method and quick start.
-- Fix: Keep the tips once (SKILL.md) and make usage-guide.md a short prompt list, or move failure modes to references/.
+- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md Color section uses plt.imshow/plt.colorbar and the recipes use plt.colorbar(..., ax=ax) while the guardrail forbids pyplot state calls after plt.subplots(n, m).
+- Root cause: Snippets not rewritten to the OO form.
+- Fix: Use ax.imshow and fig.colorbar(im, ax=ax) in SKILL.md, usage-guide and chart-recipes.
 
 ### `bio-outlier-splicing-detection` — FRASER block stops at its last line when no sample has a call
 
