@@ -8,71 +8,71 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (45)
+## P1 (46)
 
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-001 volcano_phd.R clips significant points and their labels with an unconditional y cap
+### `bio-machine-learning-atlas-mapping` — AM-001 OOD gate misses a held-out type; claim overstated
 
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 1
-- Problem: coord_cartesian(ylim = c(0, 50)) is applied regardless of the data: 49 significant genes (max -log10 p 135.7) vanish and 9 of 13 labels, including the top-ranked genes, pile at the top edge; the usage-guide says capped points remain visible at the edge.
-- Root cause: The optional cap is hard-coded and coord_cartesian clips rather than squishes points.
-- Fix: Apply the cap only when requested (y_cap = NULL by default), or squish with pmin(neg_log10_p, y_cap) plus a marker/axis break, and state the cap in the caption.
+- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
+- Observed in inputs: 3, 4, 5
+- Problem: With Monocytes removed from the reference, the shipped weighted-kNN gate flagged 2.7% of the 630 query monocytes and 95.4% were confidently labelled DC; a reference-calibrated distance gate flagged 0%. With B cells removed it gated 87.4%. SKILL.md calls the gate the step that makes labels trustworthy, and the demo's synthetic far cluster hides this.
+- Root cause: Neighbor-agreement uncertainty only detects cells between reference types; a novel type adjacent to one reference label looks certain, and the demo labels kNN predict_proba as softmax.
+- Fix: Scope the claim (the gate is a heuristic that catches between-type cells, not guaranteed novelty detection), add a short held-out-type spike-in check script and recommend running it per reference, and relabel the demo's 'softmax' as kNN probability. Changes runnable bytes (new or edited script) plus text.
 
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-002 Shipped volcanoes draw the FDR line on a raw-p axis, contradicting the Skill
+### `bio-machine-learning-omics-classifiers` — OC-001: class_weight=balanced contradicts the Skill calibration stance
 
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: Both R scripts plot -log10(pvalue) and draw the hline at -log10(fdr): line at 1.301, smallest coloured point at 2.015; SKILL.md says drawing the FDR line on raw p 'creates a meaningless line' and operational rule 3 asks that the line match the axis.
-- Root cause: Raw-p axis kept while the FDR threshold is projected; the script comment calls it approximate.
-- Fix: Plot -log10(padj) on y (as for EnhancedVolcano) or draw the line at the smallest -log10(p) among padj < fdr genes and label it.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-001 Volcano threshold line is drawn on the wrong quantity
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 1
-- Problem: create_volcano plots -log10(raw pvalue) but draws the horizontal line at -log10(fdr_threshold) while colouring by padj; 4,692 grey points (232 with \|LFC\|>1) lie above the line and coloured points start at 1.956. The y label renders '− Log10 P − value' with stray spacing.
-- Root cause: FDR cutoff applied to a raw-p axis; expression() label.
-- Fix: Remove the hline or place it at the smallest -log10(p) among padj < fdr genes; label with expression(-log[10](italic(p))).
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-002 save_publication_figure violates the Skill's cairo_pdf and mm rule
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 3
-- Problem: The helper saves with the default pdf() device in inches; pdffonts shows Helvetica and Symbol Type 1 unembedded.
-- Root cause: Helper written before the cairo_pdf doctrine.
-- Fix: Pass device = cairo_pdf and units = 'mm' (journal widths 89/183) in the PDF save.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-003 Example theme, palettes and multi-panel theme disagree with the SKILL baseline
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: theme_publication is theme_bw with a panel border and an NPG pair; boxplot uses Brewer Set2 and PCA Set1 (red/green, 9-colour cap), while SKILL.md prescribes theme_classic and Okabe-Ito. create_multi_panel's `& theme_publication()` removes the border.
-- Root cause: Script styling never reconciled with the Three Modern Defaults.
-- Fix: Rebase helpers on the SKILL theme_pub and Okabe-Ito palette; apply the theme to panels with `& theme(...)` or before composition; drop or document the border.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-004 Volcano labels overlap at max.overlaps = 20
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: Rendered labels collide in the standalone volcano and form an illegible stack in multi-panel figures; the Skill's guardrail says max.overlaps = Inf.
-- Root cause: Ensembl-ID labels too long for the top-10 cluster; arbitrary overlap cap.
-- Fix: Use max.overlaps = Inf with a seed, min.segment.length, nudges or gene symbols; open the rendered label panel.
-
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-001 Shipped rcParams do not yield the documented 89/180 mm journal widths
-
-- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: savefig.bbox='tight' re-crops the canvas: matplotlib_phd.py writes 92.0, 91.8 and 182.7 mm pages for 89, 89 and 180 mm figures (default pad 0.1 in is not set); the SKILL.md Standard Setup gives 89.4 mm.
-- Root cause: bbox_inches='tight' overrides figsize; the script omits savefig.pad_inches.
-- Fix: Drop savefig.bbox='tight' (constrained layout already prevents clipping) from both the Standard Setup and script, or document the size change and assert page width.
-
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-002 List palettes bind colours to data order, not to Up/Down/NS
-
-- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
 - Observed in inputs: 2
-- Problem: palette=['#999999','#0072B2','#D55E00'] with hue='significance' draws Up blue and Down orange on real airway data and 'ns' orange in the shipped example; the colour-to-class mapping depends on row order and the same list in seaborn.objects.
-- Root cause: seaborn maps a list palette to hue levels in order of appearance.
-- Fix: Use palette={'NS':..., 'Down':..., 'Up':...} with hue_order in SKILL.md, matplotlib_phd.py and seaborn.objects scale.
+- Problem: The Core Workflow, decision tree and usage-guide recommend class_weight=balanced for imbalance and call the model well-calibrated, while the XGBoost note says reweighting the prior distorts calibration. At 8% prevalence balanced weighting leaves AUC unchanged but doubles mean predicted risk (logistic 0.12-0.13, RF 0.19-0.21 vs 0.08) and worsens Brier (0.090-0.099 vs 0.073-0.077).
+- Root cause: class_weight reweights the training prior exactly as resampling does, but the Skill treats it as safe and only resampling as harmful.
+- Fix: Drop class_weight=balanced from the risk-model snippet and decision tree (keep it only for hard-label problems), state that class weights shift predicted risk like SMOTE, and point to threshold tuning or post-hoc recalibration; align the usage-guide and failure-modes text.
+
+### `bio-machine-learning-omics-classifiers` — OC-002: Batch-shortcut snippet fails for most real designs and is not LOBO
+
+- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 6
+- Problem: roc_auc scoring on the batch label gives NaN for more than two batches; StratifiedGroupKFold(n_splits=5) raises for fewer than five batches and is group K-fold, not the leave-one-batch-out that the code comment, failure-modes and usage-guide name. On confounded synthetic data LeaveOneGroupOut gives 0.47/0.34/0.52 against random-split 0.82/0.76/0.79.
+- Root cause: Snippet was written for two balanced batches and a roc_auc metric and never exercised on multi-batch data.
+- Fix: Use scoring="roc_auc_ovr" (or balanced accuracy) for the batch-prediction step and LeaveOneGroupOut (guarding groups with a single class) for the honest estimate; state the minimum number of batches and what to do with two.
+
+### `bio-machine-learning-omics-classifiers` — OC-003: neg_log_loss scoring removes sparsity on near-separable omics data
+
+- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 1
+- Problem: The Core Workflow claims the L1 component yields a sparse signature, but under the normalizer scoring=neg_log_loss CV selects C=545-10,000 on Golub and keeps 1,998/2,000 (seed 0), 2,000 (seed 1), 1,068 (seed 2) coefficients non-zero; accuracy gives 83-160 and roc_auc 160-508. Held-out AUC is the same. The change is defensible (proper score, sklearn 1.11 default) and consistent between SKILL.md and rf_xgboost_classifier.py, but the sparsity consequence is unstated.
+- Root cause: Log loss rewards near-unregularised fits when classes separate, so CV drifts to the top of the C grid; the Skill treats the normalizer choice as behaviour-neutral.
+- Fix: State that the scoring metric governs sparsity, show the effect, and recommend roc_auc (or a one-standard-error rule / capped Cs) when a small signature is the goal; keep neg_log_loss when calibrated probabilities are the goal.
+
+### `bio-machine-learning-omics-classifiers` — OC-004: Isotonic calibration hard-wired for tiny n collapses to 0/1
+
+- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: The calibration snippet uses method="isotonic" in a Skill aimed at tens-to-hundreds of samples. With 20 calibration samples (Golub) isotonic returns exactly 0 or 1 for every test sample and a test Brier of 0.000, while sigmoid gives 22 distinct probabilities and Brier 0.010. At 600 calibration samples both help (0.187 -> 0.166-0.168).
+- Root cause: Isotonic is a step function that needs roughly hundreds of calibration samples; the snippet gives no minimum n and no sigmoid default.
+- Fix: Default the snippet to method="sigmoid" for small n, give the isotonic minimum (state it conditionally), and warn that exact 0/1 outputs are a failure sign, not perfection.
+
+### `bio-machine-learning-survival-analysis` — SA-001 KM baseline IBS in cox_regression.py is miscomputed
+
+- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
+- Observed in inputs: 2, 1
+- Problem: km_surv = np.mean(ttr[etr] > t) averages over event-only training subjects, dropping censored patients. The printed baseline IBS is 0.290 versus 0.236 from a true KM on the script's data (GBSG2 with the same formula: 0.263 vs 0.178), overstating the margin by which a model beats 'no covariates'. On a tiny table the formula gives 0.50 at t=1 where the hand KM is 0.80.
+- Root cause: Naive survival-fraction formula used instead of kaplan_meier_estimator.
+- Fix: Replace with kaplan_meier_estimator(y_tr['event'], y_tr['time']) evaluated at times, and add the same line to the SKILL.md IBS example. Changes runnable bytes (script) plus text.
+
+### `bio-machine-learning-survival-analysis` — SA-002 Coxnet snippet predicts at the least-penalized alpha
+
+- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
+- Observed in inputs: 5, 2, 1
+- Problem: CoxnetSurvivalAnalysis(l1_ratio=0.9, alpha_min_ratio=0.01, fit_baseline_model=True) fits a 100-alpha path and predict() uses the smallest alpha. With n=150, p=1000 that kept 161 nonzero coefficients and gave held-out Uno C 0.708, against 0.790 (6 nonzero) for a CV-selected alpha. Nothing in the snippet or script selects alpha although the Skill demands tuning inside nested CV.
+- Root cause: The snippet and script never choose alpha (no CV, no alpha argument), so the path end point is used silently.
+- Fix: Select alpha by cross-validation (GridSearchCV over alphas or an explicit alpha argument) in the snippet and cox_regression.py, and state which alpha predict and predict_survival_function use. Changes runnable bytes (script) plus text.
+
+### `bio-machine-learning-biomarker-discovery` — BD-001: Stability snippet is scale-dependent and not null-calibrated
+
+- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: On raw Golub intensities the snippet (C=0.1) reports 61-64 "stable" probes at pi>0.6 and, with labels permuted, still reports 35 stable probes (Nogueira 0.38); on standardized probes the same C gives 0 stable probes for real labels (Nogueira 0.18).
+- Root cause: A fixed C on unstandardized features sets the effective penalty by feature variance, and no permuted-label reference is given for the stability index.
+- Fix: Standardize inside each subsample (as the elastic-net text already requires), choose C by CV or state its units, add a label-permutation null for the stable set and the Nogueira index, and say stability does not imply a real signal.
 
 ### `bio-outlier-splicing-detection` — AE reproducibility recipe is wrong in SKILL.md and incomplete in the example
 
@@ -81,6 +81,14 @@ None open.
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
+
+### `bio-data-visualization-ggplot2-fundamentals` — GG-004 Long-ID volcano labels still collide where the Skill promises clean
+
+- Skill: 85, Production Ready · candidate `9d22bac5b1ee` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d22bac5b1ee-reaudit-dv1-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: The shipped 3- and 4-panel create_multi_panel with the default volcano overprints 2-3 label pairs at 183 mm; the Skill's top_n = 3 rule 'under ~90 mm' still collides at 89 mm (1 pair) and at 120 mm, while a 91 mm slot (183 mm composite) already needs it; only gene symbols were clean in every cell.
+- Root cause: The width rule ignores the legend that takes about a third of the slot, and top_n = 3 is not the same as a width-safe label.
+- Fix: Text-only: tell the agent to pass label_col with gene symbols for any multi-panel or single-column volcano, to use Ensembl IDs only standalone at roughly 150 mm or wider, and to measure or open the figure; optionally set the helper default to legend.position = 'bottom' in panels.
 
 ### `bio-single-cell-perturb-seq` — Verify the primary optax mixture backend
 
@@ -370,119 +378,119 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (159)
+## P2 (165)
 
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-003 EnhancedVolcano example loses direction and mislabels the axis
+### `bio-machine-learning-atlas-mapping` — AM-002 Prose-only and heavy methods not labelled not executed
 
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: col = c('grey60','#0072B2','#56B4E9','#D55E00') colours all 451 Up and 366 Down genes the same orange (class FC_P), against 'color by direction' and the ggplot volcano; y = 'padj' is labelled '-Log10 P'.
-- Root cause: EnhancedVolcano classes are NS / FC / P / FC_P, not Up/Down/NS.
-- Fix: Use colCustom per direction or document that EnhancedVolcano colours by class; set ylab = expression(-log[10]~adjusted~italic(P)).
+- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
+- Observed in inputs: —
+- Problem: Symphony, Azimuth, scPoli, popV, treeArches/scHPL and scGPT/Geneformer appear in the taxonomy and decision tree with performance and OOD claims but no code, install line or statement that they were not run.
+- Root cause: Version Compatibility lists only the tested packages and never says the rest are untested.
+- Fix: Add one line under Version Compatibility naming these methods as described from the literature and not executed or bundled. Text only.
 
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-004 ashr is said to return svalue; it does not
+### `bio-machine-learning-atlas-mapping` — AM-003 predict(soft=True) type not stated (DataFrame)
 
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 3
-- Problem: SKILL.md says lfcShrink(type='ashr') returns an svalue column and the usage-guide says to use ashr for s-values; DESeq2 1.46 ashr returns baseMean, log2FoldChange, lfcSE, pvalue, padj only. s-values come from lfcShrink(type='apeglm', svalue = TRUE).
-- Root cause: Version-dependent claim not checked on the current API.
-- Fix: State that svalue comes from apeglm with svalue=TRUE (or from ashr::ash lfsr) and correct the decision-tree row.
-
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-005 sanbomics.tools.volcano does not exist
-
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md names sanbomics.tools.volcano; the function is sanbomics.plots.volcano and sanbomics.tools fails to import without pkg_resources.
-- Root cause: Wrong module path.
-- Fix: Name sanbomics.plots.volcano (and note the optional dependency) or drop the mention.
-
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-006 EnhancedVolcano selectLab-threshold gotcha does not reproduce
-
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: Gotcha 1 (repeated in SKILL.md, failure-modes.md, usage-guide, the script comment and the error table) says selectLab genes failing pCutoff/FCcutoff are silently unlabeled; on 1.24.0 the failing gene TSPAN6 was labelled.
-- Root cause: Behaviour of an older EnhancedVolcano version carried forward.
-- Fix: Remove or version-qualify the gotcha and the manual-layer workaround.
-
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-007 Shrinkage is described as only pulling toward zero
-
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 3
-- Problem: apeglm raised \|LFC\| for 108 of 29,391 genes and the maximum from 9.51 (MLE) to 10.99 (ALOX15B), while the text says well-estimated genes are 'essentially untouched' and the unshrunken estimate is always the inflated one.
-- Root cause: Simplified description of the apeglm posterior mode.
-- Fix: Add a sentence that apeglm uses a different estimator and can exceed the MLE for a few genes; compare against the MLE before reporting extremes.
-
-### `bio-data-visualization-volcano-and-ma-plots` — VOL-008 Rasterization guidance is not implemented and its size claim is overstated
-
-- Skill: 70, Beta Only · candidate `b94e14b191a0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@b94e14b191a0-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: volcano_phd.R comments say to rasterize above 5000 features and that ggsave raster needs ggplot2 3.5+, but no layer is rasterized (volcano.pdf 1.04 MB); '5MB+ PDFs crash Illustrator' is not reproduced (29,391 vector points = 0.45 MB).
-- Root cause: Aspirational comment and unmeasured claim.
-- Fix: Wrap the point layer in ggrastr::rasterise or drop the comment; replace '5MB+' with the measured vector/raster ratio.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-005 Grammar in Layers block does not render as written
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: scale_color_manual is inert (no colour mapping), label_log() on free log y gives 10^0.477 / 10^1.48 ticks, and the y title 'Expression (log10)' duplicates the transform.
-- Root cause: Block written as a syntax tour and never rendered.
-- Fix: Map colour = condition, use breaks_log() or plain labels, retitle 'Expression'.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-006 Failure-mode claims that do not reproduce
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: aes(color='red') renders #F8766D salmon, not blue; ggrepel's 'N > 10 labels' trigger is wrong (60 labels draw alike at default and Inf; the cap is per-label overlap count) and the Skill states the default 'silently drops labels'.
-- Root cause: Claims written from memory.
-- Fix: Correct the colour statement and describe the real overlap-count trigger; tell the agent to count drawn labels.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-007 Usage-guide tips are inert or malformed
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: 'Remove top/right axis lines ... theme(axis.line = element_line())' does nothing (theme_classic has no top/right lines); 'panel.grid.off' is not a ggplot2 term; panel.grid = element_blank() is redundant on theme_classic; {{ x }} with a string silently maps a constant.
-- Root cause: Tips untested against rendered figures.
-- Fix: Delete or correct the tips; warn that {{ }} needs bare names.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-008 Helper reproducibility and input contract
-
-- Skill: 74, Beta Only · candidate `34a174ab0263` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@34a174ab0263-initial-dv1-20261003/viewer.md)
+- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
 - Observed in inputs: 2
-- Problem: create_boxplot jitter is unseeded (differs between builds); create_pca_plot needs an undocumented var_explained column and fails with a cryptic error; Set1 warns above 9 groups.
-- Root cause: No seed and no input contract in the script.
-- Fix: Use position_jitter(seed=); document or check pca_df$var_explained; choose a palette that scales.
+- Problem: In scvi-tools 1.5.1 predict(soft=True) returns a pandas DataFrame (2638 x 8, columns are labels). SKILL.md only says 'per-class probabilities'; proba.max() then returns per-class maxima and proba[:, 0] raises.
+- Root cause: Return type was assumed to be an ndarray.
+- Fix: State that it is a DataFrame indexed by cell with label columns and show proba.max(axis=1) / idxmax(axis=1). Text only.
 
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-003 failure-modes.md contains a nonexistent method and an exaggerated claim
+### `bio-machine-learning-atlas-mapping` — AM-004 Snippets and script input contract incomplete
 
-- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: `fig.set_rasterization_zorder(0)` raises AttributeError (it is `ax.set_rasterization_zorder`); '100000 points = 50 MB PDF, 30 s open' is not reproduced (19k points = 0.27 MB); 'default rasterization can include axes' is not demonstrated.
-- Root cause: Claims written from memory.
-- Fix: Use ax.set_rasterization_zorder(0), restate the size effect with a measured ratio, drop the vague mechanism.
+- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: SKILL.md snippets use ref_vae and adata_ref without defining them, and scarches_annotation.py requires layers['counts'], obs['batch'] and obs['cell_type'] (and shared genes) without saying so.
+- Root cause: Snippets were extracted from the script without their setup lines or the data contract.
+- Fix: Define ref_vae/adata_ref in the snippets (or point to the script) and document the required h5ad fields in the script docstring and SKILL.md. Text only (docstring/comment edits, no behavior change).
 
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-004 'SVG for editable vector' leaves text as paths
+### `bio-machine-learning-atlas-mapping` — AM-005 Script unseeded and persists nothing
 
-- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
-- Observed in inputs: 3
-- Problem: svg.fonttype defaults to 'path': the saved SVG has 0 <text> elements and 55 glyph uses, so text is not editable.
-- Root cause: Saving block does not set svg.fonttype.
-- Fix: Set svg.fonttype='none' (with a note that fonts must be installed) or reword the claim.
-
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-005 Example styling departs from the Skill's own rules
-
-- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Skill: 77, Limited Release · candidate `d4048dcc887b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@d4048dcc887b-initial-lane3b-20261003/viewer.md)
 - Observed in inputs: 1
-- Problem: The cluster scatter uses cmap='tab10' (not CVD-safe) against the Okabe-Ito requirement; axes.titlesize=8 exceeds the stated 5-7 pt body-text limit; the grid titles repeat the panel tags a-f.
-- Root cause: Example written before the CVD and size rules.
-- Fix: Colour clusters with the Okabe-Ito list, use titlesize 7, and drop the redundant panel titles.
+- Problem: Two unmodified runs on identical inputs gave 1.82% vs 1.29% Unknown and accuracy 0.9647 vs 0.9666; the script writes no predictions, latent or uncertainty to disk.
+- Root cause: No scvi.settings.seed and the template only prints.
+- Fix: Set scvi.settings.seed and write the annotated query h5ad (predicted_label, transfer_uncertainty, latent). Changes runnable bytes.
 
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-006 OO-API Skill mixes pyplot state calls
+### `bio-machine-learning-omics-classifiers` — OC-005: XGBoost early stopping: val set reuse and degenerate at tiny n
 
-- Skill: 74, Beta Only · candidate `146857c3b9b5` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@146857c3b9b5-initial-dv1-20261003/viewer.md)
+- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 5
+- Problem: The snippet early-stops on X_val but never says to keep that set out of the performance estimate; with a 15-sample validation set the metric saturates (validation aucpr 1.0, best_iteration 0-18) and test AUC ranges 0.83-1.0 across splits. The bundled script uses a fixed 300 rounds and so never runs the recommended pattern.
+- Root cause: Early stopping is recommended for "tiny n" without a minimum validation size or a three-way-split instruction.
+- Fix: Add one sentence: report on a third untouched split (or nested CV), and say early stopping needs a validation set large enough not to saturate; optionally add early stopping to rf_xgboost_classifier.py.
+
+### `bio-machine-learning-omics-classifiers` — OC-006: Script docstring/captions and usage-guide contradict measured behaviour
+
+- Skill: 77, Beta Only · candidate `1d68da6e6ef8` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 7
+- Problem: logistic_regression.py promises that a batch-aware split exposes the artifact but never runs one; rf_xgboost_classifier.py prints fixed captions ("compressed toward 0.5", "pushed toward extremes"); the usage-guide tip states both as general rules while SKILL.md says the direction depends on the learner and loss.
+- Root cause: Narrative text written independently of the measured output and not reconciled with the later SKILL.md note.
+- Fix: Add a LeaveOneGroupOut result to logistic_regression.py (or trim the docstring); derive the probability-range captions from the numbers or word them conditionally; rewrite the usage-guide tip to match the SKILL.md note.
+
+### `bio-machine-learning-survival-analysis` — SA-003 Evaluation snippet is not copy-runnable
+
+- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
+- Observed in inputs: 1
+- Problem: The evaluation block raises NameError on t_horizon; y_train, y_test, X_train, X_test are never built, and the fitting block creates y from the full df, which an agent may then use for training and testing.
+- Root cause: Snippets extracted from a script without their setup lines.
+- Fix: Add a split step defining X_train/X_test/y_train/y_test and t_horizon (for example the 90th percentile of training event times) and drop the full-data y. Text only.
+
+### `bio-machine-learning-survival-analysis` — SA-004 Competing-risks claims lack an implementation
+
+- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: The taxonomy says RSF handles competing risks ('Yes (per-cause CIF)'), but scikit-survival 0.28 has no CIF or competing-risks metric. Fine-Gray, cause-specific CIF Brier and Wolbers concordance have no named package or code. lifelines Aalen-Johansen warns about tied event times (jittered), which the Skill does not mention.
+- Root cause: Method properties were taken from R (randomForestSRC, cmprsk) while the Skill's primary tool is scikit-survival.
+- Fix: Qualify the RSF row as not available in scikit-survival, name the R or Python implementation for each recommended competing-risks step, and note tie handling. Text only.
+
+### `bio-machine-learning-survival-analysis` — SA-005 Prose-only methods unlabelled; dependency note imprecise
+
+- Skill: 77, Limited Release · candidate `2dc45fa24b13` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/viewer.md)
 - Observed in inputs: 4
-- Problem: SKILL.md Color section uses plt.imshow/plt.colorbar and the recipes use plt.colorbar(..., ax=ax) while the guardrail forbids pyplot state calls after plt.subplots(n, m).
-- Root cause: Snippets not rewritten to the OO form.
-- Fix: Use ax.imshow and fig.colorbar(im, ax=ax) in SKILL.md, usage-guide and chart-recipes.
+- Problem: Fine-Gray, landmarking, calibration curves with ICI/E50/E90, nested-CV selection and the pycox DeepSurv/DeepHit models are described without code or a statement that they were not run. The version note says to isolate both scikit-survival and lifelines from a pandas 3 stack (only lifelines caps pandas; scikit-survival runs on pandas 3.0.6) and says the bundled scripts ran against pycox 0.3 (neither imports it).
+- Root cause: Compatibility note was written for the combined test environment.
+- Fix: Mark these methods 'described, not executed or bundled', attribute the pandas <3 cap to lifelines alone (competing_risks_cif.py only), and drop pycox from the scripts-tested list. Text only.
+
+### `bio-machine-learning-biomarker-discovery` — BD-002: scoring/legacy-attribute choice unexplained; it sets signature size
+
+- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: The normalizer replaced the default (accuracy) with scoring=neg_log_loss and use_legacy_attributes=False without a word in this Skill (the omics-classifiers sibling explains it); on Golub the selected signature is 329 probes (neg_log_loss), 152 (accuracy), 96 (roc_auc).
+- Root cause: The change tracks sklearn announced defaults (1.10 attributes, 1.11 scoring) and is defensible, but the Version Compatibility section and the "small signature" claim do not mention it.
+- Fix: Add one sentence to Version Compatibility naming both parameters and the sklearn schedule, and state that the scoring metric controls signature size (neg_log_loss tolerates weaker penalty; use roc_auc or a 1-SE rule for a minimal panel).
+
+### `bio-machine-learning-biomarker-discovery` — BD-003: Leakage-safe snippet: no scaler, "Nested-safe" label
+
+- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 1
+- Problem: The Pipeline has no StandardScaler although the Skill says the penalty is scale-sensitive: AUC 0.920 +/- 0.126 raw vs 0.990 +/- 0.030 scaled on Golub (pessimistic, not optimistic). The print label calls a single-level fixed-k CV "Nested-safe", and no nested-CV code is given although the text says to estimate by nested CV when tuning.
+- Root cause: Snippet written for the leakage point only; tuning k or C would need an outer loop that is not shown (deferred to model-validation without a pointer in the snippet).
+- Fix: Add StandardScaler as the first Pipeline step, rename the label (e.g. "In-pipeline CV AUC (k fixed)"), and add a one-line note or snippet showing GridSearchCV inside cross_val_score when k is tuned. The tooling ConvergenceWarning lead did not reproduce on real labels; do not add a convergence caveat for it.
+
+### `bio-machine-learning-biomarker-discovery` — BD-004: Stability snippet unseeded; empty selection gives silent NaN
+
+- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: np.random.choice is unseeded so two runs disagree (61/64 stable, 0.519/0.527) and the Nogueira expression divides by zero when no feature is ever selected (prints nan).
+- Root cause: Snippet omits a Generator seed and a guard on k.mean() in (0, p).
+- Fix: Use rng = np.random.default_rng(0) for subsampling and guard the index: report "no features selected" when k.mean() == 0.
+
+### `bio-machine-learning-biomarker-discovery` — BD-005: Script narrative strings not tied to measured output
+
+- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 5
+- Problem: boruta_feature_selection.py prints that a minimal-optimal selector "would keep ~1" module member without running one; CV-chosen L1 logistic on the same data keeps 5/5 (4/5 at C=0.05). lasso_biomarker.py comments the leaky AUC as "~0.7+" while it prints 1.00.
+- Root cause: Static comments/print strings assert results the scripts do not compute; the module members (r ~ 0.92) are not redundant enough for L1 to drop them.
+- Fix: Either run an L1/elastic-net baseline in the Boruta script and print the count it actually keeps (tighten the module noise, e.g. scale 0.05, if the contrast is the point) or soften the sentence; update the "~0.7+" comment to the observed range.
+
+### `bio-machine-learning-biomarker-discovery` — BD-006: mRMR advertised but no in-fold pattern; not labelled unexecuted
+
+- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
+- Observed in inputs: 6
+- Problem: mRMR appears in the description, taxonomy and usage-guide but no snippet shows it; mRMR selected on the full matrix with permuted labels gives CV AUC 0.94, the same leakage the Skill warns about, and nothing shows how to keep it inside the fold.
+- Root cause: Method listed from the origin Skill without a worked example; the normalizer believed the package was absent (it is installed and works).
+- Fix: Add a short in-fold mRMR transformer (or GridSearch-compatible FunctionTransformer) snippet using mrmr_classif with a DataFrame/Series, or state in the Skill that mRMR is described but not exemplified.
 
 ### `bio-outlier-splicing-detection` — FRASER block stops at its last line when no sample has a call
 
@@ -587,6 +595,38 @@ None open.
 - Problem: scPrinter is named for single-cell and per-base use but no command or test ships; the Skill says so.
 - Root cause: Out of bounded scope (GPU, source install).
 - Fix: Keep the untested label or add a tested minimal workflow later. (NUCPOS-015, deferred)
+
+### `bio-data-visualization-ggplot2-fundamentals` — GG-009 failure-modes.md misstates the ggrepel drop warning
+
+- Skill: 85, Production Ready · candidate `9d22bac5b1ee` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d22bac5b1ee-reaudit-dv1-20261003/viewer.md)
+- Observed in inputs: 6
+- Problem: The ggrepel entry says labels are dropped 'with a warning' and that the warning is 'buried in log'; ggrepel 0.9.8 emits nothing unless verbose = TRUE, so the drop is fully silent.
+- Root cause: Statement carried over from older ggrepel behaviour and left after the fix of GG-006.
+- Fix: Text-only: say the drop is silent, name verbose = TRUE as the only message, and keep 'count the labels actually drawn'.
+
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-007 seaborn.objects example ships with no colour key
+
+- Skill: 85, Production Ready · candidate `5a5bd8a000b2` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@5a5bd8a000b2-reaudit-dv1-20261003/viewer.md)
+- Observed in inputs: 1
+- Problem: scripts/matplotlib_phd.py volcano_so.pdf sets legend=False, leaving Up, Down and NS as three unlabelled colours; the default legend does fall outside the 89 mm page (bbox 348-408 px on a 350 px page) for every layout engine tried.
+- Root cause: The overflow was worked around by deleting the legend instead of repositioning it.
+- Fix: Keep the legend and move it on-page, e.g. .layout(size=..., extent=[0, 0, 0.78, 1]).plot(), then reposition fig.legends[0] (verified inside the page in scripts/r2_so_legend.py), or state that a caption must name the colours.
+
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-008 Tick frequency recipe raises ValueError
+
+- Skill: 85, Production Ready · candidate `5a5bd8a000b2` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@5a5bd8a000b2-reaudit-dv1-20261003/viewer.md)
+- Observed in inputs: 4
+- Problem: references/chart-recipes.md sets five ticks with np.arange(0, 10, 2) and then three labels, which raises ValueError on matplotlib 3.11.2; the snippet also uses np without an import.
+- Root cause: The recipe was written as an illustration and never executed.
+- Fix: Use equal counts, e.g. ax.set_xticks(np.arange(0, 6, 2)) with three labels, and add import numpy as np to the block.
+
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-009 tight_layout failure mode not reproduced; fix crashes
+
+- Skill: 85, Production Ready · candidate `5a5bd8a000b2` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@5a5bd8a000b2-reaudit-dv1-20261003/viewer.md)
+- Observed in inputs: 5
+- Problem: failure-modes.md says tight_layout clips labels and overlaps a colorbar added with ax=; in 3.11.2 it does neither. Its alternative fig.set_layout_engine('constrained') after creation raises ZeroDivisionError when a colorbar already exists.
+- Root cause: The entry restates a historic tight_layout limitation and an untested alternative.
+- Fix: Reword the trigger to axes added with fig.add_axes, and change the alternative to set the engine before adding colorbars or pass layout='constrained' to plt.subplots only.
 
 ### `bio-splicing-quantification` — parse_rmats_output raises a raw KeyError on an rMATS file with zero events
 
@@ -707,6 +747,22 @@ None open.
 - Problem: The guard drops NA cells so getMarkerFeatures completes, but recurrence at full depth is untested and dropped cells change cluster composition.
 - Root cause: Zero-read motif peaks give zero background SD in sparse cells; not investigated at full scale.
 - Fix: Optionally test on whole-genome PBMC 5k fragments and add a minimum-fragment cell filter before addDeviationsMatrix if NA recurs.
+
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-009 Stale quoted numbers in references and comments
+
+- Skill: 87, Production Ready · candidate `fa3ec8783a79` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@fa3ec8783a79-reaudit-dv1-20261003/viewer.md)
+- Observed in inputs: 5
+- Problem: failure-modes.md and reconciliation-thresholds-pushback.md say a cap of 50 hid 49 significant genes (39 measured now that y is padj); SKILL.md says median \|LFC\| 0.77 (0.7648); the volcano_phd.R save comment says 29,391 vector points gave about 1 MB (17,994 are drawn; 0.56 and 0.69 MB); SKILL.md ties the 23/444 KB MA sizes to 17,994 points though ma_plot() draws 29,391.
+- Root cause: Numbers were measured before the axis moved from raw p to padj and the NA rows were dropped, and were not re-measured.
+- Fix: Replace 49 with 39, 0.77 with 0.76, the comment with 17,994 points and 0.56/0.69 MB, and state 29,391 rows for the MA sizes.
+
+### `bio-data-visualization-volcano-and-ma-plots` — VOL-010 y_cap labels pile onto the cap and overlap
+
+- Skill: 87, Production Ready · candidate `fa3ec8783a79` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@fa3ec8783a79-reaudit-dv1-20261003/viewer.md)
+- Observed in inputs: 2
+- Problem: volcano_plot(res, y_cap = 30) with default top_n labels places every high-rank label at y = 30, where ggrepel with max.overlaps = Inf prints them on top of each other; usage-guide suggests exactly this cap.
+- Root cause: Capped genes share one y value and the repel has no free space above the panel edge.
+- Fix: Document label_genes with capped genes excluded or spread horizontally (direction = 'x', ylim expansion), or default top_n labels to genes below the cap.
 
 ### `bio-ensembl-rest` — Compara example not reproduced on final bytes
 

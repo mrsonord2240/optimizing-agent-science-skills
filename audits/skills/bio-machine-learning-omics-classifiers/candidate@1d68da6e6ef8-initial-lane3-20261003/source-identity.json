@@ -1,0 +1,56 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/omics-classifiers",
+    "checkout_read_only": "F:\\OpenScience\\bioSkills-Improved\\machine-learning/omics-classifiers"
+  },
+  "candidate": {
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "1d68da6e6ef86650cbb2f70c8fda804b7bbe5a9792b3c72bf0bf5d4c0173f047",
+    "identity_kind": "sha256-manifest",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-omics-classifiers",
+    "file_count": 5,
+    "bytes": 29444,
+    "status_before": "untracked skill directory (by design)",
+    "status_after_execution": "unchanged: identity re-verified after execution"
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "23ea53881b59d73e707712f2287f1b052355c324a308676a27616696e3da622d",
+      "bytes": 17907
+    },
+    {
+      "path": "references/failure-modes.md",
+      "sha256": "1402f58fb704603569582759154b12a3aed2538568992678e5a7fcbaecd32d71",
+      "bytes": 1971
+    },
+    {
+      "path": "scripts/logistic_regression.py",
+      "sha256": "9a0bcf14e07496d270450ff0aa49bec4a706492d65bd1bb1912e4bae8ce0bf77",
+      "bytes": 2624
+    },
+    {
+      "path": "scripts/rf_xgboost_classifier.py",
+      "sha256": "bd01b7e731aaaa10f3a17880bd5fcf2362546d37035a186d5a8f94a7b32b6aae",
+      "bytes": 2775
+    },
+    {
+      "path": "usage-guide.md",
+      "sha256": "ca15978084513dee5e3354a283be2e52d32dbfafc19b7bdbf271b7ff4b9207cf",
+      "bytes": 4167
+    }
+  ],
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-machine-learning-omics-classifiers\\TOOLS.md",
+    "tools_md_sha256": "7f4a80ba28ac74641a3bf4ad8d7f5d8cfa2cb7664f7d8320debadc4daea1db73",
+    "environment_fingerprint_sha256": "20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6",
+    "environment_root": "F:\\OpenScience\\audit-envs\\cheminformatics-hit-triage-analyst",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "preflight_warnings": [
+    "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+  ]
+}

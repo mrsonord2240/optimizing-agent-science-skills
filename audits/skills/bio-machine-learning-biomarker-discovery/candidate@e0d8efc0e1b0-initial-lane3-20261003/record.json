@@ -1,0 +1,72 @@
+{
+  "skill_id": "bio-machine-learning-biomarker-discovery",
+  "version": "candidate@e0d8efc0e1b0-initial-lane3-20261003",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/biomarker-discovery",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery"
+  },
+  "candidate": {
+    "identity": "e0d8efc0e1b0610d8c273b1e3837670cd94969cdec2b38614f6796efe08fed71",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "e0d8efc0e1b0610d8c273b1e3837670cd94969cdec2b38614f6796efe08fed71",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-biomarker-discovery",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "8e5350dda90061ada60e8db0b9db9adb6a6d2038ac169edfcf70600f06f0e0ae",
+        "bytes": 17155
+      },
+      {
+        "path": "references/failure-modes.md",
+        "sha256": "ef6e4bffe18595ace9bd8c0d3e6623428a017b9f4939aa01330b76a1dc04c926",
+        "bytes": 3604
+      },
+      {
+        "path": "scripts/boruta_feature_selection.py",
+        "sha256": "db2173e440084f4e15cf42fbbccb76bbbcaad02cd5aab503c4399ac9615b49f6",
+        "bytes": 1811
+      },
+      {
+        "path": "scripts/lasso_biomarker.py",
+        "sha256": "1250b95fbb78816d751357a010d20803ffbf8ffd72f11fa370eecd679c731b44",
+        "bytes": 2974
+      },
+      {
+        "path": "usage-guide.md",
+        "sha256": "62c9fdef854bf56b3727f21cad0d936a428f881bdc7c1d9e42058b006050f005",
+        "bytes": 4184
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": null,
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 4
+  }
+}
