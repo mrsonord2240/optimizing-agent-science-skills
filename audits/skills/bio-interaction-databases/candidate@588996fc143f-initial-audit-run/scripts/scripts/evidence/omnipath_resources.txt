@@ -1,0 +1,5 @@
+resources HTTP 200 dict 228
+keys of one resource: ['datasets', 'license', 'queries']
+sources used under license=commercial: ['ACSN', 'ARN', 'BEL-Large-Corpus', 'BioGRID', 'Cui2007', 'DEPOD', 'DIP', 'DOMINO', 'ELM', 'HINT', 'HPRD', 'HPRD-phos', 'InnateDB', 'IntAct', 'KEA', 'KEGG-MEDICUS', 'LMPID', 'LRdb', 'Lit-BM-17', 'MIMP', 'MPPI', 'Macrophage', 'NCI-PID', 'NetworKIN', 'PhosphoNetworks', 'PhosphoPoint', 'PhosphoSite', 'ProtMapper', 'REACH', 'RLIMS-P', 'Reactome', 'SIGNOR', 'SPIKE', 'SignaLink3', 'Sparser', 'Wang', 'dbPTM', 'hprd', 'iPTMnet', 'phosphoELM']
+of these, resource-level license purpose not commercial: {}
+license purpose values seen: ['academic']

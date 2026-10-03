@@ -1,0 +1,2 @@
+Swiss-Prot target rows: [('ENSG00000141510', 'P04637'), ('ENSG00000171862', 'P60484'), ('ENSG00000139618', 'P51587')] failedIds: None
+to_db=UniProtKB result[0] keys / to type: ['from', 'to'] str

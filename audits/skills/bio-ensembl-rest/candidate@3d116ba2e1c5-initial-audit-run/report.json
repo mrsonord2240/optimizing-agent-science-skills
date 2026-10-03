@@ -1,0 +1,382 @@
+{
+  "meta": {
+    "skill_name": "bio-ensembl-rest",
+    "description": "Query the Ensembl REST API for gene/transcript/protein lookup, sequence retrieval, Compara orthologs, VEP variant annotation, regulatory features, archive pinning and Ensembl divisions, through a small Python requests client.",
+    "evaluated_on": "2026-10-02",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or results; every live value (BRCA1 ENSG00000012048 chr17:43044292-43170245, TP53 protein 393 aa, rs699 missense, LD r2 0.976) matched the service."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Annotation retrieval only; no diagnostic or prescriptive output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Symbol-to-ID resolution and release pinning are sound. A GRCh37 coordinate shown against the GRCh38 default host is a documentation error (ENS-003), not a methodological fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Client functions all ran live; the shipped failures are wrong arguments in two examples and the quickstart snippet (ENS-001, ENS-002), not unrunnable client code. Scored in Layer 1/2 and filed P1."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 74,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Client covers lookup, sequence, overlap, VEP, Compara, LD and archive base; the headline gene-ID protein snippet, one example HGVS, the usage-guide VEP coordinate, and two endpoint-table rows (regulatory, homology/id) fail live."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "429 handling exists; no request timeout, no 5xx handling, archive HTML/503 surface as JSONDecodeError or an HTML body, and exhausted 429 retries raise RuntimeError that batch_symbols does not catch."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md is about 170 lines with a usage guide and examples; endpoint table and error table repeat each other."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Good symbol-vs-ID, pinning and bulk-defection guidance; the first code block an agent copies crashes with an opaque HTTP 400 and the client discards the server error body."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Clear tables and failure modes; several stated error behaviours (404 on renamed symbol, Homo_sapiens fails) are not what the service returns."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials; HTTPS only; path segments are interpolated unescaped into URLs (low risk for an unauthenticated read-only API)."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Single 90-line client with one retry helper and docstrings; examples are not asserted or tested, which is how ENS-001 and ENS-002 shipped."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger description is specific; progressive disclosure and escape hatches (BioMart, local VEP) good; examples that fail reduce composability."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 67.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 15,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Symbol to ID, e110 pinning, gene structure, protein, region overlap (lookup_and_overlap.py)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Steps 1-3 correct; exit 1 at protein step with HTTP 400 on the gene ID; region overlap step never reached.",
+        "basic": 24,
+        "specialized": 36,
+        "total": 60,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "symbol_to_id('human','BRCA1') returns ENSG00000012048 on GRCh38 at chr17:43044292-43170245, strand -1",
+            "result": "PASS",
+            "note": "Exact match against the live record."
+          },
+          {
+            "text": "e110 archive returns the same Gene ID with the e110 coordinates",
+            "result": "PASS",
+            "note": "301 to jul2023 host followed; id ENSG00000012048, start 43044295."
+          },
+          {
+            "text": "gene_info(expand=1) returns transcripts with exon lists and one canonical transcript",
+            "result": "PASS",
+            "note": "59 transcripts, canonical ENST00000357654."
+          },
+          {
+            "text": "The documented quickstart sequence_for_id('ENSG00000139618','protein') returns a protein sequence",
+            "result": "FAIL",
+            "note": "HTTP 400: gene plus non-genomic type needs multiple_sequences (15 sequences); same call exits the shipped example."
+          },
+          {
+            "text": "The shipped example runs to completion and prints the region overlap section",
+            "result": "FAIL",
+            "note": "Exit 1 before the overlap section."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "VEP by region, dbSNP ID, HGVS with consequence summary (vep_annotation.py)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Region and ID VEP correct; example HGVS ENST00000366667:c.803G>A rejected (reference base at c.803 is C); usage-guide region example on GRCh38 host returns 400.",
+        "basic": 26,
+        "specialized": 40,
+        "total": 66,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "vep_region 17:43044295-43044295:1 A returns GRCh38 consequences for BRCA1 with allele_string T/A",
+            "result": "PASS",
+            "note": "3_prime_UTR_variant, 48 transcript consequences."
+          },
+          {
+            "text": "vep_id rs699 returns a missense AGT consequence with SIFT and PolyPhen",
+            "result": "PASS",
+            "note": "ENST00000366667 M/T, tolerated, benign, position 230710048."
+          },
+          {
+            "text": "vep_hgvs ENST00000646891:c.1799T>A returns BRAF V600E missense with SIFT and PolyPhen",
+            "result": "PASS",
+            "note": "V/E, probably_damaging."
+          },
+          {
+            "text": "The shipped HGVS example string is valid for its transcript",
+            "result": "FAIL",
+            "note": "Service reports reference C at c.803; c.803C>T works (missense_variant)."
+          },
+          {
+            "text": "The usage-guide chr17:41276135 T>G example returns a result on the default host",
+            "result": "FAIL",
+            "note": "That coordinate is GRCh37 BRCA1; default GRCh38 host returns 400, grch37 host returns splice_region_variant."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Compara orthologs and paralogs (compara_homology.py)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Example exits 0; ortholog types and mouse mapping correct; BRCA1 paralog section prints nothing; confidence absent.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "TP53 to mouse returns one ortholog_one2one to ENSMUSG00000059552 with identities",
+            "result": "PASS",
+            "note": "perc_id 77.95 target, 77.35 source."
+          },
+          {
+            "text": "BRCA1 ortholog type counts are internally consistent",
+            "result": "PASS",
+            "note": "170 one2one + 29 one2many = 199 homologies."
+          },
+          {
+            "text": "Missing confidence is treated as unknown, per SKILL.md",
+            "result": "PASS",
+            "note": "Value is None for every row and the example prints it without failing."
+          },
+          {
+            "text": "The example's paralog and confidence text matches service output",
+            "result": "FAIL",
+            "note": "Paralog list for BRCA1 is empty and prints a bare header; text describes confidence as binary 0/1 and a many2one type that the service does not emit."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Release pinning: e110, e111, e116, GRCh37, and a retired archive",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "e110, e111 and GRCh37 reproducible; e116 archive host 503; e90 returns HTML 200 and the client raises JSONDecodeError.",
+        "basic": 30,
+        "specialized": 44,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "e110 archive resolves BRCA1 with the e110 coordinates",
+            "result": "PASS",
+            "note": "start 43044295 vs live 43044292, same Gene ID."
+          },
+          {
+            "text": "GRCh37 host returns the legacy assembly coordinates",
+            "result": "PASS",
+            "note": "41196312-41277500, assembly GRCh37."
+          },
+          {
+            "text": "e111 archive answers /info/data with release 111",
+            "result": "PASS",
+            "note": "{'releases': [111]}."
+          },
+          {
+            "text": "A very old or unavailable archive fails with a clear, documented error",
+            "result": "FAIL",
+            "note": "e116 returns 503 HTML (jun2026 host down, not decommissioned); e90 returns 200 HTML contradicting the doc (DNS failure or 503) and the client raises JSONDecodeError."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Batch symbols with renamed gene, LD, POST batch lookup, divisions, documented endpoint table",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Batch, LD, POST lookup and divisions correct; regulatory and homology/id endpoint-table rows 404; stated error codes and species-case rule do not match the service.",
+        "basic": 24,
+        "specialized": 36,
+        "total": 60,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "batch_symbols captures per-symbol errors and still resolves valid symbols",
+            "result": "PASS",
+            "note": "BRCA1 resolved; MARCH1 and NOTAGENE recorded as errors."
+          },
+          {
+            "text": "ld_pairwise and POST /lookup/id return expected values",
+            "result": "PASS",
+            "note": "r2 0.976 D' 1.0; POST returned BRCA1 and TP53."
+          },
+          {
+            "text": "Non-vertebrate lookup by division species name works on the main host",
+            "result": "PASS",
+            "note": "arabidopsis_thaliana NAC001 200; rest.ensemblgenomes.org does not resolve."
+          },
+          {
+            "text": "Endpoint table rows resolve: /regulatory/species/{species}/feature/{id} and /homology/id/{ensembl_id}",
+            "result": "FAIL",
+            "note": "Both 404 (homology needs /homology/id/human/ID)."
+          },
+          {
+            "text": "Documented error behaviour matches service: renamed symbol is 404 and Homo_sapiens fails",
+            "result": "FAIL",
+            "note": "Renamed symbol returns 400; Homo_sapiens returns 200."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.6,
+    "dynamic_weighted": 40.6,
+    "score": 70,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Compact single client whose functions all returned scientifically correct live values (BRCA1 coordinates, TP53 protein, rs699 and BRAF V600E missense, LD r2 0.976, one2one TP53 orthology).",
+    "Release pinning and symbol-to-ID stability guidance is correct and reproducible: e110, e111 and GRCh37 hosts returned the stated gene versions.",
+    "Divisions, rate-limit and defection guidance verified live: main host serves plants, rest.ensemblgenomes.org does not resolve, rate headers show 55000 per 3600 s."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "ENS-001 Gene-ID protein quickstart returns HTTP 400",
+      "observed_in": [
+        1
+      ],
+      "problem": "sequence_for_id('ENSG00000139618','protein') in SKILL.md and lookup_and_overlap.py fails because a gene ID with a non-genomic type needs multiple_sequences; the example exits before its region step.",
+      "root_cause": "The client has no multiple_sequences parameter and the examples were never executed.",
+      "fix": "Use a transcript or protein ID in the snippet and example (ENSP00000269305), or add a multiple_sequences option and document it."
+    },
+    {
+      "priority": "P1",
+      "title": "ENS-002 VEP HGVS example has wrong reference base",
+      "observed_in": [
+        2
+      ],
+      "problem": "ENST00000366667:c.803G>A returns HTTP 400 because the reference base at c.803 is C; the example exits before the bulk-warning text.",
+      "root_cause": "Example HGVS was written without checking the reference allele.",
+      "fix": "Use ENST00000366667:c.803C>T (rs699, missense) or the validated BRAF ENST00000646891:c.1799T>A."
+    },
+    {
+      "priority": "P1",
+      "title": "ENS-003 GRCh37 VEP coordinate sent to GRCh38 host",
+      "observed_in": [
+        2
+      ],
+      "problem": "17:41276135 T>G is BRCA1 in GRCh37; the guide sends it to the default GRCh38 host and gets HTTP 400.",
+      "root_cause": "Coordinate copied from a GRCh37 source while the guide states GRCh38 default.",
+      "fix": "Use a GRCh38 coordinate such as 17:43044295-43044295:1/A, or point the example at the grch37 host."
+    },
+    {
+      "priority": "P1",
+      "title": "ENS-004 Regulatory and homology/id endpoint rows 404",
+      "observed_in": [
+        5
+      ],
+      "problem": "/regulatory/species/{species}/feature/{id} returned 404 (also for real ENSR17_ ids, and the variants tried), and /homology/id/{ensembl_id} returns 404 without the species segment.",
+      "root_cause": "Endpoint table was not checked against the live service; the client never exercises these routes.",
+      "fix": "Correct homology to /homology/id/{species}/{id}; replace the regulatory row with the working overlap/region?feature=regulatory route (34 features returned for 17:43.0-43.2 Mb) or verify a current id route."
+    },
+    {
+      "priority": "P2",
+      "title": "ENS-005 Error-code and species-case claims are wrong",
+      "observed_in": [
+        5
+      ],
+      "problem": "Renamed or unknown symbols return HTTP 400 (not 404), and Homo_sapiens is accepted (200), contradicting the doc.",
+      "root_cause": "Behaviours were described from memory.",
+      "fix": "Say 400 'No valid lookup found' and drop or soften the Homo_sapiens-fails claim."
+    },
+    {
+      "priority": "P2",
+      "title": "ENS-006 Client: no timeout, 5xx or non-JSON handling",
+      "observed_in": [
+        4
+      ],
+      "problem": "get_with_retry has no request timeout (a 40 s read timeout occurred on xrefs), does not retry 5xx, returns HTML 503 or e90 HTML 200 pages that raise JSONDecodeError, and exhausted 429 retries raise RuntimeError that batch_symbols does not catch. e116 archive was 503 while the live host was fine.",
+      "root_cause": "Retry helper handles only 429; the archive-failure doc assumes DNS or 503.",
+      "fix": "Add a timeout, retry transient 5xx, check Content-Type before .json(), catch RuntimeError in batch_symbols, and document that a recent archive host can be temporarily down."
+    },
+    {
+      "priority": "P2",
+      "title": "ENS-007 compara example: empty paralogs, stale text",
+      "observed_in": [
+        3
+      ],
+      "problem": "The BRCA1 paralog section prints a header with nothing under it, and the closing text calls confidence binary 0/1 and names a many2one type that the service does not return while confidence is absent for every row.",
+      "root_cause": "Example prints static explanatory text rather than data-derived text.",
+      "fix": "Print 'none' for empty results and align the semantics text with SKILL.md (confidence may be absent) and with the types returned."
+    },
+    {
+      "priority": "P2",
+      "title": "ENS-008 No Skill-root LICENSE file",
+      "observed_in": [],
+      "problem": "Preflight warns that the manifest cites the repository licence only; SKILL.md frontmatter says MIT.",
+      "root_cause": "Origin repository carries the licence at its root.",
+      "fix": "Cite the upstream MIT licence evidence in provenance or add a LICENSE file."
+    }
+  ]
+}

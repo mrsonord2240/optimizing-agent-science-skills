@@ -1,0 +1,386 @@
+{
+  "meta": {
+    "skill_name": "bio-uniprot-access",
+    "description": "Query UniProt's REST API (rest.uniprot.org) for entries, search and stream TSV, async ID mapping, isoforms, cross-references, UniRef clusters and proteomes through a small Python requests client.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or values; P04637 393 aa, 311 PDB, 9 isoforms and 20431 human Swiss-Prot rows matched independent service totals."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Sequence and annotation retrieval only."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Silent first-page truncation in map_ids and the quickstart search is a data-completeness defect filed as UNI-001 and UNI-005; the Skill itself warns about the 500-record cap and stream vs search."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every client function ran; failures are a rejected proteome route (UNI-002), a list formatted as text in one example (UNI-003) and a missing inactive-entry guard (UNI-006), scored in Layers 1-2 and filed P1/P2."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 68,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "Entry, search, stream, isoform and xref functions correct live; map_ids drops mappings, download_proteome route is rejected, uniref_cluster mislabels fields, and two documented query/field names do not work."
+      },
+      "reliability": {
+        "score": 6,
+        "max": 12,
+        "note": "No request timeouts or 429 handling; map_ids truncates silently with no failedIds signal; an inactive accession raises KeyError; stream_tsv buffers the whole response."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md about 200 lines with large reference tables that duplicate UniProt's own docs."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Good stream-vs-search, async-mapping and fields guidance; the quickstart ID-mapping and kinase examples print truncated results as complete."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Clear tables; the Combine query example silently returns 0 hits and one documented field name is rejected with HTTP 400."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials; HTTPS only; accessions interpolated into URL paths without validation (low risk)."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "One 140-line client with docstrings; no tests, so truncation and the dead proteome route shipped."
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Specific trigger description and escape hatches; one example crashes and another presents capped output as totals."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 56.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 11,
+      "total": 22
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Entry parse, bulk search and stream (uniprot_query.py first three sections)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Entry and stream are exact (stream 20431 rows equals server total); the kinase search returns 500 of 640 matches and the example prints '500 reviewed human kinases' as if complete.",
+        "basic": 28,
+        "specialized": 40,
+        "total": 68,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "fetch_entry_json('P04637') returns TP53, 393 aa, reviewed, 311 PDB, AlphaFold P04637",
+            "result": "PASS",
+            "note": "Exact; pdb_count matches the xref_pdb TSV field (311)."
+          },
+          {
+            "text": "stream_tsv returns every human Swiss-Prot entry without duplicates",
+            "result": "PASS",
+            "note": "20431 rows equal X-Total-Results; no duplicate accessions; P04637 present."
+          },
+          {
+            "text": "Secondary and unreviewed accessions parse correctly",
+            "result": "PASS",
+            "note": "Q15086 resolves to P04637; a TrEMBL entry yields reviewed=False and a protein name."
+          },
+          {
+            "text": "The shipped kinase search reports the full match set",
+            "result": "FAIL",
+            "note": "500 rows versus 640 server total; nothing in the output flags the cap."
+          },
+          {
+            "text": "Documented keyword:\"Kinase\" and keyword:KW-0418 are equivalent",
+            "result": "FAIL",
+            "note": "640 versus 625 matches for the same human reviewed filter."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Async Ensembl-to-UniProtKB ID mapping (map_ids, uniprot_query.py last section)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Job runs and polls correctly but only the first results page is read: 25 of 44 rows; BRCA2 (ENSG00000139618) is absent with no failedIds entry and PTEN has 7 of 12 rows.",
+        "basic": 18,
+        "specialized": 20,
+        "total": 38,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Submit, poll and fetch complete for three Ensembl gene IDs",
+            "result": "PASS",
+            "note": "Job finished; invalid from_db raises HTTP 400."
+          },
+          {
+            "text": "All mapped rows for every input ID are returned",
+            "result": "FAIL",
+            "note": "Client 25 rows versus 44 from idmapping/stream; X-Total-Results 44 and a Link next header were ignored."
+          },
+          {
+            "text": "A dropped input is reported, not silent",
+            "result": "FAIL",
+            "note": "BRCA2 has zero rows and failedIds is empty; the example prints no NOT MAPPED line."
+          },
+          {
+            "text": "Reviewed-only mapping is reachable",
+            "result": "PASS",
+            "note": "to_db='UniProtKB-Swiss-Prot' returns P04637, P60484, P51587 within one page."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Isoforms, FASTA and cross-reference summary (isoforms_and_xrefs.py)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Library calls are correct (9 isoforms, one canonical, FASTA lengths 393/341/346/354/302/307/261/209/214, 104 databases, PDB 311); the shipped example exits 1 with TypeError formatting a list.",
+        "basic": 28,
+        "specialized": 42,
+        "total": 70,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "list_isoforms('P04637') returns nine isoforms with exactly one canonical",
+            "result": "PASS",
+            "note": "P04637-1 canonical."
+          },
+          {
+            "text": "fetch_isoform_fasta returns sequences for every isoform",
+            "result": "PASS",
+            "note": "Nine FASTA records; P04637-2 is 341 aa."
+          },
+          {
+            "text": "xref_summary agrees with the xref_pdb field",
+            "result": "PASS",
+            "note": "PDB 311 both ways; Ensembl 22."
+          },
+          {
+            "text": "The shipped example runs to completion",
+            "result": "FAIL",
+            "note": "TypeError: unsupported format string passed to list.__format__ at the isoform print."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Proteome download, UniRef cluster, inactive and secondary accessions",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "download_proteome returns HTTP 400 on the documented route (stream route works, gzip magic 1f8b); uniref_cluster labels entryType as identity and returns an entry name; a deleted accession raises KeyError.",
+        "basic": 20,
+        "specialized": 26,
+        "total": 46,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "download_proteome('UP000000625') downloads the proteome",
+            "result": "FAIL",
+            "note": "HTTP 400 'upid value has invalid format'."
+          },
+          {
+            "text": "uniref_cluster returns a representative accession and a cluster identity",
+            "result": "FAIL",
+            "note": "representative is P53_HUMAN (entry name); identity is the string 'UniRef50' from entryType; JSON has no identity field."
+          },
+          {
+            "text": "An inactive accession fails with a clear error",
+            "result": "FAIL",
+            "note": "HTTP 200 'Inactive' record raises KeyError: 'sequence'."
+          },
+          {
+            "text": "resolve_obsolete maps a secondary accession to the current primary",
+            "result": "PASS",
+            "note": "Q15086 -> P04637, P04637 -> P04637."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Documented query syntax, field names, endpoint table, cursor paging",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Most routes, suffixes and queries work and cursor paging returns 500 + 125 = 625 rows; xref:pdb silently returns 0 hits and ft_active_site is rejected.",
+        "basic": 24,
+        "specialized": 34,
+        "total": 58,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Documented endpoints and .json/.fasta/.tsv/.xml/.txt/.gff suffixes respond",
+            "result": "PASS",
+            "note": "All 200 including /uniprotkb/accessions, /uniref/search, /proteomes/{upid}, /taxonomy/{id}."
+          },
+          {
+            "text": "Cursor paging returns the remainder of a 625-hit result",
+            "result": "PASS",
+            "note": "Second page 125 rows via the Link header."
+          },
+          {
+            "text": "The documented Combine query returns hits",
+            "result": "FAIL",
+            "note": "keyword:KW-0067 AND xref:pdb returns 0; database:pdb returns 904 for the same filter."
+          },
+          {
+            "text": "Every documented fields name is accepted",
+            "result": "FAIL",
+            "note": "ft_active_site gives HTTP 400; the valid name is ft_act_site."
+          },
+          {
+            "text": "Stated corpus sizes are current",
+            "result": "FAIL",
+            "note": "TrEMBL is described as about 250M; live release 2026_03 reports 149.4M (Swiss-Prot 575,748)."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 27.2,
+    "dynamic_weighted": 33.6,
+    "score": 61,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Entry, stream, isoform and cross-reference functions return exact values verified two ways: P04637 393 aa, 311 PDB, 9 isoforms with FASTA lengths, human Swiss-Prot stream 20431 rows equal to the server total.",
+    "Stream-vs-search, async mapping with a hard timeout, isoform suffix handling and secondary-accession resolution are accurate and verified live.",
+    "Most documented endpoints, suffixes and query operators work, and cursor paging reproduces the full 625-hit result."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "UNI-001 map_ids reads only the first results page",
+      "observed_in": [
+        2
+      ],
+      "problem": "Ensembl-to-UniProtKB mapping returned 25 of 44 rows; BRCA2 vanished with empty failedIds and PTEN lost 5 rows; the quickstart and example print the partial list as complete. Ensembl-to-UniProtKB also returns many TrEMBL fragments (18 rows for TP53).",
+      "root_cause": "The client fetches /idmapping/results once and ignores X-Total-Results and the Link next header.",
+      "fix": "Fetch /idmapping/stream/{jobId} (or follow Link), report inputs with no rows, and document to_db='UniProtKB-Swiss-Prot' for reviewed-only mapping; add a regression on the three example genes."
+    },
+    {
+      "priority": "P1",
+      "title": "UNI-002 download_proteome documented route returns 400",
+      "observed_in": [
+        4
+      ],
+      "problem": "/proteomes/{upid}.fasta.gz is rejected for UP000000625 and the endpoint table and client both use it.",
+      "root_cause": "The route does not exist on the current service; it was never executed.",
+      "fix": "Use /uniprotkb/stream?query=proteome:{upid}&format=fasta&compressed=true (200, gzip verified) and correct the endpoint table."
+    },
+    {
+      "priority": "P1",
+      "title": "UNI-003 isoforms_and_xrefs.py raises TypeError",
+      "observed_in": [
+        3
+      ],
+      "problem": "The example formats iso['ids'] (a list) with a width specifier and exits at the first isoform line, before the FASTA, xref and proteome sections.",
+      "root_cause": "list_isoforms returns ids as a list but the example treats it as a string.",
+      "fix": "Join the ids (', '.join(iso['ids'])) and rerun the whole example."
+    },
+    {
+      "priority": "P1",
+      "title": "UNI-004 xref:pdb and ft_active_site documented but broken",
+      "observed_in": [
+        5
+      ],
+      "problem": "The query table and the Combine example use xref:pdb, which silently returns 0 hits (database:pdb returns 904), and the fields table lists ft_active_site, which the service rejects with HTTP 400.",
+      "root_cause": "Query and field names were not tested against the live service.",
+      "fix": "Replace xref:pdb with database:pdb (or structure_3d:true) and ft_active_site with ft_act_site."
+    },
+    {
+      "priority": "P2",
+      "title": "UNI-005 Capped results and stale counts shown as totals",
+      "observed_in": [
+        1,
+        5
+      ],
+      "problem": "The kinase example prints 500 as the number of reviewed human kinases (server total 640), keyword:\"Kinase\" differs from keyword:KW-0418 (640 vs 625), and TrEMBL is stated as about 250M (live 149.4M).",
+      "root_cause": "search_tsv returns one page without reporting X-Total-Results; counts copied from older sources.",
+      "fix": "Warn when rows equal the cap (or return the total), use KW-0418 in the example, and update the corpus sizes."
+    },
+    {
+      "priority": "P2",
+      "title": "UNI-006 Inactive accession raises KeyError",
+      "observed_in": [
+        4
+      ],
+      "problem": "A deleted accession returns HTTP 200 with entryType Inactive and no sequence, so fetch_entry_json raises KeyError; SKILL.md says obsolete accessions return 404 or 301.",
+      "root_cause": "No inactive-entry guard and the behaviour is documented from memory.",
+      "fix": "Detect entryType == 'Inactive', raise a clear error naming inactiveReason, and correct the failure-mode text (secondary accessions redirect and resolve)."
+    },
+    {
+      "priority": "P2",
+      "title": "UNI-007 uniref_cluster mislabels identity and representative",
+      "observed_in": [
+        4
+      ],
+      "problem": "identity is the entryType string 'UniRef50' (there is no identity field) and representative is the entry name P53_HUMAN, not an accession.",
+      "root_cause": "Field mapping chosen without checking the response.",
+      "fix": "Return identity as the numeric tier parsed from the id and the first representativeMember accession (P04637) alongside the member id."
+    },
+    {
+      "priority": "P2",
+      "title": "UNI-008 No timeouts, retries or 429 handling in the client",
+      "observed_in": [],
+      "problem": "Every request lacks a timeout and Retry-After handling; stream_tsv buffers the full response in memory, and map_ids treats any non-RUNNING status as finished.",
+      "root_cause": "Minimal client without a shared request helper.",
+      "fix": "Add one helper with timeout and Retry-After, check FAILED job status, and stream large responses to disk."
+    },
+    {
+      "priority": "P2",
+      "title": "UNI-009 No Skill-root LICENSE file",
+      "observed_in": [],
+      "problem": "Preflight warns that the manifest cites repository license evidence only; frontmatter says MIT.",
+      "root_cause": "Origin repository carries the licence at its root.",
+      "fix": "Cite the upstream MIT licence evidence in provenance or add a LICENSE file."
+    }
+  ]
+}

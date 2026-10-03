@@ -1,0 +1,1 @@
+{"data":[{"homologies":[{"species":"mus_musculus","type":"ortholog_one2one","taxonomy_level":"Euarchontoglires","method_link_type":"ENSEMBL_ORTHOLOGUES","protein_id":"ENSMUSP00000104298","id":"ENSMUSG00000059552"}],"id":"ENSG00000141510"}]}

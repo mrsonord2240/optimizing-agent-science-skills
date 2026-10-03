@@ -1,0 +1,56 @@
+--- symbol_to_id BRCA1
+{'id': 'ENSG00000012048', 'display_name': 'BRCA1', 'biotype': 'protein_coding', 'seq_region_name': '17', 'start': 43044292, 'end': 43170245, 'strand': -1, 'assembly_name': 'GRCh38', 'version': 28}
+--- gene_info expand
+{'n_tx': 59, 'canonical': ['ENST00000357654'], 'first_exons': [('ENST00000497488', 15), ('ENST00000489037', 22), ('ENST00000478531', 23)]}
+--- sequence_for_id ENSP protein (TP53)
+{'len': 393, 'head': 'MEEPQSDPSV', 'id': 'ENSP00000269305'}
+--- SKILL.md quickstart: sequence_for_id(ENSG00000139618, protein)
+EXC HTTPError: 400 Client Error: Bad Request for url: https://rest.ensembl.org/sequence/id/ENSG00000139618?type=protein
+--- workaround multiple_sequences=1
+{'status': 200, 'n': 15, 'first': ('ENSP00000439902', 3418)}
+--- raw 400 body
+(400, '{"error":"Requesting a gene and type not equal to \\"genomic\\" can result in multiple sequences. 15 sequences detected. Please rerun your request and specify the multiple_sequences parameter"}')
+--- sequence_for_id ENST protein (BRCA2 canonical)
+3418
+--- genes_in_region
+{'n': 13, 'syms': ['?', '?', '?', '?', 'BRCA1', 'BRCA1P1', 'IFI35', 'NBR1', 'NBR2', 'RND2', 'RPL21P4', 'RPL27', 'VAT1'], 'brca1': [(43044292, 43170245)]}
+--- vep_region BRCA1 example (GRCh38)
+{'assembly': 'GRCh38', 'allele_string': 'T/A', 'most_severe': '3_prime_UTR_variant', 'n_tc': 48, 'genes': ['BRCA1', 'RND2']}
+--- usage-guide VEP example 17:41276135 G on default GRCh38 host
+EXC HTTPError: 400 Client Error: Bad Request for url: https://rest.ensembl.org/vep/human/region/17:41276135-41276135:1/G
+--- same on GRCh37 host
+{'assembly': 'GRCh37', 'allele_string': 'T/G', 'most_severe': 'splice_region_variant', 'genes': ['BRCA1', 'NBR2']}
+--- vep_id rs699
+{'start': 230710048, 'allele_string': 'A/G', 'most_severe': 'missense_variant', 'tc': [('ENST00000366667', 'M/T', 'tolerated', 'benign')]}
+--- vep_id rs55794205 (example)
+{'start': 32340677, 'allele_string': 'C/A/G/T', 'most_severe': 'missense_variant'}
+--- vep_hgvs BRAF V600E
+{'input': 'ENST00000646891:c.1799T>A', 'most_severe': 'missense_variant', 'tc': [(['missense_variant'], 'V/E', 'deleterious_low_confidence', 'probably_damaging')]}
+--- vep_hgvs example string ENST00000366667:c.803G>A
+EXC HTTPError: 400 Client Error: Bad Request for url: https://rest.ensembl.org/vep/human/hgvs/ENST00000366667:c.803G%3EA
+--- raw body of example hgvs
+(400, '{"error":"Unable to parse HGVS notation \'ENST00000366667:c.803G>A\':  : Reference allele extracted from ENST00000366667:230710021-230710021 (C) does not match reference allele given by HGVS notation ENST00000366667:c.803G>A (G): Could not get a Transcript object for \'ENST00000366667\'"}')
+--- what is ENST00000366667
+{'tx_symbol': 'AGT-201', 'species': 'homo_sapiens'}
+--- ref base at c.803 of ENST00000366667
+{'cds_len': 1431, 'base_c803': 'C', 'context': 'CTGGCTTTCA'}
+--- corrected hgvs c.803C>T
+missense_variant
+--- orthologs TP53 mouse
+[('ortholog_one2one', 'ENSMUSG00000059552', 'mus_musculus', None, 77.9487, 77.3537)]
+--- orthologs BRCA1 all
+({'ortholog_one2one': 170, 'ortholog_one2many': 29}, 199)
+--- paralogs BRCA1
+[]
+--- ld_pairwise rs6792369/rs1042779 CEU
+[{'r2': '0.976029', 'variation1': 'rs6792369', 'population_name': '1000GENOMES:phase_3:CEU', 'd_prime': '1.000000', 'variation2': 'rs1042779'}]
+--- batch_symbols with renamed + bad symbol
+{'BRCA1': 'ENSG00000012048', 'MARCH1': '400 Client Error: Bad Request for url: https://rest.ensembl.org/lookup/symbol/human/MARCH1', 'NOTAGENE': '400 Client Error: Bad Request for url: https://rest.ensembl.org/lookup/symbol/human/NOTAGENE'}
+--- archive e110 BRCA1
+('ENSG00000012048', 43044295, 43170245, 'GRCh38')
+--- GRCh37 BRCA1
+('ENSG00000012048', 41196312, 41277500, 'GRCh37')
+--- e116 archive redirect (no follow)
+(301, 'https://jun2026.rest.ensembl.org/info/data')
+--- live release + ratelimit headers
+({'releases': [116]}, {'X-RateLimit-Limit': '55000', 'X-RateLimit-Reset': '387', 'X-RateLimit-Period': '3600', 'X-RateLimit-Remaining': '54854'})

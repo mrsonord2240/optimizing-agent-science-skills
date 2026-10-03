@@ -1,0 +1,378 @@
+{
+  "meta": {
+    "skill_name": "bio-interaction-databases",
+    "description": "Query protein-protein and gene interaction databases (STRING, BioGRID, IntAct, SIGNOR, OmniPath and others) through a small Python client; decision matrix, STRING channel semantics, license constraints and multi-resource aggregation.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or results in any run; observed values (STRING TP53-MDM2 0.999, BioGRID TP53 3081 LT physical rows) matched live services."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Interaction retrieval only; no clinical or prescriptive output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The escore-as-physical proxy and the license=commercial claim are overstated (IDM-004, IDM-002) but the Skill discloses the physical/functional distinction and license caveats; filed as findings, not a principled fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All client functions run; signor_for_gene runs but returns empty on every query (IDM-001) and the STRING example raises KeyError on a renamed column (IDM-003). Scored in Layers 1-2 and filed P0/P1 rather than as unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 67,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "STRING, BioGRID and OmniPath clients correct live; SIGNOR (headline signed-signaling resource) returns empty, the STRING example crashes, and the license=commercial filter does not filter."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "No request timeouts; SIGNOR failure is a silent empty DataFrame (false success); STRING one-request-at-a-time guidance not implemented in the client or the examples."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md about 200 lines; resource prose for Reactome, HuRI and others has no runnable counterpart."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Strong decision matrix, channel semantics and failure-mode tables; the SIGNOR open-question paragraph is honest, but agents are still handed a function that cannot work."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Clear tables; several stated behaviours (license=commercial, escore as physical, empty BioGRID means missing key) do not match the services."
+      },
+      "security": {
+        "score": 8,
+        "max": 12,
+        "note": "BioGRID access key travels as a query parameter and raise_for_status puts the full URL, key included, into the HTTPError message; the commercial-license claim creates compliance exposure."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "One 140-line client with docstrings; no tests, so the dead SIGNOR path and the failing example shipped; hardcoded shared caller_identity."
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Specific trigger description and good escape hatches; examples fail or report false success and the aggregate-union semantics are unclear."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 54.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 9,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "STRING ID resolution, confidence tiers, channels, physical filter, hubs (string_network.py)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Shipped example exits 1 with KeyError 'queryItem'; a one-token diagnostic copy shows every later section works (45/35/23 edges at 400/700/900, MDM2 and TP53 degree 9).",
+        "basic": 24,
+        "specialized": 38,
+        "total": 62,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "string_resolve_ids maps the 10 query genes to STRING IDs",
+            "result": "PASS",
+            "note": "10 rows, TP53 -> 9606.ENSP00000269305; STRING v12.5."
+          },
+          {
+            "text": "string_network returns 0-1 channel scores with the documented columns",
+            "result": "PASS",
+            "note": "13 columns; MDM2-TP53 score 0.999 escore 0.999 dscore 0.90."
+          },
+          {
+            "text": "Confidence tiers are monotone (400 >= 700 >= 900 edges)",
+            "result": "PASS",
+            "note": "45, 35, 23."
+          },
+          {
+            "text": "The shipped example runs to completion",
+            "result": "FAIL",
+            "note": "KeyError ['queryItem'] not in index; live column is queryIndex."
+          },
+          {
+            "text": "escore > 0.4 reproduces STRING's physical-only network as the guide claims",
+            "result": "FAIL",
+            "note": "26 escore edges versus 22 in network_type=physical; 5 escore edges absent from it, 1 physical edge missed."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "STRING + OmniPath + SIGNOR directed provenance graph and CSV export (interaction_query.py)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Exit 0 with 8 nodes and 52 edges, but SIGNOR contributes 0 edges and the in-memory max_score is STRING score divided by 1000 (0.000994 for MDM2-CHEK2).",
+        "basic": 26,
+        "specialized": 36,
+        "total": 62,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "STRING and OmniPath edges are added with source provenance and direction flags",
+            "result": "PASS",
+            "note": "26 STRING edges (52 directed), 20 OmniPath directional edges."
+          },
+          {
+            "text": "CSV export has per-edge sources, n_sources, effect, mechanism, directional",
+            "result": "PASS",
+            "note": "52 edges written, columns as documented."
+          },
+          {
+            "text": "SIGNOR signed edges appear in the aggregate",
+            "result": "FAIL",
+            "note": "0 signed edges; the section reports success."
+          },
+          {
+            "text": "max_score carries the 0-1 resource score",
+            "result": "FAIL",
+            "note": "STRING 0.999 stored as 0.000999; the 0.5 and 0.7 constants for OmniPath-only and SIGNOR-only edges are invented."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "BioGRID low-throughput physical interactions with a registered key (biogrid_lt_physical)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "TP53: 3081 LT physical rows, 831 unique pairs, MDM2 and CHEK2 present; filter agrees with BioGRID's own physical type for the non-expanded query (28 of 28).",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "TP53 LT physical filter returns expected partners MDM2 and CHEK2",
+            "result": "PASS",
+            "note": "Both present; all rows involve TP53."
+          },
+          {
+            "text": "PHYSICAL_LT_SYSTEMS matches BioGRID EXPERIMENTAL_SYSTEM_TYPE=physical for LT rows",
+            "result": "PASS",
+            "note": "28 LT physical rows, all in the set; no in-set system is non-physical."
+          },
+          {
+            "text": "Output is deduplicated to pairs or labelled per experiment",
+            "result": "FAIL",
+            "note": "3081 per-experiment rows for 831 pairs; neither the docstring nor SKILL.md says rows are per experiment."
+          },
+          {
+            "text": "A rejected key produces the documented empty result",
+            "result": "FAIL",
+            "note": "HTTP 401 raised; the HTTPError text includes the full request URL with accesskey."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "SIGNOR signed, directed interactions for TP53 (signor_for_gene)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Client returns an empty DataFrame (organism=human gives 'No result found.' with HTTP 200); raw organism=9606&id=P04637 returns 333 headerless 29-column rows all involving TP53.",
+        "basic": 14,
+        "specialized": 16,
+        "total": 30,
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "signor_for_gene('TP53') returns signed interactions with effect and mechanism",
+            "result": "FAIL",
+            "note": "0 rows."
+          },
+          {
+            "text": "An empty result is distinguishable from a failure",
+            "result": "FAIL",
+            "note": "Silent empty DataFrame; no warning; one row would also be lost to the header skip."
+          },
+          {
+            "text": "The live SIGNOR route is recoverable from the Skill text",
+            "result": "PASS",
+            "note": "SKILL.md names organism=9606 and id=<UniProt> accurately, and flags the function unverified."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "License-aware OmniPath query for a commercial pipeline (license=commercial)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "commercial and academic return the same 344 TP53 rows and the same 40 sources; PhosphoSite (CC BY-NC-SA, academic purpose) and HPRD (academic) rows are present under commercial.",
+        "basic": 18,
+        "specialized": 20,
+        "total": 38,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "omnipath_interactions returns directed TP53 post-translational edges with sources",
+            "result": "PASS",
+            "note": "344 rows, sources and references columns present."
+          },
+          {
+            "text": "license=commercial excludes sources whose OmniPath license purpose is academic",
+            "result": "FAIL",
+            "note": "Same 344 rows; PhosphoSite and HPRD remain."
+          },
+          {
+            "text": "The Skill's own license table is consistent with the commercial filter claim",
+            "result": "FAIL",
+            "note": "Table says PhosphoSitePlus needs a commercial license, yet the documented filter passes PhosphoSite-derived rows."
+          },
+          {
+            "text": "aggregate_networks gives comparable evidence across sources",
+            "result": "FAIL",
+            "note": "TP53+MDM2: STRING contributes 1 edge (query-set only), OmniPath 564 and BioGRID 1269 edges (query neighbourhoods); 1372 nodes."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.8,
+    "dynamic_weighted": 32.4,
+    "score": 59,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "STRING, BioGRID (with key) and OmniPath clients return scientifically correct live data: TP53-MDM2 STRING 0.999, TP53 3081 BioGRID LT physical rows, 344 OmniPath TP53 post-translational edges.",
+    "Decision matrix, STRING channel semantics, throughput filter and version-pinning guidance are accurate; the pinned-host stale-data warning was verified (version-11-5 still answers).",
+    "The SIGNOR open question is disclosed in the Skill and the live recovery route (organism=9606, id=UniProt) is described correctly."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "IDM-001 signor_for_gene returns empty for every query",
+      "observed_in": [
+        2,
+        4
+      ],
+      "problem": "organism=human returns 'No result found.' (HTTP 200) so the client yields an empty DataFrame; interaction_query.py reports 0 signed edges as success. The live route (organism=9606&id=<UniProt>) returns headerless 29-column rows (ENTITYA col 0, ENTITYB col 4, EFFECT col 8, MECHANISM col 9, PMID col 21).",
+      "root_cause": "Client written against an older response layout and never executed; the Skill's headline signed-signaling capability is unusable.",
+      "fix": "Resolve symbol to UniProt, call organism=9606&id=, parse by the live layout without a header skip, raise or warn on 'No result found.', and add a TP53 regression with the expected row count."
+    },
+    {
+      "priority": "P0",
+      "title": "IDM-002 license=commercial keeps academic-only sources",
+      "observed_in": [
+        5
+      ],
+      "problem": "Commercial and academic queries return identical rows; PhosphoSite (CC BY-NC-SA 3.0) and HPRD (academic) rows are present under commercial, contradicting the Skill's claim in three places and its own PhosphoSitePlus row.",
+      "root_cause": "The omnipath-server accepts the parameter but the filter had no effect for this query; the claim was not tested.",
+      "fix": "Remove the 'commercial keeps permissive sources only' claim or filter client-side by per-resource license purpose from /resources, and state that the pipeline must still audit sources; also reconcile the SIGNOR license entry (OmniPath lists CC BY 4.0, table says CC-BY-SA)."
+    },
+    {
+      "priority": "P1",
+      "title": "IDM-003 string_network.py raises KeyError on queryItem",
+      "observed_in": [
+        1
+      ],
+      "problem": "The first section selects a column that live STRING no longer returns; the example exits before its tier, channel, physical-filter and centrality sections.",
+      "root_cause": "The example was never executed after the STRING API changed column names.",
+      "fix": "Select queryIndex (or queryItem only if present) and rerun the whole example; later sections were verified working with that one-token change."
+    },
+    {
+      "priority": "P1",
+      "title": "IDM-004 escore > 0.4 is not STRING's physical network",
+      "observed_in": [
+        1
+      ],
+      "problem": "For the 10-gene example, 5 of 26 escore edges are absent from network_type=physical and 1 physical edge is missed, yet the Skill tells users to use escore for 'physically interact' claims.",
+      "root_cause": "The experiments channel mixes physical and functional experimental evidence; the proxy is presented as physical-only.",
+      "fix": "Recommend network_type=physical (add a parameter to string_network) for physical claims and describe escore as experimental evidence, not physical."
+    },
+    {
+      "priority": "P2",
+      "title": "IDM-005 example max_score mis-scaled and invented",
+      "observed_in": [
+        2
+      ],
+      "problem": "interaction_query.py stores STRING score/1000 although TSV scores are 0-1 (MDM2-CHEK2 0.000994) and assigns constants 0.5 and 0.7 to OmniPath-only and SIGNOR-only edges.",
+      "root_cause": "Score scale assumed 0-1000 and placeholder constants kept as data.",
+      "fix": "Use the 0-1 score as is, leave non-STRING edge scores empty, and rename the attribute so it is not read as a cross-resource confidence."
+    },
+    {
+      "priority": "P2",
+      "title": "IDM-006 aggregate_networks unions unequal evidence scopes",
+      "observed_in": [
+        5
+      ],
+      "problem": "STRING returns only edges within the query list while OmniPath and BioGRID return each query gene's whole neighbourhood, so multi_source_edges mostly counts BioGRID and OmniPath overlap (TP53+MDM2: 1 STRING edge versus 564 and 1269).",
+      "root_cause": "Per-source query scopes differ and the docstring calls the result a plain union.",
+      "fix": "Restrict all sources to the query set or add STRING add_nodes, or document the neighbourhood semantics and warn that multi-source support is not comparable."
+    },
+    {
+      "priority": "P2",
+      "title": "IDM-007 BioGRID key leaks into error text",
+      "observed_in": [
+        3
+      ],
+      "problem": "raise_for_status includes the full URL with accesskey in the HTTPError message (shown with a deliberately fake key), and a rejected key gives HTTP 401, not the empty result the Skill describes.",
+      "root_cause": "The key is a query parameter and exceptions are not sanitized.",
+      "fix": "Catch HTTPError and re-raise without the URL, document the 401, and label biogrid_lt_physical output as per-experiment rows (3081 rows, 831 pairs for TP53)."
+    },
+    {
+      "priority": "P2",
+      "title": "IDM-008 No timeouts, STRING pacing, per-user caller id",
+      "observed_in": [
+        1
+      ],
+      "problem": "Requests carry no timeout, the client and examples issue consecutive STRING calls without the 1-2 s pause the Skill prescribes, CALLER is a shared constant, and the requested OmniPath field n_resources is not returned.",
+      "root_cause": "Minimal client without a shared request helper.",
+      "fix": "Add one helper with timeout and optional pacing, let callers pass caller_identity, and drop n_resources from the field list."
+    },
+    {
+      "priority": "P2",
+      "title": "IDM-009 No Skill-root LICENSE file",
+      "observed_in": [],
+      "problem": "Preflight warns that the manifest cites repository license evidence only; frontmatter says MIT.",
+      "root_cause": "Origin repository carries the licence at its root.",
+      "fix": "Cite the upstream MIT licence evidence in provenance or add a LICENSE file."
+    }
+  ]
+}

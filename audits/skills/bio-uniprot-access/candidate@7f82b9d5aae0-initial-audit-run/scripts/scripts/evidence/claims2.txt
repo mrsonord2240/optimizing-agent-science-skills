@@ -1,0 +1,10 @@
+field ft_act_site -> 200 Active site
+field ft_active_site -> 400 Error messages Invalid fields parameter value 'ft_active_site'
+field ft_binding -> 200 Binding site
+field ft_domain -> 200 Domain [FT]
+KW-0067 base (no xref): (200, '1367')
+base AND xref:pdb  (documented Combine example): (200, '0')
+base AND database:pdb: (200, '904')
+base AND xref:pdb-*: (200, '904')
+base AND structure_3d:true: (200, '904')
+gene_exact:TP53 AND xref:pdb: (200, '0')

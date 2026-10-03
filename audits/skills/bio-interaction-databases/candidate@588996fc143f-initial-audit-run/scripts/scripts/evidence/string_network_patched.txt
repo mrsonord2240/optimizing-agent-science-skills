@@ -1,0 +1,44 @@
+=== Resolve gene symbols to STRING IDs ===
+ queryIndex preferredName             stringId
+          0          TP53 9606.ENSP00000269305
+          1         BRCA1 9606.ENSP00000418960
+          2          MDM2 9606.ENSP00000258149
+          3           ATM 9606.ENSP00000278616
+          4         CHEK2 9606.ENSP00000372023
+          5          CDK2 9606.ENSP00000266970
+          6           RB1 9606.ENSP00000267163
+          7        CDKN1A 9606.ENSP00000384849
+          8           BAX 9606.ENSP00000293288
+          9          BCL2 9606.ENSP00000381185
+
+=== Compare confidence tiers (number of edges retained) ===
+  Threshold 400: 45 edges
+  Threshold 700: 35 edges
+  Threshold 900: 23 edges
+
+=== Per-channel breakdown at threshold 700 ===
+preferredName_A preferredName_B  score  escore  dscore  tscore  ascore
+           MDM2             BAX  0.732   0.000    0.00   0.721   0.080
+           MDM2           BRCA1  0.732   0.229    0.00   0.667   0.000
+           MDM2            BCL2  0.758   0.000    0.00   0.757   0.047
+           MDM2            CDK2  0.859   0.131    0.40   0.752   0.000
+           MDM2           CHEK2  0.994   0.918    0.75   0.728   0.064
+           MDM2             ATM  0.995   0.902    0.75   0.835   0.097
+           MDM2             RB1  0.999   0.999    0.90   0.549   0.081
+           MDM2            TP53  0.999   0.999    0.90   0.984   0.129
+
+=== Physical-only filter (experiments channel only) ===
+  Combined-score 700+: 35 edges total
+  Filtered to escore > 0.4 (physical-only): 26 edges
+  Use the physical subset for "physically interact" claims.
+
+=== Build NetworkX graph and rank by centrality ===
+  Nodes: 10; edges: 35; density: 0.778; components: 1
+
+  Hubs (top 5 by degree):
+  gene  degree
+  MDM2       9
+  TP53       9
+CDKN1A       9
+ BRCA1       7
+  CDK2       7

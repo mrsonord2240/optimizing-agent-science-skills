@@ -1,0 +1,60 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/ensembl-rest",
+    "subtree": "3cbd867260dd69c8657b03e844680386a16ed050",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "fix/dbaccess-ensembl-rest",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "path": "F:\\OpenScience\\wt\\dbaccess-ensembl-rest\\skills\\bio-ensembl-rest",
+    "content_sha256": "3d116ba2e1c5bbcc610914c9e3364af733acbcf69c0c20cc39abc149099e40b2",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-ensembl-rest/",
+    "content_manifest": {
+      "file_count": 6,
+      "bytes": 24508
+    }
+  },
+  "files": [
+    {
+      "path": "examples/compara_homology.py",
+      "bytes": 1781,
+      "sha256": "3846de2063216ae24694b699bd824cec1a079794bac8335040378042c5c6157c"
+    },
+    {
+      "path": "examples/lookup_and_overlap.py",
+      "bytes": 1862,
+      "sha256": "69b4d9736511940dcdd8645449184cd0bfae8f97ae0efb932025021a1eb651b4"
+    },
+    {
+      "path": "examples/vep_annotation.py",
+      "bytes": 1878,
+      "sha256": "c40c834931d82f3658d177efe6ba1f58c8bf28d2259624caa90d767351023a0d"
+    },
+    {
+      "path": "scripts/ensembl_client.py",
+      "bytes": 3627,
+      "sha256": "a0267f7c08c562495a184ec38b67921a36e6b4d9bb4d04e9cf2db714a6e46e36"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 10688,
+      "sha256": "355f068b682b9bca47c050d5226f1870e5dc08b6a471ff47fe49acea5c5fa963"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4672,
+      "sha256": "4d76e667a97857718d1f25ca84f1071e6c45e4ea9e7a9c33e01f2ee3c6f424c5"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ]
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

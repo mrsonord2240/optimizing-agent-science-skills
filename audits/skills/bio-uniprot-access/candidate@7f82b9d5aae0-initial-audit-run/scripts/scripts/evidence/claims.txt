@@ -1,0 +1,29 @@
+--- fetch_entry_json on an inactive (deleted) accession A0A008APR2
+EXC KeyError: 'sequence'
+query gene:TP53 -> (200, '581')
+query gene_exact:TP53 -> (200, '557')
+query organism_id:9606 AND gene_exact:TP53 -> (200, '114')
+query organism_name:"Homo sapiens" AND gene_exact:TP53 -> (200, '114')
+query length:[100 TO 500] AND organism_id:9606 AND reviewed:true AND gene_exact:TP53 -> (200, '1')
+query go:0006915 AND organism_id:9606 AND reviewed:true -> (200, '545')
+query keyword:KW-0067 AND organism_id:9606 AND reviewed:true AND xref:pdb -> (200, '0')
+query database:pdb AND gene_exact:TP53 AND organism_id:9606 -> (200, '1')
+query ec:2.7.1.1 AND reviewed:true -> (200, '58')
+query existence:1 AND organism_id:9606 AND reviewed:true AND gene_exact:TP53 -> (200, '1')
+documented fields table in one request -> (400, None, "Error messages Invalid fields parameter value 'ft_active_site'")
+documented field names rejected by the service: [('ft_active_site', 400)]
+endpoint /uniprotkb/accessions: (200, '3', 'Entry P04637 P38398 P51587 ')
+endpoint /uniprotkb/P04637 (no suffix, JSON accept): (200, None, '{"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P04637","secondaryAccessions":["Q15086","Q1')
+single-entry suffix .json: 200
+single-entry suffix .fasta: 200
+single-entry suffix .tsv: 200
+single-entry suffix .xml: 200
+single-entry suffix .txt: 200
+single-entry suffix .gff: 200
+endpoint /uniref/search: (200, '3', '{"results":[{"id":"UniRef90_P04637"}]}')
+endpoint /proteomes/UP000005640: (200, None, '{"id":"UP000005640","description":"Homo sapiens (Homo sapiens sapiens) or modern humans are the only living sp')
+endpoint /taxonomy/9606: (200, None, '{"scientificName":"Homo sapiens","commonName":"Human","taxonId":9606,"mnemonic":"HUMAN","parent":{"scientificN')
+idmapping fields endpoint: (200, None)
+result-fields endpoint: (200, None)
+cursor paging: first page rows 500 ; Link next present: True
+second page rows 125 (total expected 625)

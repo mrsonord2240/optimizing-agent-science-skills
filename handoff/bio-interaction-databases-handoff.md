@@ -1,67 +1,62 @@
-# Handoff: bio-interaction-databases / prepare-scientific-skill-tooling
+# Handoff: bio-interaction-databases / fix-scientific-skill
 
-- Updated: 2026-10-02T23:28:06-07:00
-- Lane: 1
+> RUN PAUSED 2026-10-03 by Sam after the initial audit. Nothing is in flight. Resume at fix-scientific-skill; candidate is untracked and uncommitted in the working tree below.
+
+- Updated: 2026-10-03T00:30:00-07:00
+- Lane: 2
 - Status: ready-for-phase
-- Owner leaving: normalize worker (Sonnet), lane 1, batch database-access
-- Next role: prepare-scientific-skill-tooling
+- Owner leaving: initial-audit worker (Sonnet), lane 2, batch database-access light
+- Next role: fix-scientific-skill
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/interaction-databases (4 files, 35295 bytes, sha256-manifest-v1 e347b6761590b98eec7044ca28716da2576c696da27c6acf3b4a5101227a0d56)
+- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/interaction-databases
 - Working tree: F:\OpenScience\wt\dbaccess-interaction-databases\skills\bio-interaction-databases
 - Branch/worktree: fix/dbaccess-interaction-databases at 2f38178 (shelf main)
-- Candidate tree hash: 588996fc143fb0dc98a5558fce2db091e0905415fb9a80a8c4bc49419690be42 (sha256-manifest-v1, files=5, bytes=31873; `python tools/skill_preflight.py` = PASS)
-- Applicable audit: none
+- Candidate tree hash: 588996fc143fb0dc98a5558fce2db091e0905415fb9a80a8c4bc49419690be42 (sha256-manifest-v1, files=5, bytes=31873; unchanged, no pycache)
+- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-interaction-databases\candidate@588996fc143f-initial-audit-run\report.json (identity above)
 
 ## Completed this phase
 
-- Frontmatter made Marketplace-complete: `category: Data Analysis`, `license: MIT`, `author: GPTomics` (matches shelf siblings bio-entrez-fetch / bio-biomart-queries).
-- All files rewritten UTF-8, LF, no BOM; no __pycache__, dot paths, or nested LICENSE.
-- Structure: SKILL.md (decision matrix, per-resource semantics, licenses, failure modes) + usage-guide.md; STRING/BioGRID/SIGNOR/OmniPath/aggregation code consolidated into `scripts/interaction_clients.py`.
-- Structure: `examples/` (2 demos) import the client; PHYSICAL_LT_SYSTEMS is defined once.
-- Version drift against live services fixed (below). Preflight PASS with only the expected no-Skill-root-LICENSE warn (sibling convention; license in frontmatter). No near-duplicate warnings.
-
-## Runnable-surface inventory
-
-- `scripts/interaction_clients.py` (library). Functions: string_network, string_resolve_ids, biogrid_lt_physical, signor_for_gene, omnipath_interactions, aggregate_networks, summary, multi_source_edges.
-- `examples/string_network.py` (STRING tiers/channels/centrality), `examples/interaction_query.py` (DiGraph union; writes `aggregated_interactions.csv` to CWD).
-
-## Dependency clues
-
-- Python: requests 2.31+, pandas 2.2+, networkx 3.2+ (env: 2.34.2 / 2.3.3 / 3.4.2). `omnipath` pip client is mentioned only in usage-guide (not installed, not required). R STRINGdb/OmnipathR mentioned only.
-- BioGRID needs a free access key (HTTP 401 without); STRING/OmniPath/SIGNOR keyless. Hosts: version-12-5.string-db.org, omnipathdb.org, signor.uniroma2.it, webservice.thebiogrid.org.
-
-## Version drift resolved
-
-- STRING pin `version-12-0` -> `version-12-5` (live `/api/json/version` = 12.5; network TSV columns unchanged, verified). Claim 'version-11-5 deprecated/404' was false (host still answers with older data); reworded in SKILL.md and usage-guide.
-- Version Compatibility rewritten with live observations dated 2026-10-02.
+- Score 59 (static 67, exec 54.0, assertions 9/20), Reject by score only; no veto fired. Run dir: F:\OpenScience\audits\bio-interaction-databases\initial-audit-run\ (report.json, viewer.md with ordered ledger, source-identity.json, scripts/).
+- Executed STRING, OmniPath, BioGRID (with key), SIGNOR, aggregate_networks and both examples live; confirmed leads T1 (IDM-003), T2 (IDM-001); T3 strengthened to a license-compliance failure (IDM-002).
+- Key scan of run dir and published record: zero hits for the BioGRID key value; the only `accesskey=` text was a fake-key error URL, now redacted.
+- Published record; audits:index and audits:check pass.
 
 ## Required next actions
 
-1. Tooling: build/refresh the env for the dependencies above (staging at F:\OpenScience\audit-envs\database-access\, not modified here), map each surface to coverage, record the TOOLS.md fingerprint.
-2. Exercise the client functions and examples against live services; settle the ambiguities below before audit.
-3. The 2026-10-02 spot checks were ad hoc curl/Python calls, not audit evidence.
+1. Fix IDM-001 and IDM-002 (P0) first, then IDM-003, IDM-004 (P1), then IDM-005 .. IDM-009 (P2).
+2. After fixing, rerun scripts/run_string_omnipath.py, run_omnipath_license.py, run_biogrid.py (needs the key; never write it), run_examples.py. SIGNOR needs a regression with expected TP53 row count.
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| N1 | P2 | open | this handoff | SIGNOR contract (behavioral): `organism=human&entity=TP53` returns 'No result found.'; `organism=9606&entity=TP53` returns header-less rows in a different column layout and seemingly ignores `entity`; `organism=9606&id=P04637` filters. `signor_for_gene` parsing (header skip, cols 0-3, 7) is likely wrong. Left unchanged, flagged in SKILL.md; needs audit/fix decision. |
-| N2 | P2 | open | this handoff | BioGRID path untested (no key). OmniPath `types=post_translational` + `license=academic` returned data in a spot check. |
+| IDM-001 | P0 | open | evidence/string_omnipath.txt | signor_for_gene empty; use organism=9606&id=<UniProt>, headerless 29 cols (A col0, B col4, effect col8, mechanism col9, PMID col21); warn on 'No result found.' |
+| IDM-002 | P0 | open | evidence/omnipath_license.txt, omnipath_resources2.txt | license=commercial returns PhosphoSite/HPRD (academic); drop the claim or filter by /resources license purpose |
+| IDM-003 | P1 | open | evidence/examples.txt, string_network_patched.txt | queryItem -> queryIndex; later sections verified |
+| IDM-004 | P1 | open | evidence/string_omnipath.txt | escore>0.4 != network_type=physical (5 of 26 differ) |
+| IDM-005 | P2 | open | evidence/examples.txt | max_score STRING/1000 and invented 0.5/0.7 |
+| IDM-006 | P2 | open | evidence/biogrid.txt | aggregate_networks unions unequal scopes (1 vs 564 vs 1269 edges) |
+| IDM-007 | P2 | open | evidence/biogrid.txt | key in HTTPError URL; invalid key is 401; per-experiment rows |
+| IDM-008 | P2 | open | static | timeouts, STRING pacing, shared caller_identity, n_resources field |
+| IDM-009 | P2 | open | preflight warn | no Skill-root LICENSE |
 
 ## Environment and evidence
 
-- Tool inventory: none yet (tooling phase)
-- Run evidence: preflight output only; spot checks not retained
-- Restricted-access items: BioGRID API key
-- Tooling impact: changed (new importable client under scripts/; examples rewired to import it)
+- Tool inventory: F:\OpenScience\audits\bio-interaction-databases\TOOLS.md
+- Environment fingerprint: database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397
+- BioGRID key: F:\OpenScience\audit-envs\database-access\private\biogrid.env, variable BIOGRID_ACCESS_KEY; load at run time only
+- Run evidence: F:\OpenScience\audits\bio-interaction-databases\initial-audit-run\evidence\
+- Deferred/static-only: Reactome, HuRI, HuMAP, ConsensusPathDB, DIP, PhosphoSitePlus, IntAct client (liveness probe only), R clients
+- Restricted-access items: none
+- Tooling impact: none (no Skill bytes changed)
 
 ## Worktree safety
 
-- Run-owned changes: untracked `skills/bio-interaction-databases/` in F:\OpenScience\wt\dbaccess-interaction-databases (nothing staged or committed)
-- Pre-existing/user-owned changes: none
-- Records state: this handoff file only
+- Run-owned changes: run dir above; records under audits\skills\bio-interaction-databases\ and regenerated audits\INDEX/BACKLOG/STATUS (uncommitted)
+- Pre-existing/user-owned changes: F:\optimizing-agent-science-skills\test\validate.bats (untracked)
+- Records state: uncommitted paths above
 - Product commits/pushes: none
 
 ## Transition assertion

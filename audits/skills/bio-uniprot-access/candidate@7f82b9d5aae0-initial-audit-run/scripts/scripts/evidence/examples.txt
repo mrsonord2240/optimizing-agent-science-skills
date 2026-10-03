@@ -1,0 +1,60 @@
+=== examples/uniprot_query.py ===
+=== Single entry parse (P04637 / TP53) ===
+  accession      P04637
+  entry_name     P53_HUMAN
+  reviewed       True
+  protein_name   Cellular tumor antigen p53
+  gene_primary   TP53
+  sequence       MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKKGEPHHELPPGSTKRALPNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPGGSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD
+  length         393
+  pdb_count      311
+  pdb_ids        ['1A1U', '1AIE', '1C26', '1DT7', '1GZH', '1H26', '1HS5', '1JSP', '1KZY', '1MA3', '1OLG', '1OLH', '1PES', '1PET', '1SAE', '1SAF', '1SAK', '1SAL', '1TSR', '1TUP', '1UOL', '1XQH', '1YC5', '1YCQ', '1YCR', '1YCS', '2AC0', '2ADY', '2AHI', '2ATA', '2B3G', '2BIM', '2BIN', '2BIO', '2BIP', '2BIQ', '2F1X', '2FEJ', '2FOJ', '2FOO', '2GS0', '2H1L', '2H2D', '2H2F', '2H4F', '2H4H', '2H4J', '2H59', '2J0Z', '2J10', '2J11', '2J1W', '2J1X', '2J1Y', '2J1Z', '2J20', '2J21', '2K8F', '2L14', '2LY4', '2MEJ', '2MWO', '2MWP', '2MWY', '2MZD', '2OCJ', '2PCX', '2RUK', '2V5W', '2VUK', '2WGX', '2X0U', '2X0V', '2X0W', '2XWR', '2YBG', '2YDR', '2Z5S', '2Z5T', '3D05', '3D06', '3D07', '3D08', '3D09', '3D0A', '3DAB', '3DAC', '3IGK', '3IGL', '3KMD', '3KZ8', '3LW1', '3OQ5', '3PDH', '3Q01', '3Q05', '3Q06', '3SAK', '3TG5', '3TS8', '3ZME', '4AGL', '4AGM', '4AGN', '4AGO', '4AGP', '4AGQ', '4BUZ', '4BV2', '4FZ3', '4HFZ', '4HJE', '4IBQ', '4IBS', '4IBT', '4IBU', '4IBV', '4IBW', '4IBY', '4IBZ', '4IJT', '4KVP', '4LO9', '4LOE', '4LOF', '4MZI', '4MZR', '4QO1', '4RP6', '4RP7', '4X34', '4XR8', '4ZZJ', '5A7B', '5AB9', '5ABA', '5AOI', '5AOJ', '5AOK', '5AOL', '5AOM', '5BUA', '5ECG', '5G4M', '5G4N', '5G4O', '5HOU', '5HP0', '5HPD', '5LAP', '5LGY', '5MCT', '5MCU', '5MCV', '5MCW', '5MF7', '5MG7', '5MHC', '5MOC', '5O1A', '5O1B', '5O1C', '5O1D', '5O1E', '5O1F', '5O1G', '5O1H', '5O1I', '5OL0', '5UN8', '5XZC', '6FF9', '6FJ5', '6GGA', '6GGB', '6GGC', '6GGD', '6GGE', '6GGF', '6LHD', '6R5L', '6RJZ', '6RK8', '6RKI', '6RKK', '6RKM', '6RL3', '6RL4', '6RL6', '6RM5', '6RM7', '6RWH', '6RWI', '6RWS', '6RWU', '6RX2', '6RZ3', '6S39', '6S3C', '6S40', '6S9Q', '6SHZ', '6SI0', '6SI1', '6SI2', '6SI3', '6SI4', '6SIN', '6SIO', '6SIP', '6SIQ', '6SL6', '6SLV', '6T58', '6V4F', '6V4H', '6VQO', '6VR1', '6VR5', '6VRM', '6VRN', '6W51', '6XRE', '6ZNC', '7B46', '7B47', '7B48', '7B49', '7B4A', '7B4B', '7B4C', '7B4D', '7B4E', '7B4F', '7B4G', '7B4H', '7B4N', '7BWN', '7DHY', '7DHZ', '7DVD', '7EAX', '7EDS', '7EEU', '7EL4', '7NMI', '7RM4', '7V97', '7XZX', '7XZZ', '7YGI', '8A31', '8A32', '8A92', '8CG7', '8DC4', '8DC6', '8DC7', '8DC8', '8E7A', '8E7B', '8GCR', '8HLL', '8HLM', '8HLN', '8J8N', '8OXM', '8OXO', '8QWK', '8QWL', '8QWM', '8QWN', '8QWO', '8QWP', '8R1F', '8R1G', '8RBA', '8RBB', '8RBC', '8RCI', '8UQR', '8WD2', '8XCB', '8XCE', '8XP5', '9BR3', '9BR4', '9C5S', '9CHT', '9FZB', '9G5H', '9G6T', '9G6U', '9R04', '9R2M', '9R2P', '9R2Q', '9S9L', '9S9M', '9S9N', '9S9O', '9S9P', '9S9Q', '9S9R', '9SPM', '9SPN', '9SPO', '9SPP', '9SPQ', '9SPR', '9SPS']
+  alphafold_id   P04637
+
+=== Bulk search with fields= (human reviewed kinases) ===
+  500 reviewed human kinases
+ Entry Gene Names (primary)                                                                                                                                                                                                      Protein names  Length                                                                                                                                                                                                                                                                                                                                                                                                    PDB
+P33981                  TTK                                                                                                          Dual specificity protein kinase TTK (EC 2.7.12.1) (Phosphotyrosine picked threonine-protein kinase) (PYT)     857 2X9E;2ZMC;2ZMD;3CEK;3DBQ;3GFW;3H9F;3HMN;3HMO;3HMP;3VQU;3W1F;3WYX;3WYY;3WZJ;3WZK;4B94;4BHZ;4BI0;4BI1;4BI2;4C4E;4C4F;4C4G;4C4H;4C4I;4C4J;4CV8;4CV9;4CVA;4D2S;4H7X;4H7Y;4JS8;4JT3;4O6L;4ZEG;5AP0;5AP1;5AP2;5AP3;5AP4;5AP5;5AP6;5AP7;5EH0;5EHL;5EHO;5EHY;5EI2;5EI6;5EI8;5LJJ;5MRB;5N7V;5N84;5N87;5N93;5N9S;5NA0;5NAD;5NTT;5O91;6B4W;6GVJ;6H3K;6N6O;6TN9;6TNB;6TNC;6TND;7CHM;7CHN;7CHT;7CIL;7CJA;7CLH;7LQD;
+P49761                 CLK3                                                                                                                                             Dual specificity protein kinase CLK3 (EC 2.7.12.1) (CDC-like kinase 3)     490                                                                                                                                                                                                                                                                                         29MO;29MP;2EU9;2EXE;2WU6;2WU7;3RAW;6FT7;6FYP;6FYR;6KHF;6RCT;6YTW;6YTY;6YU1;6Z2V;6Z51;6Z52;6Z53;6Z54;6Z55;9EZ3;
+Q6XUX3                DSTYK     Dual serine/threonine and tyrosine protein kinase (EC 2.7.12.1) (Dusty protein kinase) (Dusty PK) (RIP-homologous kinase) (Receptor-interacting serine/threonine-protein kinase 5) (Sugen kinase 496) (SgK496)     929                                                                                                                                                                                                                                                                                                                                                                                                    NaN
+Q92630                DYRK2                                                                                                                                         Dual specificity tyrosine-phosphorylation-regulated kinase 2 (EC 2.7.12.1)     601                                                                                                                                                                                                                                                                     3K2L;3KVW;4AZF;5LXC;5LXD;5ZTN;6HDP;6HDR;6K0J;7AKF;7AKH;7DG4;7DH3;7DH9;7DHC;7DHH;7DHK;7DHN;7DHO;7DHV;7DJO;7DL6;7EJV;8HLT;9KQY;9MC0;
+P46734               MAP2K3 Dual specificity mitogen-activated protein kinase kinase 3 (MAP kinase kinase 3) (MAPKK 3) (EC 2.7.12.2) (MAPK/ERK kinase 3) (MEK 3) (Stress-activated protein kinase kinase 2) (SAPK kinase 2) (SAPKK-2) (SAPKK2)     347                                                                                                                                                                                                                                                                                                                                                                                                    NaN
+
+=== Stream for >500 results (all human Swiss-Prot reviewed) ===
+  All human Swiss-Prot: 20431
+
+=== ID Mapping: Ensembl Gene -> UniProt ===
+  ENSG00000141510        -> P04637
+  ENSG00000141510        -> A0A087WT22
+  ENSG00000141510        -> A0A087WXZ1
+  ENSG00000141510        -> A0A087X1Q1
+  ENSG00000141510        -> A0A0U1RQC9
+  ENSG00000141510        -> A0A386NBZ1
+  ENSG00000141510        -> A0AAQ5BHX5
+  ENSG00000141510        -> A0AAQ5BHY1
+  ENSG00000141510        -> A0AAQ5BHZ9
+  ENSG00000141510        -> A0ACI8UM01
+  ENSG00000141510        -> E7EMR6
+  ENSG00000141510        -> E7EQX7
+  ENSG00000141510        -> E7ESS1
+  ENSG00000141510        -> E9PCY9
+  ENSG00000141510        -> E9PFT5
+  ENSG00000141510        -> I3L0W9
+  ENSG00000141510        -> J3KP33
+  ENSG00000141510        -> S4R334
+  ENSG00000171862        -> P60484
+  ENSG00000171862        -> A0A087X033
+  ENSG00000171862        -> A0A8I5KR36
+  ENSG00000171862        -> A0A8I5KSF9
+  ENSG00000171862        -> A0A8I5KVQ8
+  ENSG00000171862        -> A0A8V8TP77Traceback (most recent call last):
+  File "F:\OpenScience\audits\bio-uniprot-access\initial-audit-run\scripts\run_examples.py", line 8, in <module>
+    runpy.run_path(os.path.join(CAND, 'examples', f'{name}.py'), run_name='__main__')
+TypeError: unsupported format string passed to list.__format__
+
+  ENSG00000171862        -> A0A8V8TPK6
+EXIT 0
+=== examples/isoforms_and_xrefs.py ===
+=== TP53 isoforms (P04637) ===
+Found 9 isoforms:
+EXIT 1

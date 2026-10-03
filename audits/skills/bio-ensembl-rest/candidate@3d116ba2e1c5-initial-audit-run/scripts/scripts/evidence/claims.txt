@@ -1,0 +1,56 @@
+--- /info/divisions
+    ['EnsemblVertebrates', 'EnsemblBacteria', 'EnsemblProtists', 'EnsemblMetazoa', 'EnsemblPlants', 'EnsemblFungi']
+--- /info/species?division=EnsemblPlants count + arabidopsis
+    (267, ['arabidopsis_halleri', 'arabidopsis_thaliana', 'arabidopsis_lyrata'])
+--- lookup arabidopsis_thaliana NAC001
+    (200, '{"description":"NAC domain containing protein 1 [Source:NCBI gene (formerly Entrezgene);Acc:839580]","logic_name":"araport11","species":"arabidopsis_thaliana","end":5899,"seq_region_name":"1","source":"araport11","start":3631,"dis')
+--- rest.ensemblgenomes.org DNS
+    ('EXC', "SSLError: HTTPSConnectionPool(host='rest.ensemblgenomes.org', port=443): Max retries exceeded with url: /info/ping (Caused by SSLError(SSLCertVerificationError(")
+--- Homo_sapiens capitalised
+    (200, '{"logic_name":"ensembl_havana_gene_homo_sapiens","display_name":"BRCA1","version":28,"end":43170245,"source":"ensembl_havana","id":"ENSG00000012048","seq_region_name":"17","description":"BRCA1 DNA repair associated [Source:HGNC Sy')
+--- homo_sapiens
+    200
+--- MARCH1 (documented 404)
+    (400, '{"error":"No valid lookup found for symbol MARCH1"}')
+--- MARCHF1
+    200
+--- SEPT7 old symbol
+    (400, '{"error":"No valid lookup found for symbol SEPT7"}')
+--- xrefs/symbol/human/BRCA1
+    ('EXC', "ReadTimeout: HTTPSConnectionPool(host='rest.ensembl.org', port=443): Read timed out. (read timeout=40)")
+--- overlap/id without feature
+    (400, '{"error":"No feature given. Please specify a feature to retrieve from this service"}')
+--- overlap/id?feature=transcript
+    200
+--- variation/human/rs699
+    (200, '{"name":"rs699","MAF":null,"mappings":[{"strand":1,"ancestral_allele":"G","end":230710048,"start":230710048,"assembly_name":"GRCh38","location":"1:230710048-230710048","seq_region_name":"1","allele_string":"A/G","coord_system":"ch')
+--- regulatory table form /regulatory/species/human/feature/ENSR00000000001
+    (404, '{"error":"page not found. Please check your uri and refer to our documentation https://rest.ensembl.org/"}')
+--- regulatory actual form /regulatory/human/ENSR00000000001
+    (404, '{"error":"page not found. Please check your uri and refer to our documentation https://rest.ensembl.org/"}')
+--- regulatory /regulatory/species/human/id/ENSR00000000001
+    (404, '{"error":"page not found. Please check your uri and refer to our documentation https://rest.ensembl.org/"}')
+--- genetree/id with member? /genetree/member/id/ENSG00000012048
+    404
+--- homology/id
+    200
+--- homology/id (usage as in SKILL.md, no species)
+    (404, '{"error":"page not found. Please check your uri and refer to our documentation https://rest.ensembl.org/"}')
+--- ga4gh/features/search? ping
+    404
+--- POST /lookup/id batch
+    (200, {'ENSG00000141510': 'TP53', 'ENSG00000012048': 'BRCA1'})
+--- archive e110 /info/data (follows redirect)
+    (200, '{"releases":[110]}')
+--- archive e111 /info/data (follows redirect)
+    (200, '{"releases":[111]}')
+--- archive e116 /info/data (follows redirect)
+    (503, '<!doctype html>\r <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->\r <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->\r <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en">')
+--- archive e90 /info/data (follows redirect)
+    (200, '<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><link rel="preload" as="script" fetchPriority="low" href="/static/client.7b4b65ae754bec5966cb.js"/><link rel="preload" as="script" fetchPriority="low" href="/static/vendo')
+--- jun2026 host direct
+    (503, '<!doctype html>\r <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->\r <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->\r <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en">')
+--- jul2023 host direct
+    (200, '{"ping":1}')
+--- region example with 1000 base window VEP
+    200

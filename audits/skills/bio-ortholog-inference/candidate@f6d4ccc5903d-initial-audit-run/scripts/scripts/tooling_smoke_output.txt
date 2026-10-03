@@ -1,0 +1,18 @@
+PASS Compara resolve_symbol | human TP53=ENSG00000141510 mouse Trp53=ENSMUSG00000059552
+PASS Compara MARCH1->MARCHF1 | MARCH1 HTTP 400; MARCHF1 -> ENSG00000145416
+PASS compara_orthologs TP53 human->mouse | [{'source_id': 'ENSG00000141510', 'source_pid': 77.3537, 'target_species': 'mus_musculus', 'target_id': 'ENSMUSG00000059552', 'target_pid': 77.9487, 'type': 'ortholog_one2one', 'confidence': None}]
+PASS compara_one2one Trp53 | {'source_id': 'ENSMUSG00000059552', 'source_pid': 77.9487, 'target_species': 'homo_sapiens', 'target_id': 'ENSG00000141510', 'target_pid': 77.3537, 'type': 'ortholog_one2one', 'confidence': None}
+PASS batch_compara zebrafish + bad symbol | rows=4 types={'ortholog_one2many': 2, 'ortholog_one2one': 1, nan: 1} errors=1; zebrafish tp53=['ENSDARG00000035559']
+PASS orthodb_groups BRCA1 | 100 groups, first=['733642at2759', '4931607at2759', '1835377at33208']
+PASS orthodb_orthologs mouse level | OBSERVED orthodb_orthologs (mouse level) per group: {'4837993at2759': '6 items, non-None=0', '4219792at2759': "EXC TypeError: 'NoneType' object is not iterable", '1464927at33208': "EXC TypeError: 'NoneType' object is not iterable", '672820at7742': "EXC TypeError: 'NoneType' object is not iterable", '672820at32523': "EXC TypeError: 'NoneType' object is not iterable"}
+PASS OMA /version | OBSERVED OMA /version HTTP 502 '<!DOCTYPE html>\n<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->\n<!--[if I'
+PASS OMA orthologs P38398 | OMA orthologs n=0 mouse=[]
+PASS OMA protein P38398 | OBSERVED OMA protein HTTP 502 after retries
+PASS KEGG ko_for_gene | hsa:7157 -> ['K04451']; mmu:22059 (Trp53) -> ['K04451']
+PASS KEGG genes_for_ko/ko_info | 548 members, 446 species; info first line=['ENTRY       K04451                      KO', 'SYMBOL      TP53, P53']
+PASS PANTHER liveness | PANTHER (no client function; liveness) P04637 -> Tp53 MOUSE|MGI=MGI=98834|UniProtKB=P02340 v19
+FAIL eggNOG API | EXC SSLError: HTTPSConnectionPool(host='eggnog6.embl.de', port=443): Max retries exceeded with url: /api/ (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, 
+PASS HomoloGene efetch | OBSERVED HomoloGene efetch HTTP 400 'Database%3A+homologene+-+is+not+supported\n'
+FAIL example compara_orthologs.py | EXC TimeoutExpired: Command '['F:\\OpenScience\\audit-envs\\database-access\\Scripts\\python.exe', '-B', 'F:\\OpenScience\\wt\\dbaccess-ortholog-inference\\skills\\bio-ortholog-inference\\examples\\compara_orthologs.py']' timed out after 30
+PASS example kegg_orthology.py | example kegg_orthology.py exit=0
+FAIL example cross_resource.py | example cross_resource.py exit=143

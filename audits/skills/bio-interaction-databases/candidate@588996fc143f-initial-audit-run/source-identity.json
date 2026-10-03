@@ -1,0 +1,55 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/interaction-databases",
+    "subtree": "249aaeefc35d2b75f343c8539fa076adb8f12c17",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "fix/dbaccess-interaction-databases",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "path": "F:\\OpenScience\\wt\\dbaccess-interaction-databases\\skills\\bio-interaction-databases",
+    "content_sha256": "588996fc143fb0dc98a5558fce2db091e0905415fb9a80a8c4bc49419690be42",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-interaction-databases/",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 31873
+    }
+  },
+  "files": [
+    {
+      "path": "examples/interaction_query.py",
+      "bytes": 3709,
+      "sha256": "88397885eb0be033bbc07cac9aff7216afa9eae9dd8956d84bc1c8edb30192eb"
+    },
+    {
+      "path": "examples/string_network.py",
+      "bytes": 2237,
+      "sha256": "4e220ea19c3699f424469923248324a9af994a0063bf558f934e904f35498f96"
+    },
+    {
+      "path": "scripts/interaction_clients.py",
+      "bytes": 5728,
+      "sha256": "99dcb7838d0fc6f1afd0c28fbbf03877de2c59713ea78125001ca83027fc99bf"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 14580,
+      "sha256": "8d640c2117c5020d41232d039124e621f8324a7c06dcac37649498feb1f88a13"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 5619,
+      "sha256": "272653a9a63e1d304e96af772da70faf608f168f44e518458f63ba55f86783c4"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ]
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

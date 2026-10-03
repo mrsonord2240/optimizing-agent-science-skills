@@ -1,0 +1,39 @@
+exit=0
+=== Human TP53 (Gene ID 7157) -> KEGG Orthology ===
+KOs: ['K04451']
+
+=== KO K04451 info (truncated) ===
+  ENTRY       K04451                      KO
+  SYMBOL      TP53, P53
+  NAME        tumor protein p53
+  PATHWAY     map01522  Endocrine resistance
+              map01524  Platinum drug resistance
+              map03440  Homologous recombination
+              map04010  MAPK signaling pathway
+              map04071  Sphingolipid signaling pathway
+              map04110  Cell cycle
+              map04115  p53 signaling pathway
+              map04137  Mitophagy - animal
+              map04151  PI3K-Akt signaling pathway
+              map04210  Apoptosis
+              map04211  Longevity regulating pathway
+              map04216  Ferroptosis
+
+=== Members of K04451 across all species ===
+Total members: 548
+Species represented: 446
+Top species by member count:
+    cgib: 4
+    mcep: 4
+     xen: 4
+    asao: 3
+    ccar: 3
+    caua: 3
+    masi: 3
+    char: 3
+    bspl: 3
+    sasa: 3
+
+=== License note ===
+KEGG REST API: free for academic use; commercial use requires paid license.
+For commercial workflows, prefer eggNOG (permissive) or OrthoDB.

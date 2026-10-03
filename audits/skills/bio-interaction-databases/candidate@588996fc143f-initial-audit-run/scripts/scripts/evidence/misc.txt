@@ -1,0 +1,6 @@
+--- STRING version-11-5 host
+(200, '[{"string_version": "11.5", "stable_address": "https://version-11-5.string-db.org"}]')
+--- IntAct findInteractions/P04637 (liveness; no client function ships)
+(200, 2243, [('Q9UER7 (uniprotkb)', 'P04637 (uniprotkb)')])
+--- BioGRID total rows for a very large gene vs the client max=10000
+{'UBC': '4551', 'TP53': '6108'}

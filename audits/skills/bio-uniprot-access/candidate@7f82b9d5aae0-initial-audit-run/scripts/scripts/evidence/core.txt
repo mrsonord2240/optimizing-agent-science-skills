@@ -1,0 +1,28 @@
+--- release + Swiss-Prot / TrEMBL totals
+{'reviewed': (575748, '2026_03'), 'unreviewed': (149430635, '2026_03')}
+--- fetch_entry_json P04637
+{'accession': 'P04637', 'entry_name': 'P53_HUMAN', 'reviewed': True, 'protein_name': 'Cellular tumor antigen p53', 'gene_primary': 'TP53', 'sequence': 'MEEPQSDPSVEP', 'length': 393, 'pdb_count': 311, 'pdb_ids': ['1A1U', '1AIE', '1C26', '1DT7', '1GZH'], 'alphafold_id': 'P04637'}
+--- fetch_entry_json on an unreviewed entry
+{'acc': 'A0A0A0MS99', 'reviewed': False, 'protein_name': 'Multidrug resistance-associated protein 1', 'has_submissionNames': False, 'gene_primary': 'ABCC1'}
+--- fetch_entry_json on a secondary accession (Q15086)
+('P04637', 'TP53')
+--- is there a way to list inactive entries
+(200, '{"results":[{"entryType":"Inactive","primaryAccession":"A0A008APR2","inactiveReason":{"inactiveReasonType":"DELETED","deletedReason":"Not part of a reference proteome"},"extraAttributes":{"uniParcId":')
+--- search_tsv kinases (documented quickstart + shipped example)
+{'search_tsv rows': 500, 'server total for the same query': (640, '2026_03'), 'KW-0418 total': (625, '2026_03'), 'columns': ['Entry', 'Gene Names (primary)', 'Protein names', 'Length', 'PDB'], 'head': [{'Entry': 'P33981', 'Gene Names (primary)': 'TTK', 'Protein names': 'Dual specificity protein kinase TTK (EC 2.7.12.1) (Phosphotyrosine picked threonine-protein kinase) (PYT)', 'Length': 857, 'PDB': '2X9E;2ZMC;2ZMD;3CEK;3DBQ;3GFW;3H9F;3HMN;3HMO;3HMP;3VQU;3W1F;3WYX;3WYY;3WZJ;3WZK;4B94;4BHZ;4BI0;4BI1;4BI2;4C4E;4C4F;4C4G;4C4H;4C4I;4C4J;4CV8;4CV9;4CVA;4D2S;4H7X;4H7Y;4JS8;4JT3;4O6L;4ZEG;5AP0;5AP1;5AP2;5AP3;5AP4;5AP5;5AP6;5AP7;5EH0;5EHL;5EHO;5EHY;5EI2;5EI6;5EI8;5LJJ;5MRB;5N7V;5N84;5N87;5N93;5N9S;5NA0;5NAD;5NTT;5O91;6B4W;6GVJ;6H3K;6N6O;6TN9;6TNB;6TNC;6TND;7CHM;7CHN;7CHT;7CIL;7CJA;7CLH;7LQD;'}, {'Entry': 'P49761', 'Gene Names (primary)': 'CLK3', 'Protein names': 'Dual specificity protein kinase CLK3 (EC 2.7.12.1) (CDC-like kinase 3)', 'Length': 490, 'PDB': '29MO;29MP;2EU9;2EXE;2WU6;2WU7;3RAW;6FT7;6FYP;6FYR;6KHF;6RCT;6YTW;6YTY;6YU1;6Z2V;6Z51;6Z52;6Z53;6Z54;6Z55;9EZ3;'}]}
+--- stream_tsv human Swiss-Prot
+{'rows': 20431, 'server total': (20431, '2026_03'), 'P04637 present': True, 'dup accessions': 0}
+--- map_ids Ensembl gene -> UniProtKB (shipped example input) vs idmapping/stream
+{'client rows': 25, 'client per-id counts': {'ENSG00000141510': 18, 'ENSG00000171862': 7}, 'client failedIds': None, 'stream rows': 44, 'stream per-id counts': {'ENSG00000141510': 18, 'ENSG00000171862': 12, 'ENSG00000139618': 14}, 'X-Total-Results (results endpoint)': '44', 'Link header present (next page)': True, 'ids with zero rows in client output': ['ENSG00000139618']}
+--- resolve_obsolete (secondary accession Q15086 and current P04637)
+([('Q15086', 'P04637'), ('P04637', 'P04637')], None)
+--- map_ids invalid from_db
+HTTPError: 400 Client Error:  for url: https://rest.uniprot.org/idmapping/run
+--- list_isoforms + fetch_isoform_fasta for every P04637 isoform
+{'n': 9, 'canonical': [['P04637-1']], 'ids': [['P04637-1'], ['P04637-2'], ['P04637-3'], ['P04637-4'], ['P04637-5'], ['P04637-6'], ['P04637-7'], ['P04637-8'], ['P04637-9']], 'ids type': 'list', 'fasta lengths': {'P04637-1': 393, 'P04637-2': 341, 'P04637-3': 346, 'P04637-4': 354, 'P04637-5': 302, 'P04637-6': 307, 'P04637-7': 261, 'P04637-8': 209, 'P04637-9': 214}}
+--- xref_summary vs xref_pdb field
+{'n_dbs': 104, 'PDB': 311, 'Ensembl': 22, 'xref_pdb TSV count': 311}
+--- uniref_cluster
+{'client': {'id': 'UniRef50_P04637', 'representative': 'P53_HUMAN', 'member_count': 290, 'identity': 'UniRef50'}, 'identity field in JSON': None, 'entryType': 'UniRef50', 'representative accessions': ['P04637', 'Q15086', 'Q15087', 'Q15088', 'Q16535', 'Q16807', 'Q16808', 'Q16809', 'Q16810', 'Q16811', 'Q16848', 'Q2XN98', 'Q3LRW1', 'Q3LRW2', 'Q3LRW3', 'Q3LRW4', 'Q3LRW5', 'Q86UG1', 'Q8J016', 'Q99659', 'Q9BTM4', 'Q9HAQ8', 'Q9NP68', 'Q9NPJ2', 'Q9NZD0', 'Q9UBI2', 'Q9UQ61'], 'memberIdType': 'UniProtKB ID'}
+--- download_proteome documented route versus the stream route
+{'documented route status': 400, 'documented body': '{"url":"http://rest.uniprot.org/proteomes/UP000000625.fasta.gz","messages":["The \'upid\' value has invalid format. It should be a valid Proteome UPID"]', 'client': 'HTTPError: 400 Client Error: Bad Request for url: https://rest.uniprot.org/proteomes/UP000000625.fasta.gz', 'stream route status': 200, 'stream gzip magic': '1f8b'}

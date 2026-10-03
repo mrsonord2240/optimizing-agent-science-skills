@@ -1,0 +1,12 @@
+--- TP53 total BioGRID rows (count endpoint)
+{'count includeInteractors=True': '6108', 'count includeInteractors=False': '34'}
+--- TP53 rows via the client request shape
+{'rows returned (max=10000)': 6108, 'rows involving TP53': 6108, 'throughput': {'Low Throughput': 3795, 'High Throughput': 2309, 'Low Throughput|High Throughput': 4}, 'organisms A': {9606: 6003, 10090: 25, 333760: 19}, 'evidence types': {'physical': 5720, 'genetic': 388}}
+--- TP53 LT physical filter versus BioGRID EXPERIMENTAL_SYSTEM_TYPE
+{'rows': 34, 'LT physical rows (EXPERIMENTAL_SYSTEM_TYPE=physical)': 28, 'of which in PHYSICAL_LT_SYSTEMS': 28, 'LT physical systems excluded by the set': {}, 'in-set systems that are not physical type': {}}
+--- biogrid_lt_physical TP53 shape (client)
+{'rows': 3081, 'unique gene pairs': 831, 'rows involving TP53': 3081, 'rows not involving TP53': 0}
+--- invalid key behaviour (fake key, not the real one)
+('client raised HTTPError: 401 Client Error: Unauthorized for url: https://webservice.thebiogrid.org/interactions/?accesskey=<REDACTED>', 401, '{"STATUS":"ERROR","MESSAGES":["Your Access Key is Not Valid. This might be because you have not yet registered, or possi')
+--- aggregate_networks TP53+MDM2 with BioGRID
+{'summary': {'nodes': 1372, 'edges': 1621, 'density': 0.0017235403070262178, 'components': 1, 'mean_degree': 2.3629737609329444}, 'edges per source (total, both endpoints in query list)': {'STRING': (1, 1), 'BioGRID-LT-physical': (1269, 3), 'OmniPath': (564, 1)}, 'multi_source_edges': [('MDM2', 'TP53', ['BioGRID-LT-physical', 'OmniPath', 'STRING']), ('MDM2', 'RRM2B', ['BioGRID-LT-physical', 'OmniPath']), ('MDM2', 'USP7', ['BioGRID-LT-physical', 'OmniPath']), ('MDM2', 'JMY', ['BioGRID-LT-physical', 'OmniPath']), ('MDM2', 'GSK3B', ['BioGRID-LT-physical', 'OmniPath'])]}

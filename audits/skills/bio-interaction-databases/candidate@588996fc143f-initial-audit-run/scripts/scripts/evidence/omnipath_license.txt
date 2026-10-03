@@ -1,0 +1,9 @@
+columns: ['source', 'target', 'source_genesymbol', 'target_genesymbol', 'is_directed', 'is_stimulation', 'is_inhibition', 'consensus_direction', 'consensus_stimulation', 'consensus_inhibition', 'sources', 'references', 'curation_effort']
+academic rows 344
+license=academic: HTTP 200 rows=344 n_sources=40
+license=commercial: HTTP 200 rows=344 n_sources=40
+license=ignore: HTTP 200 rows=344 n_sources=40
+license=bogus: HTTP 200 rows=7 n_sources=0
+sources only in academic (not in commercial): []
+about: 200 Hello, this is the omnipath-server 0.1.5. Welcome! For the descriptions of pathway resources go to `/info`. Available qu
+license arg documented: True {"header": null, "format": ["json", "query", "raw", "tab", "table", "text", "tsv"], "license": ["academic", "commercial", "for_profit", "forprofit", "ignore", "non_profit", "nonprofit"], "password": n

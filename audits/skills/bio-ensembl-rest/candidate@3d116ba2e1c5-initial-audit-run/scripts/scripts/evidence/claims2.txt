@@ -1,0 +1,5 @@
+regulatory overlap in BRCA1 promoter window: []
+xrefs/symbol retry: (200, '[{"id":"ENSG00000012048","type":"gene"},{"id":"LRG_292","type":"gene"}]')
+homology/id/human/ID: (200, '{"data":[{"homologies":[{"target":{"align_seq":"MDLSAVQIQEVQNVLHAMQKILECPICLELIKEPVSTKCDHIFCKFCMLKLLNQKKGPSQCPLCKNEITKRSLQGSTRFSQLAEELLRIMAAFELDTGMQLTNGFSFSKKRNNSCERLNEEASIIQSVGYRNRVRRLPQVEPGNATL-KDSL')
+client on e90 archive -> JSONDecodeError Expecting value: line 1 column 1 (char 0)
+jun2026 host again: 503

@@ -1,0 +1,14 @@
+exit=1
+=== Compara: BRCA1 human -> mouse ===
+  1 hits: ['ENSMUSG00000017146']
+
+=== OMA: BRCA1 (UniProt P38398) human -> mouse ===
+Traceback (most recent call last):
+  File "F:\OpenScience\wt\dbaccess-ortholog-inference\skills\bio-ortholog-inference\examples\cross_resource.py", line 21, in <module>
+    oma_hits = [o.get('canonicalid') or o.get('omaid') for o in oma_orthologs('P38398')]
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ortholog-inference\skills\bio-ortholog-inference\examples\..\scripts\ortholog_clients.py", line 105, in oma_orthologs
+    r.raise_for_status()
+  File "F:\OpenScience\audit-envs\database-access\Lib\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 502 Server Error: Bad Gateway for url: https://omabrowser.org/api/protein/P38398/orthologs/

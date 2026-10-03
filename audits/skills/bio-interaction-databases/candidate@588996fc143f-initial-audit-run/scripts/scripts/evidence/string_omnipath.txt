@@ -1,0 +1,24 @@
+--- STRING version endpoint
+[{'string_version': '12.5', 'stable_address': 'https://string-db.org'}]
+--- string_resolve_ids columns + rows
+(['queryIndex', 'stringId', 'ncbiTaxonId', 'taxonName', 'preferredName', 'annotation'], 10, [{'queryIndex': 0, 'preferredName': 'TP53', 'stringId': '9606.ENSP00000269305'}, {'queryIndex': 1, 'preferredName': 'BRCA1', 'stringId': '9606.ENSP00000418960'}, {'queryIndex': 2, 'preferredName': 'MDM2', 'stringId': '9606.ENSP00000258149'}, {'queryIndex': 3, 'preferredName': 'ATM', 'stringId': '9606.ENSP00000278616'}])
+--- multi-identifier encoding as sent by the client
+('identifiers=TP53%250dMDM2%250dATM&species=9606&caller_identity=bioskills-2026', 3, ['TP53', 'MDM2', 'ATM'])
+--- string_network threshold 700
+(['stringId_A', 'stringId_B', 'preferredName_A', 'preferredName_B', 'ncbiTaxonId', 'score', 'nscore', 'fscore', 'pscore', 'ascore', 'escore', 'dscore', 'tscore'], 35, 'preferredName_A preferredName_B  score  escore  dscore  tscore\n           MDM2             BAX  0.732   0.000    0.00   0.721\n           MDM2           BRCA1  0.732   0.229    0.00   0.667\n           MDM2            BCL2  0.758   0.000    0.00   0.757\n           MDM2            CDK2  0.859   0.131    0.40   0.752\n           MDM2           CHEK2  0.994   0.918    0.75   0.728')
+--- confidence tiers edge counts (400/700/900)
+{400: 45, 700: 35, 900: 23}
+--- SKILL.md physical proxy (escore>0.4) vs STRING network_type=physical
+{'physical_network_edges@700': 22, 'escore>0.4 edges@700 (guide physical proxy)': 26, 'in escore not in physical network': [('BCL2', 'CDK2'), ('BRCA1', 'CDKN1A'), ('CDKN1A', 'CHEK2'), ('CDKN1A', 'RB1'), ('CHEK2', 'RB1')], 'in physical network not escore>0.4': [('ATM', 'CDK2')]}
+--- omnipath TP53 academic vs commercial
+{'academic': (344, ['source', 'target', 'source_genesymbol', 'target_genesymbol', 'is_directed', 'is_stimulation']), 'commercial': (344, ['source', 'target', 'source_genesymbol', 'target_genesymbol', 'is_directed', 'is_stimulation'])}
+--- omnipath raw license parameter (all default dataset)
+{'academic': 344, 'commercial': 344, 'raw url tail': 'partners=TP53&genesymbols=1&license=commercial&fields=sources'}
+--- omnipath MDM2->TP53 edge fields
+EXC KeyError: 'n_resources'
+--- signor_for_gene(TP53) via the client
+(0, [])
+--- SIGNOR raw behaviours
+{'organism=human&entity=TP53': (200, 'No result found.'), 'organism=9606&id=P04637': (200, 333, 29), 'first row cols 0-11': ['DUSP26', 'protein', 'Q9BV47', 'UNIPROT', 'TP53', 'protein', 'P04637', 'UNIPROT', 'down-regulates activity', 'dephosphorylation', 'Ser37', 'NVLSPLPsQAMDDLM'], 'tf cols': [(21, '20562916')], 'all rows involve P04637': True}
+--- SIGNOR first row after client-style parse (header skipped)
+client drops line 0 as header; the raw response has no header, so one real record is lost per query

@@ -1,0 +1,16 @@
+{"search": {
+    "product": {
+        "version": 19,
+        "content": "PANTHERDB"
+    },
+    "mapping": {"mapped": {
+        "target_gene_symbol": "Tp53",
+        "persistent_id": "PTN002479088",
+        "target_persistent_id": "PTN000154807",
+        "ortholog": "LDO",
+        "gene": "HUMAN|HGNC=11998|UniProtKB=P04637",
+        "target_gene": "MOUSE|MGI=MGI=98834|UniProtKB=P02340",
+        "id": "P04637"
+    }},
+    "search_type": "matching ortholog info"
+}}

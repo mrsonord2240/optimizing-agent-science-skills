@@ -1,0 +1,6 @@
+lookup/symbol/human/BRCA1 -> 200 0.569462s
+homology/symbol/human/BRCA1?type=orthologues;target_species=mouse -> 000 40.003001s
+homology/symbol/human/TP53?type=orthologues;target_species=mouse -> 000 40.015417s
+homology BRCA1 try1 -> 200 14.027351s
+homology BRCA1 try2 -> 000 40.006420s
+homology BRCA1 try3 -> 000 40.012721s

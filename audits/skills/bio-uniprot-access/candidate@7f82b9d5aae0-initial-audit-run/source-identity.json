@@ -1,0 +1,55 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "database-access/uniprot-access",
+    "subtree": "1c4d604cb066b2afd2435bade70b7381093d5a6a",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "fix/dbaccess-uniprot-access",
+    "commit": "2f381782596c6569fe5a8357556856512b7fbb6c",
+    "path": "F:\\OpenScience\\wt\\dbaccess-uniprot-access\\skills\\bio-uniprot-access",
+    "content_sha256": "7f82b9d5aae0ba064038b97d399123a2be4d845124d1d4cf13a0918dd4e48240",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-uniprot-access/",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 24298
+    }
+  },
+  "files": [
+    {
+      "path": "examples/isoforms_and_xrefs.py",
+      "bytes": 1431,
+      "sha256": "7131a2e099e9d7a8ecf3617688050bc0fb51fb3f7395aac71fb0aac8a0f95839"
+    },
+    {
+      "path": "examples/uniprot_query.py",
+      "bytes": 1398,
+      "sha256": "85329ffa49f9356323fe6bb8de66fe58bfb4aaf7b62465fad285b2e9c2a26bf3"
+    },
+    {
+      "path": "scripts/uniprot_client.py",
+      "bytes": 5057,
+      "sha256": "8ae1d33fedb20b83cd6bc4ecce9be547a3c53dfce48f8ae1e24c87d5e6a1a2fd"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 11557,
+      "sha256": "ff4903241114f5ad29080b7db0221c7a86bfc9bcec584b25ea2cf9972d4f8d2e"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4855,
+      "sha256": "843d82db459b5430cee4d14ec39d8570e460946d893309e8007ecc78d600f222"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ]
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

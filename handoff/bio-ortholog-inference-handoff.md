@@ -1,68 +1,62 @@
-# Handoff: bio-ortholog-inference / prepare-scientific-skill-tooling
+# Handoff: bio-ortholog-inference / fix-scientific-skill
 
-- Updated: 2026-10-02T23:28:06-07:00
-- Lane: 1
+> RUN PAUSED 2026-10-03 by Sam after the initial audit. Nothing is in flight. Resume at fix-scientific-skill; candidate is untracked and uncommitted in the working tree below.
+
+- Updated: 2026-10-03T00:00:00-07:00
+- Lane: 3
 - Status: ready-for-phase
-- Owner leaving: normalize worker (Sonnet), lane 1, batch database-access
-- Next role: prepare-scientific-skill-tooling
+- Owner leaving: initial-audit worker (Sonnet), lane 3, batch database-access
+- Next role: fix-scientific-skill
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/ortholog-inference (5 files, 32293 bytes, sha256-manifest-v1 fff8c2b2953d822bf41a5bc7038253cf0de5aa4f99277806bea3fc58bcb762f2)
+- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/ortholog-inference
 - Working tree: F:\OpenScience\wt\dbaccess-ortholog-inference\skills\bio-ortholog-inference
 - Branch/worktree: fix/dbaccess-ortholog-inference at 2f38178 (shelf main)
-- Candidate tree hash: f6d4ccc5903d157167ae1106f009ecf5d36a0e1d3c56c8a691e63625fcc2e9ac (sha256-manifest-v1, files=6, bytes=27397; `python tools/skill_preflight.py` = PASS)
-- Applicable audit: none
+- Candidate tree hash: f6d4ccc5903d157167ae1106f009ecf5d36a0e1d3c56c8a691e63625fcc2e9ac (sha256-manifest-v1, 6 files, 27397 bytes; preflight PASS, bytes unchanged)
+- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-ortholog-inference\candidate@f6d4ccc5903d-initial-audit-run\report.json (score 69, Beta Only, no veto; static 72, execution avg 67.3, assertions 9/14)
 
 ## Completed this phase
 
-- Frontmatter made Marketplace-complete: `category: Data Analysis`, `license: MIT`, `author: GPTomics` (matches shelf siblings bio-entrez-fetch / bio-biomart-queries).
-- All files rewritten UTF-8, LF, no BOM; no __pycache__, dot paths, or nested LICENSE.
-- Structure: SKILL.md (decision matrix, per-resource API notes, confidence semantics, failure modes) + usage-guide.md; Compara/OrthoDB/OMA/KEGG code consolidated into `scripts/ortholog_clients.py`.
-- Structure: `examples/` (3 demos) import the client; duplicated retry helpers removed.
-- Version drift against live services fixed (below). Preflight PASS with only the expected no-Skill-root-LICENSE warn (sibling convention; license in frontmatter). No near-duplicate warnings.
-
-## Runnable-surface inventory
-
-- `scripts/ortholog_clients.py` (library). Functions: get_with_retry, resolve_symbol, compara_orthologs, compara_one2one, batch_compara, orthodb_groups, orthodb_orthologs, oma_orthologs, oma_hog_for_protein, oma_hog_members, ko_for_gene, genes_for_ko, ko_info.
-- `examples/compara_orthologs.py`, `examples/cross_resource.py`, `examples/kegg_orthology.py`: live-API demos that run at module level.
-- PANTHER, eggNOG, HomoloGene are prose only (no code).
-
-## Dependency clues
-
-- Python: requests 2.31+, pandas 2.2+ (env: 2.34.2 / 2.3.3). No keys. Hosts: rest.ensembl.org, data.orthodb.org/v12, omabrowser.org/api, rest.kegg.jp, pantherdb.org.
-- Ensembl 15 req/sec limit; eggNOG-mapper (local tool) is named as the batch path but not scripted.
-
-## Version drift resolved
-
-- HomoloGene: E-utilities `db=homologene` now returns 'Database not supported'; 'still queryable' replaced with 'retired' (SKILL.md, usage-guide).
-- eggNOG: `http://eggnog6.embl.de/api/` 301s to `eggnogdb.org/api/`, which gave 403 to a script; marked unverified. PANTHER base http -> https. Ensembl 'release 112+' -> 116 checked live.
+- Static review of the full tree; live execution of Compara, OrthoDB, OMA, KEGG, PANTHER, eggNOG, HomoloGene and all three examples.
+- Confirmed or refuted the tooling leads (below) with raw-vs-client comparisons; no Skill bytes changed, no audit-local repair.
+- Published the record (17 scripts/inputs), regenerated index, `audits:check` passes, no published record deleted.
 
 ## Required next actions
 
-1. Tooling: build/refresh the env for the dependencies above (staging at F:\OpenScience\audit-envs\database-access\, not modified here), map each surface to coverage, record the TOOLS.md fingerprint.
-2. Exercise the client functions and examples against live services; settle the ambiguities below before audit.
-3. The 2026-10-02 spot checks were ad hoc curl/Python calls, not audit evidence.
+1. Fix OI-01 to OI-05 (P1) in order, then OI-06 to OI-08 (P2); rerun the saved probes in the run `scripts/` against the fixed bytes.
+2. Live checks are flaky: Ensembl homology hangs/500s and OMA unfiltered `/orthologs/` 502s intermittently; use timeouts, retry later, prefer TP53 and `rel_type=1:1` for OMA.
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| N1 | P2 | open | this handoff | OMA REST gave HTTP 502 for `/protein/P38398/` and `[]` (HTTP 200) for `/protein/P38398/orthologs/` on 2026-10-02: transient outage vs changed contract unresolved; re-test in tooling. |
-| N2 | P2 | open | this handoff | eggNOG API access (403) and PANTHER ortholog endpoint shapes unexercised; OrthoDB `/search` returned `{'data': [og ids]}` as documented, `/orthologs` shape unchecked. |
+| OI-01 | P1 | open | scripts/probe_orthodb_oma_output.txt | Parse `data[].genes[].gene_id.id` null-safely; return [] on null data; raise on non-200 |
+| OI-02 | P1 | open | scripts/ensembl_liveness_curl.txt, example_compara_orthologs_attempt_failed_500.txt | Timeouts, 5xx/connection retry in one session; broaden batch_compara except |
+| OI-03 | P1 | open | scripts/probe_raw_output.txt | Compara has no `confidence` key; fix docs, docstrings, usage-guide prompt |
+| OI-04 | P1 | open | scripts/probe_orthodb_oma_output.txt | OrthoDB /search is full text (TP53 -> TIGAR first); verify group, fix example |
+| OI-05 | P1 | open | scripts/example_cross_resource_output.txt | Per-resource try/except; use TP53 P04637 for OMA (BRCA1 P38398 returns []) |
+| OI-06 | P2 | open | scripts/probe_raw_output.txt | OrthoDB `/tab` is 404; correct or remove |
+| OI-07 | P2 | open | scripts/panther_raw.txt | PANTHER has no evidence codes in response; document real route or drop claim |
+| OI-08 | P2 | open | preflight warn | Add Skill-root LICENSE; fix oma_orthologs docstring (species.taxon_id) |
+| B1 | blocker | deferred | viewer.md | OMA service flaky, not a Skill defect except missing retry; rerun when stable |
+| B2 | blocker | deferred | TOOLS.md | eggNOG API refuses scripts (TLS mismatch/403); Skill already labels it unverified |
+
+Leads resolved: T1 confirmed (OI-01). T2 confirmed (OI-03, OI-02). OMA 502 confirmed intermittent upstream; the example crash is OI-05. eggNOG confirmed blocked, labelled correctly. PANTHER live and correct for matchortho, claims partly unsupported (OI-07). HomoloGene retired, documented correctly.
 
 ## Environment and evidence
 
-- Tool inventory: none yet (tooling phase)
-- Run evidence: preflight output only; spot checks not retained
-- Restricted-access items: none
-- Tooling impact: changed (new importable client under scripts/; examples rewired to import it)
+- Tool inventory: F:\OpenScience\audits\bio-ortholog-inference\TOOLS.md (sha256 aff688a8...c21a)
+- Environment fingerprint: database-access venv py3.12.13 | requests 2.34.2 pandas 3.0.5 | pip-freeze sha256 5fdd1350df2cf397 (F:\OpenScience\audit-envs\database-access\Scripts\python.exe, PYTHONDONTWRITEBYTECODE=1)
+- Run evidence: F:\OpenScience\audits\bio-ortholog-inference\initial-audit-run\ (report.json, viewer.md, source-identity.json, scripts/)
+- Restricted-access items: none (B1, B2 service-side)
+- Tooling impact: none (no Skill bytes changed this phase; fixes may touch the client, so the fixer must classify)
 
 ## Worktree safety
 
-- Run-owned changes: untracked `skills/bio-ortholog-inference/` in F:\OpenScience\wt\dbaccess-ortholog-inference (nothing staged or committed)
-- Pre-existing/user-owned changes: none
-- Records state: this handoff file only
+- Run-owned changes: F:\OpenScience\audits\bio-ortholog-inference\initial-audit-run\; records at audits\skills\bio-ortholog-inference\ plus regenerated audits INDEX/BACKLOG/STATUS (uncommitted)
+- Pre-existing/user-owned changes: test/validate.bats (untracked); other Skills' records and handoffs belong to the concurrent auditor
+- Records state: uncommitted paths above
 - Product commits/pushes: none
 
 ## Transition assertion

@@ -1,0 +1,15 @@
+=== BRCA1 human -> all Compara orthologs ===
+  ortholog_one2one             170
+  ortholog_one2many            29
+
+=== BRCA1 human -> mouse, with confidence ===
+  type=ortholog_one2one  confidence=None  target=ENSMUSG00000017146  identity_target=57.6711  identity_query=56.0923
+
+=== BRCA1 within-species paralogs ===
+
+=== Compara confidence semantics ===
+  type=ortholog_one2one: 1:1 ortholog (high-confidence single match)
+  type=ortholog_one2many / many2one: lineage-specific duplication
+  type=ortholog_many2many: ancestral duplication; multiple co-orthologs
+  type=within_species_paralog: in-paralog (post-speciation duplication)
+  confidence: 0 or 1 (binary; 1 = gene-tree-topology high confidence)

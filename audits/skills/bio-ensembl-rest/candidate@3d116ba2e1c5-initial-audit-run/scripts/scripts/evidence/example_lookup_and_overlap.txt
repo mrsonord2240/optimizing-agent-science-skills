@@ -1,0 +1,27 @@
+=== Symbol resolution (live release) ===
+  Ensembl Gene ID: ENSG00000012048
+  Biotype:         protein_coding
+  Location:        chr17:43044292-43170245 (strand -1)
+
+=== Same query against archive (release 110) -- for reproducibility ===
+  Ensembl Gene ID (e110): ENSG00000012048
+
+=== Full gene info (transcripts + exons via ?expand=1) ===
+  Transcripts: 59
+    ENST00000497488        protein_coding         15 exons
+    ENST00000489037        protein_coding         22 exons
+    ENST00000478531        protein_coding         23 exons
+
+=== Protein sequence ===
+Traceback (most recent call last):
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\lookup_and_overlap.py", line 34, in <module>
+    prot = sequence_for_id('ENSG00000139618', seq_type='protein')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 46, in sequence_for_id
+    return get_with_retry(f'{base}/sequence/id/{ensembl_id}', params={'type': seq_type}).json()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 29, in get_with_retry
+    r.raise_for_status()
+  File "F:\OpenScience\audit-envs\database-access\Lib\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://rest.ensembl.org/sequence/id/ENSG00000139618?type=protein

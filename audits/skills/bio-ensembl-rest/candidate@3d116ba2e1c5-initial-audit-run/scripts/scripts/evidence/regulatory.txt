@@ -1,0 +1,5 @@
+overlap regulatory status 200
+n regulatory in 17:43.0-43.2Mb: 34 [('ENSR17_74J9CW', 'regulatory'), ('ENSR17_BBJFL', 'regulatory'), ('ENSR17_5D54RJ', 'regulatory')]
+SKILL.md form 404 {"error":"page not found. Please check your uri and refer to our documentation https://rest.ensembl.org/"}
+regulatory/human/ID 404 {"error":"page not found. Please check your uri and refer to our documentation https://rest.ensembl.org/"}
+regulatory/species/human/id/ID 404 {"error":"page not found. Please check your uri and refer to our documentation https://rest.ensembl.org/"}

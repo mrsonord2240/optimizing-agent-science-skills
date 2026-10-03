@@ -1,0 +1,48 @@
+compara_orthologs TIMEOUT
+kegg_orthology exit 0
+              map04110  Cell cycle
+              map04115  p53 signaling pathway
+              map04137  Mitophagy - animal
+              map04151  PI3K-Akt signaling pathway
+              map04210  Apoptosis
+              map04211  Longevity regulating pathway
+              map04216  Ferroptosis
+
+=== Members of K04451 across all species ===
+Total members: 548
+Species represented: 446
+Top species by member count:
+    cgib: 4
+    mcep: 4
+     xen: 4
+    asao: 3
+    ccar: 3
+    caua: 3
+    masi: 3
+    char: 3
+    bspl: 3
+    sasa: 3
+
+=== License note ===
+KEGG REST API: free for academic use; commercial use requires paid license.
+For commercial workflows, prefer eggNOG (permissive) or OrthoDB.
+
+
+cross_resource exit 1
+=== Compara: BRCA1 human -> mouse ===
+  1 hits: ['ENSMUSG00000017146']
+
+=== OMA: BRCA1 (UniProt P38398) human -> mouse ===
+
+tus()
+  File "F:\OpenScience\audit-envs\database-access\Lib\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 502 Server Error: Bad Gateway for url: https://omabrowser.org/api/protein/P38398/orthologs/
+
+--- TP53 consensus via shipped functions ---
+Compara: [('ENSMUSG00000059552', 'ortholog_one2one', None)]
+OMA raised HTTPError 502 Server Error: Bad Gateway for url: https://omabrowser.org/api/protein/P04637
+OrthoDB first 3 groups: ['4837993at2759', '4219792at2759', '1464927at33208']
+orthodb_orthologs(first TP53 hit, mouse): [None, None, None, None, None, None]
+orthodb_orthologs(4289813at2759 [tumor protein p53], mouse): [None, None, None, None, None, None]
+KEGG: ['K04451'] unknown gene -> []

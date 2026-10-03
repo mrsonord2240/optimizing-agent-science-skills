@@ -1,0 +1,7 @@
+PhosphoSite {"name": "CC BY-NC-SA 3.0", "full_name": "Creative Commons Attribution-NonCommercial-ShareAlike 3.0 International", "purpose": "academic", "attrib": "attrib", "sharing": "alike", "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/"}
+DIP {"name": "CC BY-ND 3.0", "full_name": "Creative Commons Attribution-NoDerivatives 3.0 International", "purpose": "commercial", "attrib": "attrib", "sharing": "noderiv", "url": "https://creativecommons.org/licenses/by-nd/3.0/"}
+HPRD {"name": "HPRD", "full_name": "HPRD License", "purpose": "academic", "attrib": "attrib", "sharing": "free", "url": "http://hprd.org/FAQ"}
+KEGG-MEDICUS {"name": "CC BY-SA 4.0", "full_name": "Creative Commons Attribution-ShareAlike 4.0 International", "purpose": "commercial", "attrib": "attrib", "sharing": "alike", "url": "https://creativecommons.org/licenses/by-sa/4.0/"}
+IntAct {"name": "CC BY 4.0", "full_name": "Creative Commons Attribution 4.0 International", "purpose": "commercial", "attrib": "attrib", "sharing": "free", "url": "https://creativecommons.org/licenses/by/4.0/"}
+SIGNOR {"name": "CC BY 4.0", "full_name": "Creative Commons Attribution 4.0 International", "purpose": "commercial", "attrib": "attrib", "sharing": "free", "url": "https://creativecommons.org/licenses/by/4.0/"}
+BioGRID {"name": "MIT", "full_name": "MIT License", "purpose": "commercial", "attrib": "attrib", "sharing": "free", "url": "https://spdx.org/licenses/MIT.html"}

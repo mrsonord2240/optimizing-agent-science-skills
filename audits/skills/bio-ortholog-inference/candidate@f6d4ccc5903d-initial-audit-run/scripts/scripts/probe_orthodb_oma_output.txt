@@ -1,0 +1,29 @@
+TP53 search n= 100 keys ['data', 'count', 'status', 'bigdata', 'message']
+   4837993at2759 name= phosphoglycerate mutase | genes None species None
+   4219792at2759 name= TP53-target gene 3 protein | genes None species None
+   1464927at33208 name= TP53-target gene 3 protein | genes None species None
+   672820at7742 name= TP53-target gene 3 protein | genes None species None
+BRCA1 search n= 100 keys ['data', 'count', 'status', 'bigdata', 'message']
+   733642at2759 name= Ubiquitin | genes None species None
+   4931607at2759 name= ankyrin repeat domain-containing protein | genes None species None
+   1835377at33208 name= ankyrin repeat | genes None species None
+   5015203at2759 name= e3 ubiquitin-protein ligase | genes None species None
+orthologs 4219792at2759 200 {"data": null, "status": "ok", "message": 0}
+orthologs human 4219792at2759 200 {"data": [{"genes": [{"aas": "132", "gene_id": {"id": "TP53TG3C", "param": "9606_0:003eea"}, "more_info": true, "how_muc
+orthologs 1464927at33208 200 {"data": null, "status": "ok", "message": 0}
+orthologs human 1464927at33208 200 {"data": [{"genes": [{"aas": "132", "gene_id": {"id": "TP53TG3C", "param": "9606_0:003eea"}, "more_info": true, "how_muc
+populated: type list n groups 6 group keys ['genes', 'genes_and_clusters_statistics', 'organism'] n genes 4
+first gene keys ['aas', 'description', 'exons', 'gene_id', 'genomic_coordinates', 'how_much_more_info', 'interpro', 'more_info']
+first gene gene_id {'id': 'BPGM', 'param': '10090_1:001d33'} organism None
+  p53 text search 4661351at2759 Tumor protein
+  p53 text search 1906486at33208 Tumor protein
+  p53 text search 217985at7742 tumor protein 63 isoform A
+  p53 text search 217985at32523 tumor protein 63 isoform a
+  p53 text search 4289813at2759 tumor protein p53
+OMA /protein/P38398/ (200, '{"entry_nr":24440698,"entry_url":"https://omabrowser.org/api/protein/24440698/","omaid":"HUMAN34016","canonicalid":"BRCA1_HUMAN","sequence_md5":"e40f752dedf675e2f7c99142ebb2607a","sequence_length":1863,"species":{"code":"HUMAN","taxon_id":9606,"species":"Homo ')
+OMA /protein/HUMAN34016/orthologs/ (200, '[]')
+OMA /protein/P04637/ (200, '{"entry_nr":24438216,"entry_url":"https://omabrowser.org/api/protein/24438216/","omaid":"HUMAN31534","canonicalid":"P53_HUMAN","sequence_md5":"c133dfce69f606f20865e9008199f852","sequence_length":393,"species":{"code":"HUMAN","taxon_id":9606,"species":"Homo sap')
+   oma_hog_id= 'HOG:F0782425.2c.7a' keys ['alternative_isoforms_urls', 'canonicalid', 'cdna', 'chromosome', 'description', 'domains', 'entry_nr', 'entry_url', 'gene_ontology', 'hog_levels', 'homoeologs', 'is_main_isoform', 'isoforms', 'locus', 'oma_group', 'oma_group_url', 'oma_hog_id', 'oma_hog_members', 'omaid', 'orthologs', 'roothog_id', 'sequence', 'sequence_length', 'sequence_md5', 'species', 'structure', 'xref']
+   hog (200, '[{"hog_id":"HOG:F0782425.2c.7a","level":"Primates","levels_url":"https://omabrowser.org/api/hog/HOG:F0782425.2c.7a/?level=Primates","members_url":"https://omabrowser.org/api/hog/HOG:F0782425.2c.7a/mem')
+OMA /protein/P04637/orthologs/ (502, '<!DOCTYPE html> <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]--> <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]--> <!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]--> <!--[if gt IE 8]><!')
+OMA /protein/P04637/orthologs/?rel_type=1:1 (200, '[{"entry_nr":14201167,"entry_url":"https://omabrowser.org/api/protein/14201167/","omaid":"ACTTE20737","canonicalid":"A0A6P8IM60","sequence_md5":"d96e0a7fdd420e33383cbb64afcf66d4","sequence_length":520,"species":{"code":"ACTTE","taxon_id":6105,"species":"Actini')

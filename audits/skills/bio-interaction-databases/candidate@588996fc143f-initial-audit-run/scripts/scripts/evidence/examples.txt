@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "F:\OpenScience\audits\bio-interaction-databases\initial-audit-run\scripts\run_examples.py", line 14, in <module>
+    runpy.run_path(os.path.join(CAND, 'examples', 'string_network.py'), run_name='__main__')
+KeyError: "['queryItem'] not in index"
+=== examples/string_network.py ===
+=== Resolve gene symbols to STRING IDs ===
+EXIT 1
+
+=== examples/interaction_query.py ===
+=== STRING (high confidence; experiments channel emphasized) ===
+  26 STRING edges added
+
+=== OmniPath (directional aggregate) ===
+  20 OmniPath directional edges added
+
+=== SIGNOR (signed, mechanism-typed) ===
+  0 SIGNOR signed edges added
+
+=== Aggregated network summary ===
+  Nodes: 8
+  Directed edges: 52
+  Multi-source edges (higher confidence): 20
+  Signed (SIGNOR) edges: 0
+
+=== Signed signaling edges with mechanism ===
+
+=== Export edge list with provenance ===
+  Wrote aggregated_interactions.csv (52 edges)
+EXIT 0
+
+=== edge attribute audit on the example graph ===
+  OmniPath: distinct max_score values [0.0007, 0.0009, 0.001]
+  STRING: distinct max_score values [0.0007, 0.0008, 0.0009, 0.001]
+  MDM2->CHEK2 attrs: {'sources': ['STRING'], 'max_score': 0.000994, 'directional': False, 'signed_effect': None, 'mechanism': None}
+  STRING TSV score for MDM2-CHEK2 was 0.994 (0-1 scale)
