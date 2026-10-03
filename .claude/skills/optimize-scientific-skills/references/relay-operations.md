@@ -60,15 +60,19 @@ Otherwise it is **light**.
 Environments and public inputs are built once per ecosystem and reused by every
 Skill, phase, and later run. This is the largest saving in the relay; protect it.
 
-- The ecosystem is the upstream category (`atac-seq`, `alignment-files`). Its
-  root is `F:\OpenScience\audit-envs\<ecosystem>\`, with inputs under
-  `public-data\`. Reuse the existing directory for a category; never create a
-  per-Skill or per-run staging directory.
+- The ecosystem is the upstream category (`atac-seq`, `alignment-files`).
+  `F:\OpenScience\audit-envs\INDEX.md` maps each category to its staging root;
+  resolve the root there, never by directory name, because several roots are
+  named after an analyst (`crispr-screens` is `crispr-screen-analyst\`). Inputs
+  sit under the root's `public-data\`. Reuse the indexed directory; never
+  create a per-Skill or per-run staging directory.
+- A category with no row is not staged. The tooling worker creates
+  `audit-envs\<category>\` and adds the row in the same pass.
 - `public-data\README.md` is the index: one row per file with source URL,
   bytes, sha256, and licence. Put inputs derived from a download (slices,
   indexes, planted truth sets) under `derived\` with the script that made them.
-- Before any download or environment build, read that README and the
-  ecosystem's existing `TOOLS.md` files. Reuse a matching entry; add a row only
+- Before any download or environment build, read the index row, that README,
+  and the ecosystem's existing `TOOLS.md` files. Reuse a matching entry; add a row only
   for what is missing.
 - Staging outlives the run. Do not delete or rebuild it at close.
 - Only a tooling worker adds to staging or changes an environment. An audit,
