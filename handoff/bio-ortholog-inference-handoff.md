@@ -1,10 +1,19 @@
-# Handoff: bio-ortholog-inference / fix-scientific-skill (fix-run-2)
+# Handoff: bio-ortholog-inference / prepare-scientific-skill-tooling (delta, after fix-run-2)
 
 - Updated: 2026-10-03
 - Lane: 2
 - Status: ready-for-phase
-- Next role: prepare-scientific-skill-tooling (delta mode; tooling impact changed), then reaudit-scientific-skill
-- Tooling impact: changed. Surfaces: Compara batch_compara (new `status` column, fixed column set, rows for empty symbols) and examples/compara_orthologs.py (new output). No new dependency, runtime, input or service.
+- Next role: reaudit-scientific-skill
+- Tooling impact: changed (batch_compara status/error columns, examples/compara_orthologs.py output); no new dependency, runtime, input or service.
+
+## Tooling
+
+- TOOLS.md: F:\OpenScience\audits\bio-ortholog-inference\TOOLS.md (refreshed for identity 6e3122b0...; delta section added, unchanged surfaces listed)
+- Fingerprint (verified live): py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397 (raw pip-freeze bytes)
+- Interpreter: F:\OpenScience\audit-envs\database-access\Scripts\python.exe, PYTHONDONTWRITEBYTECODE=1
+- Delta evidence: fix-run-2\stub.txt (all three statuses), compara_run2.txt (live partial batch); one live attempt this pass: human->mouse [TP53, NOTAGENE123] -> TP53 found, NOTAGENE123 request failed (HTTP 400; invalid symbol reports as failure, not "no ortholog returned").
+- Installed or downloaded this pass: nothing. Preflight --offline PASS after the pass (identity unchanged).
+- Blockers unchanged: Ensembl homology intermittent (500/503/45 s timeouts), OMA 502s, eggNOG refuses scripts (not executed), PANTHER liveness only.
 
 ## Candidate
 
