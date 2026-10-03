@@ -1,0 +1,64 @@
+== versions
+v4.4.0
+as-core pandas 2.3.3 statsmodels 0.15.0
+as-suppa pandas 3.0.6 statsmodels 0.14.6
+== A. rMATS real chrX 2v2, Skill command flags (readLength 75, paired)
+rmats real rc=0
+   252 rmats_real/out/A3SS.MATS.JC.txt
+   217 rmats_real/out/A5SS.MATS.JC.txt
+    52 rmats_real/out/MXE.MATS.JC.txt
+   175 rmats_real/out/RI.MATS.JC.txt
+   959 rmats_real/out/SE.MATS.JC.txt
+  1655 total
+== B. rMATS planted (hand-checkable)
+rmats planted rc=0
+== C. SUPPA2 planted + chrX through scripts/quantify_splicing.py (as-suppa)
+tpm (5895, 4)
+ERROR:psiCalculator:PSI not calculated for event ENSG00000063601;AL:X:149924337-149931038:149931380:149924337-149932985:149933397:+.
+ERROR:psiCalculator:transcript ENST00000570135 not found in the "expression file".
+ERROR:psiCalculator:PSI not calculated for event ENSG00000147274;AL:X:135954434:135954504-135957245:135955608:135956611-135957245:-.
+INFO:lib.tools:File suppa/chrX_AL_strict.ioe closed.
+INFO:psiCalculator:Generating output suppa/chrX_psi_AL.psi
+INFO:psiCalculator:Done
+planted psi files ['A3', 'A5', 'AF', 'AL', 'MX', 'RI', 'SE']
+chrX psi files ['A3', 'A5', 'AF', 'AL', 'MX', 'RI', 'SE']
+planted SE PSI:
+A	B	C
+G1;SE:chrP:200-501:600-901:+	0.8	0.2	0.5
+== D. SUPPA2 TPM header trap + statsmodels in as-core
+INFO:lib.tools:File suppa/tpm_pandas_default_header.tsv closed.
+ERROR:psiCalculator:No expression values have been buffered.
+ERROR:psiCalculator:Unknown error: 1
+ls: cannot access 'suppa/hdrtest.psi': No such file or directory
+-- as-core suppa.py psiPerEvent (statsmodels 0.15?)
+    from lib.diff_tools import multiple_conditions_analysis
+  File "/home/sci/micromamba/envs/as-core/lib/python3.13/site-packages/lib/diff_tools.py", line 25, in <module>
+    from statsmodels.sandbox.stats.multicomp import multipletests
+ImportError: cannot import name 'multipletests' from 'statsmodels.sandbox.stats.multicomp' (/home/sci/micromamba/envs/as-core/lib/python3.13/site-packages/statsmodels/sandbox/stats/multicomp.py)
+== E. regtools/leafcutter: STAR BAM without XS tags (Skill route) vs XS-tagged
+ERR188383 noXS rc=0 junc_lines=2839 strand_col_counts:    2838 ? 
+ERR188383 XS rc=0 junc_lines=2841 strand_col_counts:    1398 +    1343 -      99 ? 
+ERR188428 noXS rc=0 junc_lines=2934 strand_col_counts:    2933 ? 
+ERR188428 XS rc=0 junc_lines=2941 strand_col_counts:    1411 +    1412 -     117 ? 
+ERR188454 noXS rc=0 junc_lines=2872 strand_col_counts:    2871 ? 
+ERR188454 XS rc=0 junc_lines=2874 strand_col_counts:    1422 +    1390 -      61 ? 
+ERR204916 noXS rc=0 junc_lines=3033 strand_col_counts:    3032 ? 
+ERR204916 XS rc=0 junc_lines=3046 strand_col_counts:    1489 +    1461 -      95 ? 
+lc_noxs cluster rc=0 clusters=0
+merging 4 junction files...
+merging 4 files done.
+lc_xs cluster rc=0 clusters=0
+merging 4 junction files...
+merging 4 files done.
+== F. IRFinder syntax: Skill reference literal vs real CLI (reference reused read-only)
+-- literal: IRFinder FastQ -r REF -d out sample.fastq
+literal rc=1
+Argument error: -r is required.
+ls: cannot access 'irf/literal': No such file or directory
+-- IRFinder --version
+Invalid option: --
+== done
+
+real	0m53.981s
+user	0m0.061s
+sys	0m0.045s

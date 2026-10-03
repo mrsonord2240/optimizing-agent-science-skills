@@ -1,0 +1,441 @@
+{
+  "meta": {
+    "skill_name": "bio-splicing-quantification",
+    "description": "Quantifies alternative splicing as PSI from RNA-seq with rMATS-turbo, SUPPA2, MAJIQ V3, leafcutter, VAST-TOOLS, Shiba and IRFinder-S, with event taxonomy, tool selection, quality thresholds and reconciliation rules.",
+    "evaluated_on": "2026-10-03",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 6,
+    "performed_by": "Claude (Anthropic) initial-audit worker, lane 2",
+    "auditor_independent": true
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; planted PSI, formula and cross-tool concordance reproduce"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-method Skill with no clinical conclusions; disease signatures are cited literature"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Effective-length PSI, tool-family reconciliation and sign conventions held; SUPPA2 and rMATS agree in direction"
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "Documented code does not run on real output: the inline snippet raises TypeError on every real rMATS JC file and parse_rmats_output raises KeyError for 4 of 5 listed event types (SQ-01, SQ-02); the SE path silently returns wrong mean_PSI (SQ-03)"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 69,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "Broad, accurate taxonomy and tool-selection guidance; the rMATS formula, SUPPA2 and regtools commands reproduce, but the inline snippet, the shipped parser (4 of 5 event types), mean_PSI and the IRFinder command are wrong"
+      },
+      "reliability": {
+        "score": 6,
+        "max": 12,
+        "note": "Raw KeyError/TypeError on documented use, silent exit 0 with zero clusters on untagged BAMs, run_suppa2_quantification silently skips missing event files"
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md 290 lines with failure modes and IR/microexon detail routed to references; the tool matrix and decision tree overlap"
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Decision tables, quality thresholds and reconciliation rules are clear; no format contract for rMATS BAM lists or SUPPA2 TPM and no XS prerequisite"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Good pitfalls and prompts; errors are uninformative and unsupported benchmark figures are stated as fact"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials; subprocess calls use argument lists; no shell interpolation"
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "Small modular script, but SE-only column assumptions, hardcoded 0.1-0.9 filter, no tests, no dependency pins"
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Precise trigger description; progressive disclosure works; Related Skills names do not resolve on the shelf and MAJIQ/VAST are not labeled not-executed"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 61.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 13,
+      "total": 26
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "rMATS-turbo on real chrX 2v2 BAMs, then parse PSI per the Skill",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "rMATS ran with the Skill flags (rc 0, 958 SE events); the inline pandas snippet raised TypeError and the shipped parser reports wrong mean_PSI on 310 of 958 SE rows",
+        "basic": 24,
+        "specialized": 34,
+        "assertions": [
+          {
+            "text": "rMATS runs with the flags the Skill states and writes all five *.MATS.JC.txt files",
+            "result": "PASS",
+            "note": "rc 0; SE 958, A5SS 216, A3SS 251, MXE 51, RI 174 rows"
+          },
+          {
+            "text": "The SKILL.md inline snippet computes mean PSI from the real JC file",
+            "result": "FAIL",
+            "note": "TypeError: IncLevel1/2 are comma strings and startswith(IncLevel) also matches IncLevelDifference (SQ-01)"
+          },
+          {
+            "text": "parse_rmats_output returns the mean of the replicate IncLevel values",
+            "result": "FAIL",
+            "note": "mean_PSI includes IncLevelDifference: 310/958 SE rows differ from the true mean, up to 0.5 (e.g. true 0.5 reported 0.0) (SQ-03)"
+          },
+          {
+            "text": "Skill PSI formula reproduces rMATS IncLevel on real data",
+            "result": "PASS",
+            "note": "1465 replicate values, max abs diff 0.0005 with IncFormLen 148 / SkipFormLen 74"
+          },
+          {
+            "text": "Reliability filter covers both conditions",
+            "result": "FAIL",
+            "note": "Both snippet and script filter on SAMPLE_1 only; 47 vs 50 events pass in SAMPLE_2 vs SAMPLE_1 (SQ-03)"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "total": 58
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "rMATS on planted hand-checkable SE data, effective-length PSI",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "IJC 80,80,80 / SJC 10,10,12 gives IncLevel1 0.8,0.8,0.769 and a 0.587 difference, matching hand values; JC IncFormLen 98 / SkipFormLen 49",
+        "basic": 33,
+        "specialized": 50,
+        "assertions": [
+          {
+            "text": "rMATS IncLevel equals the hand-computed PSI",
+            "result": "PASS",
+            "note": "0.8/0.8/0.769 vs 0.8/0.8/0.769; IncLevel2 0.2/0.2/0.208"
+          },
+          {
+            "text": "Effective-length formula in the Skill gives the planted PSI and differs from naive counts",
+            "result": "PASS",
+            "note": "formula 0.8000, naive 0.8889 (about 11% bias)"
+          },
+          {
+            "text": "IncLevelDifference sign matches --b1 minus --b2",
+            "result": "PASS",
+            "note": "+0.587 with b1 the high group"
+          },
+          {
+            "text": "IncFormLen description matches the JC file",
+            "result": "FAIL",
+            "note": "Skill says IncFormLen includes exon body bases; JC value 98 = 2*(50-1), the body appears only in JCEC (149) (SQ-08)"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "total": 83
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "SUPPA2 PSI from TPM via run_suppa2_quantification, planted and real chrX, concordance with rMATS",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Planted TPM gives PSI 0.8/0.2/0.5 exactly; real chrX yields all seven psi files; SE r=0.864, A5 r=0.718, A3 r=0.849 vs rMATS; undocumented TPM header and statsmodels limits reproduced",
+        "basic": 31,
+        "specialized": 46,
+        "assertions": [
+          {
+            "text": "SUPPA2 PSI equals the planted PSI",
+            "result": "PASS",
+            "note": "G1;SE:chrP:200-501:600-901:+ = 0.8, 0.2, 0.5"
+          },
+          {
+            "text": "SS yields A5+A3 and FL yields AF+AL files as the script states",
+            "result": "PASS",
+            "note": "seven psi files from five -e codes"
+          },
+          {
+            "text": "Independent tools agree on direction and magnitude for matched events",
+            "result": "PASS",
+            "note": "SE 892 matched events r=0.864; A5SS 161 r=0.718; A3SS 197 r=0.849, positive, so the A5/A3 sign claim holds"
+          },
+          {
+            "text": "Skill states the TPM header contract and a SUPPA2 dependency pin that works",
+            "result": "FAIL",
+            "note": "pandas-default header gives \"No expression values have been buffered\" and no output; suppa.py fails ImportError (multipletests) with statsmodels 0.15.0 (SQ-06)"
+          },
+          {
+            "text": "filter_reliable_events matches the documented dynamic range",
+            "result": "FAIL",
+            "note": "hardcodes mean PSI 0.1-0.9; Skill states 0.05-0.95 (SQ-07)"
+          }
+        ],
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "total": 77
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Shipped parser on the other four rMATS event types",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "parse_rmats_output raises KeyError for A5SS, A3SS, MXE and RI; only SE works",
+        "basic": 16,
+        "specialized": 20,
+        "assertions": [
+          {
+            "text": "parse_rmats_output handles every event_type its docstring lists",
+            "result": "FAIL",
+            "note": "KeyError ['exonStart_0base', 'exonEnd'] not in index for A5SS, A3SS, MXE, RI (SQ-02)"
+          },
+          {
+            "text": "Failure is reported with an actionable message",
+            "result": "FAIL",
+            "note": "raw pandas KeyError after printing event counts"
+          },
+          {
+            "text": "SE path returns reliable events",
+            "result": "PASS",
+            "note": "50 reliable of 958 at >=20 reads on tiny chrX data"
+          }
+        ],
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "total": 36
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "regtools junctions + leafcutter clustering on STAR-style BAMs, with and without XS tags",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "BAMs without XS give strand ? for every junction and leafcutter exits 0 with 0 clusters; XS-tagged BAMs give 115 clusters at -m 5; the Skill never mentions XS or --outSAMstrandField",
+        "basic": 24,
+        "specialized": 34,
+        "assertions": [
+          {
+            "text": "regtools extract with the Skill flags succeeds on the aligned BAMs",
+            "result": "PASS",
+            "note": "rc 0 for all four BAMs"
+          },
+          {
+            "text": "Junction strand is resolved for the Skill route (STAR 2-pass BAM, -s XS)",
+            "result": "FAIL",
+            "note": "noXS: 2,838 of 2,838 junctions strand ?; XS: 1,398 + / 1,343 - / 99 ? (SQ-04)"
+          },
+          {
+            "text": "leafcutter clustering yields clusters for the stated route",
+            "result": "FAIL",
+            "note": "0 clusters from untagged BAMs at -m 5 (rc 0, silent); 115 from tagged BAMs"
+          },
+          {
+            "text": "Skill warns about XS-tag prerequisite",
+            "result": "FAIL",
+            "note": "no mention; STAR default outSAMstrandField None confirmed"
+          },
+          {
+            "text": "Skill -m 50 default is workable on realistic data",
+            "result": "PASS",
+            "note": "tiny test data give 0 clusters at -m 50; not a Skill defect"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "total": 58
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "IRFinder intron retention route from references/",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The literal reference command fails (rc 1, \"-r is required\"); the real syntax IRFinder -m FastQ works on single-end FASTQ (7,955 intron rows); IRFinder-S 2.0 is not what installs",
+        "basic": 24,
+        "specialized": 32,
+        "assertions": [
+          {
+            "text": "Literal reference command IRFinder FastQ -r REF/ -d out sample.fastq runs",
+            "result": "FAIL",
+            "note": "Argument error: -r is required, rc 1; FastQ is a -m value (SQ-05)"
+          },
+          {
+            "text": "Corrected command IRFinder -m FastQ -r REF -d out reads.fq.gz produces IR ratios",
+            "result": "PASS",
+            "note": "7,955 rows in IRFinder-IR-nondir.txt in 15 s on chrX reads"
+          },
+          {
+            "text": "Skill gives how to obtain the reference and the claimed IRFinder-S 2.0 tool",
+            "result": "FAIL",
+            "note": "no BuildRef step; installable release is IRFinder 1.3.1 (SQ-05)"
+          },
+          {
+            "text": "Scope: IR route stays within quantification",
+            "result": "PASS",
+            "note": "no differential testing claimed"
+          }
+        ],
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "total": 56
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 27.6,
+    "dynamic_weighted": 36.8,
+    "score": 64,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Tool-family taxonomy, selection matrix and reconciliation rules are scientifically sound and useful",
+    "rMATS effective-length PSI formula, SUPPA2 PSI and A5/A3 sign claims reproduce on planted and real data (rMATS vs SUPPA2 r 0.72-0.86)",
+    "Progressive disclosure keeps detail in references/ and the SUPPA2 wrapper and filter run correctly",
+    "No credentials, and subprocess calls use argument lists"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "SKILL.md inline rMATS snippet raises TypeError",
+      "observed_in": [
+        1
+      ],
+      "problem": "se_jc[inc_cols].mean(axis=1) fails on every real rMATS JC file: IncLevel1/2 are comma-separated strings and startswith(IncLevel) also selects IncLevelDifference.",
+      "root_cause": "The snippet was written for numeric columns.",
+      "fix": "Split IncLevel1 and IncLevel2 on commas, convert to float with NA handling, average per event, and exclude IncLevelDifference; execute against a real JC file. (SQ-01)"
+    },
+    {
+      "priority": "P1",
+      "title": "parse_rmats_output fails for A5SS/A3SS/MXE/RI",
+      "observed_in": [
+        4
+      ],
+      "problem": "The function selects exonStart_0base and exonEnd, which exist only in SE files; A5SS, A3SS, MXE and RI raise KeyError although its docstring lists them.",
+      "root_cause": "Column names are hardcoded for SE.",
+      "fix": "Select coordinate columns per event type (longExon*/shortE*/flanking*, 1stExon*/2ndExon*, riExon*) or return only common columns; test all five types. (SQ-02)"
+    },
+    {
+      "priority": "P1",
+      "title": "Shipped mean_PSI is silently wrong; filter ignores group 2",
+      "observed_in": [
+        1
+      ],
+      "problem": "The script averages IncLevelDifference with replicate PSI values (310 of 958 SE rows differ, up to 0.5; e.g. true 0.5 reported 0.0), and both snippet and script apply read-count reliability to SAMPLE_1 only.",
+      "root_cause": "Prefix match on IncLevel and SAMPLE_1-only filtering.",
+      "fix": "Restrict to IncLevel1 and IncLevel2, report group-wise means, and apply the junction-read filter to both groups; add a regression on the planted data. (SQ-03)"
+    },
+    {
+      "priority": "P1",
+      "title": "regtools/leafcutter route silently empty without XS tags",
+      "observed_in": [
+        5
+      ],
+      "problem": "Without XS tags every junction gets strand ? and leafcutter exits 0 with zero clusters (115 clusters from XS-tagged BAMs); the Skill never states the XS prerequisite or STAR --outSAMstrandField intronMotif.",
+      "root_cause": "STAR default outSAMstrandField is None; the Skill assumes tagged BAMs.",
+      "fix": "State the XS requirement beside the regtools command (STAR --outSAMstrandField intronMotif or add XS), and tell the reader that zero clusters means a prerequisite or -m problem. (SQ-04)"
+    },
+    {
+      "priority": "P1",
+      "title": "IRFinder command and tool version do not run as written",
+      "observed_in": [
+        6
+      ],
+      "problem": "IRFinder FastQ -r REF/ -d out sample.fastq exits 1 (-r is required); the real form is IRFinder -m FastQ. The reference build is undocumented, and IRFinder-S 2.0+ is not what installs (IRFinder 1.3.1; BuildRef is FTP-only, use BuildRefFromSTARRef).",
+      "root_cause": "Command written from memory; version floor not checked.",
+      "fix": "Replace with the working IRFinder -m FastQ form, document reference building, and state which IRFinder release was exercised; label IRFinder-S 2.0 unverified if not obtainable. (SQ-05)"
+    },
+    {
+      "priority": "P2",
+      "title": "SUPPA2 TPM header and statsmodels pin not stated",
+      "observed_in": [
+        3
+      ],
+      "problem": "A pandas-default TPM header yields no output (psiCalculator: no expression values buffered), and SUPPA 2.4 fails on import with statsmodels 0.15.0; 0.14.6 works.",
+      "root_cause": "Input contract and dependency ceiling are undocumented.",
+      "fix": "Document the header-without-index-name TPM format and pin statsmodels<0.15 in the prerequisites. (SQ-06)"
+    },
+    {
+      "priority": "P2",
+      "title": "filter_reliable_events range disagrees with the Skill",
+      "observed_in": [
+        3
+      ],
+      "problem": "The script hardcodes mean PSI 0.1-0.9 while the quality table says 0.05-0.95 and claims rMATS/SUPPA2 default filters drop near-constitutive events; rMATS output contains PSI 0 and 1 rows.",
+      "root_cause": "Threshold duplicated and unparameterized.",
+      "fix": "Expose the bounds as parameters defaulting to the documented range and correct the default-filter claim. (SQ-07)"
+    },
+    {
+      "priority": "P2",
+      "title": "IncFormLen description wrong for JC files",
+      "observed_in": [
+        2
+      ],
+      "problem": "The Skill says IncFormLen adds exon body bases; JC IncFormLen is 2*(L-1) (98 at L=50) and the body appears only in JCEC (149).",
+      "root_cause": "JC and JCEC lengths conflated.",
+      "fix": "State the JC and JCEC lengths separately. (SQ-08)"
+    },
+    {
+      "priority": "P2",
+      "title": "MAJIQ V3 and VAST-TOOLS not labeled not-executed; benchmark figures unsourced",
+      "observed_in": [],
+      "problem": "MAJIQ V3 commands and Zarr claims (restricted licence) and VAST-TOOLS (heavy VASTDB) are presented without an unexecuted/unverified label; figures such as FDR 15-30% and 14% novel-junction loss lack inline evidence.",
+      "root_cause": "Surfaces that cannot be run are written like tested ones.",
+      "fix": "Add a one-line not-executed label for MAJIQ and VAST-TOOLS and mark unsourced figures as literature claims. (SQ-09)"
+    },
+    {
+      "priority": "P2",
+      "title": "Related Skills names do not resolve on the shelf",
+      "observed_in": [],
+      "problem": "differential-splicing and others lack the bio- prefix, and read-alignment/star-alignment and rna-quantification/alignment-free-quant (both required upstream) have no shelf Skill.",
+      "root_cause": "Provider-style paths were kept in normalization.",
+      "fix": "Use shelf IDs where they exist and describe or drop the two missing upstream steps. (SQ-10)"
+    },
+    {
+      "priority": "P2",
+      "title": "Input formats and tool provenance not stated",
+      "observed_in": [],
+      "problem": "rMATS --b1/--b2 list-file format is not described, leafcutter_cluster_regtools.py has no stated source (usage-guide installs only the R package), and there is no Skill-root LICENSE.",
+      "root_cause": "Prerequisites written for a reader who already knows the tools.",
+      "fix": "Describe the comma-separated BAM list, name where the clustering script comes from, and add a LICENSE. (SQ-11)"
+    }
+  ]
+}

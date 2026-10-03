@@ -1,0 +1,2 @@
+tail runs; rows passing Skill filter (min IJC + min SJC >= 20): 24 ; rows where every replicate has IJC+SJC >= 20: 24
+Skill filter passes but a replicate has <20 junction reads: 0

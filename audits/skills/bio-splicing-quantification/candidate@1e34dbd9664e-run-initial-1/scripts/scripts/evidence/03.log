@@ -1,0 +1,40 @@
+== 1. SKILL.md inline rMATS snippet, executed verbatim on real chrX rMATS output
+SNIPPET FAILS: TypeError can only concatenate str (not "int") to str
+== 2. scripts/quantify_splicing.py parse_rmats_output, five event types
+Total SE events: 958
+Reliable events (>=20 reads): 50
+SE ok rows=50
+Total A5SS events: 216
+Reliable events (>=20 reads): 15
+A5SS FAILS: KeyError "['exonStart_0base', 'exonEnd'] not in index"
+Total A3SS events: 251
+Reliable events (>=20 reads): 15
+A3SS FAILS: KeyError "['exonStart_0base', 'exonEnd'] not in index"
+Total MXE events: 51
+Reliable events (>=20 reads): 1
+MXE FAILS: KeyError "['exonStart_0base', 'exonEnd'] not in index"
+Total RI events: 174
+Reliable events (>=20 reads): 11
+RI FAILS: KeyError "['exonStart_0base', 'exonEnd'] not in index"
+== 3. SE: script mean_PSI vs independent mean of IncLevel1+IncLevel2 (no difference column)
+Total SE events: 958
+Reliable events (>=0 reads): 958
+SE rows 958 script mean_PSI != true mean in 310 rows; max abs error 0.5
+script mean_PSI outside [0,1]: 0 rows (min 0.000 max 1.000)
+    geneSymbol IncLevel1 IncLevel2  IncLevelDifference  true_mean  mean_PSI
+860   CXorf40B    NA,0.0    NA,1.0                -1.0        0.5       0.0
+859   CXorf40B    NA,0.0    NA,1.0                -1.0        0.5       0.0
+301     CD99P1    0.0,NA    NA,1.0                -1.0        0.5       0.0
+events with >=20 junction reads: SAMPLE_1 = 50  SAMPLE_2 = 47 (script filters on SAMPLE_1 only)
+== 4. PSI formula and IncFormLen claims (planted + real)
+planted JC IncFormLen/SkipFormLen: 98 49 | JCEC: 149 49 (readLength 50, exon 100 nt)
+IJC 80,80,80 SJC 10,10,12 IncLevel1 0.8,0.8,0.769 IncLevel2 0.2,0.2,0.208 diff 0.587
+Skill formula=0.8000 ; naive IJC/(IJC+SJC)=0.8889 ; expected 0.8
+real SE JC: formula vs IncLevel on 1465 replicate values; max abs diff 0.0005
+real SE IncFormLen/SkipFormLen (readLength 75): 148 74
+== 5. rMATS vs SUPPA2 direction (Skill: A5/A3 same convention; SE inclusion same)
+SE: matched events 892, paired values 1127, Pearson r = 0.864, mean |diff| = 0.101, mean(rMATS-SUPPA) = 0.047
+A5: SUPPA ID first alternative equals rMATS long form in 161 events, short form in 0
+A5SS vs SUPPA2 A5: matched events 161, paired values 203, Pearson r = 0.718, mean |diff| = 0.179, mean(rMATS-SUPPA) = 0.074
+A3: SUPPA ID first alternative equals rMATS long form in 197 events, short form in 0
+A3SS vs SUPPA2 A3: matched events 197, paired values 279, Pearson r = 0.849, mean |diff| = 0.115, mean(rMATS-SUPPA) = 0.043

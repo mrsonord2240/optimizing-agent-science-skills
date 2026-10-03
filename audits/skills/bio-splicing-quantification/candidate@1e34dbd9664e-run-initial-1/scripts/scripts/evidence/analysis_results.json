@@ -1,0 +1,23 @@
+{
+ "inline_snippet": "TypeError: can only concatenate str (not \"int\") to str",
+ "parse_SE": "ok rows=50",
+ "parse_A5SS": "KeyError",
+ "parse_A3SS": "KeyError",
+ "parse_MXE": "KeyError",
+ "parse_RI": "KeyError",
+ "SE_mean_PSI_wrong_rows": 310,
+ "SE_mean_PSI_max_err": 0.5,
+ "SE_mean_PSI_outside_01": 0,
+ "planted_len_JC": [
+  98,
+  49
+ ],
+ "planted_len_JCEC": [
+  149,
+  49
+ ],
+ "real_formula_maxdiff": 0.0005000000000000004,
+ "SE_corr": 0.8639406652908755,
+ "A5_corr": 0.7178035733964137,
+ "A3_corr": 0.8494785990339994
+}

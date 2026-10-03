@@ -1,0 +1,72 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "alternative-splicing/splicing-quantification",
+    "subtree": "6e11b64e5f1c319983ec851f3d922655291db35a",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills",
+    "status": "clean",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "git_blob": "686fd3bbca0044c82f86e05ce7cf3231e2fdcb83"
+      },
+      {
+        "path": "examples/quantify_splicing.py",
+        "git_blob": "43c5d63b74589c582c327559064c47e53696a47a"
+      },
+      {
+        "path": "usage-guide.md",
+        "git_blob": "37b3fa27d836861548f6e32755e4b72dd757d4a4"
+      }
+    ],
+    "normalization_note": "The audited tree moves examples/quantify_splicing.py to scripts/, extracts two references/ files from SKILL.md, and edits SKILL.md and usage-guide.md; origin identifies the source Skill subtree, not a one-to-one file mapping."
+  },
+  "candidate": {
+    "branch": "normalize/bio-splicing-quantification",
+    "commit": "29f5446",
+    "path": "F:\\OpenScience\\wt\\norm-bio-splicing-quantification\\skills\\bio-splicing-quantification",
+    "status_before": "untracked Skill subtree only",
+    "status_after_execution": "untracked Skill subtree only; candidate files unchanged (preflight re-verified)",
+    "content_sha256": "1e34dbd9664e334b3feb336a3d624ec99d39ca9b5ad9a056f1f7142448bd489c",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 37504,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted by path and separated by LF; no trailing LF"
+    }
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 21211,
+      "sha256": "ee32feba1ec3ceb01eb2ce2c2a5c6486484b33843705917e73668123060b1d90"
+    },
+    {
+      "path": "references/failure-modes-and-errors.md",
+      "bytes": 5082,
+      "sha256": "a576d68f7271f56930091cfa944bea3e143e968d0a2b41396666a9372c22b785"
+    },
+    {
+      "path": "references/intron-retention-and-microexons.md",
+      "bytes": 2429,
+      "sha256": "17a45168bfeb67bc2f67a58ad32e6cbb2b4e08d23f01c1f1ed33d0e27ae66977"
+    },
+    {
+      "path": "scripts/quantify_splicing.py",
+      "bytes": 4968,
+      "sha256": "c1071a1e5f2ed87654da459a1e28b9603e97f76c672e834aca150561c304efef"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 3814,
+      "sha256": "515b11a9eb74a7a7c01a299567687203a4cf6bfb803049dbc42f91051278d638"
+    }
+  ],
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-splicing-quantification\\TOOLS.md",
+    "tools_md_sha256": "48cde79a160428e3ae04f5505701b446bae203983b02aca6a9f3f21cdd1e00ed",
+    "rubric_zip_sha256": "recorded from repository skill-auditor.zip (extracted to run-root rubric/)",
+    "environment": "WSL science: as-core (rMATS-turbo 4.4.0, regtools 1.0.0, leafcutter 0.2.9 scripts, STAR 2.7.11b; pandas 2.3.3, statsmodels 0.15.0), as-suppa (SUPPA 2.4, statsmodels 0.14.6, pandas 3.0.6), as-irfinder (IRFinder 1.3.1); combined env sha256 20c07bbbf63a972c04364225b028c9c83e0ee45a0ee9ee775cc56d7a8c26ad3c; staged public data (nf-core rnasplice chrX 2v2, synthetic planted)"
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

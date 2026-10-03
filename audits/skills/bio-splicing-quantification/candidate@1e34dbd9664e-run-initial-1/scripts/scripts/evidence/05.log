@@ -1,0 +1,34 @@
+outSAMstrandField               None
+outFilterMismatchNoverReadLmax  1.0
+alignSJoverhangMin          5
+alignSJDBoverhangMin        3
+IRFinder version: 1.3.1
+Usage: IRFinder -r ReferenceDir raw_reads_1.fastq[.gz] [raw_reads_2.fastq[.gz]]
+Usage: IRFinder -m BAM -r ReferenceDir Unsorted.bam
+Usage: IRFinder -m BuildRef -r ReferenceDir ftp://ftp.ensembl.org/pub/release-89/gtf/mus_musculus/Mus_musculus.GRCm38.89.gtf.gz
+Usage: IRFinder -m BuildRefProcess -r ReferenceDir
+Usage: IRFinder -m BuildRefFromSTARRef -r ReferenceDir -x STARRefDir
+
+    -v Show version number of current IRFinder.
+    -h Show this usage information.
+    -m RunMode. FastQ (default. Quantifies intron retention from FASTQ file);
+                BAM (quantifies intron retention from a name-sorted BAM file);
+                BuildRef (builds IRFinder reference from Ensembl FTP site. Requires Internet),
+                BuildRefDownload (only downloads FASTA and GTF files from Ensembl FTP site, without building IRFinder reference. Requires Internet),
+                BuildRefProcess (builds IRFinder reference from local FASTA and GTF files),
+                BuildRefFromSTARRef (builds IRFinder reference from a local STAR reference).
+
+Parameters for BuildRef mode:
+  required:
+    ftp://... A base Ensembl URL to a (gzipped) gtf file
+    -r ReferenceDir: Directory should not yet exist, will be created.
+  optional:
+    -t Threads: The number of physical CPUs to use by IRFinder. When ommited (default), IRFinder will use all physical CPUs.
+    -j INTEGER: An integer that is parsed to '--sjdbOverhang' under STAR 'genomeGenerate' mode. Default: 150.
+    -e ExtraGenomeRef.fasta.gz: Typically an ERCC reference.
+    -b Blacklist.bed.gz: BED of regions to be excluded from analysis.
+    -R ROI.bed.gz: A non-overlapping BED file of additional Regions of Interest for read counts.
+
+Parameters for BuildRefProcess mode:
+  required:
+    -r ReferenceDir. Directory should already contain EXACT files named 'genome.fa' and 'transcripts.gtf' (case-sensitive) for genome and transcriptome annotations respectively.

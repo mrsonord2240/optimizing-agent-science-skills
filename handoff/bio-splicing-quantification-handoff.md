@@ -1,72 +1,60 @@
-# Handoff: bio-splicing-quantification / audit-scientific-skill
+# Handoff: bio-splicing-quantification / fix-scientific-skill
 
 - Updated: 2026-10-03
 - Lane: 2
 - Status: ready-for-phase
-- Owner leaving: tooling worker (lane 2, full mode)
-- Next role: audit-scientific-skill
+- Owner leaving: initial-audit worker (lane 2)
+- Next role: fix-scientific-skill
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:alternative-splicing/splicing-quantification (source identity de91158720430e45ef20d81624a331dc9457edd99741b6e84e10da22f2315248, files=3, bytes=36158)
+- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:alternative-splicing/splicing-quantification (subtree 6e11b64e5f1c319983ec851f3d922655291db35a)
 - Working tree: F:\OpenScience\wt\norm-bio-splicing-quantification (sparse cone: skills/bio-splicing-quantification)
-- Branch/worktree: normalize/bio-splicing-quantification, started at 29f5446 (uncommitted)
-- Candidate tree hash: 1e34dbd9664e334b3feb336a3d624ec99d39ca9b5ad9a056f1f7142448bd489c (files=5, bytes=37504; `skill_preflight --offline` PASS, re-verified 2026-10-03, unchanged)
-- Applicable audit: none
+- Branch/worktree: normalize/bio-splicing-quantification, started at 29f5446 (uncommitted by design)
+- Candidate tree hash: 1e34dbd9664e334b3feb336a3d624ec99d39ca9b5ad9a056f1f7142448bd489c (files=5, bytes=37504; `skill_preflight --offline` PASS before and after the audit; no Skill bytes edited, no audit-local repair)
+- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-splicing-quantification\candidate@1e34dbd9664e-run-initial-1 (raw run: F:\OpenScience\audits\bio-splicing-quantification\run-initial-1; report.json, viewer.md). Score 64 numeric (Beta Only), recorded Reject because Research Veto M4 (code usability) FAILS. Static 69, execution 61.3, assertions 13/26.
 
 ## Completed this phase
 
-- Verified candidate identity, then ran the Skill's own commands and `scripts/quantify_splicing.py` on real chrX 2v2 and planted data in shared staging (no env/data added).
-- Wrote TOOLS.md with the per-surface coverage map, environment fingerprint, blockers and observations.
-- Added four scripts to ecosystem tools (`smoke_splicequant*.sh`, `fp_splicequant.sh`); noted in the ecosystem TOOLS.md.
-- Normalizer's Skill bytes untouched.
+- Verified identity, then executed rMATS (real chrX 2v2 and planted), SUPPA2 (planted, real, concordance with rMATS r 0.72-0.86), regtools + leafcutter (with and without XS tags), IRFinder, and the shipped script; the tooling leads O1-O3, N1 and N3 reproduced.
+- Published the record (13 scripts/inputs) and regenerated INDEX, BACKLOG, STATUS.md and STATUS.html; `audits:check` passes.
 
 ## Required next actions
 
-1. Audit the candidate using TOOLS.md. Spend effort on the observed defects (O1-O3) and on rMATS / SUPPA2 / leafcutter / IRFinder concordance.
-2. Label MAJIQ V3 as restricted-access and VAST-TOOLS as not executed; do not request tooling for either.
-
-## Coverage map (detail: TOOLS.md)
-
-| Surface | Status |
-|---|---|
-| rMATS-turbo 4.4.0 (Skill flags, paired real chrX + planted) | ready |
-| pandas parse of `*.MATS.JC.txt` (inline snippet) | ready; snippet fails (O1) |
-| `scripts/quantify_splicing.py` (parse_rmats_output, run_suppa2_quantification, filter_reliable_events) | ready; parse_rmats_output fails on 4 of 5 types (O2) |
-| SUPPA2 2.4 generateEvents/psiPerEvent (as-suppa) | ready (planted PSI 0.8/0.2/0.5 exact; chrX 7 psi files) |
-| regtools 1.0.0 + leafcutter_cluster_regtools.py | ready (0 clusters at `-m 50` on tiny data; 115 at `-m 5`) |
-| IRFinder `FastQ` mode, **1.3.1** | ready (IRratio r=0.99997 vs BAM mode) |
-| STAR/Salmon/kallisto upstream | ready, optional |
-| MAJIQ V3 build/psi/voila | restricted-access (licence form, not attempted) |
-| VAST-TOOLS (VASTDB 6.7 GB) | heavy-optional, not tooled; Skill must label not executed |
-| MicroExonator, S-IRFindeR, iREAD, leafcutter2, IRFinder-S 2.0 | not installed, mention-only |
+1. Fix SQ-01 to SQ-03 first (they clear the veto): working inline snippet, `parse_rmats_output` for all five event types, mean over IncLevel1/IncLevel2 only (never IncLevelDifference), junction filter on both groups; add a regression on `public-data\planted`.
+2. Fix SQ-04 (XS-tag prerequisite for regtools/leafcutter) and SQ-05 (`IRFinder -m FastQ`, reference build via `BuildRefFromSTARRef`, IRFinder-S 2.0 unverified).
+3. Then P2: SQ-06 to SQ-11. Execute every changed command again; classify tooling impact for re-audit.
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| O1 | P1 candidate | open | TOOLS.md obs. 1; logs\smoke_splicequant (A2) | Audit: SKILL.md inline `se_jc[inc_cols].mean(axis=1)` raises TypeError on real rMATS output (comma-string IncLevel, also matches `IncLevelDifference`) |
-| O2 | P1 candidate | open | TOOLS.md obs. 2 | Audit: `parse_rmats_output` KeyError (`exonStart_0base`, `exonEnd`) for A5SS/A3SS/MXE/RI; only SE works |
-| O3 | P2 | open | TOOLS.md obs. 3 | Audit: SUPPA2 statsmodels<=0.14.x pin not stated (as-core 0.15.0 breaks suppa.py); TPM header must omit index-name cell |
-| N1 | P2 | open | TOOLS.md obs. 4 | IRFinder-S 2.0 named; only IRFinder 1.3.1 available; `-m BuildRef` is FTP-only, use `BuildRefFromSTARRef` |
-| N2 | P2 | restricted | TOOLS.md Blockers | MAJIQ V3 licence; user action: register and install; then tooling delta |
-| N3 | P2 | deferred | SKILL.md Related Skills | Provider-style cross-skill names left as-is |
+| SQ-01 | P1 | open | run-initial-1\scripts\03_analyze.py sec. 1; evidence\03.log | Inline snippet raises TypeError on real JC output |
+| SQ-02 | P1 | open | 03_analyze.py sec. 2 | parse_rmats_output KeyError for A5SS/A3SS/MXE/RI (columns: longExon*/shortE*/flanking*, 1stExon*/2ndExon*, riExon*) |
+| SQ-03 | P1 | open | 03_analyze.py sec. 3 | mean_PSI wrong in 310/958 SE rows (IncLevelDifference included); filters use SAMPLE_1 only |
+| SQ-04 | P1 | open | 01_run_tools.sh sec. E; 02_leafcutter_m5_irf.sh | No XS prerequisite: strand ?, 0 clusters (115 with XS at -m 5) |
+| SQ-05 | P1 | open | 01_run_tools.sh sec. F | IRFinder literal syntax fails; IRFinder-S 2.0 not obtainable (1.3.1) |
+| SQ-06 | P2 | open | 01_run_tools.sh sec. C-D | SUPPA2 TPM header contract; statsmodels<0.15 pin |
+| SQ-07 | P2 | open | scripts/quantify_splicing.py | PSI filter 0.1-0.9 vs Skill 0.05-0.95; default-filter claim |
+| SQ-08 | P2 | open | 03_analyze.py sec. 4 | JC IncFormLen excludes exon body (98 vs JCEC 149) |
+| SQ-09 | P2 | open | viewer.md | Label MAJIQ V3 (restricted) and VAST-TOOLS (heavy-optional) as not executed; mark unsourced figures |
+| SQ-10 | P2 | open | SKILL.md Related Skills | Names do not resolve on the shelf; STAR and alignment-free-quant Skills absent |
+| SQ-11 | P2 | open | SKILL.md, usage-guide.md | BAM-list format, leafcutter script source, Skill-root LICENSE |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-splicing-quantification\TOOLS.md, sha256 `48cde79a160428e3ae04f5505701b446bae203983b02aca6a9f3f21cdd1e00ed` (written before the handoff; recompute if edited)
-- Environment fingerprint: combined sha256 `20c07bbbf63a972c04364225b028c9c83e0ee45a0ee9ee775cc56d7a8c26ad3c` (as-core 4c5897dd..., as-suppa 01529643..., as-irfinder 96dde80d...; `tools\fp_splicequant.sh`)
-- Staging: F:\OpenScience\audit-envs\alternative-splicing\ (reused); smoke output `logs\smoke_splicequant\`; driver `wsl_run.sh 'bash /mnt/openscience/audit-envs/alternative-splicing/tools/smoke_splicequant.sh'`
-- IRFinder reference lives at `logs\smoke_irfinder\ref` (do not rerun `tools\smoke_irfinder.sh`, it recreates that directory)
-- Restricted-access items: MAJIQ V3
-- Tooling impact: none (no Skill bytes changed in this phase)
-- Heavy surfaces: VAST-TOOLS VASTDB only; no GPU
+- Tool inventory: F:\OpenScience\audits\bio-splicing-quantification\TOOLS.md, sha256 `48cde79a160428e3ae04f5505701b446bae203983b02aca6a9f3f21cdd1e00ed`
+- Environment fingerprint: combined sha256 `20c07bbbf63a972c04364225b028c9c83e0ee45a0ee9ee775cc56d7a8c26ad3c` (as-core, as-suppa, as-irfinder; no environment changed)
+- Run evidence: run-initial-1\out (local raw outputs), scripts\ and scripts\evidence (published); driver `wsl_run.sh 'bash /mnt/openscience/audits/bio-splicing-quantification/run-initial-1/scripts/01_run_tools.sh'`
+- Deferred / static-only: MAJIQ V3 (restricted-access licence), VAST-TOOLS (heavy-optional), Shiba, MicroExonator, S-IRFindeR, iREAD, leafcutter2, IRFinder-S 2.0
+- Restricted-access items: MAJIQ V3 (register under licence, install, then tooling delta)
+- Tooling impact for the fixer to reassess: none expected unless the fix adds tools; IRFinder reference at `logs\smoke_irfinder\ref` is read-only (do not rerun `smoke_irfinder.sh`)
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\audits\bio-splicing-quantification\TOOLS.md; ecosystem tools\smoke_splicequant*.sh, tools\fp_splicequant.sh, logs\smoke_splicequant\, one appended note in alternative-splicing\TOOLS.md
-- Pre-existing/user-owned changes: records `test/validate.bats` (untracked); shelf `.vscode/` (untracked); untouched
-- Records state: this handoff uncommitted
+- Run-owned changes: F:\OpenScience\audits\bio-splicing-quantification\run-initial-1\; records repo audits\skills\bio-splicing-quantification\, audits\INDEX.md, BACKLOG.md, STATUS.md, STATUS.html (uncommitted for the orchestrator); this handoff
+- Pre-existing/user-owned changes: records `test/validate.bats` (untracked), shelf `.vscode/` (untracked); untouched
+- Records state: uncommitted
 - Product commits/pushes: none
 
 ## Transition assertion
