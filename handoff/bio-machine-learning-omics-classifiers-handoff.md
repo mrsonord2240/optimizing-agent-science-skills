@@ -1,60 +1,56 @@
-# Handoff: bio-machine-learning-omics-classifiers / fix-scientific-skill
+# Handoff: bio-machine-learning-omics-classifiers / prepare-scientific-skill-tooling (delta)
 
 - Updated: 2026-10-03
 - Lane: 3
-- Status: phase-failed (final re-audit: NOT candidate-ready; text-only P2 fixes plus one small script change)
-- Owner leaving: reaudit worker (lane 3a-2, independent of fixer and initial auditor)
-- Next role: fix-scientific-skill, then reaudit-scientific-skill in delta mode (the fix must stay within prose/comments/frontmatter plus one localized script change of at most 20 lines, else full mode)
+- Status: ready-for-phase (fix loop 2 done; OC-007..OC-011 fixed, executed)
+- Owner leaving: fix worker (lane 3a-2), did not audit and will not certify
+- Next role: prepare-scientific-skill-tooling in delta mode (tooling impact changed), then reaudit-scientific-skill in FULL mode (no certified identity exists)
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/omics-classifiers
 - Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-omics-classifiers
 - Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dir untracked by design)
-- Candidate tree hash: ac3c92e83a1c6946b20bc052a5443f1ab99e8e97c2dd902360b5a465a263732c (files=7, bytes=48515); `tools/skill_preflight.py --offline` PASS before and after the audit; bytes untouched
-- Applicable audit: audits/skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003 (this identity). Prior: candidate@1d68da6e6ef8-initial-lane3-20261003 (previous identity, superseded)
-
-## Readiness decision
-
-Not candidate-ready. Score 85, grade Limited Release (band Production Ready, one tier down for the assertion floor). Static 85, execution average 85.6, Layer 1 34.3, Layer 2 51.3, assertions 29/33 = 87.9% (gate 90%). Vetoes pass, no open P0/P1.
+- Candidate tree hash: 906900fae480655dca3808442d858f84b17aace68513ed281607842a0151276f (files=7, bytes=50806); `tools/skill_preflight.py` and `--offline` both PASS (only the no-root-LICENSE warn)
+- Previous identity (failed re-audit, superseded): ac3c92e83a1c6946b20bc052a5443f1ab99e8e97c2dd902360b5a465a263732c (files=7, bytes=48515)
+- Applicable audit: audits/skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003 (score 85, assertions 29/33; superseded by this identity)
 
 ## Completed this phase
 
-- OC-001..OC-006 independently retested and resolved (numbers in the record viewer, "Finding verdicts"). Tooling caveats T-1 (prose attributes numbers to the right setups), T-3/T-2 (cwd) and T-4 (demo 2 'warnings raised: 0'; warning path itself works) judged.
-- Record published and views regenerated: audits/skills/bio-machine-learning-omics-classifiers/candidate@ac3c92e83a1c-reaudit-lane3-20261003 (report.json, viewer.md, source-identity.json, 9 scripts); `npm run audits:index` and `npm run audits:check` pass.
-- Raw run: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\reaudit-lane3-20261003\ (evidence/, scripts/, build_*.py).
+- OC-007..OC-011 fixed; per-file before/after sha256 in `edits.json` (run dir below). Changed: SKILL.md, usage-guide.md, references/failure-modes.md, scripts/rf_xgboost_classifier.py. Unchanged: batch_checks.py, calibration_check.py, logistic_regression.py.
+- All 7 SKILL.md python blocks run OK on Golub and synthetic data, and all four scripts rc 0, under `-W error::FutureWarning`, no warnings; evidence/snippets_*.out, script_*.out.
+
+## Finding dispositions (all fixed; evidence under evidence/ in the run dir)
+
+| ID | Disposition | Measured |
+|---|---|---|
+| OC-007 | fixed | reproduced (oc007_rf_weights.out, 6 seeds): logistic AUC 0.826 plain vs 0.820 balanced (scale only); RF 0.776 vs 0.812, higher in 6/6; RF risk ratio 1.11x vs 2.43x. SKILL.md decision row, imbalance Approach + measured paragraph, thresholds row, usage-guide tip and failure-modes symptom now say logistic ranking unchanged, RF ranking can change, recalibrate in both |
+| OC-008 | fixed (text) | snippet comment says relative to cwd: run from the Skill dir or use the absolute scripts path; oc008_cwd_check.out: foreign cwd fails relative, passes with absolute path |
+| OC-009 | fixed (text) | "Not executed here" paragraph before the algorithm table (LightGBM, CatBoost, linear SVM, DLDA) and a usage-guide tip |
+| OC-010 | fixed (script) | before: n=300, best round 0 of 2000, XGB test AUC 0.597 (script_rf_xgboost_classifier.before.out). After: n=600, learning rate unchanged at 0.03, best round 223, validation logloss 0.588, XGB test AUC 0.834 (elastic net 0.944, RF 0.729; .after.out). Basis: oc010_explore.out, validation logloss only, test split not scored (n=600: lr 0.03 0.577 vs 0.1 0.601 vs 0.3 0.632 on the script's seed). Loud "!!! WARNING" when best round is 0, shown firing at n=300 (oc010_warn_check_n300.out) |
+| OC-011 | fixed (text) | usage-guide adds 100-rarer-class condition and the n=20 recalibration-can-lose note; SKILL.md noise sentence now any batch count (SD 0.09-0.10 at 2/3/6); n=20 RF Brier raw 0.1985 vs sigmoid 0.2089 vs isotonic 0.2356 (sigmoid ties raw at n=100, 0.1980); `random_state=0` in all three saga snippets |
+
+Not done (outside the brief): demo 2 'warnings raised: 0' remains unexplained in script output (sigmoid branch at n=20; tooling note T-4 explains it).
 
 ## Required next actions
 
-1. Fix OC-007 to OC-011 below (all P2); changes limited as noted, no new measurement needed except re-running the touched script.
-2. Re-audit in delta mode against the published record; rerun `scripts/rf_xgboost_classifier.py` and the touched snippets under `-W error::FutureWarning` from the Skill directory and from another cwd.
-
-## Open findings and blockers
-
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| OC-007 | P2 | open | viewer input 2; evidence/ra_calibration.out (RF AUC 0.776 -> 0.812 balanced, 6/6 seeds); staged calibration_part1.json (0.648 -> 0.720) | Text-only: "changes scale, not ranking" and "no AUC gain" (SKILL.md Approach, decision tree, thresholds table; failure-modes) hold for logistic, not for RF; say so, keep the advice |
-| OC-008 | P2 | open | evidence/ra_cwd.out | Text-only: say the blocks run from the Skill directory or anchor the path on the Skill's location |
-| OC-009 | P2 | open | SKILL.md algorithm table, tips; usage-guide | Text-only: mark LightGBM, CatBoost, linear SVM, DLDA as prose guidance, not executed |
-| OC-010 | P2 | open | evidence/script_rf_xgboost_classifier.out (best round 0 of 2000, AUC 0.597, spread [0.46, 0.49]) | Script (few lines): choose rounds by CV as SKILL.md advises, or drop the XGBoost spread line and label the row non-informative; update the SKILL.md sentence describing the script if behaviour changes |
-| OC-011 | P2 | open | viewer "New findings" | Text-only: usage-guide add "100 in the rarer class"; explain 'warnings raised: 0' in demo 2 (sigmoid branch, warning only on isotonic); noise caution applies at any small batch count (SD 0.09-0.10 at 2, 3, 6); say recalibration at n<=100 can lose to raw probabilities; set random_state in saga snippets |
-
-Standing caveats (not findings): sample-size rule from synthetic RF/XGBoost bases (my own logistic base agrees); no public multi-batch cohort staged; small-n early-stopping advice measured at n_train=120 only; Golub near-separable. LightGBM, CatBoost, SVM, DLDA never executed (static-only, not heavy-optional-labelled in the Skill: OC-009).
+1. Tooling delta refresh of the rf_xgboost_classifier.py row, then full-mode independent re-audit of the identity above; rerun rf_xgboost_classifier.py (21 s class) and the SKILL.md blocks.
+2. Standing caveats unchanged: sample-size rule from synthetic bases; no public multi-batch cohort; Golub near-separable; LightGBM/CatBoost/SVM/DLDA unexecuted (now labelled).
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\TOOLS.md (sha256 481d854386ebb5cf91301ef6f54c999b3ad032112168ffa641e193ac908c2800); environment fingerprint UNCHANGED 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6; pip freeze identical to staged freeze
-- Run evidence: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\reaudit-lane3-20261003\evidence\; staged claims F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\derived\omics-classifiers-claims\
+- Tool inventory: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\TOOLS.md; interpreter F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\Scripts\python.exe (3.12, sklearn 1.9.1, xgboost 3.4.1); environment untouched
+- Fix run: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\fix2-lane3-20261003\ (edits.json, before.sha256, scripts/, evidence/)
 - Restricted-access items: none
-- Tooling impact: none expected (a script edit uses numpy/sklearn/xgboost already staged)
+- Tooling impact: changed (surface `scripts/rf_xgboost_classifier.py` runnable bytes changed: n=300 to 600, new warning branch; no new dependency or environment change; the TOOLS.md row's numbers (AUC 0.741/0.639/0.597, best round 0, 21 s) are stale and the SKILL.md block text changed). Route note: tooling-delta only to refresh that row, may run in parallel with or before the full re-audit as the relay decides
 
 ## Worktree safety
 
-- Run-owned changes: the reaudit run dir above; published record and regenerated audits/INDEX.md, BACKLOG.md, STATUS.md, STATUS.html (other workers regenerate the same views); this handoff
+- Run-owned changes: the four Skill files above; fix2 run dir; this handoff
 - Pre-existing/user-owned changes: records untracked test/validate.bats; shelf .vscode/; sibling Skill dirs (untouched)
 - Records state: uncommitted
 - Product commits/pushes: none
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes (fix phase can start from this handoff and the record)
+- Next-phase prerequisites met: yes, subject to the tooling-delta refresh of the one stale TOOLS.md row
