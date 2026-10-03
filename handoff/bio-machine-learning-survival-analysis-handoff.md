@@ -1,60 +1,57 @@
-# Handoff: bio-machine-learning-survival-analysis / fix-scientific-skill
+# Handoff: bio-machine-learning-survival-analysis / prepare-scientific-skill-tooling (delta)
 
-- Updated: 2026-10-03T14:45:00-04:00
-- Lane: 3 (batch 3b)
+- Updated: 2026-10-03T16:00:00-04:00
+- Lane: 3 (batch 3b-2)
 - Status: ready-for-phase
-- Owner leaving: initial-audit worker (lane 3b)
-- Next role: fix-scientific-skill
+- Owner leaving: fix-scientific-skill worker (lane 3b-2)
+- Next role: prepare-scientific-skill-tooling (delta mode), then reaudit-scientific-skill
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/survival-analysis
 - Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis
-- Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dirs untracked by design)
-- Candidate tree hash: 2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b (files=5, bytes=27923), re-verified with `tools/skill_preflight.py --offline` after the audit (PASS, no pycache)
-- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-machine-learning-survival-analysis\candidate@2dc45fa24b13-initial-lane3b-20261003\report.json (identity above; score 77, Limited Release, no veto)
+- Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dir untracked by design; no product commit)
+- Candidate tree hash: c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39 (files=5, bytes=33891), `tools/skill_preflight.py` PASS (full and --offline-equivalent run, no pycache)
+- Previous identity: 2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b
+- Applicable audit: audits\skills\bio-machine-learning-survival-analysis\candidate@2dc45fa24b13-initial-lane3b-20261003\ (audited the previous identity; stale for these bytes)
 
 ## Completed this phase
 
-- Static review plus 5 executed inputs: SKILL.md blocks verbatim on GBSG2, cox_regression.py, competing_risks_cif.py with a hand-computed table, metric-direction and pycox CPU checks, p>>n Coxnet check.
-- Reproduced two silent defects: KM baseline IBS miscomputed (0.290 vs 0.236; GBSG2 0.263 vs 0.178) and Coxnet predicting at the smallest alpha (p>>n: C 0.708 vs 0.790 CV-tuned).
-- Verified: lifelines 1-C trap, 1-KM vs Aalen-Johansen (hand values match), Harrell upward bias, dependency statements (sksurv sklearn <1.10 and pandas >=2.2 no cap; lifelines alone pandas <3; pycox trains on CPU).
-- Published record with 20 scripts/evidence files; views regenerated, `npm run audits:check` passes.
-- No audit-local repair; no Skill bytes changed.
+- All five findings fixed; fix log and ledger: F:\OpenScience\audits\bio-machine-learning-survival-analysis\fix-lane3b-20261003\fix-log.md
+- SA-001: GBSG2 KM-baseline IBS 0.263 -> 0.178, equals lifelines/hand KM. SA-002: p>>n (n=150, p=1000) 161 nonzero / Uno C 0.708 -> CV alpha, 6 nonzero / 0.791; GBSG2 0.668 -> 0.669.
+- SKILL.md snippets execute as written (logs\run_skill_snippets.log); competing-risks and prose-only claims corrected.
+- Changed files: scripts/cox_regression.py, SKILL.md, usage-guide.md.
 
 ## Required next actions
 
-1. Fix SA-001 (P1, runnable bytes): true KM baseline in scripts/cox_regression.py and SKILL.md IBS example.
-2. Fix SA-002 (P1, runnable bytes): choose Coxnet alpha by CV in the snippet and script; state which alpha predict uses.
-3. Fix SA-003, SA-004, SA-005 (text only): runnable evaluation setup (t_horizon, splits); qualify RSF competing-risks claim and name implementations; label prose-only methods not executed and tighten the dependency note.
-4. Report tooling impact: SA-001/SA-002 change scripts, so request a tooling delta (rerun scripts/pgtn_and_censoring_checks.py and km_baseline_check.py).
+1. Tooling delta: re-smoke scripts/cox_regression.py (`--data synthetic|gbsg2`, new surface flag) and the SKILL.md snippet block; update TOOLS.md surface rows (old KM IBS 0.290 and "snippets 0.178 KM-only" figures are superseded).
+2. Reaudit the new identity with a fresh auditor (full mode: runnable bytes changed).
 
-## Open findings and blockers
+## Findings
 
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| SA-001 | P1 | open | audits\skills\...\scripts\evidence\km_baseline_check.log | runnable bytes + text |
-| SA-002 | P1 | open | scripts\evidence\pgtn_and_censoring_checks.log, coxnet_alpha_check.log | runnable bytes + text |
-| SA-003 | P2 | open | scripts\evidence\gbsg2_skill_snippets.log | text only |
-| SA-004 | P2 | open | scripts\evidence\sksurv_competing_check.log, competing_hand_check.log | text only |
-| SA-005 | P2 | open | scripts\evidence\dependency_metadata.log | text only |
+| ID | Severity | State | Evidence |
+|---|---|---|---|
+| SA-001 | P1 | fixed | fix-lane3b-20261003\logs\verify_fixes.log |
+| SA-002 | P1 | fixed | same log, parts C-E |
+| SA-003 | P2 | fixed | logs\run_skill_snippets.log |
+| SA-004 | P2 | fixed | logs\competing_impl_check.log |
+| SA-005 | P2 | fixed | SKILL.md Version Compatibility and Model Taxonomy |
 
-Deferred (static-only, prose only): Fine-Gray, landmarking, calibration curves/ICI, nested CV. Blocked: none. No real public competing-risks set is staged (script stays synthetic).
+Deferred: none. Blocked: none. R packages (cmprsk, riskRegression, randomForestSRC) are named, not installed or executed.
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md (sha256 f74308bb8b2fd623cc27e8529cd61ce9f7a8045cbf5844f119e963cf63453e63)
-- Environment fingerprint: sha256 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6; survival-venv and pycox-venv (CPU)
-- Run evidence: F:\OpenScience\audits\bio-machine-learning-survival-analysis\initial-lane3b-20261003\ (report.json, viewer.md, finding-ledger.md, scripts\, logs\)
+- Tool inventory: F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md (sha256 f74308bb8b2fd623cc27e8529cd61ce9f7a8045cbf5844f119e963cf63453e63); survival-venv, no new dependency
+- Run evidence: F:\OpenScience\audits\bio-machine-learning-survival-analysis\fix-lane3b-20261003\ (scripts\, logs\, fix-log.md)
 - Restricted-access items: none
-- Tooling impact: not applicable to this phase (no Skill bytes changed); fixes for SA-001/SA-002 will change runnable bytes
+- Tooling impact: changed (scripts/cox_regression.py algorithm and CLI; SKILL.md snippets)
 
 ## Worktree safety
 
-- Run-owned changes: the run directory above; records `audits/skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-initial-lane3b-20261003/`; regenerated audits/INDEX.md, BACKLOG.md, STATUS.md, STATUS.html; this handoff
-- Pre-existing/user-owned changes: records untracked `test/validate.bats`; shelf untracked `.vscode/`; sibling workers' records and handoffs; none touched
-- Records state: uncommitted paths above
-- Product commits/pushes: none
+- Run-owned changes: the Skill dir above, the run directory, this handoff
+- Pre-existing/user-owned: records untracked test/validate.bats; shelf .vscode/; sibling Skill dirs untouched
+- Incident: three unidentified python.exe PIDs (50840, 46632, 59468) were force-killed while stopping my own slow job; owner unknown, may include sibling workers' runs
+- Records state: uncommitted; Product commits/pushes: none
 
 ## Transition assertion
 
