@@ -84,8 +84,16 @@ export function renderStatusDashboard(status) {
   const areaRows = status.areas
     .map((row) => {
       for (const key of Object.keys(areaTotals)) areaTotals[key] += row[key];
+      const inScope = row.known - row.excluded;
+      const share = percent(row.done, inScope);
+      const tone =
+        inScope > 0 && row.done === inScope
+          ? ' class="area-complete"'
+          : row.done > 0
+            ? ` class="area-partial" style="--share:${Math.round(8 + share * 0.4)}%"`
+            : "";
       return `
-            <tr>
+            <tr${tone} title="${row.done} of ${inScope} done">
               <td data-label="Area"><strong>${escapeHtml(row.area)}</strong></td>
               <td data-label="Done">${row.done}</td>
               <td data-label="Started">${row.started}</td>
@@ -243,6 +251,9 @@ export function renderStatusDashboard(status) {
     th { padding: 0.75rem 0.9rem; background: var(--header); color: var(--header-ink); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; }
     td { padding: 0.9rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: 0; }
+    tr.area-complete td { background: var(--forest); color: var(--paper-raised); }
+    tr.area-complete td::before { color: inherit; }
+    tr.area-partial td { background: color-mix(in srgb, var(--amber) var(--share), var(--paper-raised)); }
     tbody tr:hover { background: #eee9dc; }
     .skill-cell { min-width: 22rem; }
     .skill-cell a { font-weight: 600; }
@@ -455,7 +466,7 @@ export function renderStatusDashboard(status) {
     <section aria-labelledby="area-title">
       <div class="section-heading">
         <h2 id="area-title">Progress by upstream area</h2>
-        <p class="pretext-copy" data-pretext contenteditable="plaintext-only">The area is the first segment of each Skill's upstream path. Done is ready on the optimized shelf, started has a published audit but is not ready, and excluded covers excluded and out-of-scope Skills.</p>
+        <p class="pretext-copy" data-pretext contenteditable="plaintext-only">The area is the first segment of each Skill's upstream path. Done is ready on the optimized shelf, started has a published audit but is not ready, and excluded covers excluded and out-of-scope Skills. Green rows are fully done; amber rows deepen as the done share rises.</p>
       </div>
       <div class="table-wrap">
         <table>
