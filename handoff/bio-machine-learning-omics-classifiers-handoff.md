@@ -1,60 +1,60 @@
-# Handoff: bio-machine-learning-omics-classifiers / fix-scientific-skill
+# Handoff: bio-machine-learning-omics-classifiers / prepare-scientific-skill-tooling (delta, then reaudit-scientific-skill)
 
-- Updated: 2026-10-03T15:20:00-04:00
+- Updated: 2026-10-03T19:00:00-04:00
 - Lane: 3
 - Status: ready-for-phase
-- Owner leaving: audit worker (lane 3a, initial audit, batch with biomarker-discovery)
-- Next role: fix-scientific-skill
+- Owner leaving: fix worker (lane 3a-2)
+- Next role: prepare-scientific-skill-tooling (delta mode); then reaudit-scientific-skill
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/omics-classifiers
 - Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-omics-classifiers
 - Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dir untracked by design)
-- Candidate tree hash: 1d68da6e6ef86650cbb2f70c8fda804b7bbe5a9792b3c72bf0bf5d4c0173f047 (files=5, bytes=29444), re-verified with `tools/skill_preflight.py --offline` before and after execution (PASS)
-- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-machine-learning-omics-classifiers\candidate@1d68da6e6ef8-initial-lane3-20261003 (audits the identity above; score 77, grade Beta Only after the execution-average and assertion-rate floors; both vetoes PASS)
+- Candidate tree hash: ac3c92e83a1c6946b20bc052a5443f1ab99e8e97c2dd902360b5a465a263732c (files=7, bytes=48515); `tools/skill_preflight.py` and `--offline` both PASS (warn: no Skill-root LICENSE, as before)
+- Applicable audit: candidate@1d68da6e6ef8-initial-lane3-20261003 audited the PREVIOUS identity 1d68da6e...; it does not cover these bytes
 
 ## Completed this phase
 
-- Ran the Core Workflow, quick-reference, XGBoost, SMOTE, calibration and batch snippets plus both bundled scripts; Golub ALL/AML for API/behaviour, synthetic data with a known generative model for discrimination and calibration claims. Run dir F:\OpenScience\audits\bio-machine-learning-omics-classifiers\initial-lane3-20261003 (report, viewer, ledger, scripts, evidence).
-- SMOTE leakage and "no AUC gain, inflated risk" reproduced. Tooling's Golub AUC 1.000 not used (near-separable).
-- Normalizer scoring change judged correct and stated here, but it removes sparsity on Golub (OC-003).
-- No audit-local repair; Skill bytes untouched.
+- All six findings fixed (ledger: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\fix-lane3-20261003\finding-ledger.md); all eleven failed assertions addressed.
+- Every SKILL.md python block and all four scripts executed under `-W error::FutureWarning` (Golub and synthetic): evidence/snippets_golub.out, snippets_synthetic.out, *.out.
+- Measured numbers are in SKILL.md prose; raw experiments in the run dir evidence/ (calibration_part1/2.json, scoring_golub.json, scoring_1se.json, earlystop.json).
 
-## Required next actions
+## Finding dispositions
 
-1. Fix OC-001 (P1): drop class_weight=balanced from risk-model snippet/decision tree/usage-guide; state it shifts predicted risk like SMOTE.
-2. Fix OC-002 (P1): batch snippet needs a multiclass-safe metric and LeaveOneGroupOut.
-3. Fix OC-003 (P1): document that scoring governs sparsity; recommend roc_auc / 1-SE for small signatures.
-4. Fix OC-004 (P1): calibration snippet default sigmoid at small n; state isotonic minimum n.
-5. Fix OC-005 (SKILL.md sentence; optional script) and OC-006 (script docstring/captions + usage-guide). Scripts are the only runnable-byte changes; changed snippets need re-execution. Optionally request a tooling-delta pass for a public multi-batch set.
+| ID | State | Result |
+|---|---|---|
+| OC-001 | fixed | No reweighting when probability is the output; balanced logistic 4.2x prevalence vs 0.99x unweighted, 1.11x recalibrated (8%, 20k test); balanced RF 2.6x |
+| OC-002 | fixed | batch_checks.py LeaveOneGroupOut; works at 2/3/6 batches (per-batch mean AUC 0.54/0.70/0.45 vs random-split 0.82/0.88/0.86); one-class batch shown as NaN with note |
+| OC-003 | fixed | scoring stays neg_log_loss; dense (Golub 1,059-2,000 of 2,000 non-zero); lasso + 1-SE gives 45/142/60 at unchanged AUC; claim reworded |
+| OC-004 | fixed | sigmoid default; isotonic only at n_cal >= 1000 and >= 100 rarer-class events; recalibrate() warns at <= 3 distinct values |
+| OC-005 | fixed | 3-way split; early-stopping set not reported; val 15 gives best round 4.5 and AUCPR 0.83 vs test AUC 0.61; inner-CV rounds 0.69 |
+| OC-006 | fixed | scripts match docstrings/captions; usage-guide tip rewritten |
 
-## Open findings and blockers
+## Changed files
 
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| OC-001 | P1 | open | evidence/o2.json | class_weight vs calibration (SKILL.md, usage-guide, failure-modes text) |
-| OC-002 | P1 | open | evidence/o6.json | batch snippet metric + LOBO (SKILL.md snippet) |
-| OC-003 | P1 | open | evidence/o1.json, o8.json | scoring vs sparsity (SKILL.md text) |
-| OC-004 | P1 | open | evidence/o4.json | isotonic at tiny n (SKILL.md snippet) |
-| OC-005 | P2 | open | evidence/o5.json | early-stopping validation reuse (text; optional script) |
-| OC-006 | P2 | open | evidence/*.run1.out | script docstring/captions, usage-guide tip (runnable bytes) |
+- SKILL.md, usage-guide.md, references/failure-modes.md (prose and snippets)
+- scripts/logistic_regression.py, scripts/rf_xgboost_classifier.py (changed)
+- scripts/batch_checks.py, scripts/calibration_check.py (new; import only numpy, pandas, sklearn)
 
-Deferred/static-only: LightGBM, CatBoost, SVM, DLDA (prose). Blocked: none (no public multi-batch set staged; synthetic batches used, failures are API-level).
+## Open items for the next workers
+
+1. Tooling delta: two new runnable surfaces (batch_checks.py, calibration_check.py), two changed scripts, new SKILL.md snippets importing them (cwd = Skill dir, `sys.path.insert(0, 'scripts')`). No new dependency or environment change. Calibration demo takes about 80 s.
+2. Re-audit independently. Caveats to scrutinise: sample-size rule is from synthetic RF/XGBoost bases (not real omics); 2-3 batch leave-one-batch-out is noisy; no public multi-batch set was staged; the "small n: use CV rounds" advice was measured at n_train=120 only.
+3. Golub is near-separable: used only for executability and sparsity counts.
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\TOOLS.md (sha256 7f4a80ba28ac74641a3bf4ad8d7f5d8cfa2cb7664f7d8320debadc4daea1db73)
-- Environment fingerprint: sha256 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6; root F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst (sklearn 1.9.1, xgboost 3.4.1, imbalanced-learn 0.14.2)
-- Run evidence: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\initial-lane3-20261003\ (ledger: finding-ledger.md)
+- Tool inventory: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\TOOLS.md (sha256 7f4a80ba28ac74641a3bf4ad8d7f5d8cfa2cb7664f7d8320debadc4daea1db73; needs a delta row for the new scripts)
+- Fix run evidence: F:\OpenScience\audits\bio-machine-learning-omics-classifiers\fix-lane3-20261003\
 - Restricted-access items: none
-- Tooling impact: uncertain until fixes land (scripts and snippets change)
+- Tooling impact: changed (new surfaces scripts/batch_checks.py and scripts/calibration_check.py; changed logistic_regression.py and rf_xgboost_classifier.py; SKILL.md snippets rewritten; no dependency change)
 
 ## Worktree safety
 
-- Run-owned changes: audit run dir above; records `audits/skills/bio-machine-learning-omics-classifiers/candidate@1d68da6e6ef8-initial-lane3-20261003/`; regenerated audits views; this handoff
-- Pre-existing/user-owned changes: records untracked `test/validate.bats`; shelf untracked `.vscode/`; other workers' handoffs and audit records; none touched
-- Records state: uncommitted paths above
+- Run-owned changes: the Skill dir above; fix run dir; this handoff
+- Pre-existing/user-owned changes: records untracked test/validate.bats; shelf .vscode/; sibling Skill dirs and handoffs (untouched)
+- Records state: uncommitted
 - Product commits/pushes: none
 
 ## Transition assertion
