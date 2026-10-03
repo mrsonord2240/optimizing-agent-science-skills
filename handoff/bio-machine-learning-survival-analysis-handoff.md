@@ -1,65 +1,57 @@
-# Handoff: bio-machine-learning-survival-analysis / prepare-scientific-skill-tooling
+# Handoff: bio-machine-learning-survival-analysis / audit-scientific-skill
 
-- Updated: 2026-10-03
+- Updated: 2026-10-03T12:30:00-04:00
 - Lane: 3
 - Status: ready-for-phase
-- Owner leaving: normalize worker (lane 3, machine-learning batch)
-- Next role: prepare-scientific-skill-tooling
+- Owner leaving: tooling worker (lane 3, machine-learning batch)
+- Next role: audit-scientific-skill
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/survival-analysis
-- Source identity (skill_preflight, measured on F:\OpenScience\bioSkills-Improved): 0bb20cee2b407e12bb5750d39c28288692e98753e5a2653f659303b3775537a0 (files=4, bytes=27071)
 - Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis
-- Branch/worktree: normalize/ml-lane3 from 29f5446 (sparse cone: the four machine-learning Skills of this batch; shared with the three sibling Skills)
-- Candidate tree hash: 2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b (files=5, bytes=27923), taken from `python tools/skill_preflight.py`
-- Preflight: PASS; warn: no Skill-root LICENSE (manifest must cite repository license evidence; frontmatter `license: MIT` is present, shelf root LICENSE is MIT, GPTomics)
+- Branch/worktree: normalize/ml-lane3 from 29f5446 (Skill dirs untracked by design)
+- Candidate tree hash: 2dc45fa24b1316256e951edee5cb62a428151ed508104a0dc2aa75033405182b (files=5, bytes=27923), re-verified with `tools/skill_preflight.py --offline` after tooling (PASS)
 - Applicable audit: none
 
 ## Completed this phase
 
-- Directory named to the Skill ID; frontmatter gains `category: Data Analysis` (name, license, author unchanged).
-- `examples/*.py` moved to `scripts/` with only version headers and deprecated-API fixes changed; SKILL.md routes to each with a run line.
-- "Per-Method Failure Modes" (and reconciliation table where present) moved to `references/failure-modes.md`, routed from SKILL.md with a read-when line.
-- Version drift resolved: compat line (sksurv 0.28, lifelines 0.30, sklearn 1.9, numpy 2.5, pandas 2.3); added note that sksurv 0.28 pins sklearn 1.9.x and lifelines needs pandas <3 (isolated env required).
-- Scripts re-run against the current environments (see Environment); LF, UTF-8 no BOM, no pycache.
+- Both scripts re-run clean (rc 0, no warnings) in tools\survival-venv; snippets run on real GBSG2 (686 pts): Coxnet Uno C 0.668, RSF 0.683, IBS 0.161 vs KM-only 0.178; lifelines 1-C sign trap reproduces.
+- Constraint check from installed metadata: sksurv 0.28 needs sklearn >=1.9,<1.10 and pandas >=2.2 (no cap); lifelines 0.30.3 alone needs pandas <3.0. SKILL.md wording is accurate.
+- Added tools\pycox-venv (pycox 0.3.0, torch 2.14.1 CPU, pandas 3.0.6): DeepSurv C-td 0.615 and DeepHit 0.620 on GBSG2, CPU, seconds.
 
-## Structural summary
+## Coverage map (per surface)
 
-- `SKILL.md` (core workflow, taxonomy, decision tree, thresholds, common errors, citations), `usage-guide.md` (unchanged), `references/failure-modes.md`, `scripts/` (2 files).
-- Scientific content, defaults, thresholds, and citations unchanged.
-
-## Runnable-surface inventory
-
-- `scripts/cox_regression.py` - synthetic Coxnet + RSF, Uno C / AUC(t) / IBS vs KM baseline, CPU, seconds; ran OK.
-- `scripts/competing_risks_cif.py` - synthetic 1-KM vs Aalen-Johansen CIF, CPU, seconds; ran OK.
-- pycox DeepSurv/DeepHit, Fine-Gray, landmarking, lifelines C-index appear as prose or one-line fixes only (no code; pycox untested).
-
-Dependency clues: scikit-survival (pins scikit-learn 1.9.x), lifelines (pandas <3), pandas; optional pycox + torch.
+- `scripts/cox_regression.py`, `scripts/competing_risks_cif.py`: executed (synthetic; survival venv).
+- Snippets + lifelines CoxPH/C-index: executed on GBSG2 (sksurv bundled, no download).
+- pycox DeepSurv/DeepHit (prose only): executed in pycox venv (`logs/pycox_smoke.log`).
+- Fine-Gray, landmarking: prose only, no code, not exercised; no real public competing-risks set staged.
 
 ## Required next actions
 
-1. Tooling worker: map the surfaces above to the staged environment and record coverage; flag any surface needing public inputs.
-2. Do not edit Skill bytes without re-running preflight and updating the identity above.
+1. Audit batching: **light** (every required surface runs on CPU in under 2 minutes; inputs under 30 MB).
+2. Audit against the exact identity above; run from saved scripts in F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3 (logs in its `logs` folder).
+3. Do not edit Skill bytes in the audit; findings go to the ledger. Needed-but-missing inputs: request a tooling-delta pass.
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| none | - | - | - | No blocker. Notes for audit: The pandas <3 constraint comes from lifelines pins per the staging TOOLS.md, not re-verified here. pycox 0.3 unchecked against current torch. |
+| none | - | - | - | Notes for audit: Use two venvs: lifelines needs pandas 2.3 (survival-venv); pycox/sksurv-only code runs on pandas 3 (pycox-venv). |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\tools\survival-venv\ (scikit-survival 0.28.0, lifelines 0.30.3, scikit-learn 1.9.1, numpy 2.5.3, pandas 2.3.3); pycox not installed (torch-pinned, optional)
-- Run evidence: scripts executed in place from the worktree with `PYTHONDONTWRITEBYTECODE=1`; no transcripts saved.
+- Tool inventory: F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md (sha256 f74308bb8b2fd623cc27e8529cd61ce9f7a8045cbf5844f119e963cf63453e63)
+- Environment fingerprint: sha256 20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6 of F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3\fingerprint-inputs.txt (hashes of four pip freezes); ecosystem root F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst (INDEX row `machine-learning`), addendum in its TOOLS.md and `public-data\README.md`
+- Run evidence: F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\smoke\ml-lane3\logs\
 - Restricted-access items: none
-- Tooling impact: changed (scripts moved from `examples/` to `scripts/`; deprecated sklearn API replaced)
+- Tooling impact: none (no Skill bytes changed; staging additions only: pycox-venv)
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis\ (untracked, new to the shelf); this handoff
-- Pre-existing/user-owned changes: records repo untracked `test/validate.bats` and a modified `handoff/bio-splicing-quantification-handoff.md` (another worker); shelf untracked `.vscode/`; none touched
-- Records state: uncommitted handoff file
+- Run-owned changes: staging under F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst (smoke\ml-lane3, derived, public-data, tools\pycox-venv, freeze, TOOLS.md, INDEX.md); records `audits/skills/bio-machine-learning-survival-analysis/candidate@2dc45fa24b13-tooling-20261003/TOOLS.md`; this handoff
+- Pre-existing/user-owned changes: records untracked `test/validate.bats`; shelf untracked `.vscode/`; other workers' handoffs; none touched
+- Records state: uncommitted paths above
 - Product commits/pushes: none
 
 ## Transition assertion
