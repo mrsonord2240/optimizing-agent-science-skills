@@ -1,61 +1,51 @@
 # Handoff: bio-ensembl-rest / fix-scientific-skill
 
-> RUN PAUSED 2026-10-03 by Sam after the initial audit. Nothing is in flight. Resume at fix-scientific-skill; candidate is untracked and uncommitted in the working tree below.
-
-- Updated: 2026-10-03T00:00:00-07:00
-- Lane: 2
+- Updated: 2026-10-03
+- Lane: 4
 - Status: ready-for-phase
-- Owner leaving: initial-audit worker (Sonnet), lane 2, batch database-access light
-- Next role: fix-scientific-skill
+- Owner leaving: fix worker (lane 4)
+- Next role: reaudit-scientific-skill
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/ensembl-rest
-- Working tree: F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest
-- Branch/worktree: fix/dbaccess-ensembl-rest at 2f38178 (shelf main)
-- Candidate tree hash: 3d116ba2e1c5bbcc610914c9e3364af733acbcf69c0c20cc39abc149099e40b2 (sha256-manifest-v1, files=6, bytes=24508; unchanged, no pycache)
-- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-ensembl-rest\candidate@3d116ba2e1c5-initial-audit-run\report.json (identity above)
+- Working tree: F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest (branch fix/dbaccess-ensembl-rest at 2f38178; Skill dir untracked, uncommitted)
+- Audited identity: 3d116ba2e1c5bbcc610914c9e3364af733acbcf69c0c20cc39abc149099e40b2 (audit: audits\skills\bio-ensembl-rest\candidate@3d116ba2e1c5-initial-audit-run\report.json, 70 Beta Only)
+- Candidate identity (preflight --offline PASS): sha256-manifest-v1 dabba949803e4c58bd3cc906389087520b3e5f5c32702fb6535c749131c0487b, files=7, bytes=28785
 
-## Completed this phase
+## Finding ledger
 
-- Score 70 (static 74, exec 67.6, assertions 15/23), Beta Only, no veto. Run dir: F:\OpenScience\audits\bio-ensembl-rest\initial-audit-run\ (report.json, viewer.md with ordered ledger, source-identity.json, scripts/).
-- Executed every client function, all three examples, e110/e111/e116/GRCh37/e90 archives, divisions, POST lookup, doc endpoint table against live Ensembl 116.
-- Confirmed leads T1 -> ENS-001 and T2 -> ENS-002; N1 narrowed: e116 archive host (jun2026) 503 is an outage, e110/e111 reproducible.
-- Published record; audits:index and audits:check pass.
+| ID | Sev | State | Change / evidence |
+|---|---|---|---|
+| ENS-001 | P1 | fixed | SKILL.md snippet, example and usage-guide use ENSP00000269305; client gains `multiple_sequences=` (15 records for ENSG00000139618). Evidence: fix-evidence\bio-ensembl-rest\example_lookup_and_overlap.txt, verify.txt |
+| ENS-002 | P1 | fixed | vep_annotation.py uses ENST00000366667:c.803C>T (missense_variant). example_vep_annotation.txt, verify.txt |
+| ENS-003 | P1 | fixed | usage-guide uses GRCh38 17:43044295 T>A and points GRCh37 coordinates to the grch37 host (splice_region_variant there; 400 on GRCh38 host). verify.txt |
+| ENS-004 | P1 | fixed | Regulatory row now `/overlap/region/...?feature=regulatory` (34 features); homology row now `/homology/id/{species}/{id}` (200; no-species 404). verify.txt |
+| ENS-005 | P2 | fixed | Docs say 400 `No valid lookup found`; Homo_sapiens noted as accepted. SKILL.md + usage-guide.md |
+| ENS-006 | P2 | fixed | Client: 30 s timeout, retry 429/5xx/timeouts, non-JSON check, `EnsemblError`, error body in HTTPError, batch_symbols catches both. Verified: e90 HTML -> EnsemblError, e116 503 -> EnsemblError after 3 tries, timeout path, batch. Docs note temporary archive outage. verify.txt |
+| ENS-007 | P2 | fixed | compara example prints "none returned" for empty paralogs; semantics text matches service. example_compara_homology.txt (exit 0 on third attempt; first two hit 503/ReadTimeout on the flaky homology endpoint) |
+| ENS-008 | P2 | fixed | Skill-root LICENSE (upstream MIT, LF) copied from origin checkout; preflight no longer warns. |
 
-## Required next actions
+No new findings. Residual: e116 archive host still returned 503 (service outage, not a fix failure); the e110/e111 archive paths were re-exercised via lookup_and_overlap (e110 OK).
 
-1. Fix ENS-001 .. ENS-004 (P1) first; they are doc/example edits plus optional `multiple_sequences` client option.
-2. Then ENS-005 .. ENS-008 (P2). Re-run the three examples and the run_core/run_claims probes after fixing.
+## Changed files
 
-## Open findings and blockers
+SKILL.md, usage-guide.md, scripts/ensembl_client.py, examples/lookup_and_overlap.py, examples/vep_annotation.py, examples/compara_homology.py, LICENSE (new).
 
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| ENS-001 | P1 | open | evidence/core.txt, example_lookup_and_overlap.txt | gene ID + protein returns 400; use ENSP/ENST ID or add multiple_sequences |
-| ENS-002 | P1 | open | evidence/core.txt, example_vep_annotation.txt | HGVS c.803G>A wrong ref base; use c.803C>T or BRAF c.1799T>A |
-| ENS-003 | P1 | open | evidence/core.txt | usage-guide 17:41276135 is GRCh37; 400 on GRCh38 host |
-| ENS-004 | P1 | open | evidence/claims.txt, regulatory.txt | /regulatory/.../feature/{id} and /homology/id/{id} 404; correct or remove |
-| ENS-005 | P2 | open | evidence/claims.txt | renamed symbol is 400 not 404; Homo_sapiens accepted |
-| ENS-006 | P2 | open | evidence/claims.txt, claims2.txt | no timeout/5xx/non-JSON handling; e90 HTML 200; e116 503 |
-| ENS-007 | P2 | open | evidence/example_compara_homology.txt | empty paralog section, stale confidence/many2one text |
-| ENS-008 | P2 | open | preflight warn | no Skill-root LICENSE |
+## Evidence
 
-## Environment and evidence
+- F:\OpenScience\fix-evidence\bio-ensembl-rest\ (verify.py, verify.txt, example_*.txt); interpreter database-access venv py3.12.13, requests 2.34.2, PYTHONDONTWRITEBYTECODE=1.
+- Inputs/tools: F:\OpenScience\audits\bio-ensembl-rest\TOOLS.md
 
-- Tool inventory: F:\OpenScience\audits\bio-ensembl-rest\TOOLS.md
-- Environment fingerprint: database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397
-- Run evidence: F:\OpenScience\audits\bio-ensembl-rest\initial-audit-run\evidence\
-- Deferred/blocked surfaces: none (local VEP and BioMart are out of scope)
-- Restricted-access items: none
-- Tooling impact: none (no Skill bytes changed)
+## Tooling impact: none
+
+Same requests dependency and venv; no new runtime, executable path or service. Client behaviour changed but the surfaces (client functions, three examples) were already tooled and re-executed.
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\audits\bio-ensembl-rest\initial-audit-run\; records under audits\skills\bio-ensembl-rest\ and regenerated audits\INDEX/BACKLOG/STATUS (uncommitted)
-- Pre-existing/user-owned changes: F:\optimizing-agent-science-skills\test\validate.bats (untracked)
-- Records state: uncommitted paths above
-- Product commits/pushes: none
+- Run-owned: Skill tree (untracked), F:\OpenScience\fix-evidence\bio-ensembl-rest\, this handoff
+- Pre-existing/user-owned: F:\optimizing-agent-science-skills\test\validate.bats (untouched)
+- No product commit, push, or staging; no pycache in the Skill tree.
 
 ## Transition assertion
 
