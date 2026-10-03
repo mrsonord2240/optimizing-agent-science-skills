@@ -12,7 +12,7 @@
 - Working tree: F:\OpenScience\wt\dbaccess-uniprot-access\skills\bio-uniprot-access (untracked by design)
 - Branch/worktree: fix/dbaccess-uniprot-access at 2f38178
 - Audited candidate: 7f82b9d5aae0ba064038b97d399123a2be4d845124d1d4cf13a0918dd4e48240 (audit score 61, Beta Only)
-- New candidate identity: e5b597f3d58d78960d6e5d99216956fc3b4ff9e29ee1e0096b28f1366caf5899 (sha256-manifest-v1, files=5, bytes=29226); preflight --offline PASS, no pycache
+- New candidate identity: ea100b041cafcbf60a8d1202d6ca09387fff80515d37b45d5998162fb799bcb1 (sha256-manifest-v1, files=6, bytes=30291); preflight --offline PASS, no pycache
 
 ## Finding ledger
 
@@ -26,13 +26,13 @@
 | UNI-006 | P2 | fixed | inactive entry raises ValueError with reason; failure-mode text corrected (secondary redirects, deleted = 200 Inactive) |
 | UNI-007 | P2 | fixed | uniref_cluster: identity=50 (int), representative=P04637, representative_member_id=P53_HUMAN |
 | UNI-008 | P2 | fixed | _request helper: 60 s timeout, retry 429/5xx with Retry-After, connection retries; poll uses monotonic clock and FAILED check. stream_tsv still buffers in memory (documented; not needed for readiness) |
-| UNI-009 | P2 | deferred-with-rationale | no Skill-root LICENSE; preflight warns only, manifest cites repo license evidence; adding a file needs upstream license text/holder (licensing decision), not needed for readiness |
+| UNI-009 | P2 | fixed | upstream MIT LICENSE copied byte-identical to Skill root (text-only batch) |
 
 Claim-family sweep done (rg for xref:pdb, active_site, 250M, 570K, fasta.gz, results/{jobId}, 404 or 301, KeyError): survivors are intentional warnings (SKILL.md) and the client docstring.
 
 ## Changed files
 
-scripts/uniprot_client.py, SKILL.md, usage-guide.md, examples/isoforms_and_xrefs.py, examples/uniprot_query.py.
+scripts/uniprot_client.py, SKILL.md, usage-guide.md, examples/isoforms_and_xrefs.py, examples/uniprot_query.py, LICENSE (added, UNI-009).
 
 ## Execution record
 

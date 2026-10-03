@@ -11,7 +11,7 @@
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/interaction-databases
 - Working tree: F:\OpenScience\wt\dbaccess-interaction-databases\skills\bio-interaction-databases
 - Branch/worktree: fix/dbaccess-interaction-databases at 2f38178; Skill directory untracked and uncommitted by design
-- Candidate tree hash: 61d508cd959e4ef8b832ab59c9c6532e4855b49f51812788801b8c069d503eeb (sha256-manifest-v1, files=5, bytes=40552); preflight --offline PASS (warn: no Skill-root LICENSE, IDM-009 disposition below)
+- Candidate tree hash: 7430509d403cde092a4c2e1d02a12f7bc00c7183597ebfaafa3335254b02c5f5 (sha256-manifest-v1, files=6, bytes=41606); preflight --offline PASS
 - Prior audited identity: 588996fc143fb0dc98a5558fce2db091e0905415fb9a80a8c4bc49419690be42 (report.json under audits\skills\bio-interaction-databases\candidate@588996fc143f-initial-audit-run\)
 - Note: after the verification run, two example print strings were reworded (text only; ast parse checked, no pycache).
 
@@ -27,13 +27,13 @@
 | IDM-006 | P2 | fixed | aggregate_networks restricts OmniPath/BioGRID to pairs inside the query set; docs say overlap, not confidence | TP53+MDM2: 2 nodes, edge from 3 sources |
 | IDM-007 | P2 | fixed | _get re-raises without URL or chained exception; 401 documented; per-experiment rows documented | bad key raises "HTTP 401 Unauthorized" only; live key run 3081 rows / 831 pairs; key scan of fix-run and Skill: 0 hits |
 | IDM-008 | P2 | fixed | 60 s timeouts, 1 s STRING pacing, caller_identity parameter, n_resources dropped | verify_fix.txt |
-| IDM-009 | P2 | fixed (text) | Provenance section cites upstream MIT at repository root; no LICENSE file added (text not available locally) | preflight warn remains by design |
+| IDM-009 | P2 | fixed | upstream MIT LICENSE copied byte-identical to Skill root; Provenance sentence corrected to point at it |
 
 No new findings. Residual notes: OmniPath commercial screen is source-level only (is_stimulation/consensus_* and curation_effort stay server-computed, stated in docs); SIGNOR license kept as share-alike pending a check on the SIGNOR site.
 
 ## Changed files
 
-SKILL.md, usage-guide.md, scripts/interaction_clients.py, examples/string_network.py, examples/interaction_query.py.
+SKILL.md, usage-guide.md, scripts/interaction_clients.py, examples/string_network.py, examples/interaction_query.py, LICENSE (added, IDM-009), SKILL.md Provenance sentence.
 
 ## Execution record
 
