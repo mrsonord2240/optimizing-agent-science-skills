@@ -35,11 +35,19 @@ SKILL.md, usage-guide.md, scripts/ensembl_client.py, examples/lookup_and_overlap
 ## Evidence
 
 - F:\OpenScience\fix-evidence\bio-ensembl-rest\ (verify.py, verify.txt, example_*.txt); interpreter database-access venv py3.12.13, requests 2.34.2, PYTHONDONTWRITEBYTECODE=1.
-- Inputs/tools: F:\OpenScience\audits\bio-ensembl-rest\TOOLS.md
+- Inputs/tools: F:\OpenScience\audits\bio-ensembl-rest\TOOLS.md (delta-refreshed)
 
-## Tooling impact: none
+## Tooling impact: none per fixer; recorded as changed by the delta pass
 
-Same requests dependency and venv; no new runtime, executable path or service. Client behaviour changed but the surfaces (client functions, three examples) were already tooled and re-executed.
+Same requests dependency and venv; no new runtime, executable path or service. The client surface grew (`multiple_sequences=`, `EnsemblError`, retry), so TOOLS.md now lists it.
+
+## Tooling (delta, 2026-10-03)
+
+- TOOLS.md: F:\OpenScience\audits\bio-ensembl-rest\TOOLS.md (refreshed; example failures and sequence/VEP rows replaced). Shared: F:\OpenScience\audit-envs\database-access\TOOLS.md.
+- Fingerprint verified live: database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397.
+- Identity unchanged (preflight --offline PASS): dabba949803e4c58bd3cc906389087520b3e5f5c32702fb6535c749131c0487b, files=7, bytes=28785.
+- Installed: nothing. Downloaded: nothing. Live spot check: symbol lookup, protein sequence, multiple_sequences (15), VEP HGVS, LD pass.
+- Not made ready: e116 archive host (503, service-side); Ensembl homology intermittently 500/timeout.
 
 ## Worktree safety
 

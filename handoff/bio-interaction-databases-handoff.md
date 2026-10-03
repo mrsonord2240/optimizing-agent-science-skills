@@ -44,7 +44,16 @@ SKILL.md, usage-guide.md, scripts/interaction_clients.py, examples/string_networ
 
 ## Tooling impact: changed
 
-Reason: runnable surfaces changed (signor_for_gene, omnipath_interactions, string_network, aggregate_networks, biogrid_lt_physical error path) and the Skill now calls the UniProt REST search endpoint. No new package, runtime, key or staged dataset is needed; the existing database-access venv covered every run, so the re-auditor can proceed without a tooling delta unless it wants UniProt added to TOOLS.md.
+Reason: runnable surfaces changed (signor_for_gene, omnipath_interactions, string_network, aggregate_networks, biogrid_lt_physical error path) and the Skill now calls the UniProt REST search endpoint. No new package, runtime, key or staged dataset is needed.
+
+## Tooling (delta, 2026-10-03)
+
+- TOOLS.md: F:\OpenScience\audits\bio-interaction-databases\TOOLS.md (refreshed; UniProt REST added as a listed external service, SIGNOR and example rows replaced). Shared: F:\OpenScience\audit-envs\database-access\TOOLS.md.
+- Fingerprint verified live: database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397.
+- Identity unchanged (preflight --offline PASS): 7430509d403cde092a4c2e1d02a12f7bc00c7183597ebfaafa3335254b02c5f5, files=6, bytes=41606.
+- Installed: nothing. Downloaded: nothing. BioGRID key loaded at run time only (TP53 3081 rows); not printed or written.
+- Live spot check: STRING, UniProt accession, SIGNOR (333 rows), BioGRID pass; OmniPath returned HTTP 502 once (intermittent, not retried).
+- Not made ready: none beyond OmniPath flakiness.
 
 ## Re-audit pointers
 

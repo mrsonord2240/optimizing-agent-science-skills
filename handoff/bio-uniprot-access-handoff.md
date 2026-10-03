@@ -4,7 +4,7 @@
 - Lane: 2
 - Status: ready-for-phase
 - Owner leaving: fix worker (Sonnet), lane 2, batch database-access light
-- Next role: prepare-scientific-skill-tooling (delta mode), then reaudit-scientific-skill
+- Next role: reaudit-scientific-skill (tooling delta done 2026-10-03)
 
 ## Source identity
 
@@ -41,7 +41,15 @@ scripts/uniprot_client.py, SKILL.md, usage-guide.md, examples/isoforms_and_xrefs
 
 ## Tooling impact: changed
 
-No new dependency, runtime, model or data. Runnable surfaces changed: map_ids, resolve_obsolete, search_tsv, fetch_entry_json, uniref_cluster, download_proteome (new route), both examples. TOOLS.md surface notes are stale (proteome route, map_ids truncation, example failure); delta pass should refresh them. Human-proteome download still not staged (UP000000625 used).
+No new dependency, runtime, model or data. Runnable surfaces changed: map_ids, resolve_obsolete, search_tsv, fetch_entry_json, uniref_cluster, download_proteome (new route), both examples.
+
+## Tooling (delta, 2026-10-03)
+
+- TOOLS.md: F:\OpenScience\audits\bio-uniprot-access\TOOLS.md (refreshed; stale proteome, map_ids truncation and example-failure rows replaced). Shared: F:\OpenScience\audit-envs\database-access\TOOLS.md (service table refreshed).
+- Fingerprint verified live: database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397.
+- Identity unchanged (preflight --offline PASS): ea100b041cafcbf60a8d1202d6ca09387fff80515d37b45d5998162fb799bcb1, files=6, bytes=30291.
+- Installed: nothing. Downloaded: nothing. Live spot check: fetch_entry_json, search_tsv, map_ids (BRCA2 present), resolve_obsolete, uniref_cluster all pass.
+- Not made ready: none. Human proteome (~20 MB) not staged; UP000000625 used.
 
 ## Blockers
 

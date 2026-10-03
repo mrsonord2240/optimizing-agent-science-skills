@@ -4,7 +4,7 @@
 - Lane: 3
 - Status: ready-for-phase
 - Owner leaving: fix worker (Sonnet), lane 3, batch database-access
-- Next role: prepare-scientific-skill-tooling (delta mode), then reaudit-scientific-skill
+- Next role: reaudit-scientific-skill (tooling delta done 2026-10-03)
 
 ## Source identity
 
@@ -44,7 +44,15 @@ scripts/ortholog_clients.py, SKILL.md, usage-guide.md, examples/cross_resource.p
 
 ## Tooling impact: changed
 
-Reason: client behavior changed (timeouts, retry, OrthoDB parser, new helpers `orthodb_search` and `orthodb_group_has_gene`, `rel_type` argument) with no new dependency or runtime. Affected surfaces: Compara resolve/orthologs/one2one/batch, OrthoDB orthologs and search, OMA orthologs/HOG, KEGG helpers, examples/cross_resource.py. Delta worker should refresh the surface map; nothing to install.
+Reason: client behavior changed (timeouts, retry, OrthoDB parser, new helpers `orthodb_search` and `orthodb_group_has_gene`, `rel_type` argument) with no new dependency or runtime. Affected surfaces: Compara resolve/orthologs/one2one/batch, OrthoDB orthologs and search, OMA orthologs/HOG, KEGG helpers, examples/cross_resource.py. Nothing to install.
+
+## Tooling (delta, 2026-10-03)
+
+- TOOLS.md: F:\OpenScience\audits\bio-ortholog-inference\TOOLS.md (refreshed surface map; OrthoDB, OMA, retry and example rows replaced). Shared: F:\OpenScience\audit-envs\database-access\TOOLS.md.
+- Fingerprint verified live: database-access-venv py3.12.13 | requests 2.34.2 pandas 3.0.5 numpy 2.5.3 networkx 3.7 | pip-freeze sha256 5fdd1350df2cf397.
+- Identity unchanged (preflight --offline PASS): aa32b51586699da5ed4708ce63e6cbc9eb19751ed79f94b5ff5d73208e252495, files=7, bytes=34073.
+- Installed: nothing. Downloaded: nothing. Live spot check: Compara, OrthoDB search/groups, KEGG pass; OMA HTTP 502 after 4 retries (service-side).
+- Not made ready: OMA (flaky, rerun later), eggNOG (refuses scripts).
 
 ## Worktree safety
 
