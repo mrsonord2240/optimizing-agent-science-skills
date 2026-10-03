@@ -410,7 +410,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (160)
+## P2 (158)
 
 ### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
 
@@ -748,14 +748,6 @@ None open.
 - Root cause: Method table without worked commands.
 - Fix: Add a minimal PAUP* svdq block and a BPP A00/A10 control-file skeleton, or route explicitly.
 
-### `bio-uniprot-access` — UNI-010 Proteome route returns all entries; sizes misstated
-
-- Skill: 86, Production Ready · candidate `ea100b041caf` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/uniprot-access) · [viewer](skills/bio-uniprot-access/candidate@ea100b041caf-reaudit-run/viewer.md)
-- Observed in inputs: 5
-- Problem: download_proteome("UP000005640") writes 147,520 records (20,416 reviewed + 127,104 TrEMBL), 37.8 MB gzip, but the example prints "~20 MB compressed; ~80 MB unpacked; ~20K proteins" and no text says the route includes TrEMBL.
-- Root cause: The size note was carried over from the upstream reference-proteome FTP set (one per gene) and the stream route was not checked for human.
-- Fix: Correct the example text to the measured sizes, state in the docstring and SKILL.md that proteome:UPID returns all UniProtKB entries, and show `AND reviewed:true` for a Swiss-Prot-only FASTA.
-
 ### `bio-atac-seq-motif-deviation` — ArchR NA z-scores guarded, not root-caused (MOTDEV-004)
 
 - Skill: 87, Production Ready · candidate `9e4cce81ace8` from [mrsonord2240/optimized-scientific-skills@2f38178](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2f381782596c6569fe5a8357556856512b7fbb6c/skills/bio-atac-seq-motif-deviation) · [viewer](skills/bio-atac-seq-motif-deviation/mrsonord2240-optimized-scientific-skills@2f38178/viewer.md)
@@ -780,17 +772,9 @@ None open.
 - Root cause: summarize_consequences prints every transcript consequence.
 - Fix: Cap the printed rows or print the most severe consequence per gene.
 
-### `bio-interaction-databases` — IDM-012 Dropped self-interactions are disclosed only in a parenthetical
-
-- Skill: 87, Production Ready · candidate `16290147ab41` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/interaction-databases) · [viewer](skills/bio-interaction-databases/candidate@16290147ab41-reaudit-run-2/viewer.md)
-- Observed in inputs: 6
-- Problem: aggregate_networks silently drops homodimer/self-interaction rows (no warning); a gene whose only BioGRID evidence is a self-interaction does not appear as a node. SKILL.md says "self-interactions are dropped" but does not name homodimers or point to biogrid_lt_physical for them.
-- Root cause: The fix removes the rows in _add_edge without a counter or message.
-- Fix: Name homodimers in the SKILL.md aggregate bullet and point to biogrid_lt_physical (where gene_a == gene_b rows remain); optionally return or log the dropped count.
-
 ### `bio-interaction-databases` — IDM-013 Example edge attributes depend on SIGNOR record order
 
-- Skill: 87, Production Ready · candidate `16290147ab41` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/interaction-databases) · [viewer](skills/bio-interaction-databases/candidate@16290147ab41-reaudit-run-2/viewer.md)
+- Skill: 87, Production Ready · candidate `f4d95b083e70` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/interaction-databases) · [viewer](skills/bio-interaction-databases/candidate@f4d95b083e70-delta-reaudit-run/viewer.md)
 - Observed in inputs: 2
 - Problem: examples/interaction_query.py overwrites signed_effect and mechanism with the last SIGNOR record for a pair, so exported edge attributes differ between runs (MDM2->CDKN1A: destabilization/binding in one run, repression/empty in another).
 - Root cause: Records repeat per site/paper and are applied in server order with last-write-wins.
