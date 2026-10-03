@@ -1,69 +1,64 @@
-# Handoff: bio-data-visualization-volcano-and-ma-plots / prepare-scientific-skill-tooling
+# Handoff: bio-data-visualization-volcano-and-ma-plots / audit-scientific-skill
 
-- Updated: 2026-10-03T11:45:00-07:00
+- Updated: 2026-10-03T12:30:00-07:00
 - Lane: 1
 - Status: ready-for-phase
-- Owner leaving: normalize-scientific-skill worker (batch: ggplot2-fundamentals, matplotlib-fundamentals, volcano-and-ma-plots)
-- Next role: prepare-scientific-skill-tooling
+- Owner leaving: prepare-scientific-skill-tooling worker (batch: ggplot2-fundamentals, matplotlib-fundamentals, volcano-and-ma-plots; mode full)
+- Next role: audit-scientific-skill
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:data-visualization/volcano-and-ma-plots (read-only checkout F:\OpenScience\bioSkills-Improved\data-visualization\volcano-and-ma-plots\; source sha256-manifest 3a32713ea2a79ce8d82cfe9d43b176cfd1b1ba0be1158f5481008b2341f1505f (3 files, 31751 B))
+- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:data-visualization/volcano-and-ma-plots
 - Working tree: F:\OpenScience\wt\normalize-dv-lane1\skills\bio-data-visualization-volcano-and-ma-plots
-- Branch/worktree: normalize/dv-lane1 @ 29f5446 (sparse cone, 3 Skills)
-- Candidate tree hash: sha256-manifest-v1 b94e14b191a0a1f2c6138fe10108d39b44b52efd299c47ae5a850e4e425ccb76 (files=7, bytes=33343)
-- Applicable audit: none usable (bytes changed). Diagnostic history only: F:\optimizing-agent-science-skills\audits\skills\bio-data-visualization-volcano-and-ma-plots\mrsonord2240-bioSkills@019953e\ (Beta Only, open P1/P2; not fixed here)
+- Branch/worktree: normalize/dv-lane1 @ 29f5446 (sparse cone; Skill dirs untracked by design)
+- Candidate tree hash: sha256-manifest-v1 b94e14b191a0a1f2c6138fe10108d39b44b52efd299c47ae5a850e4e425ccb76 (files=7, bytes=33343); re-verified with skill_preflight --offline: PASS
+- Applicable audit: none usable (bytes changed); prior audit under audits\skills\bio-data-visualization-volcano-and-ma-plots\ is diagnostic history only
 
 ## Completed this phase
 
-- Frontmatter: added `category: Data Analysis`; name already equals directory; `author: GPTomics`, `license: MIT` kept.
-- SKILL.md cut to the core workflow; failure modes/error table and reconciliation/thresholds/reviewer pushback moved to references/; ggplot2 volcano function and Python MA function moved to scripts/; dead `[[api_gotchas]]` link removed.
-- Version drift cleared against staged runtimes (Dependency clues); fabricated or obsolete claims fixed, listed in the table below.
-- Hygiene: UTF-8, LF, no BOM, no pycache/dot paths/nested LICENSE. Preflight PASS.
+- Built derived public input: fitted airway DESeq2 dds (public-data\derived\airway_dds_condition.rds); volcano_phd.R, volcano_plot.R run unmodified; EnhancedVolcano, ashr, plotMA, ggbreak, edgeR glmTreat run.
+- ma_plot.py and adjustText run on the real shrunken table; sanbomics 0.1.0 tooled in isolated py-extra.
+- Figures opened: volcano_plot, EnhancedVolcano, sanbomics volcano all render with labels.
 
-## Structural summary
+## Coverage map (surface | coverage | status)
 
-SKILL.md (shrinkage insight + method table, scenario tree, volcano design choices, EnhancedVolcano gotchas, MA diagnostics, resources); references/failure-modes.md; references/reconciliation-thresholds-pushback.md; scripts/volcano_plot.R, volcano_phd.R, ma_plot.py; usage-guide.md.
+| volcano_phd.R | covered | ready |
+| volcano_plot.R | covered | ready |
+| ma_plot.py (+adjustText) | covered | ready |
+| inline ashr / plotMA / EnhancedVolcano / ggbreak / edgeR glmTreat | covered | ready |
+| sanbomics | covered (plots only) | ready |
 
-## Runnable surfaces
-
-- R: scripts/volcano_plot.R (volcano_plot function); scripts/volcano_phd.R (end-to-end lfcShrink apeglm -> ggplot volcano -> MA -> cairo_pdf -> EnhancedVolcano; needs a fitted `dds` with coef condition_treated_vs_control). Both ran clean on airway (condition relabelled) with DESeq2 1.46.0 / ggplot2 4.0.3.
-- Python: scripts/ma_plot.py (ma_plot), ran on a synthetic table under matplotlib 3.11.2.
-- Inline R: lfcShrink apeglm/ashr, EnhancedVolcano call, DESeq2::plotMA.
-
-## Dependency clues
-
-R 4.4.3 / Bioc 3.20: DESeq2 1.46.0, EnhancedVolcano 1.24.0, apeglm 1.28.0, ashr 2.2.63, airway 1.26.0, ggplot2 4.0.3, ggrepel 0.9.8, dplyr, tibble. Python: matplotlib 3.11.2, numpy 2.5.3, pandas 3.0.6, adjustText 1.4.0 (named, unused by ma_plot.py). Named but unstaged: ggbreak, sanbomics.
+All surfaces core; none heavy-optional; none restricted.
 
 ## Required next actions
 
-1. Tooling worker: reuse the data-visualization staging env; map each surface above to a coverage entry; refresh TOOLS.md only if needed.
-2. Audit worker: start fresh (prior audit is on different bytes); weigh the open items below.
+1. Audit worker: start fresh on the exact bytes above using TOOLS file below; weigh the observations below plus the normalizer's open items (see git history of this file's predecessor: GG/MPL/VOL-N* ids carried in the audit ledger).
+2. Any new input or package need: report for a tooling-delta pass; do not fetch in the run directory.
+
+## Observations from tooling smoke (not findings; for audit)
+
+- VOL-N1 confirmed visually (-log10 p axis, fdr hline). New: `sanbomics.tools.volcano` does not exist (is `sanbomics.plots.volcano`); `sanbomics.tools` import fails (pkg_resources). Max shrunken |LFC| 10.99 > unshrunken 9.51 (check). Evidence: smoke\lane1_vol\
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| VOL-N1 | P1 | open | scripts/volcano_plot.R | Plots -log10(pvalue) but draws the threshold at -log10(fdr), contradicting the Skill's own raw-p gotcha (same in volcano_phd.R); behavioral, left for audit |
-| VOL-N2 | P2 | open | SKILL.md | `sanbomics.tools.volcano`, `ggbreak`, edgeR `glmTreat` claim named but never exercised |
-| VOL-N3 | info | resolved | SKILL.md Version Compatibility | Compat line re-checked on staged versions; EnhancedVolcano emits ggplot2 4.x size-for-lines deprecation warnings but renders; no API breakage found |
-
-## Preflight
-
-- `python tools/skill_preflight.py <dir>` from F:\optimizing-agent-science-skills: PASS, identity above. Warn: no Skill-root LICENSE (manifest must cite repository license evidence; frontmatter declares MIT).
+| none from tooling | n/a | n/a | n/a | n/a |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS.md (read-only; R 4.4.3 via r.sh, Python 3.12 via py.sh)
-- Run evidence: normalization-time smoke only (scratch, not retained); scripts ran clean on the installed versions listed below
+- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS-bio-data-visualization-volcano-and-ma-plots.md
+- Shared inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS.md ; fingerprint sha256 8923551f7fdd6c7e0d23acaa651c76b899b97a6c94500f4e0fe61dd1fd81f721 (snapshots\lane1_versions.txt)
+- Run evidence: F:\OpenScience\audit-envs\data-visualization\smoke\lane1_*\ ; scripts in F:\OpenScience\audit-envs\data-visualization\tools\smoke_lane1_* , lane1_pdffonts*.sh , make_airway_dds.R
+- Staging additions: public-data\derived\airway_dds_condition.rds (README row added); py-extra\sanbomics (isolated); INDEX.md row note
 - Restricted-access items: none
-- Tooling impact: none (staging env already covers every surface)
+- Tooling impact: none (full pass complete; no Skill bytes changed)
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\wt\normalize-dv-lane1\skills\bio-data-visualization-volcano-and-ma-plots\ (new, untracked in the sparse worktree, no commit); branch normalize/dv-lane1 from 29f5446, shared with the other two data-visualization lane-1 Skills
+- Run-owned changes: staging files above; this handoff (uncommitted); no Skill bytes touched
 - Pre-existing/user-owned changes: records untracked test/validate.bats; shelf untracked .vscode/ (untouched)
-- Records state: this handoff uncommitted
+- Records state: uncommitted paths (this handoff)
 - Product commits/pushes: none
 
 ## Transition assertion

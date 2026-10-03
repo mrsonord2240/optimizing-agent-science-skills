@@ -1,67 +1,62 @@
-# Handoff: bio-data-visualization-matplotlib-fundamentals / prepare-scientific-skill-tooling
+# Handoff: bio-data-visualization-matplotlib-fundamentals / audit-scientific-skill
 
-- Updated: 2026-10-03T11:45:00-07:00
+- Updated: 2026-10-03T12:30:00-07:00
 - Lane: 1
 - Status: ready-for-phase
-- Owner leaving: normalize-scientific-skill worker (batch: ggplot2-fundamentals, matplotlib-fundamentals, volcano-and-ma-plots)
-- Next role: prepare-scientific-skill-tooling
+- Owner leaving: prepare-scientific-skill-tooling worker (batch: ggplot2-fundamentals, matplotlib-fundamentals, volcano-and-ma-plots; mode full)
+- Next role: audit-scientific-skill
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:data-visualization/matplotlib-fundamentals (read-only checkout F:\OpenScience\bioSkills-Improved\data-visualization\matplotlib-fundamentals\; source sha256-manifest c2230271d5a95bc2bfa7e926db44aa930b800229ac8c61cd0040ca19a40239e9 (3 files, 20133 B))
+- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:data-visualization/matplotlib-fundamentals
 - Working tree: F:\OpenScience\wt\normalize-dv-lane1\skills\bio-data-visualization-matplotlib-fundamentals
-- Branch/worktree: normalize/dv-lane1 @ 29f5446 (sparse cone, 3 Skills)
-- Candidate tree hash: sha256-manifest-v1 146857c3b9b509e7fb41764055239b497b5793cf0b386f83542fdfd5c5302d78 (files=5, bytes=21575)
-- Applicable audit: none usable (bytes changed). Diagnostic history only: F:\optimizing-agent-science-skills\audits\skills\bio-data-visualization-matplotlib-fundamentals\mrsonord2240-bioSkills@64b3b15\ (Beta Only, open P1/P2; not fixed here)
+- Branch/worktree: normalize/dv-lane1 @ 29f5446 (sparse cone; Skill dirs untracked by design)
+- Candidate tree hash: sha256-manifest-v1 146857c3b9b509e7fb41764055239b497b5793cf0b386f83542fdfd5c5302d78 (files=5, bytes=21575); re-verified with skill_preflight --offline: PASS
+- Applicable audit: none usable (bytes changed); prior audit under audits\skills\bio-data-visualization-matplotlib-fundamentals\ is diagnostic history only
 
 ## Completed this phase
 
-- Frontmatter: added `category: Data Analysis`; name already equals directory; `author: GPTomics`, `license: MIT` kept.
-- SKILL.md trimmed to the core workflow; chart-type/axis recipes and failure modes moved to references/; example moved to scripts/ (name kept: matplotlib_phd.py).
-- Version drift cleared against staged runtimes (Dependency clues); fabricated or obsolete claims fixed, listed in the table below.
-- Hygiene: UTF-8, LF, no BOM, no pycache/dot paths/nested LICENSE. Preflight PASS.
+- matplotlib_phd.py runs (5 s); pdffonts shows CID TrueType, no Type 3 in all 5 PDFs.
+- Inline recipes and savefig formats run; default pdf.fonttype=3 control shows Type 3 (claim verified).
+- Gaps resolved: pdffonts exists in WSL dv-cli; Arial IS present on the Windows py.sh runtime (ArialMT embedded), so MPL-N2 is not an environment gap.
 
-## Structural summary
+## Coverage map (surface | coverage | status)
 
-SKILL.md (defaults, rcParams, Figure/Axes API, seaborn, palettes, saving, guardrails); references/chart-recipes.md; references/failure-modes.md; scripts/matplotlib_phd.py; usage-guide.md.
+| matplotlib_phd.py | covered | ready |
+| inline recipes + savefig formats | covered | ready |
+| pdffonts | covered (WSL) | ready |
 
-## Runnable surfaces
-
-- Python example: scripts/matplotlib_phd.py (rcParams, 89 mm scatter, 2x3 grid, Crameri heatmap, seaborn scatter, seaborn.objects; writes 5 PDFs to cwd). Ran end-to-end on matplotlib 3.11.2 / seaborn 0.13.2 / numpy 2.5.3 / pandas 3.0.6: clean.
-- Inline Python recipes (boxplot, imshow, savefig formats, ticker/dates); `pdffonts` (poppler, external) named for font verification.
-
-## Dependency clues
-
-Python 3.12; matplotlib 3.11.2, seaborn 0.13.2, numpy 2.5.3, pandas 3.0.6, cmcrameri 1.10 (py.sh); pdffonts not staged on Windows (WSL may have it).
+All surfaces core; none heavy-optional; none restricted.
 
 ## Required next actions
 
-1. Tooling worker: reuse the data-visualization staging env; map each surface above to a coverage entry; refresh TOOLS.md only if needed.
-2. Audit worker: start fresh (prior audit is on different bytes); weigh the open items below.
+1. Audit worker: start fresh on the exact bytes above using TOOLS file below; weigh the observations below plus the normalizer's open items (see git history of this file's predecessor: GG/MPL/VOL-N* ids carried in the audit ledger).
+2. Any new input or package need: report for a tooling-delta pass; do not fetch in the run directory.
+
+## Observations from tooling smoke (not findings; for audit)
+
+- EPS save warns the PostScript backend ignores alpha (opaque render); recipes savefig('.eps') path worth a line. Evidence: smoke\lane1_mpl_recipes\
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| MPL-N1 | info | resolved | references/chart-recipes.md | Version fixes: `boxplot(labels=)` -> `tick_labels=` (TypeError on 3.11, verified); `constrained_layout=True` -> `layout='constrained'`; `set_constrained_layout` -> `set_layout_engine`; removed false "constrained_layout is default in 3.6+" claim |
-| MPL-N2 | P2 | open | SKILL.md Standard Setup | Arial/Helvetica absent in staging env (DejaVu fallback); audit should confirm font-embedding claim by PDF inspection |
-
-## Preflight
-
-- `python tools/skill_preflight.py <dir>` from F:\optimizing-agent-science-skills: PASS, identity above. Warn: no Skill-root LICENSE (manifest must cite repository license evidence; frontmatter declares MIT).
+| none from tooling | n/a | n/a | n/a | n/a |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS.md (read-only; R 4.4.3 via r.sh, Python 3.12 via py.sh)
-- Run evidence: normalization-time smoke only (scratch, not retained); scripts ran clean on the installed versions listed below
+- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS-bio-data-visualization-matplotlib-fundamentals.md
+- Shared inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS.md ; fingerprint sha256 8923551f7fdd6c7e0d23acaa651c76b899b97a6c94500f4e0fe61dd1fd81f721 (snapshots\lane1_versions.txt)
+- Run evidence: F:\OpenScience\audit-envs\data-visualization\smoke\lane1_*\ ; scripts in F:\OpenScience\audit-envs\data-visualization\tools\smoke_lane1_* , lane1_pdffonts*.sh , make_airway_dds.R
+- Staging additions: public-data\derived\airway_dds_condition.rds (README row added); py-extra\sanbomics (isolated); INDEX.md row note
 - Restricted-access items: none
-- Tooling impact: none (staging env already covers every surface)
+- Tooling impact: none (full pass complete; no Skill bytes changed)
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\wt\normalize-dv-lane1\skills\bio-data-visualization-matplotlib-fundamentals\ (new, untracked in the sparse worktree, no commit); branch normalize/dv-lane1 from 29f5446, shared with the other two data-visualization lane-1 Skills
+- Run-owned changes: staging files above; this handoff (uncommitted); no Skill bytes touched
 - Pre-existing/user-owned changes: records untracked test/validate.bats; shelf untracked .vscode/ (untouched)
-- Records state: this handoff uncommitted
+- Records state: uncommitted paths (this handoff)
 - Product commits/pushes: none
 
 ## Transition assertion

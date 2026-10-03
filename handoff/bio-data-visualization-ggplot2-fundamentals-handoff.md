@@ -1,68 +1,62 @@
-# Handoff: bio-data-visualization-ggplot2-fundamentals / prepare-scientific-skill-tooling
+# Handoff: bio-data-visualization-ggplot2-fundamentals / audit-scientific-skill
 
-- Updated: 2026-10-03T11:45:00-07:00
+- Updated: 2026-10-03T12:30:00-07:00
 - Lane: 1
 - Status: ready-for-phase
-- Owner leaving: normalize-scientific-skill worker (batch: ggplot2-fundamentals, matplotlib-fundamentals, volcano-and-ma-plots)
-- Next role: prepare-scientific-skill-tooling
+- Owner leaving: prepare-scientific-skill-tooling worker (batch: ggplot2-fundamentals, matplotlib-fundamentals, volcano-and-ma-plots; mode full)
+- Next role: audit-scientific-skill
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:data-visualization/ggplot2-fundamentals (read-only checkout F:\OpenScience\bioSkills-Improved\data-visualization\ggplot2-fundamentals\; source sha256-manifest 304161080342a7838728a8d936f9745b3c8efd3b6d9d60e4ba500d2004513448 (3 files, 18928 B))
+- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:data-visualization/ggplot2-fundamentals
 - Working tree: F:\OpenScience\wt\normalize-dv-lane1\skills\bio-data-visualization-ggplot2-fundamentals
-- Branch/worktree: normalize/dv-lane1 @ 29f5446 (sparse cone, 3 Skills)
-- Candidate tree hash: sha256-manifest-v1 34a174ab026364c4b2884a4465ee5bd6b13eb0d80609c9f0ce729ac0746f159a (files=5, bytes=20148)
-- Applicable audit: none usable (bytes changed). Diagnostic history only: F:\optimizing-agent-science-skills\audits\skills\bio-data-visualization-ggplot2-fundamentals\mrsonord2240-bioSkills@64b3b15\ (Beta Only, open P1/P2; not fixed here)
+- Branch/worktree: normalize/dv-lane1 @ 29f5446 (sparse cone; Skill dirs untracked by design)
+- Candidate tree hash: sha256-manifest-v1 34a174ab026364c4b2884a4465ee5bd6b13eb0d80609c9f0ce729ac0746f159a (files=5, bytes=20148); re-verified with skill_preflight --offline: PASS
+- Applicable audit: none usable (bytes changed); prior audit under audits\skills\bio-data-visualization-ggplot2-fundamentals\ is diagnostic history only
 
 ## Completed this phase
 
-- Frontmatter: added `category: Data Analysis`; name already equals directory; `author: GPTomics`, `license: MIT` kept.
-- SKILL.md trimmed to the core workflow; geoms/aesthetics/scales/facets and failure modes moved to references/; example moved to scripts/.
-- Version drift cleared against staged runtimes (Dependency clues); fabricated or obsolete claims fixed, listed in the table below.
-- Hygiene: UTF-8, LF, no BOM, no pycache/dot paths/nested LICENSE. Preflight PASS.
+- publication_figures.R: all six functions run on real airway results and prcomp(mtcars); figures opened.
+- Inline snippets run: cairo_pdf embeds TrueType, default pdf() leaves unembedded Helvetica Type 1 (rule verified); ggrastr, ggtext, tidy eval, TIFF/PNG sizes checked.
+- pdffonts staged in WSL dv-cli (poppler 26.07.0); only missing from Windows PATH.
 
-## Structural summary
+## Coverage map (surface | coverage | status)
 
-SKILL.md (defaults, layers, theme, tidy eval, ggtext, saving, guardrails); references/geoms-scales-facets.md; references/failure-modes.md; scripts/publication_figures.R; usage-guide.md (unchanged).
+| publication_figures.R | covered | ready |
+| inline ggplot2 snippets (cairo_pdf, ggrastr, ggtext, tidy eval, ggsave formats) | covered | ready |
+| pdffonts | covered (WSL) | ready |
 
-## Runnable surfaces
-
-- R function library: scripts/publication_figures.R (theme_publication, create_volcano, create_boxplot, create_pca_plot, save_publication_figure, create_multi_panel). Sourced and run on synthetic data under ggplot2 4.0.3: clean.
-- Inline R snippets in SKILL.md and references (ggsave cairo_pdf, ggrastr::rasterise, ggtext, tidy-eval wrappers); no CLIs.
-
-## Dependency clues
-
-R 4.4.3; ggplot2 4.0.3 (r.sh; 3.5.2 via r-gg35.sh), scales 1.4.0, ggrepel 0.9.8, ggtext 0.2.0, viridis 0.6.5, scico 1.5.0, patchwork 1.3.2, ggrastr 1.0.2, dplyr, RColorBrewer; cairo_pdf device.
+All surfaces core; none heavy-optional; none restricted.
 
 ## Required next actions
 
-1. Tooling worker: reuse the data-visualization staging env; map each surface above to a coverage entry; refresh TOOLS.md only if needed.
-2. Audit worker: start fresh (prior audit is on different bytes); weigh the open items below.
+1. Audit worker: start fresh on the exact bytes above using TOOLS file below; weigh the observations below plus the normalizer's open items (see git history of this file's predecessor: GG/MPL/VOL-N* ids carried in the audit ledger).
+2. Any new input or package need: report for a tooling-delta pass; do not fetch in the run directory.
+
+## Observations from tooling smoke (not findings; for audit)
+
+- GG-N1 confirmed by evidence (default pdf device, Helvetica not embedded). Also: volcano labels overlap at max.overlaps=20; multi-panel `& theme_publication()` renders without the border seen in the standalone theme (look). Evidence: smoke\lane1_gg\
 
 ## Open findings and blockers
 
 | ID | Severity | State | Evidence | Required disposition |
 |---|---|---|---|---|
-| GG-N1 | P2 | open | scripts/publication_figures.R | `save_publication_figure` uses default pdf() device, contradicting the Skill's own cairo_pdf rule; behavioral, left for audit/fix |
-| GG-N2 | P2 | open | scripts/publication_figures.R | Example uses theme_bw + non-Okabe palette while SKILL baseline is theme_classic + Okabe-Ito; left as is |
-| GG-N3 | info | resolved | references/geoms-scales-facets.md | Version fixes: removed `geom_point(rasterize=TRUE)` (ggplot2 ignores it, verified on 4.0.3; now ggrastr::rasterise); `scale_*(trans=)` -> `transform=`; compat line updated |
-
-## Preflight
-
-- `python tools/skill_preflight.py <dir>` from F:\optimizing-agent-science-skills: PASS, identity above. Warn: no Skill-root LICENSE (manifest must cite repository license evidence; frontmatter declares MIT).
+| none from tooling | n/a | n/a | n/a | n/a |
 
 ## Environment and evidence
 
-- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS.md (read-only; R 4.4.3 via r.sh, Python 3.12 via py.sh)
-- Run evidence: normalization-time smoke only (scratch, not retained); scripts ran clean on the installed versions listed below
+- Tool inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS-bio-data-visualization-ggplot2-fundamentals.md
+- Shared inventory: F:\OpenScience\audit-envs\data-visualization\TOOLS.md ; fingerprint sha256 8923551f7fdd6c7e0d23acaa651c76b899b97a6c94500f4e0fe61dd1fd81f721 (snapshots\lane1_versions.txt)
+- Run evidence: F:\OpenScience\audit-envs\data-visualization\smoke\lane1_*\ ; scripts in F:\OpenScience\audit-envs\data-visualization\tools\smoke_lane1_* , lane1_pdffonts*.sh , make_airway_dds.R
+- Staging additions: public-data\derived\airway_dds_condition.rds (README row added); py-extra\sanbomics (isolated); INDEX.md row note
 - Restricted-access items: none
-- Tooling impact: none (staging env already covers every surface)
+- Tooling impact: none (full pass complete; no Skill bytes changed)
 
 ## Worktree safety
 
-- Run-owned changes: F:\OpenScience\wt\normalize-dv-lane1\skills\bio-data-visualization-ggplot2-fundamentals\ (new, untracked in the sparse worktree, no commit); branch normalize/dv-lane1 from 29f5446, shared with the other two data-visualization lane-1 Skills
+- Run-owned changes: staging files above; this handoff (uncommitted); no Skill bytes touched
 - Pre-existing/user-owned changes: records untracked test/validate.bats; shelf untracked .vscode/ (untouched)
-- Records state: this handoff uncommitted
+- Records state: uncommitted paths (this handoff)
 - Product commits/pushes: none
 
 ## Transition assertion
