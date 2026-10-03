@@ -1,0 +1,12 @@
+=== VEP by region (BRCA1 region in GRCh38 coords) ===
+Traceback (most recent call last):
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\vep_annotation.py", line 28, in <module>
+    res = vep_region('human', '17:43044295-43044295:1', 'A')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 95, in vep_region
+    return get_with_retry(f'{base}/vep/{species}/region/{region}/{allele}').json()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\wt\dbaccess-ensembl-rest\skills\bio-ensembl-rest\examples\..\scripts\ensembl_client.py", line 61, in get_with_retry
+    raise EnsemblError(f'{max_retries} attempts exhausted (last: {last}) for {url}')
+ensembl_client.EnsemblError: 3 attempts exhausted (last: 500) for https://rest.ensembl.org/vep/human/region/17:43044295-43044295:1/A
+exit=1

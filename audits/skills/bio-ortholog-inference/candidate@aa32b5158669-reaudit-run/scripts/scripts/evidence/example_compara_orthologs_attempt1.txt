@@ -1,0 +1,14 @@
+=== Single-gene: BRCA1 human -> mouse ===
+  ENSMUSG00000017146  type=ortholog_one2one  level=Euarchontoglires  identity=57.6711%
+
+=== Symbol resolution example (MARCH1 was renamed in 2020) ===
+  MARCH1 not found (renamed to MARCHF1 by HGNC 2020)
+  MARCHF1 -> ENSG00000145416
+
+=== Batch: 5 genes, human -> zebrafish ===
+symbol          target_id taxonomy_level  target_pid
+  TP53 ENSDARG00000035559   Euteleostomi     50.6775
+   ATM ENSDARG00000002385       Chordata     49.4015
+
+1:1 calls: 2; 1:many or many:many: 2
+exit=0

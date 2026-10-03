@@ -1,0 +1,32 @@
+=== Symbol resolution (live release) ===
+  Ensembl Gene ID: ENSG00000012048
+  Biotype:         protein_coding
+  Location:        chr17:43044292-43170245 (strand -1)
+
+=== Same query against archive (release 110) -- for reproducibility ===
+  Ensembl Gene ID (e110): ENSG00000012048
+
+=== Full gene info (transcripts + exons via ?expand=1) ===
+  Transcripts: 59
+    ENST00000497488        protein_coding         15 exons
+    ENST00000489037        protein_coding         22 exons
+    ENST00000478531        protein_coding         23 exons
+
+=== Protein sequence ===
+  TP53 protein ENSP00000269305: 393 aa  (first 60: MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP...)
+
+=== Genes in interval chr17:43000000-43200000 ===
+  RPL21P4      ENSG00000240828 processed_pseudogene   43079302-43079780
+  ?            ENSG00000285057 transcribed_unprocessed_pseudogene 43131208-43131270
+  ?            ENSG00000267681 transcribed_processed_pseudogene 43144956-43145255
+  BRCA1P1      ENSG00000267595 unprocessed_pseudogene 43168170-43168249
+  ?            ENSG00000267340 transcribed_processed_pseudogene 43169880-43170077
+  NBR2         ENSG00000198496 lncRNA                 43125420-43153671
+  ?            ENSG00000267002 lncRNA                 43148366-43171037
+  NBR1         ENSG00000188554 protein_coding         43170317-43211690
+  RND2         ENSG00000108830 protein_coding         43025210-43047509
+  BRCA1        ENSG00000012048 protein_coding         43044292-43170245
+  RPL27        ENSG00000131469 protein_coding         42998265-43002973
+  VAT1         ENSG00000108828 protein_coding         42999182-43025123
+  IFI35        ENSG00000068079 protein_coding         43006740-43014638
+exit=0

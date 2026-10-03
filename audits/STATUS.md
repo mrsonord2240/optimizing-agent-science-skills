@@ -23,6 +23,78 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 `Unclassified` contains Skills for which neither the current audit nor the corpus snapshot supplies an authoritative category. This generator does not guess from directory names.
 
+## By upstream area
+
+The area is the first segment of each Skill's upstream path. `Done` is ready on the optimized shelf, `Started` has a published audit but is not ready, and `Excluded` covers excluded and out-of-scope Skills.
+
+| Area | Done | Started | Untouched | Excluded | Total |
+|---|---:|---:|---:|---:|---:|
+| alignment | 7 | 0 | 0 | 0 | 7 |
+| alignment-files | 10 | 0 | 0 | 0 | 10 |
+| alternative-splicing | 8 | 0 | 1 | 0 | 9 |
+| atac-seq | 12 | 0 | 0 | 0 | 12 |
+| causal-genomics | 11 | 0 | 0 | 0 | 11 |
+| chemoinformatics | 15 | 0 | 5 | 0 | 20 |
+| chip-seq | 1 | 0 | 11 | 0 | 12 |
+| clawhub-installer | 0 | 0 | 0 | 1 | 1 |
+| clinical-biostatistics | 1 | 0 | 11 | 0 | 12 |
+| clinical-databases | 5 | 0 | 7 | 0 | 12 |
+| clip-seq | 1 | 0 | 11 | 0 | 12 |
+| comparative-genomics | 1 | 0 | 12 | 0 | 13 |
+| copy-number | 0 | 0 | 11 | 0 | 11 |
+| crispr-screens | 15 | 0 | 0 | 0 | 15 |
+| data-visualization | 7 | 5 | 5 | 3 | 20 |
+| database-access | 11 | 4 | 0 | 0 | 15 |
+| differential-expression | 1 | 0 | 5 | 0 | 6 |
+| ecological-genomics | 0 | 0 | 6 | 0 | 6 |
+| epidemiological-genomics | 0 | 0 | 5 | 0 | 5 |
+| epitranscriptomics | 0 | 0 | 5 | 0 | 5 |
+| experimental-design | 5 | 0 | 0 | 0 | 5 |
+| expression-matrix | 0 | 0 | 5 | 0 | 5 |
+| flow-cytometry | 0 | 0 | 8 | 0 | 8 |
+| gene-regulatory-networks | 0 | 0 | 6 | 0 | 6 |
+| genome-annotation | 0 | 0 | 7 | 0 | 7 |
+| genome-assembly | 0 | 0 | 9 | 0 | 9 |
+| genome-engineering | 0 | 0 | 5 | 0 | 5 |
+| genome-intervals | 0 | 0 | 8 | 0 | 8 |
+| hi-c-analysis | 0 | 0 | 9 | 0 | 9 |
+| imaging-mass-cytometry | 0 | 0 | 7 | 0 | 7 |
+| immunoinformatics | 0 | 0 | 6 | 0 | 6 |
+| liquid-biopsy | 2 | 0 | 5 | 0 | 7 |
+| long-read-sequencing | 0 | 0 | 9 | 0 | 9 |
+| machine-learning | 2 | 0 | 4 | 0 | 6 |
+| metabolomics | 9 | 0 | 0 | 0 | 9 |
+| metagenomics | 0 | 0 | 8 | 0 | 8 |
+| methylation-analysis | 0 | 0 | 10 | 0 | 10 |
+| microbiome | 6 | 0 | 0 | 0 | 6 |
+| multi-omics-integration | 0 | 0 | 5 | 0 | 5 |
+| pathway-analysis | 6 | 0 | 0 | 0 | 6 |
+| phasing-imputation | 0 | 0 | 4 | 0 | 4 |
+| phylogenetics | 8 | 0 | 0 | 0 | 8 |
+| population-genetics | 1 | 0 | 6 | 0 | 7 |
+| primer-design | 0 | 0 | 4 | 0 | 4 |
+| proteomics | 9 | 0 | 0 | 0 | 9 |
+| read-alignment | 0 | 0 | 4 | 0 | 4 |
+| read-qc | 0 | 0 | 7 | 0 | 7 |
+| reporting | 0 | 0 | 6 | 0 | 6 |
+| restriction-analysis | 0 | 0 | 5 | 0 | 5 |
+| ribo-seq | 0 | 0 | 6 | 0 | 6 |
+| rna-quantification | 0 | 0 | 4 | 0 | 4 |
+| rna-structure | 0 | 0 | 4 | 0 | 4 |
+| sequence-io | 1 | 0 | 8 | 0 | 9 |
+| sequence-manipulation | 1 | 0 | 6 | 0 | 7 |
+| single-cell | 17 | 0 | 0 | 0 | 17 |
+| small-rna-seq | 0 | 0 | 6 | 0 | 6 |
+| spatial-transcriptomics | 0 | 0 | 12 | 0 | 12 |
+| structural-biology | 0 | 0 | 10 | 0 | 10 |
+| systems-biology | 0 | 0 | 7 | 0 | 7 |
+| tcr-bcr-analysis | 0 | 0 | 6 | 0 | 6 |
+| temporal-genomics | 0 | 0 | 6 | 0 | 6 |
+| variant-calling | 6 | 0 | 7 | 0 | 13 |
+| workflow-management | 0 | 0 | 5 | 0 | 5 |
+| workflows | 4 | 0 | 37 | 0 | 41 |
+| **Total** | **183** | **9** | **366** | **4** | **562** |
+
 ## Audited but not ready
 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
@@ -35,9 +107,9 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 | `bio-data-visualization-multipanel-figures` | Data Analysis | 94.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@3749f31/viewer.md) |
 | `bio-data-visualization-upset-plots` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md) |
 | `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 76 | Beta Only | 0 / 3 / 6 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md) |
-| `bio-ensembl-rest` | Data Analysis | 70 | Beta Only | 0 / 4 / 4 | [viewer](skills/bio-ensembl-rest/candidate@3d116ba2e1c5-initial-audit-run/viewer.md) |
-| `bio-interaction-databases` | Data Analysis | 59 | Reject | 2 / 2 / 5 | [viewer](skills/bio-interaction-databases/candidate@588996fc143f-initial-audit-run/viewer.md) |
-| `bio-ortholog-inference` | Data Analysis | 69 | Beta Only | 0 / 5 / 3 | [viewer](skills/bio-ortholog-inference/candidate@f6d4ccc5903d-initial-audit-run/viewer.md) |
-| `bio-uniprot-access` | Data Analysis | 61 | Beta Only | 0 / 4 / 5 | [viewer](skills/bio-uniprot-access/candidate@7f82b9d5aae0-initial-audit-run/viewer.md) |
+| `bio-ensembl-rest` | Data Analysis | 87 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-ensembl-rest/candidate@dabba949803e-reaudit-run/viewer.md) |
+| `bio-interaction-databases` | Data Analysis | 87 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-interaction-databases/candidate@16290147ab41-reaudit-run-2/viewer.md) |
+| `bio-ortholog-inference` | Data Analysis | 84 | Limited Release | 0 / 0 / 3 | [viewer](skills/bio-ortholog-inference/candidate@aa32b5158669-reaudit-run/viewer.md) |
+| `bio-uniprot-access` | Data Analysis | 86 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-uniprot-access/candidate@ea100b041caf-reaudit-run/viewer.md) |
 
 Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.

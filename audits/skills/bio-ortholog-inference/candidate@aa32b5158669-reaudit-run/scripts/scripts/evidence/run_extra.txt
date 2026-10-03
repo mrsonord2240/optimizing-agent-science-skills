@@ -1,0 +1,6 @@
+OMA TP53 1:1 total 130 mouse ['P53_MOUSE'] keys ['canonicalid', 'chromosome', 'distance', 'entry_nr', 'entry_url', 'is_main_isoform', 'locus', 'oma_group', 'oma_hog_id', 'omaid', 'rel_type', 'score', 'sequence_length', 'sequence_md5', 'species'] species keys ['code', 'genome_url', 'species', 'taxon_id']
+PASS OMA mouse P53_MOUSE
+Compara TP53 human->mouse [{'source_id': 'ENSG00000141510', 'source_pid': 77.3537, 'target_species': 'mus_musculus', 'target_id': 'ENSMUSG00000059552', 'target_pid': 77.9487, 'type': 'ortholog_one2one', 'taxonomy_level': 'Euarchontoglires', 'confidence': None}]
+PASS Compara TP53 row schema
+eggNOG https://eggnog6.embl.de/api/ SSLError HTTPSConnectionPool(host='eggnog6.embl.de', port=443): Max retries exceeded with url: /api/ (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_V
+eggNOG https://eggnogdb.org/api/ 403 https://eggnogdb.org/api/ 58

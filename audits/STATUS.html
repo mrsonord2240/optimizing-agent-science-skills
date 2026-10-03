@@ -112,6 +112,9 @@
     th { padding: 0.75rem 0.9rem; background: var(--header); color: var(--header-ink); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; }
     td { padding: 0.9rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: 0; }
+    tr.area-complete td { background: var(--forest); color: var(--paper-raised); }
+    tr.area-complete td::before { color: inherit; }
+    tr.area-partial td { background: color-mix(in srgb, var(--amber) var(--share), var(--paper-raised)); }
     tbody tr:hover { background: #eee9dc; }
     .skill-cell { min-width: 22rem; }
     .skill-cell a { font-weight: 600; }
@@ -389,6 +392,549 @@
       </div>
     </section>
 
+    <section aria-labelledby="area-title">
+      <div class="section-heading">
+        <h2 id="area-title">Progress by upstream area</h2>
+        <p class="pretext-copy" data-pretext contenteditable="plaintext-only">The area is the first segment of each Skill's upstream path. Done is ready on the optimized shelf, started has a published audit but is not ready, and excluded covers excluded and out-of-scope Skills. Green rows are fully done; amber rows deepen as the done share rises.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Area</th>
+              <th scope="col">Done</th>
+              <th scope="col">Started</th>
+              <th scope="col">Untouched</th>
+              <th scope="col">Excluded</th>
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="area-complete" title="7 of 7 done">
+              <td data-label="Area"><strong>alignment</strong></td>
+              <td data-label="Done">7</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr class="area-complete" title="10 of 10 done">
+              <td data-label="Area"><strong>alignment-files</strong></td>
+              <td data-label="Done">10</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">10</td>
+            </tr>
+            <tr class="area-partial" style="--share:44%" title="8 of 9 done">
+              <td data-label="Area"><strong>alternative-splicing</strong></td>
+              <td data-label="Done">8</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">1</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">9</td>
+            </tr>
+            <tr class="area-complete" title="12 of 12 done">
+              <td data-label="Area"><strong>atac-seq</strong></td>
+              <td data-label="Done">12</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">12</td>
+            </tr>
+            <tr class="area-complete" title="11 of 11 done">
+              <td data-label="Area"><strong>causal-genomics</strong></td>
+              <td data-label="Done">11</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">11</td>
+            </tr>
+            <tr class="area-partial" style="--share:38%" title="15 of 20 done">
+              <td data-label="Area"><strong>chemoinformatics</strong></td>
+              <td data-label="Done">15</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">20</td>
+            </tr>
+            <tr class="area-partial" style="--share:11%" title="1 of 12 done">
+              <td data-label="Area"><strong>chip-seq</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">11</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">12</td>
+            </tr>
+            <tr title="0 of 0 done">
+              <td data-label="Area"><strong>clawhub-installer</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">1</td>
+              <td data-label="Total">1</td>
+            </tr>
+            <tr class="area-partial" style="--share:11%" title="1 of 12 done">
+              <td data-label="Area"><strong>clinical-biostatistics</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">11</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">12</td>
+            </tr>
+            <tr class="area-partial" style="--share:25%" title="5 of 12 done">
+              <td data-label="Area"><strong>clinical-databases</strong></td>
+              <td data-label="Done">5</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">7</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">12</td>
+            </tr>
+            <tr class="area-partial" style="--share:11%" title="1 of 12 done">
+              <td data-label="Area"><strong>clip-seq</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">11</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">12</td>
+            </tr>
+            <tr class="area-partial" style="--share:11%" title="1 of 13 done">
+              <td data-label="Area"><strong>comparative-genomics</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">12</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">13</td>
+            </tr>
+            <tr title="0 of 11 done">
+              <td data-label="Area"><strong>copy-number</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">11</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">11</td>
+            </tr>
+            <tr class="area-complete" title="15 of 15 done">
+              <td data-label="Area"><strong>crispr-screens</strong></td>
+              <td data-label="Done">15</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">15</td>
+            </tr>
+            <tr class="area-partial" style="--share:24%" title="7 of 17 done">
+              <td data-label="Area"><strong>data-visualization</strong></td>
+              <td data-label="Done">7</td>
+              <td data-label="Started">5</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">3</td>
+              <td data-label="Total">20</td>
+            </tr>
+            <tr class="area-partial" style="--share:37%" title="11 of 15 done">
+              <td data-label="Area"><strong>database-access</strong></td>
+              <td data-label="Done">11</td>
+              <td data-label="Started">4</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">15</td>
+            </tr>
+            <tr class="area-partial" style="--share:15%" title="1 of 6 done">
+              <td data-label="Area"><strong>differential-expression</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>ecological-genomics</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 5 done">
+              <td data-label="Area"><strong>epidemiological-genomics</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr title="0 of 5 done">
+              <td data-label="Area"><strong>epitranscriptomics</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr class="area-complete" title="5 of 5 done">
+              <td data-label="Area"><strong>experimental-design</strong></td>
+              <td data-label="Done">5</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr title="0 of 5 done">
+              <td data-label="Area"><strong>expression-matrix</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr title="0 of 8 done">
+              <td data-label="Area"><strong>flow-cytometry</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">8</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">8</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>gene-regulatory-networks</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 7 done">
+              <td data-label="Area"><strong>genome-annotation</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">7</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr title="0 of 9 done">
+              <td data-label="Area"><strong>genome-assembly</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">9</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">9</td>
+            </tr>
+            <tr title="0 of 5 done">
+              <td data-label="Area"><strong>genome-engineering</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr title="0 of 8 done">
+              <td data-label="Area"><strong>genome-intervals</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">8</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">8</td>
+            </tr>
+            <tr title="0 of 9 done">
+              <td data-label="Area"><strong>hi-c-analysis</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">9</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">9</td>
+            </tr>
+            <tr title="0 of 7 done">
+              <td data-label="Area"><strong>imaging-mass-cytometry</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">7</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>immunoinformatics</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr class="area-partial" style="--share:19%" title="2 of 7 done">
+              <td data-label="Area"><strong>liquid-biopsy</strong></td>
+              <td data-label="Done">2</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr title="0 of 9 done">
+              <td data-label="Area"><strong>long-read-sequencing</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">9</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">9</td>
+            </tr>
+            <tr class="area-partial" style="--share:21%" title="2 of 6 done">
+              <td data-label="Area"><strong>machine-learning</strong></td>
+              <td data-label="Done">2</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">4</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr class="area-complete" title="9 of 9 done">
+              <td data-label="Area"><strong>metabolomics</strong></td>
+              <td data-label="Done">9</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">9</td>
+            </tr>
+            <tr title="0 of 8 done">
+              <td data-label="Area"><strong>metagenomics</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">8</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">8</td>
+            </tr>
+            <tr title="0 of 10 done">
+              <td data-label="Area"><strong>methylation-analysis</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">10</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">10</td>
+            </tr>
+            <tr class="area-complete" title="6 of 6 done">
+              <td data-label="Area"><strong>microbiome</strong></td>
+              <td data-label="Done">6</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 5 done">
+              <td data-label="Area"><strong>multi-omics-integration</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr class="area-complete" title="6 of 6 done">
+              <td data-label="Area"><strong>pathway-analysis</strong></td>
+              <td data-label="Done">6</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 4 done">
+              <td data-label="Area"><strong>phasing-imputation</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">4</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">4</td>
+            </tr>
+            <tr class="area-complete" title="8 of 8 done">
+              <td data-label="Area"><strong>phylogenetics</strong></td>
+              <td data-label="Done">8</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">8</td>
+            </tr>
+            <tr class="area-partial" style="--share:14%" title="1 of 7 done">
+              <td data-label="Area"><strong>population-genetics</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr title="0 of 4 done">
+              <td data-label="Area"><strong>primer-design</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">4</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">4</td>
+            </tr>
+            <tr class="area-complete" title="9 of 9 done">
+              <td data-label="Area"><strong>proteomics</strong></td>
+              <td data-label="Done">9</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">9</td>
+            </tr>
+            <tr title="0 of 4 done">
+              <td data-label="Area"><strong>read-alignment</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">4</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">4</td>
+            </tr>
+            <tr title="0 of 7 done">
+              <td data-label="Area"><strong>read-qc</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">7</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>reporting</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 5 done">
+              <td data-label="Area"><strong>restriction-analysis</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>ribo-seq</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 4 done">
+              <td data-label="Area"><strong>rna-quantification</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">4</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">4</td>
+            </tr>
+            <tr title="0 of 4 done">
+              <td data-label="Area"><strong>rna-structure</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">4</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">4</td>
+            </tr>
+            <tr class="area-partial" style="--share:12%" title="1 of 9 done">
+              <td data-label="Area"><strong>sequence-io</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">8</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">9</td>
+            </tr>
+            <tr class="area-partial" style="--share:14%" title="1 of 7 done">
+              <td data-label="Area"><strong>sequence-manipulation</strong></td>
+              <td data-label="Done">1</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr class="area-complete" title="17 of 17 done">
+              <td data-label="Area"><strong>single-cell</strong></td>
+              <td data-label="Done">17</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">0</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">17</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>small-rna-seq</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 12 done">
+              <td data-label="Area"><strong>spatial-transcriptomics</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">12</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">12</td>
+            </tr>
+            <tr title="0 of 10 done">
+              <td data-label="Area"><strong>structural-biology</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">10</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">10</td>
+            </tr>
+            <tr title="0 of 7 done">
+              <td data-label="Area"><strong>systems-biology</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">7</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">7</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>tcr-bcr-analysis</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr title="0 of 6 done">
+              <td data-label="Area"><strong>temporal-genomics</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">6</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">6</td>
+            </tr>
+            <tr class="area-partial" style="--share:26%" title="6 of 13 done">
+              <td data-label="Area"><strong>variant-calling</strong></td>
+              <td data-label="Done">6</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">7</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">13</td>
+            </tr>
+            <tr title="0 of 5 done">
+              <td data-label="Area"><strong>workflow-management</strong></td>
+              <td data-label="Done">0</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">5</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">5</td>
+            </tr>
+            <tr class="area-partial" style="--share:12%" title="4 of 41 done">
+              <td data-label="Area"><strong>workflows</strong></td>
+              <td data-label="Done">4</td>
+              <td data-label="Started">0</td>
+              <td data-label="Untouched">37</td>
+              <td data-label="Excluded">0</td>
+              <td data-label="Total">41</td>
+            </tr>
+            <tr>
+              <td data-label="Area"><strong>Total</strong></td>
+              <td data-label="Done"><strong>183</strong></td>
+              <td data-label="Started"><strong>9</strong></td>
+              <td data-label="Untouched"><strong>366</strong></td>
+              <td data-label="Excluded"><strong>4</strong></td>
+              <td data-label="Total"><strong>562</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <section aria-labelledby="queue-title">
       <div class="section-heading">
         <h2 id="queue-title">Audited, not ready</h2>
@@ -413,62 +959,6 @@
             </tr>
           </thead>
           <tbody>
-        <tr data-queue-row data-search="bio-interaction-databases data analysis reject remaining p0 p1 p2">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-interaction-databases/candidate@588996fc143f-initial-audit-run/viewer.md">bio-interaction-databases</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">59</strong></td>
-          <td data-label="Grade"><span class="badge negative">Reject</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="2 P0, 2 P1, 5 P2 findings">
-            <span class="finding p0">P0 2</span>
-            <span class="finding p1">P1 2</span>
-            <span class="finding p2">P2 5</span>
-          </td>
-        </tr>
-        <tr data-queue-row data-search="bio-uniprot-access data analysis beta only remaining  p1 p2">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-uniprot-access/candidate@7f82b9d5aae0-initial-audit-run/viewer.md">bio-uniprot-access</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">61</strong></td>
-          <td data-label="Grade"><span class="badge negative">Beta Only</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="0 P0, 4 P1, 5 P2 findings">
-            <span class="finding p0 zero">P0 0</span>
-            <span class="finding p1">P1 4</span>
-            <span class="finding p2">P2 5</span>
-          </td>
-        </tr>
-        <tr data-queue-row data-search="bio-ortholog-inference data analysis beta only remaining  p1 p2">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-ortholog-inference/candidate@f6d4ccc5903d-initial-audit-run/viewer.md">bio-ortholog-inference</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">69</strong></td>
-          <td data-label="Grade"><span class="badge negative">Beta Only</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="0 P0, 5 P1, 3 P2 findings">
-            <span class="finding p0 zero">P0 0</span>
-            <span class="finding p1">P1 5</span>
-            <span class="finding p2">P2 3</span>
-          </td>
-        </tr>
-        <tr data-queue-row data-search="bio-ensembl-rest data analysis beta only remaining  p1 p2">
-          <td class="skill-cell" data-label="Skill">
-            <a href="skills/bio-ensembl-rest/candidate@3d116ba2e1c5-initial-audit-run/viewer.md">bio-ensembl-rest</a>
-            <span>Data Analysis</span>
-          </td>
-          <td data-label="Score"><strong class="score">70</strong></td>
-          <td data-label="Grade"><span class="badge negative">Beta Only</span></td>
-          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
-          <td class="findings" data-label="Open findings" aria-label="0 P0, 4 P1, 4 P2 findings">
-            <span class="finding p0 zero">P0 0</span>
-            <span class="finding p1">P1 4</span>
-            <span class="finding p2">P2 4</span>
-          </td>
-        </tr>
         <tr data-queue-row data-search="bio-data-visualization-ggplot2-fundamentals data analysis beta only excluded  p1 p2">
           <td class="skill-cell" data-label="Skill">
             <a href="skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md">bio-data-visualization-ggplot2-fundamentals</a>
@@ -509,6 +999,62 @@
             <span class="finding p0 zero">P0 0</span>
             <span class="finding p1">P1 3</span>
             <span class="finding p2">P2 6</span>
+          </td>
+        </tr>
+        <tr data-queue-row data-search="bio-ortholog-inference data analysis limited release remaining   p2">
+          <td class="skill-cell" data-label="Skill">
+            <a href="skills/bio-ortholog-inference/candidate@aa32b5158669-reaudit-run/viewer.md">bio-ortholog-inference</a>
+            <span>Data Analysis</span>
+          </td>
+          <td data-label="Score"><strong class="score">84</strong></td>
+          <td data-label="Grade"><span class="badge caution">Limited Release</span></td>
+          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
+          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 3 P2 findings">
+            <span class="finding p0 zero">P0 0</span>
+            <span class="finding p1 zero">P1 0</span>
+            <span class="finding p2">P2 3</span>
+          </td>
+        </tr>
+        <tr data-queue-row data-search="bio-uniprot-access data analysis production ready remaining   p2">
+          <td class="skill-cell" data-label="Skill">
+            <a href="skills/bio-uniprot-access/candidate@ea100b041caf-reaudit-run/viewer.md">bio-uniprot-access</a>
+            <span>Data Analysis</span>
+          </td>
+          <td data-label="Score"><strong class="score">86</strong></td>
+          <td data-label="Grade"><span class="badge positive">Production Ready</span></td>
+          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
+          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 1 P2 findings">
+            <span class="finding p0 zero">P0 0</span>
+            <span class="finding p1 zero">P1 0</span>
+            <span class="finding p2">P2 1</span>
+          </td>
+        </tr>
+        <tr data-queue-row data-search="bio-ensembl-rest data analysis production ready remaining   p2">
+          <td class="skill-cell" data-label="Skill">
+            <a href="skills/bio-ensembl-rest/candidate@dabba949803e-reaudit-run/viewer.md">bio-ensembl-rest</a>
+            <span>Data Analysis</span>
+          </td>
+          <td data-label="Score"><strong class="score">87</strong></td>
+          <td data-label="Grade"><span class="badge positive">Production Ready</span></td>
+          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
+          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 2 P2 findings">
+            <span class="finding p0 zero">P0 0</span>
+            <span class="finding p1 zero">P1 0</span>
+            <span class="finding p2">P2 2</span>
+          </td>
+        </tr>
+        <tr data-queue-row data-search="bio-interaction-databases data analysis production ready remaining   p2">
+          <td class="skill-cell" data-label="Skill">
+            <a href="skills/bio-interaction-databases/candidate@16290147ab41-reaudit-run-2/viewer.md">bio-interaction-databases</a>
+            <span>Data Analysis</span>
+          </td>
+          <td data-label="Score"><strong class="score">87</strong></td>
+          <td data-label="Grade"><span class="badge positive">Production Ready</span></td>
+          <td data-label="Provider state"><span class="badge neutral">Remaining</span></td>
+          <td class="findings" data-label="Open findings" aria-label="0 P0, 0 P1, 2 P2 findings">
+            <span class="finding p0 zero">P0 0</span>
+            <span class="finding p1 zero">P1 0</span>
+            <span class="finding p2">P2 2</span>
           </td>
         </tr>
         <tr data-queue-row data-search="bio-data-visualization-heatmaps-clustering data analysis production ready remaining   ">
