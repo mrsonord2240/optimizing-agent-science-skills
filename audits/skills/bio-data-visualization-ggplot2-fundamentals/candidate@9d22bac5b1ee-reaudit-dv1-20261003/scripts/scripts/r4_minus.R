@@ -1,0 +1,12 @@
+# Is the "purple minus" in the y-axis title a device artefact? Render one volcano with each PNG device and count chromatic text pixels.
+a <- commandArgs(TRUE); skill <- a[1]; out <- a[2]; dir.create(out, FALSE, TRUE)
+suppressMessages({library(ggplot2); library(ggrepel); library(patchwork)})
+cat("ggplot2", as.character(packageVersion("ggplot2")), " png() default type:", getOption("bitmapType"), " capabilities cairo:", capabilities("cairo"), "\n")
+suppressMessages(source(file.path(skill, "scripts/publication_figures.R"))); setwd(out)
+raw <- read.csv("F:/OpenScience/audit-envs/data-visualization/public-data/differential-expression/airway_dex_deseq2_results.csv")
+p <- create_volcano(raw, top_n = 3)
+png("dev_default.png", 1200, 850, res = 170); print(p); invisible(dev.off())
+png("dev_cairo.png", 1200, 850, res = 170, type = "cairo"); print(p); invisible(dev.off())
+png("dev_windows.png", 1200, 850, res = 170, type = "windows"); print(p); invisible(dev.off())
+ggsave("dev_ggsave.png", p, width = 7, height = 5, dpi = 170)
+cat("ggsave png device class:", class(ggplot2:::plot_dev(NULL, "png", 170)), "\n")

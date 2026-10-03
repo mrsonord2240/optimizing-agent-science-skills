@@ -1,0 +1,308 @@
+{
+ "meta": {
+  "skill_name": "bio-data-visualization-ggplot2-fundamentals",
+  "description": "Build publication-quality figures in R with ggplot2 using the grammar of graphics with CVD-safe palettes, cairo_pdf TrueType embedding, tidy evaluation and a theme_classic baseline; ships scripts/publication_figures.R helpers.",
+  "evaluated_on": "2026-10-03",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "complexity": "Moderate"
+ },
+ "veto_gates": {
+  "skill_veto": {
+   "gate": "PASS",
+   "stability": "PASS",
+   "contract": "PASS",
+   "determinism": "PASS",
+   "security": "PASS"
+  },
+  "research_veto": {
+   "applicable": true,
+   "gate": "PASS",
+   "scientific_integrity": {
+    "result": "PASS",
+    "detail": "Volcano classes (541 Up, 497 Down, 17,200 NS among 18,238 padj-bearing airway genes), the plotted y values (-log10 padj) and PCA variance labels (57.6 %, 26.5 %) equal independent recomputation; no fabricated values."
+   },
+   "practice_boundaries": {
+    "result": "PASS",
+    "detail": "Plotting skill; no clinical or prescriptive output."
+   },
+   "methodological_ground": {
+    "result": "PASS",
+    "detail": "The volcano threshold now sits on the plotted -log10(padj) axis; no methodological fallacy remains."
+   },
+   "code_usability": {
+    "result": "PASS",
+    "detail": "All six helpers, every SKILL.md block and every references/geoms-scales-facets.md line built and rendered on ggplot2 4.0.3 and 3.5.2; the remaining defect is label collision, not failure to run."
+   }
+  }
+ },
+ "static": {
+  "functional_suitability": {
+   "score": 10,
+   "note": "Covers the grammar, theme, programmatic aes, export and helper workflows, and the first four fixes hold; the shipped create_multi_panel with the default volcano still prints overlapping Ensembl labels (GG-004)."
+  },
+  "reliability": {
+   "score": 10,
+   "note": "Input guards give clear errors (missing var_explained, >8 groups, missing padj/label column) and jitter is seeded; a fraction-valued var_explained is silently labelled '0.6%' (the contract says percent). Label placement is only reliable at >= ~150 mm with Ensembl IDs."
+  },
+  "performance_context": {
+   "score": 7,
+   "note": "SKILL.md routes to two references and one script; compact, with some restatement across SKILL.md, usage-guide.md and failure-modes.md."
+  },
+  "agent_usability": {
+   "score": 13,
+   "note": "Idioms and guardrails are clear and the theme/palette now come from one script; the narrow-panel label rule ('top_n = 3 under ~90 mm') is wrong at both ends (GG-004)."
+  },
+  "human_usability": {
+   "score": 7,
+   "note": "Readable; usage-guide tips repaired. failure-modes.md says ggrepel drops labels 'with a warning' and elsewhere 'silently' (GG-009)."
+  },
+  "security": {
+   "score": 11,
+   "note": "No credentials, network or destructive operations; local ggsave writes only."
+  },
+  "maintainability": {
+   "score": 10,
+   "note": "Single-purpose helpers on one theme and one palette; no tests; label-collision limits live in prose, not a guard."
+  },
+  "agent_specific": {
+   "score": 16,
+   "note": "Precise trigger description and progressive disclosure to two references and a script; two failure-mode statements about ggrepel are inaccurate (GG-009)."
+  }
+ },
+ "inputs": [
+  {
+   "type": "Canonical",
+   "label": "create_volcano on airway DESeq2 results (19,772 genes, 1,534 NA padj): plotted quantity, threshold line, labels at 183 mm",
+   "status": "COMPLETED",
+   "note": "Plotted y equals -log10(padj) computed independently; hline 1.3010 = FDR cutoff; min coloured point 1.3035, max grey |LFC|>1 point 1.3004; 10 labels, 0 overlaps at 183 mm, no warnings, identical on 3.5.2.",
+   "basic": 37,
+   "specialized": 55,
+   "assertions": [
+    {
+     "text": "Volcano classes equal independent classification (541 Up / 497 Down / 17,200 NS)",
+     "result": "PASS",
+     "note": "Exact match; NA padj filtered with no warnings."
+    },
+    {
+     "text": "The plotted y of every point equals -log10(padj) recomputed from the raw CSV",
+     "result": "PASS",
+     "note": "all.equal on ggplot_build layer data (GG-001)."
+    },
+    {
+     "text": "The horizontal threshold lies on the colour boundary in the same quantity",
+     "result": "PASS",
+     "note": "hline 1.3010; smallest coloured y 1.3035; largest grey y with |LFC|>1 is 1.3004; fdr_threshold = 0.01 moves the line to 2."
+    },
+    {
+     "text": "The ten labelled genes are the ten smallest padj and are not overlapping at 183 mm",
+     "result": "PASS",
+     "note": "Measured label boxes: 10 drawn, 0 overlapping pairs; standalone_top10_w183.png opened."
+    }
+   ]
+  },
+  {
+   "type": "Variant A",
+   "label": "save_publication_figure defaults and 183 x 120 mm, fonts and page size inspected with pdffonts/pdfinfo",
+   "status": "COMPLETED",
+   "note": "Default save is 252 x 198 pt (89 x 70 mm) and 1051 x 826 px; 183 x 120 mm gives 518 x 340 pt; ArialMT/SymbolMT/Arial-ItalicMT embedded; default pdf() device still leaves Helvetica/Symbol unembedded as the Skill states.",
+   "basic": 37,
+   "specialized": 54,
+   "assertions": [
+    {
+     "text": "Default PDF page size is 89 x 70 mm",
+     "result": "PASS",
+     "note": "pdfinfo 252 x 198 pt (GG-002)."
+    },
+    {
+     "text": "183 x 120 mm PDF page is 518 x 340 pt",
+     "result": "PASS",
+     "note": "pdfinfo 518 x 340 pt on 4.0.3 and 3.5.2."
+    },
+    {
+     "text": "All fonts of the helper PDF are embedded TrueType",
+     "result": "PASS",
+     "note": "pdffonts: ArialMT, SymbolMT, Arial-ItalicMT, emb yes sub yes."
+    },
+    {
+     "text": "Default ggsave PDF leaves Helvetica/Symbol unembedded (Skill's stated reason for cairo_pdf)",
+     "result": "PASS",
+     "note": "pdffonts on default_dev.pdf: Helvetica, Helvetica-Oblique, Symbol Type 1 emb no."
+    },
+    {
+     "text": "PNG is 300 dpi at the stated mm size",
+     "result": "PASS",
+     "note": "1051 x 826 and 2161 x 1417 px."
+    }
+   ]
+  },
+  {
+   "type": "Variant B",
+   "label": "Theme/palette consistency (GG-003), boxplot and PCA helpers on synthetic groups and prcomp(mtcars)",
+   "status": "COMPLETED",
+   "note": "theme_publication is borderless theme_classic with no grid and black axes; every helper and the multi-panel composite use it and the single Okabe-Ito vector; boxplot jitter is seeded; PCA labels equal prcomp; errors are clear.",
+   "basic": 36,
+   "specialized": 53,
+   "assertions": [
+    {
+     "text": "theme_publication equals the SKILL baseline (theme_classic, no grid, no border, black axes, bold strips)",
+     "result": "PASS",
+     "note": "Element-level comparison against theme_classic(base_size = 10); no redefinition elsewhere."
+    },
+    {
+     "text": "Volcano, boxplot and PCA colours are drawn only from the Okabe-Ito vector in SKILL.md",
+     "result": "PASS",
+     "note": "Built layer colours subset of okabe_ito; okabe_ito[1:2] = #0072B2/#D55E00."
+    },
+    {
+     "text": "Multi-panel panels keep the borderless theme_publication",
+     "result": "PASS",
+     "note": "plot_theme of every patchwork sub-plot has blank border and grid."
+    },
+    {
+     "text": "Boxplot medians equal raw medians, jitter reproducible, PCA axis labels equal prcomp variance, guards raise clear errors",
+     "result": "PASS",
+     "note": "all.equal on medians; identical jitter; 'PC1 (57.6%)'; clear errors for missing var_explained and 12 groups."
+    },
+    {
+     "text": "Volcano with a missing padj column or a bad label_col fails with a message naming the column",
+     "result": "PASS",
+     "note": "'object padj not found' in argument !is.na(padj); 'Column `nope` not found in `.data`'."
+    }
+   ]
+  },
+  {
+   "type": "Stress",
+   "label": "Label collision matrix: create_volcano Ensembl IDs vs symbols, standalone and create_multi_panel, 85-183 mm, ggplot2 4.0.3 and 3.5.2",
+   "status": "COMPLETED",
+   "note": "Label boxes measured from drawn ggrepel grobs and figures opened. Default top_n = 10 collides at 120 mm (1 pair), 89 mm (6) and in the shipped 3- and 4-panel composites at 183 mm (2-3 pairs); the Skill's top_n = 3 remedy still collides at 89 mm (1 pair) and at 120 x 110 mm; symbols are clean everywhere tested.",
+   "basic": 28,
+   "specialized": 40,
+   "assertions": [
+    {
+     "text": "The default create_multi_panel example with the default volcano renders without overlapping labels",
+     "result": "FAIL",
+     "note": "multi3 183x120: 3 overlapping pairs; multi3 183x150 and multi4 183x150: 2 pairs each (ENSG00000152583~ENSG00000165995 and ENSG00000157214~ENSG00000189221 by 3.8 and 14-15 mm); same on 3.5.2."
+    },
+    {
+     "text": "The Skill's rule 'top_n = 3 in panels under ~90 mm' yields clean labels at those widths",
+     "result": "FAIL",
+     "note": "Standalone 89 x 70 mm with top_n = 3: ENSG00000152583 overlaps ENSG00000165995 by 1.5 mm; 85 mm control the same; at 120 x 110 mm in a 4-panel 1 pair and 3 labels leave the panel."
+    },
+    {
+     "text": "The Skill's multi-panel guidance (top_n = 3) is clean at 183 mm",
+     "result": "PASS",
+     "note": "multi3 and multi4 at 183 x 120 and 183 x 150: 0 overlapping pairs, 4.0.3 and 3.5.2."
+    },
+    {
+     "text": "Short gene symbols with top_n = 10 are clean at 89 mm and in the 183 mm composites",
+     "result": "PASS",
+     "note": "Symbols mapped with org.Hs.eg.db: 0 overlapping pairs in standalone 89 and 183 mm and multi3/multi4 composites; opened multi4_symbols10_183x150.png."
+    },
+    {
+     "text": "Labels are never silently dropped by the helper",
+     "result": "PASS",
+     "note": "max.overlaps = Inf: 10 of 10 labels drawn in every top_n = 10 cell and 3 of 3 with top_n = 3 (none dropped, though some overlap)."
+    }
+   ]
+  },
+  {
+   "type": "Canonical",
+   "label": "SKILL.md and reference snippets run as written: Grammar block, theme, tidy eval, ggtext, rasterise, PNG/TIFF, geoms-scales-facets (23 lines), on both ggplot2 versions",
+   "status": "COMPLETED",
+   "note": "Every block builds and renders without warnings except the documented ones; Grammar block now shows colour-coded jitter, log ticks 3/5/10, 'Expression' title; rasterised PDF is 63 KB versus 634 KB all-vector; results identical on 4.0.3 and 3.5.2.",
+   "basic": 38,
+   "specialized": 56,
+   "assertions": [
+    {
+     "text": "Grammar in Layers block renders as its comments describe",
+     "result": "PASS",
+     "note": "Opened grammar_block.png: ctrl/trt in #0072B2/#D55E00, y ticks 3 5 10 (no 10^0.477), title 'Expression' (GG-005)."
+    },
+    {
+     "text": "Tidy-eval blocks map the named columns and the {{ }} string caveat is true",
+     "result": "PASS",
+     "note": ".data[[ ]] and {{ }} with bare names reproduce mtcars$wt; {{ }} with strings maps a constant (GG-007 wording); aes_string deprecation warning emitted."
+    },
+    {
+     "text": "ggtext label block renders a true minus and subscripts; cairo_pdf embeds the CID TrueType font",
+     "result": "PASS",
+     "note": "Opened ggtext.png; pdffonts ArialMT TrueType and CID TrueType emb yes."
+    },
+    {
+     "text": "rasterise() keeps vector axes and shrinks the PDF; PNG 89 mm @300 dpi; TIFF LZW written",
+     "result": "PASS",
+     "note": "63 KB vs 634 KB; 1051 x 826 px; figure.tiff written."
+    },
+    {
+     "text": "All 23 reference snippet lines build and save without warning or error",
+     "result": "PASS",
+     "note": "r6_reference.R: 23/23 PASS on 4.0.3 and 3.5.2."
+    }
+   ]
+  },
+  {
+   "type": "Edge",
+   "label": "failure-modes.md claims reproduced (colour, linewidth, ggrepel default drop, default pdf device, inches trap)",
+   "status": "COMPLETED",
+   "note": "Four of five claims reproduce; ggrepel 0.9.8 drops labels with no warning at all (message only when verbose = TRUE), contradicting 'dropped with a warning' and the 'warning buried in log' symptom.",
+   "basic": 32,
+   "specialized": 46,
+   "assertions": [
+    {
+     "text": "aes(color = 'red') renders salmon #F8766D with a 'red' legend entry",
+     "result": "PASS",
+     "note": "Built colour #F8766D."
+    },
+    {
+     "text": "size = on geom_line warns in ggplot2 >= 3.4",
+     "result": "PASS",
+     "note": "'Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.'"
+    },
+    {
+     "text": "Default ggrepel drops labels at default max.overlaps and Inf draws them all",
+     "result": "PASS",
+     "note": "300 clustered labels: 120 drawn by default, 300 with max.overlaps = Inf."
+    },
+    {
+     "text": "The drop is accompanied by a warning in the log, as failure-modes.md states",
+     "result": "FAIL",
+     "note": "No warning or message at draw time on ggrepel 0.9.8 (message only if verbose = TRUE); the file also says 'silently missing' in the same entry."
+    },
+    {
+     "text": "Default pdf() leaves fonts unembedded; width 89 without units gives an 89 inch page",
+     "result": "PASS",
+     "note": "pdffonts Helvetica emb no; pdfinfo 6408 x 5040 pt."
+    }
+   ]
+  }
+ ],
+ "key_strengths": [
+  "GG-001, GG-002, GG-003, GG-005, GG-007 and GG-008 reproduce as fixed: the volcano y axis and threshold share one quantity, the helper PDF is a 518 x 340 pt cairo_pdf with embedded TrueType, and every helper wears one borderless theme and one Okabe-Ito vector.",
+  "Every SKILL.md block and all 23 reference snippet lines build and render, identically on ggplot2 4.0.3 and 3.5.2.",
+  "Input guards (missing var_explained, over 8 groups, missing padj or label column) fail with actionable messages.",
+  "Core export claims are verified by pdffonts: cairo_pdf embeds TrueType, the default device does not, rasterise() shrinks the PDF tenfold."
+ ],
+ "recommendations": [
+  {
+   "priority": "P1",
+   "title": "GG-004 Long-ID volcano labels still collide where the Skill promises clean",
+   "observed_in": [
+    4
+   ],
+   "problem": "The shipped 3- and 4-panel create_multi_panel with the default volcano overprints 2-3 label pairs at 183 mm; the Skill's top_n = 3 rule 'under ~90 mm' still collides at 89 mm (1 pair) and at 120 mm, while a 91 mm slot (183 mm composite) already needs it; only gene symbols were clean in every cell.",
+   "root_cause": "The width rule ignores the legend that takes about a third of the slot, and top_n = 3 is not the same as a width-safe label.",
+   "fix": "Text-only: tell the agent to pass label_col with gene symbols for any multi-panel or single-column volcano, to use Ensembl IDs only standalone at roughly 150 mm or wider, and to measure or open the figure; optionally set the helper default to legend.position = 'bottom' in panels."
+  },
+  {
+   "priority": "P2",
+   "title": "GG-009 failure-modes.md misstates the ggrepel drop warning",
+   "observed_in": [
+    6
+   ],
+   "problem": "The ggrepel entry says labels are dropped 'with a warning' and that the warning is 'buried in log'; ggrepel 0.9.8 emits nothing unless verbose = TRUE, so the drop is fully silent.",
+   "root_cause": "Statement carried over from older ggrepel behaviour and left after the fix of GG-006.",
+   "fix": "Text-only: say the drop is silent, name verbose = TRUE as the only message, and keep 'count the labels actually drawn'."
+  }
+ ]
+}

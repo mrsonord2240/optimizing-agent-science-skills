@@ -1,0 +1,26 @@
+ggplot2 4.0.3 
+-- standalone create_volcano, Ensembl IDs, defaults (top_n = 10)
+standalone_top10_w183                          183 x 128 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+standalone_top10_w120                          120 x  84 mm | labels drawn 10 | overlapping pairs 1 | outside panel 0 [ENSG00000157214~ENSG00000189221(2.2x2.0)]
+standalone_top10_w89                            89 x  62 mm | labels drawn 10 | overlapping pairs 6 | outside panel 0 [ENSG00000101347~ENSG00000157214(1.5x1.6); ENSG00000120129~ENSG00000152583(1.5x2.0); ENSG00000120129~ENSG00000165995(15.0x2.0); ENSG00000125148~ENSG00000162614(4.8x1.8); ENSG00000152583~ENSG00000165995(8.3x2.0); ENSG00000157214~ENSG00000189221(17.2x0.3)]
+-- standalone, top_n = 3 / symbols
+standalone_top3_w89                             89 x  70 mm | labels drawn  3 | overlapping pairs 1 | outside panel 0 [ENSG00000152583~ENSG00000165995(1.5x2.0)]
+standalone_symbols10_w89                        89 x  70 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+standalone_symbols10_w183                      183 x 128 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+-- create_multi_panel as shipped (volcano default top_n = 10)
+multi3_default_183x120                         183 x 120 mm | labels drawn 10 | overlapping pairs 3 | outside panel 0 [ENSG00000120129~ENSG00000165995(14.6x2.0); ENSG00000152583~ENSG00000165995(3.7x2.0); ENSG00000157214~ENSG00000211445(1.4x0.4)]
+multi3_default_183x150                         183 x 150 mm | labels drawn 10 | overlapping pairs 2 | outside panel 0 [ENSG00000152583~ENSG00000165995(3.8x2.0); ENSG00000157214~ENSG00000189221(15.0x2.0)]
+multi4_default_183x150                         183 x 150 mm | labels drawn 10 | overlapping pairs 2 | outside panel 0 [ENSG00000152583~ENSG00000165995(3.8x2.0); ENSG00000157214~ENSG00000189221(13.9x2.0)]
+multi3_default_120x110                         120 x 110 mm | labels drawn 10 | overlapping pairs 7 | outside panel 10 [ENSG00000101347~ENSG00000120129(21.8x0.9); ENSG00000101347~ENSG00000189221(21.8x1.0); ENSG00000125148~ENSG00000154734(21.8x0.9); ENSG00000125148~ENSG00000162614(21.8x0.9); ENSG00000152583~ENSG00000165995(21.8x2.0); ENSG00000157214~ENSG00000162614(21.8x0.4); ENSG00000157214~ENSG00000211445(21.8x0.1)]
+-- create_multi_panel with the Skill's advice (top_n = 3)
+multi3_top3_183x120                            183 x 120 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi3_top3_183x150                            183 x 150 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi4_top3_183x150                            183 x 150 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi4_top3_183x120                            183 x 120 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi4_top3_120x110                            120 x 110 mm | labels drawn  3 | overlapping pairs 1 | outside panel 3 [ENSG00000152583~ENSG00000165995(21.8x2.0)]
+-- multi-panel with symbols (top_n = 10)
+multi4_symbols10_183x150                       183 x 150 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+multi3_symbols10_183x120                       183 x 120 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+-- same-width control: volcano alone at the width it gets in the 4-panel (about 85 mm)
+control_top10_w85                               85 x  62 mm | labels drawn 10 | overlapping pairs 5 | outside panel 0 [ENSG00000120129~ENSG00000152583(5.5x0.4); ENSG00000120129~ENSG00000165995(16.9x0.4); ENSG00000125148~ENSG00000162614(5.5x0.8); ENSG00000152583~ENSG00000165995(10.5x2.0); ENSG00000157214~ENSG00000189221(17.7x2.0)]
+control_top3_w85                                85 x  62 mm | labels drawn  3 | overlapping pairs 1 | outside panel 0 [ENSG00000152583~ENSG00000165995(5.5x2.0)]

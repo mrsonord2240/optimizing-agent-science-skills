@@ -1,0 +1,24 @@
+ggplot2 4.0.3 
+[PASS] geom_point alpha/size
+[PASS] geom_line linewidth
+[PASS] geom_col
+[PASS] geom_bar
+[PASS] geom_boxplot outlier.shape NA
+[PASS] geom_violin bw SJ trim FALSE
+[PASS] geom_histogram bins
+[PASS] geom_density alpha
+[PASS] geom_tile fill
+[PASS] geom_text check_overlap
+[PASS] geom_text_repel max.overlaps Inf
+[PASS] scale_x_continuous limits/breaks/label_number
+[PASS] scale_y_log10
+[PASS] scale_y_continuous sqrt
+[PASS] scale_x_discrete limits
+[PASS] scale_color_manual named
+[PASS] scale_color_viridis_c
+[PASS] scale_color_scico batlow
+[PASS] scale_fill_gradient2
+[PASS] scale_x_date
+[PASS] facet_wrap free_y
+[PASS] facet_grid vars
+[PASS] facet_grid formula

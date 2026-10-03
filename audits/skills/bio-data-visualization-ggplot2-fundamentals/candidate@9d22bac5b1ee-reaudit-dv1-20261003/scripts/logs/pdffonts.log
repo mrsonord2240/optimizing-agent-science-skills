@@ -1,0 +1,96 @@
+== gg4/default_dev.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+Helvetica                            Type 1            Custom           no  no  no      10  0
+Helvetica-Oblique                    Type 1            Custom           no  no  no      11  0
+Symbol                               Type 1            Symbol           no  no  no      12  0
+Page size:       252 x 198 pts
+== gg4/pub_183.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+PWLKKF+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+SWQNHG+SymbolMT                      TrueType          WinAnsi          yes yes yes      8  0
+RCYOFO+Arial-ItalicMT                TrueType          WinAnsi          yes yes yes      9  0
+Page size:       518 x 340 pts
+== gg4/pub_default.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+PWLKKF+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+SWQNHG+SymbolMT                      TrueType          WinAnsi          yes yes yes      8  0
+RCYOFO+Arial-ItalicMT                TrueType          WinAnsi          yes yes yes      9  0
+Page size:       252 x 198 pts
+== snip4/allvec.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+LMTUUW+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+Page size:       252 x 198 pts
+== snip4/figure.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+LMTUUW+ArialMT                       TrueType          WinAnsi          yes yes yes      8  0
+Page size:       252 x 198 pts
+== snip4/figure_defaultdev.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+Helvetica                            Type 1            Custom           no  no  no      12  0
+Page size:       252 x 198 pts
+== snip4/ggtext.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+NPOWHH+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+UBGKEP+ArialMT                       CID TrueType      Identity-H       yes yes yes      8  0
+GITBJA+Arial-ItalicMT                TrueType          WinAnsi          yes yes yes      9  0
+Page size:       252 x 198 pts
+== snip4/inches_trap.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+JNQLID+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+Page size:       6408 x 5040 pts
+== gg35/default_dev.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+Helvetica                            Type 1            Custom           no  no  no      10  0
+Helvetica-Oblique                    Type 1            Custom           no  no  no      11  0
+Symbol                               Type 1            Symbol           no  no  no      12  0
+Page size:       252 x 198 pts
+== gg35/pub_183.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+PWLKKF+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+SWQNHG+SymbolMT                      TrueType          WinAnsi          yes yes yes      8  0
+RCYOFO+Arial-ItalicMT                TrueType          WinAnsi          yes yes yes      9  0
+Page size:       518 x 340 pts
+== gg35/pub_default.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+PWLKKF+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+SWQNHG+SymbolMT                      TrueType          WinAnsi          yes yes yes      8  0
+RCYOFO+Arial-ItalicMT                TrueType          WinAnsi          yes yes yes      9  0
+Page size:       252 x 198 pts
+== snip35/allvec.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+LMTUUW+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+Page size:       252 x 198 pts
+== snip35/figure.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+LMTUUW+ArialMT                       TrueType          WinAnsi          yes yes yes      8  0
+Page size:       252 x 198 pts
+== snip35/figure_defaultdev.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+Helvetica                            Type 1            Custom           no  no  no      12  0
+Page size:       252 x 198 pts
+== snip35/ggtext.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+NPOWHH+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+UBGKEP+ArialMT                       CID TrueType      Identity-H       yes yes yes      8  0
+GITBJA+Arial-ItalicMT                TrueType          WinAnsi          yes yes yes      9  0
+Page size:       252 x 198 pts
+== snip35/inches_trap.pdf
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+JNQLID+ArialMT                       TrueType          WinAnsi          yes yes yes      7  0
+Page size:       6408 x 5040 pts

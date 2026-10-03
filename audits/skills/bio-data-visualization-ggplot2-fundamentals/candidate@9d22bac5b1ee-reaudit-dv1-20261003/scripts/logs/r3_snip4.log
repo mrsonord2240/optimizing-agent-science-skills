@@ -1,0 +1,34 @@
+ggplot2 4.0.3 
+== Grammar in Layers block (verbatim)
+[1] "condition"  "tissue"     "expression"
+panel 1 y labels: NA 3 5 10 NA 
+panel 2 y labels: NA 1 3 10 30 NA 
+panel 3 y labels: NA 3 5 10 NA 
+warnings:  
+[PASS] jitter colours are exactly the two palette entries
+== Theme snippet
+[PASS] theme snippet points use #0072B2/#D55E00
+== Tidy evaluation
+[PASS] .data[[var]] maps mtcars$wt
+[PASS] {{ }} with bare names maps mtcars$wt
+Warning message:
+In geom_point() : All aesthetics have length 1, but the data has 32 rows.
+ℹ Please consider using `annotate()` or provide this layer with data containing
+  a single row.
+[PASS] {{ }} with strings maps a constant (one unique x), as the Skill warns
+aes_string warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information. 
+== ggtext snippet
+ggtext snippet rendered
+== Saving block (cairo_pdf, ggrastr, PNG, TIFF)
+png px 1051x826 
+geom_point(rasterize=TRUE) conditions: Ignoring unknown parameters: `rasterize` 
+rasterized-pdf file size (KB) cairo vs all-vector: 63 vs 634 
+== failure-modes claims
+aes(color='red') colour: #F8766D 
+geom_line(size=) warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead. 
+null device 
+          1 
+ggrepel default 60 clustered labels:  

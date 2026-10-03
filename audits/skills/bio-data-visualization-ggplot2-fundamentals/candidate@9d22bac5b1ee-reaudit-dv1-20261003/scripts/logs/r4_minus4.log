@@ -1,0 +1,4 @@
+ggplot2 4.0.3  png() default type:  capabilities cairo: TRUE 
+Error in cat("ggsave png device class:", class(ggplot2:::plot_dev(NULL,  : 
+  object 'plot_dev' not found
+Execution halted

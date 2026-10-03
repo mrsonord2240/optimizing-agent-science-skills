@@ -1,0 +1,11 @@
+ggplot2 3.5.2  png() default type:  capabilities cairo: TRUE 
+Error:
+! Can't save to png.
+ℹ Either supply `filename` with a file extension or supply `device`.
+Backtrace:
+    ▆
+ 1. ├─base::cat(...)
+ 2. └─ggplot2:::plot_dev(NULL, "png", 170)
+ 3.   └─cli::cli_abort(...)
+ 4.     └─rlang::abort(...)
+Execution halted

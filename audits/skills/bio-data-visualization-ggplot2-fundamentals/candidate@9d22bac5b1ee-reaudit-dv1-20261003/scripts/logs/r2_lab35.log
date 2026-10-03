@@ -1,0 +1,19 @@
+ggplot2 3.5.2 
+
+-- standalone create_volcano, Ensembl IDs, defaults (top_n = 10)
+standalone_top10_w183                          183 x 128 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+
+-- standalone, top_n = 3 / symbols
+standalone_top3_w89                             89 x  70 mm | labels drawn  3 | overlapping pairs 1 | outside panel 0 [ENSG00000152583~ENSG00000165995(1.5x2.0)]
+
+-- create_multi_panel as shipped (volcano default top_n = 10)
+multi3_default_183x120                         183 x 120 mm | labels drawn 10 | overlapping pairs 3 | outside panel 0 [ENSG00000120129~ENSG00000165995(14.6x2.0); ENSG00000152583~ENSG00000165995(3.7x2.0); ENSG00000157214~ENSG00000211445(1.4x0.4)]
+multi4_default_183x150                         183 x 150 mm | labels drawn 10 | overlapping pairs 2 | outside panel 0 [ENSG00000152583~ENSG00000165995(3.8x2.0); ENSG00000157214~ENSG00000189221(13.8x2.0)]
+
+-- create_multi_panel with the Skill's advice (top_n = 3)
+multi4_top3_183x150                            183 x 150 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+
+-- multi-panel with symbols (top_n = 10)
+multi4_symbols10_183x150                       183 x 150 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+
+-- same-width control: volcano alone at the width it gets in the 4-panel (about 85 mm)

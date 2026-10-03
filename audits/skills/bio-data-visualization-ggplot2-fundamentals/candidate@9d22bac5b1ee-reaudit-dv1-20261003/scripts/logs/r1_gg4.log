@@ -1,0 +1,45 @@
+ggplot2 4.0.3  R 4.4.3 
+airway rows 19772 padj NA 1534 
+== GG-001 volcano threshold vs colour boundary
+build warnings: 0  
+[PASS] class counts == independent (Up 541 Down 497 NS 17200)
+     geom_point geom_text_repel      geom_vline      geom_hline 
+    "GeomPoint" "GeomTextRepel"     "GeomVline"     "GeomHline" 
+[PASS] plotted y of every point == -log10(padj) computed independently from raw
+hline yintercept 1.3010 ; -log10(0.05) 1.3010
+min plotted y of coloured points 1.3035 ; max plotted y of grey points with |LFC|>1: 1.3004
+[PASS] hline == FDR cutoff on the plotted axis
+[PASS] every coloured point on/above the line
+[PASS] no grey |LFC|>1 point above the line
+y title: expression(-log[10] ~ (adjusted ~ italic(P))) 
+[PASS] fdr_threshold=0.01 moves hline to 2
+== GG-002 save_publication_figure
+pub_default.png px 1051x826 (89x70 mm @300 dpi = 1051x827)
+pub_183.png px 2161x1417 (183x120 mm @300 dpi = 2161x1417)
+== GG-003 theme / palette
+[PASS] theme_publication: panel.border blank, panel bg == theme_classic
+[PASS] panel.grid blank
+[PASS] axis line, ticks, text black
+[PASS] strip: no background, bold text
+[PASS] okabe_ito[1:2] == SKILL.md #0072B2/#D55E00; 8 unique
+[PASS] volcano: panel.border blank, grid blank, axis line black
+[PASS] boxplot: panel.border blank, grid blank, axis line black
+[PASS] pca: panel.border blank, grid blank, axis line black
+[PASS] volcano coloured classes drawn from Okabe-Ito
+[PASS] boxplot fills Okabe-Ito
+[PASS] PCA colours Okabe-Ito
+[PASS] multi-panel: every sub-plot keeps borderless theme_publication
+[PASS] SKILL.md source('scripts/publication_figures.R') works with cwd = Skill dir
+== helper guards
+[PASS] boxplot jitter reproducible across builds
+[PASS] boxplot medians == raw medians
+[PASS] PCA axis labels == prcomp variance
+no var_explained -> pca_df needs a 'var_explained' column (percent variance, first two rows = PC1, PC2) 
+12 groups -> Okabe-Ito has 8 colours; got 12 groups. Collapse groups or facet. 
+fraction-valued var_explained label (contract is percent): PC1 (0.6%) 
+volcano without padj -> ℹ In argument: `!is.na(padj)`.
+Caused by error:
+! object 'padj' not found 
+volcano bad label_col -> ℹ In argument: `label = ifelse(...)`.
+Caused by error in `.data[["nope"]]`:
+! Column `nope` not found in `.data`. 
