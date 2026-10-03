@@ -1,0 +1,42 @@
+airway rows 19772 after dropna(padj,pvalue): 18238
+{'NS': 17200, 'Up': 541, 'Down': 497}
+5 python blocks
+--- ordering upfirst: first-appearance order ['Up', 'Down', 'NS']
+[PASS] all 5 blocks ran verbatim (upfirst)
+[PASS] seaborn recipe figure found (upfirst)
+[PASS] points drawn == rows (upfirst): 18238 vs 18238
+[PASS] every drawn point has its class colour (upfirst); mismatches=0
+   legend: {'NS': '#999999', 'Down': '#0072b2', 'Up': '#d55e00'}
+[PASS] legend text->colour matches palette (upfirst)
+   so legend: {'Up': '#d55e00', 'Down': '#0072b2', 'NS': '#999999'}
+--- ordering nsfirst: first-appearance order ['NS', 'Down', 'Up']
+[PASS] all 5 blocks ran verbatim (nsfirst)
+[PASS] seaborn recipe figure found (nsfirst)
+[PASS] points drawn == rows (nsfirst): 18238 vs 18238
+[PASS] every drawn point has its class colour (nsfirst); mismatches=0
+   legend: {'NS': '#999999', 'Down': '#0072b2', 'Up': '#d55e00'}
+[PASS] legend text->colour matches palette (nsfirst)
+   so legend: {'NS': '#999999', 'Down': '#0072b2', 'Up': '#d55e00'}
+--- ordering shuffled: first-appearance order ['NS', 'Up', 'Down']
+[PASS] all 5 blocks ran verbatim (shuffled)
+[PASS] seaborn recipe figure found (shuffled)
+[PASS] points drawn == rows (shuffled): 18238 vs 18238
+[PASS] every drawn point has its class colour (shuffled); mismatches=0
+   legend: {'NS': '#999999', 'Down': '#0072b2', 'Up': '#d55e00'}
+[PASS] legend text->colour matches palette (shuffled)
+   so legend: {'NS': '#999999', 'Up': '#d55e00', 'Down': '#0072b2'}
+['figure.pdf', 'figure.png', 'figure.svg', 'figure.tiff', 'scatter.pdf']
+[PASS] scatter.pdf page (89.0, 70.0) mm == 89 wide x 70
+[PASS] figure.pdf page 89.0 x 70.0 mm == 89 x 70
+figure.png (1051, 826) (299.9994, 299.9994) None
+[PASS] figure.png width 1051 px == 89 mm @300 dpi (1051)
+figure.tiff (1051, 826) (300.0, 300.0) tiff_lzw
+[PASS] figure.tiff width 1051 px == 89 mm @300 dpi (1051)
+[PASS] tiff compression is tiff_lzw
+svg <text> elements: 14
+[PASS] figure.svg has <text> elements
+control (default fonttype) <text> elements: 0
+[PASS] control default SVG has 0 <text>
+eps warnings: []
+eps bbox: %%BoundingBox: 0 0 253 199
+RESULT PASS

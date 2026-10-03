@@ -1,0 +1,315 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-matplotlib-fundamentals",
+    "description": "Build publication-quality figures with matplotlib using the object-oriented Figure/Axes API, constrained layout, rcParams, Type-42 font embedding and CVD-safe palettes, with seaborn integration; ships scripts/matplotlib_phd.py and two reference files.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every drawn point of the airway volcano (18,238 genes) carries its class colour in three row orders (0 mismatches); page sizes, font embedding and file sizes are measured; the Skill's numeric claims (89 vs about 92 mm with bbox tight, 1.5 MB vs 24 KB) reproduce."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Plotting skill; no clinical or prescriptive output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Colours are bound to category names, journal page sizes are exact, no methodological fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "scripts/matplotlib_phd.py, all five SKILL.md python blocks and both chart-recipes.md blocks (11 fragments) run verbatim on matplotlib 3.11.2 and seaborn 0.13.2; the legend recipe's limits (MPL-010) concern layout, not running."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Covers OO API, rcParams, grid, heatmap, seaborn and seaborn.objects with exact journal sizes; the seaborn.objects legend now ships and fits for its own labels. Its 22 % reservation and private-attribute use are not stated as limits (MPL-010)."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "All shipped code and every recipe runs warning-free and deterministically (second run reproduces every PDF); the legend recipe overflows into the axes with a longer legend title and depends on seaborn's private Plotter._figure (verified on seaborn 0.13.2 only)."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md routes to two references and one script; compact, with some restatement across SKILL.md, usage-guide.md and failure-modes.md."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Clear defaults and guardrails with trigger/mechanism/symptom/fix; section 7 explains why the legend is moved but not when the 22 % reserve is too small."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Readable; the rewritten tight_layout entry and the Tick frequency recipe now state only reproducible behaviour."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network or destructive operations; local savefig writes only."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Single runnable example, no tests; section 7 relies on a private seaborn attribute and a fixed fraction."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Precise trigger description, progressive disclosure to two references and a script, guardrails aligned with measured behaviour; first-loop corrections all hold."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 21,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scripts/matplotlib_phd.py run verbatim: five PDFs, page sizes, fonts, text sizes, seaborn.objects legend (MPL-007), determinism",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Five PDFs are exactly 89x70, 180x110, 89x90, 89x70 and 89x70 mm; every font is embedded CID TrueType (no Type 3); visible text is 6 and 7 pt; the seaborn.objects legend sits at x 0.815-0.988 of the page, clear of the axes (right edge 0.750), grey/blue/orange; a second run reproduces every PDF.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Each of the five PDFs has the stated page size in mm (MPL-001)",
+            "result": "PASS",
+            "note": "MediaBox 89.0x70.0, 180.0x110.0, 89.0x90.0, 89.0x70.0, 89.0x70.0."
+          },
+          {
+            "text": "All fonts are embedded TrueType and no Type 3 appears (pdffonts)",
+            "result": "PASS",
+            "note": "ArialMT / Arial-BoldMT CID TrueType emb yes in all five PDFs."
+          },
+          {
+            "text": "The seaborn.objects legend is inside the exact page, clear of the axes, with the three significance classes in the palette colours (MPL-007)",
+            "result": "PASS",
+            "note": "legend bbox x 0.815-0.988, y 0.406-0.594; axes tight x1 0.750; handle colours #999999/#0072b2/#d55e00; volcano_so_pdf.png opened."
+          },
+          {
+            "text": "Visible text is only 6 or 7 pt in every figure (MPL-005)",
+            "result": "PASS",
+            "note": "text sizes {6.0, 7.0}; no panel titles, tags a-f present."
+          },
+          {
+            "text": "Two runs of the script reproduce every PDF byte for byte apart from creation date and ID",
+            "result": "PASS",
+            "note": "five identical digests."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Every SKILL.md python block verbatim on the real airway DESeq2 table (18,238 genes) in three row orders, plus the Saving block at 89 x 70 mm",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All five blocks run verbatim in each ordering; each of the 18,238 drawn points has its class colour and legends map NS/Down/Up to the palette; figure.pdf 89.0x70.0 mm, PNG and TIFF 1051 px (300 dpi), TIFF tiff_lzw, SVG keeps 14 <text> elements versus 0 by default, EPS saves without warning.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All five SKILL.md python blocks run verbatim in three row orderings",
+            "result": "PASS",
+            "note": "'all 5 blocks ran verbatim' for Up-first, NS-first and shuffled."
+          },
+          {
+            "text": "Every drawn point carries its category colour and the legend maps each class to the palette colour (MPL-002)",
+            "result": "PASS",
+            "note": "18,238 of 18,238 points, 0 mismatches in all orderings; legend and so legend maps equal the palette."
+          },
+          {
+            "text": "Saved PDF page is 89 x 70 mm and PNG/TIFF are 1051 px wide at 300 dpi with lzw TIFF",
+            "result": "PASS",
+            "note": "scatter.pdf and figure.pdf 89.0x70.0; 1051x826 px; compression tiff_lzw."
+          },
+          {
+            "text": "svg.fonttype='none' keeps text editable and the default does not (MPL-004)",
+            "result": "PASS",
+            "note": "14 <text> elements versus 0 in the control."
+          },
+          {
+            "text": "EPS saves with ps.fonttype 42 without warnings",
+            "result": "PASS",
+            "note": "no warnings; EPS BoundingBox 0 0 253 199; Type42 resource present, differs from fonttype 3."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Section 7 legend recipe stress: longer legend title and labels, 8 and 12 classes, a public Plot.on(fig) route (MPL-007 fragility)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The page stays exactly 89x70 mm and the legend stays inside it in every variant, and it clears the axes for the Skill's labels, for longer labels alone, and for 8 and 12 classes; a 51-character title puts the legend at x 0.299-0.988 (axes end at 0.750) and 'Differential expression class' with longer labels at 0.604-0.988, covering 13 mm of data. Neither the 22 % reserve, the private Plot.plot()._figure use, nor the seaborn 0.13.2-only verification appears in the Skill.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The legend stays inside the exact 89 x 70 mm page for every title/label/class-count variant",
+            "result": "PASS",
+            "note": "seven variants: inside the page, MediaBox 89.0x70.0 each."
+          },
+          {
+            "text": "The legend clears the axes for the shipped labels, longer labels alone, and 8 or 12 classes",
+            "result": "PASS",
+            "note": "x0 0.815, 0.757, 0.820, 0.808 against axes right edge 0.750."
+          },
+          {
+            "text": "A longer legend title keeps the legend off the axes",
+            "result": "FAIL",
+            "note": "title 'Differential expression class (DESeq2, padj < 0.05)': legend x0 0.299; 'Differential expression class' with long labels: x0 0.604; extent 0.70 did not help (axes end 0.671); out/legend/D_long_title_long_labels.png opened: legend over the data."
+          },
+          {
+            "text": "The limits of the recipe (fixed 22 % reserve, private Plot.plot()._figure, verified on seaborn 0.13.2 only) are disclosed in SKILL.md or the script",
+            "result": "FAIL",
+            "note": "SKILL.md names only 'seaborn 0.13+ (0.13.2)'; the script comment explains why the legend moves but not these limits; a public route exists (Plot.on(fig) + legend move + subplots_adjust: legend 0.815-0.988, axes end 0.760, page 89.0x70.0)."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "references/chart-recipes.md: both python blocks run verbatim as 11 fragments incl. the rewritten Tick frequency recipe (MPL-008); API and layout claims",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 11 fragments run verbatim without warnings, including Tick frequency (three ticks 0/2/4 labelled A/B/C, rotated); boxplot(labels=) raises TypeError and tick_labels= works; constrained layout is opt-in and constrained_layout=True still works.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "All 11 chart-recipes.md fragments run verbatim without warnings",
+            "result": "PASS",
+            "note": "scatter, line, bar, box, histogram, heatmap, log scale, scientific notation, date axis, tick frequency, grid."
+          },
+          {
+            "text": "The Tick frequency recipe sets as many ticks as labels and runs on its own (MPL-008)",
+            "result": "PASS",
+            "note": "import numpy as np; set_xticks(np.arange(0, 6, 2)) then three labels; frag__Tick_frequency.png opened."
+          },
+          {
+            "text": "Axes.boxplot(labels=) is rejected on 3.11 and tick_labels= works, as SKILL.md and the recipe state",
+            "result": "PASS",
+            "note": "TypeError: unexpected keyword argument 'labels'; tick_labels gives A, B."
+          },
+          {
+            "text": "The default layout engine is none and constrained_layout=True still works (SKILL.md Defaults claim)",
+            "result": "PASS",
+            "note": "get_layout_engine() is None; legacy keyword gives ConstrainedLayoutEngine with no warning."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "references/failure-modes.md claims re-measured incl. the rewritten tight_layout entry (MPL-009), rasterization through seaborn, bbox_inches, first-loop regressions",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 22 staged failure-mode checks pass: tight_layout clips after a longer label or resize while constrained does not; set_layout_engine after a colorbar raises ZeroDivisionError and before it works; multi-axes colorbar warns; 100000 points 1.52 MB vs 23.2 KB (the entry says 63x, measured 66x from unrounded sizes); bbox tight gives about 92 mm; seaborn passes rasterized=True through (0 to 2 image objects, 341 KB to 93 KB).",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The tight_layout entry states only reproducible behaviour and its fix (MPL-009)",
+            "result": "PASS",
+            "note": "clipped after label change and resize; constrained at creation not clipped; set_layout_engine after colorbar ZeroDivisionError, before works; multi-axes colorbar warning; single colorbar not clipped."
+          },
+          {
+            "text": "Large-N rasterization numbers and the Axes.set_rasterization_zorder claim reproduce (MPL-003)",
+            "result": "PASS",
+            "note": "1.52 MB vs 23.2 KB; zorder PDF has an image object and is small; Figure has no set_rasterization_zorder."
+          },
+          {
+            "text": "bbox_inches='tight' changes the page from 89 to about 92 mm and the Type 3 / Type 42 entries hold (MPL-001)",
+            "result": "PASS",
+            "note": "page 91-93.5 mm vs 89.0; type3.pdf vs type42.pdf; pdffonts TrueType on all shipped PDFs."
+          },
+          {
+            "text": "The remaining entries reproduce (pyplot state machine, FacetGrid vs Axes, figsize inches, colorbar shrink, svg.fonttype, spines)",
+            "result": "PASS",
+            "note": "staged_failure_modes.py 22 of 22 PASS."
+          },
+          {
+            "text": "First-loop corrections hold: Okabe-Ito cluster colours, no panel titles, no pyplot state calls in shipped code (MPL-005, MPL-006)",
+            "result": "PASS",
+            "note": "PCA colours = four named Okabe-Ito colours; grid panels untitled; no plt.imshow/colorbar/scatter calls in code."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 54.4,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every shipped figure has the exact journal page size, embedded TrueType fonts and 6-7 pt text, and the whole example is deterministic.",
+    "The seaborn.objects example now keeps its colour key inside an exact 89 x 70 mm page for its own labels.",
+    "Colours are bound to category names; every drawn point of a real 18,238-gene volcano carries its class colour in three row orders.",
+    "All SKILL.md blocks, all recipe fragments and all 22 failure-mode claims run verbatim and state only reproducible behaviour, including the rewritten tight_layout entry and Tick frequency recipe."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "MPL-010 seaborn.objects legend recipe discloses neither its private-attribute use nor its fixed 22 % reserve",
+      "observed_in": [
+        3
+      ],
+      "problem": "Section 7 reserves the right 22 % of the page and moves fig.legends[0] through Plot.plot()._figure, a private seaborn attribute verified on seaborn 0.13.2 only; with a longer legend title ('Differential expression class' with longer labels) the legend spans x 0.604-0.988 and covers 13 mm of the plot area (axes end at 0.750), and a 51-character title spans 0.299-0.988. Nothing in SKILL.md or the script says so.",
+      "root_cause": "The recipe was verified for the three short example labels only and the dependency on seaborn internals is left implicit.",
+      "fix": "Text-only: add to the script comment and SKILL.md a line that the recipe uses a private seaborn attribute (verified on 0.13.2), that 22 % fits legend text up to about 'Downregulated', and that longer titles need a smaller extent[2] or a shorter title with the legend bbox checked; optionally name the public route Plot.on(fig) + fig.legends[0] + fig.subplots_adjust(right=0.76), which measured inside the page and clear of the axes."
+    }
+  ]
+}

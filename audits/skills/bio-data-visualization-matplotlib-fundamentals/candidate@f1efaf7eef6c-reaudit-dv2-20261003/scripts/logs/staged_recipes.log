@@ -1,0 +1,13 @@
+2 python blocks in chart-recipes.md
+[PASS] block 1 fragment '# Scatter -- always rasterized f' ran verbatim; warnings=[]
+[PASS] block 1 fragment '# Line' ran verbatim; warnings=[]
+[PASS] block 1 fragment '# Bar' ran verbatim; warnings=[]
+[PASS] block 1 fragment '# Box / violin (prefer seaborn f' ran verbatim; warnings=[]
+[PASS] block 1 fragment '# Histogram' ran verbatim; warnings=[]
+[PASS] block 1 fragment '# Heatmap (prefer seaborn for cl' ran verbatim; warnings=[]
+[PASS] block 2 fragment '# Log scale' ran verbatim; warnings=[]
+[PASS] block 2 fragment '# Scientific notation' ran verbatim; warnings=[]
+[PASS] block 2 fragment '# Date axis' ran verbatim; warnings=[]
+[PASS] block 2 fragment '# Tick frequency' ran verbatim; warnings=[]
+[PASS] block 2 fragment '# Grid' ran verbatim; warnings=[]
+RESULT PASS

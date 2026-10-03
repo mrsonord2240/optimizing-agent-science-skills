@@ -1,0 +1,26 @@
+ggplot2 4.0.3 ggrepel 0.9.8 
+top10 symbols: SPARCL1 CACNB2 DUSP1 SAMHD1 MAOA GPX3 STEAP2 NEXN MT2A ADAMTS1  max nchar 7 
+default labels: Ensembl 3  symbol 10 
+standalone_ens_default             183 x 128 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+standalone_ens_default             150 x 105 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+standalone_ens_default             120 x  84 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+standalone_ens_default              89 x  70 mm | labels drawn  3 | overlapping pairs 1 | outside panel 0 [ENSG00000152583~ENSG00000165995(1.5x2.0)]
+standalone_sym_default             183 x 128 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+standalone_sym_default             120 x  84 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+standalone_sym_default              89 x  70 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+multi3_ens_default                 183 x 120 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi4_ens_default                 183 x 120 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi3_ens_default                 183 x 150 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi4_ens_default                 183 x 150 mm | labels drawn  3 | overlapping pairs 0 | outside panel 0
+multi3_ens_default                 120 x 110 mm | labels drawn  3 | overlapping pairs 1 | outside panel 3 [ENSG00000152583~ENSG00000165995(21.8x2.0)]
+multi4_ens_default                 120 x 110 mm | labels drawn  3 | overlapping pairs 1 | outside panel 3 [ENSG00000152583~ENSG00000165995(21.8x2.0)]
+multi3_sym_default                 183 x 120 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+multi4_sym_default                 183 x 120 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+multi3_sym_default                 183 x 150 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+multi4_sym_default                 183 x 150 mm | labels drawn 10 | overlapping pairs 0 | outside panel 0
+multi3_sym_default                 120 x 110 mm | labels drawn 10 | overlapping pairs 9 | outside panel 0 [SAMHD1~STEAP2(3.8x0.5); SAMHD1~MAOA(3.5x1.0); SAMHD1~GPX3(6.4x0.7); DUSP1~SPARCL1(3.9x2.0); DUSP1~CACNB2(7.3x2.0); MT2A~ADAMTS1(6.3x0.3); SPARCL1~CACNB2(6.6x2.0); ADAMTS1~NEXN(2.2x0.8); STEAP2~GPX3(0.2x1.8)]
+multi4_sym_default                 120 x 110 mm | labels drawn 10 | overlapping pairs 11 | outside panel 0 [SAMHD1~STEAP2(3.8x0.5); SAMHD1~MAOA(1.2x0.9); SAMHD1~GPX3(6.4x0.5); DUSP1~SPARCL1(3.9x2.0); DUSP1~CACNB2(7.3x2.0); MT2A~ADAMTS1(6.3x0.3); MT2A~STEAP2(1.5x0.1); MT2A~GPX3(5.0x0.1); SPARCL1~CACNB2(6.7x2.0); ADAMTS1~NEXN(2.2x1.9); STEAP2~GPX3(0.2x2.0)]
+
+-- PCA contract
+fraction input warning: var_explained for PC1+PC2 sums to <= 1: it is read as percent, so axis labels show values under 1%. Multiply fractions by 100. | label PC1 (0.6%) 
+percent input warning: none | label PC1 (57.6%) PC2 (26.5%)  expected PC1 (57.6%) 

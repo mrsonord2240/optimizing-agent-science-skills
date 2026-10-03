@@ -1,0 +1,29 @@
+pandas 3.0.6
+WARN Pandas4Warning The copy keyword is deprecated and will be removed in a future version. Copy-on-Write is active in p @ F:\OpenScience\audit-envs\data-visualization\Lib\site-packages\seaborn\_core\data.py 109
+  stack (innermost last):
+    matplotlib_phd.py:111 <module>
+    plot.py:932 plot
+    plot.py:942 _plot
+    plot.py:1075 _extract_data
+    data.py:109 join
+    concat.py:390 concat
+    warnings.py:112 _showwarnmsg
+WARN Pandas4Warning The copy keyword is deprecated and will be removed in a future version. Copy-on-Write is active in p @ F:\OpenScience\audit-envs\data-visualization\Lib\site-packages\seaborn\_core\data.py 109
+  stack (innermost last):
+    matplotlib_phd.py:111 <module>
+    plot.py:932 plot
+    plot.py:942 _plot
+    plot.py:1076 _extract_data
+    data.py:109 join
+    concat.py:390 concat
+    warnings.py:112 _showwarnmsg
+WARN Pandas4Warning The copy keyword is deprecated and will be removed in a future version. Copy-on-Write is active in p @ F:\OpenScience\audit-envs\data-visualization\Lib\site-packages\seaborn\_core\data.py 109
+  stack (innermost last):
+    matplotlib_phd.py:111 <module>
+    plot.py:932 plot
+    plot.py:942 _plot
+    plot.py:1082 _extract_data
+    data.py:109 join
+    concat.py:390 concat
+    warnings.py:112 _showwarnmsg
+distinct warnings: 1 total 3

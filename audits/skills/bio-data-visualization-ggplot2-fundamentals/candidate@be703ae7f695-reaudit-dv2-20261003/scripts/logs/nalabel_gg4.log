@@ -1,0 +1,9 @@
+ggplot2 4.0.3 
+[PASS] 8-char labels -> 10 labels
+[PASS] 9-char labels -> 3 labels
+rows with NA symbol: 0  empty: 0  NA among 10 smallest padj: 0 
+NA symbol at padj rank 4 (label_col = 'symbol') -> ERROR: missing value where TRUE/FALSE needed 
+[FAIL] NA label among the smallest padj does not crash the helper
+same with explicit top_n = 10 -> builds, 9 labels 
+empty-string symbol -> builds, 9 labels 
+NA-padj rows filtered -> 18238 of 19772 

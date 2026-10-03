@@ -100,10 +100,10 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
-| `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 85 | Production Ready | 0 / 1 / 1 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d22bac5b1ee-reaudit-dv1-20261003/viewer.md) |
+| `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 89 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@be703ae7f695-reaudit-dv2-20261003/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |
 | `bio-data-visualization-lollipop-protein-maps` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@4f5e4c0/viewer.md) |
-| `bio-data-visualization-matplotlib-fundamentals` | Data Analysis | 85 | Production Ready | 0 / 0 / 3 | [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@5a5bd8a000b2-reaudit-dv1-20261003/viewer.md) |
+| `bio-data-visualization-matplotlib-fundamentals` | Data Analysis | 90 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@f1efaf7eef6c-reaudit-dv2-20261003/viewer.md) |
 | `bio-data-visualization-multipanel-figures` | Data Analysis | 94.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@3749f31/viewer.md) |
 | `bio-data-visualization-upset-plots` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md) |
 | `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 87 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@fa3ec8783a79-reaudit-dv1-20261003/viewer.md) |

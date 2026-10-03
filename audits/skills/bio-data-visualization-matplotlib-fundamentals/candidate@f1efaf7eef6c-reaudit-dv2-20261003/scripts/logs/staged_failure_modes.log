@@ -1,0 +1,24 @@
+matplotlib 3.11.2
+[PASS] tight_layout() then longer label: clipped
+[PASS] tight_layout() then resize: clipped
+[PASS] layout='constrained' at creation: not clipped after label change or resize
+[PASS] set_layout_engine('constrained') after a colorbar exists raises ZeroDivisionError
+[PASS] set_layout_engine('constrained') before the colorbar works, not clipped
+[PASS] multi-axes colorbar + tight_layout warns 'not compatible with tight_layout'
+[PASS] single colorbar on one axes + tight_layout: not clipped (entry says so)
+[PASS] plt.xlabel after plt.subplots(2,3) labels the last axes only
+   vector 1.52 MB raster 23.2 KB ratio 66x
+[PASS] 100000 pts: 1.5 MB vs 24 KB (63x) at default dpi
+[PASS] FacetGrid.set_xlabel AttributeError; set_axis_labels works
+[PASS] axes-level histplot(ax=) + set_xlabel works
+[PASS] figsize=(89,70) is 89 inches wide
+[PASS] 89/25.4 gives 89 mm page
+   colorbar height default 0.922 shrink 0.6 0.56
+[PASS] shrink=0.6 aspect=20 gives a shorter colorbar than default
+[PASS] ax.set_rasterization_zorder(1): image object, small PDF
+[PASS] Figure has no set_rasterization_zorder
+[PASS] bbox_inches='tight' page ~92 mm, without it 89 mm
+[PASS] svg.fonttype none keeps <text>; path (default) does not
+[PASS] ax.spines[['top','right']].set_visible(False)
+[PASS] plt.subplots(layout='constrained') gives ConstrainedLayoutEngine
+RESULT PASS

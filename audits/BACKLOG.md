@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (43)
+## P1 (42)
 
 ### `bio-machine-learning-omics-classifiers` — OC-001: class_weight=balanced contradicts the Skill calibration stance
 
@@ -57,14 +57,6 @@ None open.
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
-
-### `bio-data-visualization-ggplot2-fundamentals` — GG-004 Long-ID volcano labels still collide where the Skill promises clean
-
-- Skill: 85, Production Ready · candidate `9d22bac5b1ee` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d22bac5b1ee-reaudit-dv1-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: The shipped 3- and 4-panel create_multi_panel with the default volcano overprints 2-3 label pairs at 183 mm; the Skill's top_n = 3 rule 'under ~90 mm' still collides at 89 mm (1 pair) and at 120 mm, while a 91 mm slot (183 mm composite) already needs it; only gene symbols were clean in every cell.
-- Root cause: The width rule ignores the legend that takes about a third of the slot, and top_n = 3 is not the same as a width-safe label.
-- Fix: Text-only: tell the agent to pass label_col with gene symbols for any multi-panel or single-column volcano, to use Ensembl IDs only standalone at roughly 150 mm or wider, and to measure or open the figure; optionally set the helper default to legend.position = 'bottom' in panels.
 
 ### `bio-single-cell-perturb-seq` — Verify the primary optax mixture backend
 
@@ -516,38 +508,6 @@ None open.
 - Root cause: Out of bounded scope (GPU, source install).
 - Fix: Keep the untested label or add a tested minimal workflow later. (NUCPOS-015, deferred)
 
-### `bio-data-visualization-ggplot2-fundamentals` — GG-009 failure-modes.md misstates the ggrepel drop warning
-
-- Skill: 85, Production Ready · candidate `9d22bac5b1ee` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d22bac5b1ee-reaudit-dv1-20261003/viewer.md)
-- Observed in inputs: 6
-- Problem: The ggrepel entry says labels are dropped 'with a warning' and that the warning is 'buried in log'; ggrepel 0.9.8 emits nothing unless verbose = TRUE, so the drop is fully silent.
-- Root cause: Statement carried over from older ggrepel behaviour and left after the fix of GG-006.
-- Fix: Text-only: say the drop is silent, name verbose = TRUE as the only message, and keep 'count the labels actually drawn'.
-
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-007 seaborn.objects example ships with no colour key
-
-- Skill: 85, Production Ready · candidate `5a5bd8a000b2` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@5a5bd8a000b2-reaudit-dv1-20261003/viewer.md)
-- Observed in inputs: 1
-- Problem: scripts/matplotlib_phd.py volcano_so.pdf sets legend=False, leaving Up, Down and NS as three unlabelled colours; the default legend does fall outside the 89 mm page (bbox 348-408 px on a 350 px page) for every layout engine tried.
-- Root cause: The overflow was worked around by deleting the legend instead of repositioning it.
-- Fix: Keep the legend and move it on-page, e.g. .layout(size=..., extent=[0, 0, 0.78, 1]).plot(), then reposition fig.legends[0] (verified inside the page in scripts/r2_so_legend.py), or state that a caption must name the colours.
-
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-008 Tick frequency recipe raises ValueError
-
-- Skill: 85, Production Ready · candidate `5a5bd8a000b2` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@5a5bd8a000b2-reaudit-dv1-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: references/chart-recipes.md sets five ticks with np.arange(0, 10, 2) and then three labels, which raises ValueError on matplotlib 3.11.2; the snippet also uses np without an import.
-- Root cause: The recipe was written as an illustration and never executed.
-- Fix: Use equal counts, e.g. ax.set_xticks(np.arange(0, 6, 2)) with three labels, and add import numpy as np to the block.
-
-### `bio-data-visualization-matplotlib-fundamentals` — MPL-009 tight_layout failure mode not reproduced; fix crashes
-
-- Skill: 85, Production Ready · candidate `5a5bd8a000b2` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@5a5bd8a000b2-reaudit-dv1-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: failure-modes.md says tight_layout clips labels and overlaps a colorbar added with ax=; in 3.11.2 it does neither. Its alternative fig.set_layout_engine('constrained') after creation raises ZeroDivisionError when a colorbar already exists.
-- Root cause: The entry restates a historic tight_layout limitation and an untested alternative.
-- Fix: Reword the trigger to axes added with fig.add_axes, and change the alternative to set the engine before adding colorbars or pass layout='constrained' to plt.subplots only.
-
 ### `bio-splicing-quantification` — parse_rmats_output raises a raw KeyError on an rMATS file with zero events
 
 - Skill: 85, Production Ready · candidate `0c0354add99b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@0c0354add99b-run-reaudit-1/viewer.md)
@@ -908,6 +868,30 @@ None open.
 - Root cause: The references name alternatives without a verified local execution route.
 - Fix: Add a supported environment recipe or an explicit unavailable-here note with a tested fallback.
 
+### `bio-data-visualization-ggplot2-fundamentals` — GG-010 create_volcano stops with a cryptic error when a label among the smallest padj is NA
+
+- Skill: 89, Production Ready · candidate `be703ae7f695` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@be703ae7f695-reaudit-dv2-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: With the new default top_n = NULL the helper evaluates max(nchar(lead)); a NA label (an unmapped gene symbol, the usual result of an org.Hs.eg.db lookup) makes the result NA and `if` fails with 'missing value where TRUE/FALSE needed' on ggplot2 4.0.3 and 3.5.2; with an explicit top_n the same data builds.
+- Root cause: The second-loop heuristic does not handle NA in the label column.
+- Fix: Local code change of one line (max(nchar(lead), na.rm = TRUE), or treat NA as long) and, optionally, one sentence in SKILL.md telling the agent to fill unmapped symbols with the Ensembl ID before labelling.
+
+### `bio-data-visualization-ggplot2-fundamentals` — GG-011 The zero-overlap envelope omits composite height and dataset, and 'no collisions' means label boxes only
+
+- Skill: 89, Production Ready · candidate `be703ae7f695` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@be703ae7f695-reaudit-dv2-20261003/viewer.md)
+- Observed in inputs: 2
+- Problem: The Resources line says composites collide-free 'at 183 mm', but the claim was measured at 183 x 120 and 183 x 150 mm on the airway data; a 183 x 90 mm composite with the default airway symbols has 1 overlapping pair (STEAP2~MAOA) and a re-ranked Ensembl set (3 extreme-LFC IDs) has 3 pairs at 183 x 120 mm. Threshold lines and points also cross labels in the clean rows (183 x 120 Ensembl composite), which a reader may take as collisions.
+- Root cause: Envelope phrased by width only; label placement depends on where the top genes fall.
+- Fix: Text-only: state 'measured on the airway DESeq2 results at 183 x 120 mm and taller', say the count is label-label boxes only, and keep 'open the figure'.
+
+### `bio-data-visualization-ggplot2-fundamentals` — GG-012 usage-guide prerequisites omit packages the shipped script loads
+
+- Skill: 89, Production Ready · candidate `be703ae7f695` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@be703ae7f695-reaudit-dv2-20261003/viewer.md)
+- Observed in inputs: 5
+- Problem: usage-guide.md installs ggplot2, scales, ggrepel, ggtext, viridis, scico and ggrastr, but scripts/publication_figures.R calls library(patchwork) and library(dplyr); on a fresh R the documented source() step fails. SKILL.md's version line also keeps a stray "axes='collect'" note for a feature the Skill does not use.
+- Root cause: The install line predates the helper script's dependencies.
+- Fix: Text-only: add patchwork and dplyr to the install.packages line and drop the unused axes='collect' remark.
+
 ### `bio-microbiome-taxonomy-assignment` — DADA2 example exits with a post-output segmentation fault
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@60fd788](https://github.com/mrsonord2240/bioSkills/tree/60fd788ddba9db5cdfdd157003ee4274e5c47349/microbiome/taxonomy-assignment) · [viewer](skills/bio-microbiome-taxonomy-assignment/mrsonord2240-bioSkills@60fd788/viewer.md)
@@ -931,6 +915,14 @@ None open.
 - Problem: Several named specialist methods remain taxonomy/escalation guidance rather than locally executable workflows with fixtures.
 - Root cause: The Skill intentionally focuses runnable coverage on FUSION, MetaXcan, and FOCUS.
 - Fix: For each retained optional method, either add a minimal verified invocation or label it explicitly as a handoff/reference-only route.
+
+### `bio-data-visualization-matplotlib-fundamentals` — MPL-010 seaborn.objects legend recipe discloses neither its private-attribute use nor its fixed 22 % reserve
+
+- Skill: 90, Production Ready · candidate `f1efaf7eef6c` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@f1efaf7eef6c-reaudit-dv2-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: Section 7 reserves the right 22 % of the page and moves fig.legends[0] through Plot.plot()._figure, a private seaborn attribute verified on seaborn 0.13.2 only; with a longer legend title ('Differential expression class' with longer labels) the legend spans x 0.604-0.988 and covers 13 mm of the plot area (axes end at 0.750), and a 51-character title spans 0.299-0.988. Nothing in SKILL.md or the script says so.
+- Root cause: The recipe was verified for the three short example labels only and the dependency on seaborn internals is left implicit.
+- Fix: Text-only: add to the script comment and SKILL.md a line that the recipe uses a private seaborn attribute (verified on 0.13.2), that 22 % fits legend text up to about 'Downregulated', and that longer titles need a smaller extent[2] or a shorter title with the legend bbox checked; optionally name the public route Plot.on(fig) + fig.legends[0] + fig.subplots_adjust(right=0.76), which measured inside the page and clear of the axes.
 
 ### `bio-reference-operations` — Reject wholly out-of-range consensus windows
 

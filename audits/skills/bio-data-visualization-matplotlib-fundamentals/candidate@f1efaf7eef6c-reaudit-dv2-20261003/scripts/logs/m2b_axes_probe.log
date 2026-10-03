@@ -1,0 +1,5 @@
+layout engine: TightLayoutEngine
+after plot(), legend not moved           axes pos x 0.125-0.900 | axes tight x 0.033-0.900 | legend x 0.992-1.165
+after move, first draw                   axes pos x 0.125-0.900 | axes tight x 0.033-0.900 | legend x 0.815-0.988
+after save + draw                        axes pos x 0.126-0.750 | axes tight x 0.034-0.750 | legend x 0.815-0.988
+after 2nd savefig + draw                 axes pos x 0.126-0.750 | axes tight x 0.034-0.750 | legend x 0.815-0.988

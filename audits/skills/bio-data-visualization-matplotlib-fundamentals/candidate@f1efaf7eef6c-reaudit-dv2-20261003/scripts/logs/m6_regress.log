@@ -1,0 +1,10 @@
+figures: [(1, (89, 70)), (6, (180, 110)), (2, (89, 90)), (1, (89, 70))]
+pca cluster colours: ['#0072b2', '#009e73', '#56b4e9', '#e69f00']
+[PASS] PCA cluster colours are the four Okabe-Ito colours the script names (yellow skipped)
+[PASS] grid panels carry no titles (only the a-f tags)
+[PASS] panel tags a-f present
+text sizes: [6.0, 7.0]
+[PASS] visible text only 6 and 7 pt in all five figures
+pyplot state calls in code lines: none
+[PASS] no pyplot state-machine plotting calls in shipped code
+RESULT PASS

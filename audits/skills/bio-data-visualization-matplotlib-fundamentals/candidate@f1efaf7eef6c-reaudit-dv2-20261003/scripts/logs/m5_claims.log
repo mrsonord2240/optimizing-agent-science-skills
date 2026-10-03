@@ -1,0 +1,26 @@
+matplotlib 3.11.2
+[PASS] default layout engine is None (opt-in claim)
+constrained_layout=True -> ConstrainedLayoutEngine | warnings: []
+[PASS] legacy constrained_layout=True still works and gives the same engine
+boxplot(labels=) -> TypeError: Axes.boxplot() got an unexpected keyword argument 'labels'
+[PASS] boxplot(labels=) is rejected on 3.11 (claim in SKILL.md and chart-recipes.md)
+[PASS] boxplot(tick_labels=) works
+pca.pdf              106.4 KB | image XObjects 2 | font objects 2
+[PASS] pca.pdf: raster image present (rasterized=True took effect) and fonts embedded
+volcano_sns.pdf      190.4 KB | image XObjects 2 | font objects 2
+[PASS] volcano_sns.pdf: raster image present (rasterized=True took effect) and fonts embedded
+volcano_so.pdf       105.8 KB | image XObjects 0 | font objects 2
+multipanel.pdf       129.2 KB | image XObjects 12 | font objects 4
+[PASS] multipanel.pdf: raster image present (rasterized=True took effect) and fonts embedded
+heatmap.pdf           31.7 KB | image XObjects 2 | font objects 2
+[PASS] heatmap.pdf: raster image present (rasterized=True took effect) and fonts embedded
+volcano_so.pdf images 0 (so.Dots is vector by design, 500 points)
+seaborn.scatterplot 20000 pts, rasterized False/True -> (bytes, images): {False: (341216, 0), True: (93323, 2)}
+[PASS] seaborn passes rasterized=True through: images appear and the PDF shrinks
+EPS fonttype 42 has Type42 resource: True | fonttype 3 has "FontType 3": True
+[PASS] ps.fonttype=42 changes EPS font embedding vs 3
+[PASS] 2x3 grid figure present
+panel tags ['a', 'b', 'c', 'd', 'e', 'f'] outside page: []
+[PASS] every panel tag lies inside the page
+[PASS] no axes tight box overlaps another axes (constrained layout)
+RESULT PASS

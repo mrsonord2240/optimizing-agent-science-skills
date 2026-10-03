@@ -1,0 +1,362 @@
+ggplot2 3.5.2 ggrepel 0.9.8 
+r blocks in SKILL.md: 5 
+[PASS] SKILL.md block 1 (2 exprs, first line: library(ggplot2)) runs; warnings: []
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+[PASS] SKILL.md block 2 (2 exprs, first line: source('scripts/publication_figures.R')) runs; warnings: []
+[PASS] SKILL.md block 3 (4 exprs, first line: # Pass variable name as a string) runs; warnings: []
+[PASS] SKILL.md block 4 (2 exprs, first line: library(ggtext)) runs; warnings: []
+Saving 7 x 7 in image
+[PASS] SKILL.md block 5 (6 exprs, first line: # cairo_pdf for TrueType embedded; porta) runs; warnings: []
+files written to skill copy: figure.pdf, figure.png, figure.tiff, out.pdf 
+grammar panel1 y labels: NA 3 5 10 NA 
+[PASS] grammar y labels plain (no e+)
+[PASS] grammar colour legend 'condition' with 2 levels
+[PASS] plot_var2(df, PC1, PC2) maps data
+[PASS] plot_var2(df, 'PC1','PC2') maps a constant string (as the comment says)
+Warning message:
+In geom_point() : All aesthetics have length 1, but the data has 60 rows.
+ℹ Please consider using `annotate()` or provide this layer with data containing
+  a single row.
+aes(color='red') colour: #F8766D 
+[PASS] aes(color='red') -> #F8766D salmon
+$data
+$data[[1]]
+              x           y PANEL group flipped_aes colour linewidth linetype
+48 -1.897727292 -1.12365383     1    -1       FALSE  black       0.5        1
+9  -1.289006611 -1.72434420     1    -1       FALSE  black       0.5        1
+32 -0.989994331  2.63504537     1    -1       FALSE  black       0.5        1
+19 -0.988052822 -1.30643833     1    -1       FALSE  black       0.5        1
+28 -0.886463751 -0.64269441     1    -1       FALSE  black       0.5        1
+30 -0.886389751  0.41019936     1    -1       FALSE  black       0.5        1
+31 -0.853818454 -1.29134932     1    -1       FALSE  black       0.5        1
+55 -0.721055711 -0.50060277     1    -1       FALSE  black       0.5        1
+49 -0.682582832  0.66833012     1    -1       FALSE  black       0.5        1
+33 -0.650877737  0.48707229     1    -1       FALSE  black       0.5        1
+6  -0.480846375 -0.76244861     1    -1       FALSE  black       0.5        1
+51 -0.463031038  0.23457535     1    -1       FALSE  black       0.5        1
+37 -0.462050809  0.06819884     1    -1       FALSE  black       0.5        1
+56 -0.453093157  1.16389749     1    -1       FALSE  black       0.5        1
+7  -0.418829722  0.38607379     1    -1       FALSE  black       0.5        1
+53 -0.413690145  0.23822009     1    -1       FALSE  black       0.5        1
+42 -0.405077513  0.91286265     1    -1       FALSE  black       0.5        1
+35 -0.390878033  1.08844271     1    -1       FALSE  black       0.5        1
+22 -0.352298306 -1.98234768     1    -1       FALSE  black       0.5        1
+52 -0.279741696 -0.41869659     1    -1       FALSE  black       0.5        1
+40 -0.209274345  2.46405534     1    -1       FALSE  black       0.5        1
+20 -0.156852910 -0.87719899     1    -1       FALSE  black       0.5        1
+36 -0.070586394  0.22601396     1    -1       FALSE  black       0.5        1
+60 -0.050148494 -1.03855341     1    -1       FALSE  black       0.5        1
+11 -0.031325502  0.69350659     1    -1       FALSE  black       0.5        1
+26 -0.006402398  0.40766981     1    -1       FALSE  black       0.5        1
+57  0.014257161  2.15553695     1    -1       FALSE  black       0.5        1
+10  0.186197433  1.15631908     1    -1       FALSE  black       0.5        1
+59  0.188870195 -1.60082262     1    -1       FALSE  black       0.5        1
+47  0.206735995  1.21785408     1    -1       FALSE  black       0.5        1
+58  0.215764621 -1.70915701     1    -1       FALSE  black       0.5        1
+27  0.219150635 -1.24218438     1    -1       FALSE  black       0.5        1
+15  0.231826103  0.12784602     1    -1       FALSE  black       0.5        1
+3   0.256287273  0.51714402     1    -1       FALSE  black       0.5        1
+14  0.267358452 -1.63215348     1    -1       FALSE  black       0.5        1
+4   0.351966556 -0.48433547     1    -1       FALSE  black       0.5        1
+18  0.383358345 -0.87889305     1    -1       FALSE  black       0.5        1
+29  0.439760291  1.93024369     1    -1       FALSE  black       0.5        1
+12  0.467097310  0.14315636     1    -1       FALSE  black       0.5        1
+50  0.481338415  1.21641149     1    -1       FALSE  black       0.5        1
+38  0.540908267 -0.98481553     1    -1       FALSE  black       0.5        1
+1   0.573518173 -1.49541963     1    -1       FALSE  black       0.5        1
+44  0.602284246  1.60800294     1    -1       FALSE  black       0.5        1
+46  0.608167318  0.70246273     1    -1       FALSE  black       0.5        1
+41  0.617350048 -0.66542807     1    -1       FALSE  black       0.5        1
+23  0.688640044 -0.98994423     1    -1       FALSE  black       0.5        1
+16  0.747592465 -2.40366373     1    -1       FALSE  black       0.5        1
+25  0.794296303  0.91250679     1    -1       FALSE  black       0.5        1
+2   0.918196208  0.36783775     1    -1       FALSE  black       0.5        1
+39  0.931634971 -1.31085442     1    -1       FALSE  black       0.5        1
+8   0.955112803 -0.66400334     1    -1       FALSE  black       0.5        1
+45  1.017461177  1.83539952     1    -1       FALSE  black       0.5        1
+13  1.024197674  1.49281356     1    -1       FALSE  black       0.5        1
+43  1.053103763  0.96466423     1    -1       FALSE  black       0.5        1
+34  1.053946660  0.85389232     1    -1       FALSE  black       0.5        1
+5   1.174337357  0.67485562     1    -1       FALSE  black       0.5        1
+17  1.217068511  1.44392826     1    -1       FALSE  black       0.5        1
+24  1.224406096 -0.15168460     1    -1       FALSE  black       0.5        1
+54  1.618766521 -0.55058819     1    -1       FALSE  black       0.5        1
+21  1.735535216 -1.16438046     1    -1       FALSE  black       0.5        1
+   alpha
+48    NA
+9     NA
+32    NA
+19    NA
+28    NA
+30    NA
+31    NA
+55    NA
+49    NA
+33    NA
+6     NA
+51    NA
+37    NA
+56    NA
+7     NA
+53    NA
+42    NA
+35    NA
+22    NA
+52    NA
+40    NA
+20    NA
+36    NA
+60    NA
+11    NA
+26    NA
+57    NA
+10    NA
+59    NA
+47    NA
+58    NA
+27    NA
+15    NA
+3     NA
+14    NA
+4     NA
+18    NA
+29    NA
+12    NA
+50    NA
+38    NA
+1     NA
+44    NA
+46    NA
+41    NA
+23    NA
+16    NA
+25    NA
+2     NA
+39    NA
+8     NA
+45    NA
+13    NA
+43    NA
+34    NA
+5     NA
+17    NA
+24    NA
+54    NA
+21    NA
+
+
+$layout
+<ggproto object: Class Layout, gg>
+    coord: <ggproto object: Class CoordCartesian, Coord, gg>
+        aspect: function
+        backtransform_range: function
+        clip: on
+        default: TRUE
+        distance: function
+        expand: TRUE
+        is_free: function
+        is_linear: function
+        labels: function
+        limits: list
+        modify_scales: function
+        range: function
+        render_axis_h: function
+        render_axis_v: function
+        render_bg: function
+        render_fg: function
+        setup_data: function
+        setup_layout: function
+        setup_panel_guides: function
+        setup_panel_params: function
+        setup_params: function
+        train_panel_guides: function
+        transform: function
+        super:  <ggproto object: Class CoordCartesian, Coord, gg>
+    coord_params: list
+    facet: <ggproto object: Class FacetNull, Facet, gg>
+        compute_layout: function
+        draw_back: function
+        draw_front: function
+        draw_labels: function
+        draw_panels: function
+        finish_data: function
+        init_scales: function
+        map_data: function
+        params: list
+        setup_data: function
+        setup_params: function
+        shrink: TRUE
+        train_scales: function
+        vars: function
+        super:  <ggproto object: Class FacetNull, Facet, gg>
+    facet_params: list
+    finish_data: function
+    get_scales: function
+    layout: data.frame
+    map_position: function
+    panel_params: list
+    panel_scales_x: list
+    panel_scales_y: list
+    render: function
+    render_labels: function
+    reset_scales: function
+    resolve_label: function
+    setup: function
+    setup_panel_guides: function
+    setup_panel_params: function
+    train_position: function
+    super:  <ggproto object: Class Layout, gg>
+
+$plot
+
+attr(,"class")
+[1] "ggplot_built"
+geom_line(size=) warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead. 
+[PASS] size-for-lines deprecation warning fires
+$data
+$data[[1]]
+              x           y PANEL group shape colour size fill alpha stroke
+1   0.573518173 -1.49541963     1    -1    19  black  1.5   NA    NA    0.5
+2   0.918196208  0.36783775     1    -1    19  black  1.5   NA    NA    0.5
+3   0.256287273  0.51714402     1    -1    19  black  1.5   NA    NA    0.5
+4   0.351966556 -0.48433547     1    -1    19  black  1.5   NA    NA    0.5
+5   1.174337357  0.67485562     1    -1    19  black  1.5   NA    NA    0.5
+6  -0.480846375 -0.76244861     1    -1    19  black  1.5   NA    NA    0.5
+7  -0.418829722  0.38607379     1    -1    19  black  1.5   NA    NA    0.5
+8   0.955112803 -0.66400334     1    -1    19  black  1.5   NA    NA    0.5
+9  -1.289006611 -1.72434420     1    -1    19  black  1.5   NA    NA    0.5
+10  0.186197433  1.15631908     1    -1    19  black  1.5   NA    NA    0.5
+11 -0.031325502  0.69350659     1    -1    19  black  1.5   NA    NA    0.5
+12  0.467097310  0.14315636     1    -1    19  black  1.5   NA    NA    0.5
+13  1.024197674  1.49281356     1    -1    19  black  1.5   NA    NA    0.5
+14  0.267358452 -1.63215348     1    -1    19  black  1.5   NA    NA    0.5
+15  0.231826103  0.12784602     1    -1    19  black  1.5   NA    NA    0.5
+16  0.747592465 -2.40366373     1    -1    19  black  1.5   NA    NA    0.5
+17  1.217068511  1.44392826     1    -1    19  black  1.5   NA    NA    0.5
+18  0.383358345 -0.87889305     1    -1    19  black  1.5   NA    NA    0.5
+19 -0.988052822 -1.30643833     1    -1    19  black  1.5   NA    NA    0.5
+20 -0.156852910 -0.87719899     1    -1    19  black  1.5   NA    NA    0.5
+21  1.735535216 -1.16438046     1    -1    19  black  1.5   NA    NA    0.5
+22 -0.352298306 -1.98234768     1    -1    19  black  1.5   NA    NA    0.5
+23  0.688640044 -0.98994423     1    -1    19  black  1.5   NA    NA    0.5
+24  1.224406096 -0.15168460     1    -1    19  black  1.5   NA    NA    0.5
+25  0.794296303  0.91250679     1    -1    19  black  1.5   NA    NA    0.5
+26 -0.006402398  0.40766981     1    -1    19  black  1.5   NA    NA    0.5
+27  0.219150635 -1.24218438     1    -1    19  black  1.5   NA    NA    0.5
+28 -0.886463751 -0.64269441     1    -1    19  black  1.5   NA    NA    0.5
+29  0.439760291  1.93024369     1    -1    19  black  1.5   NA    NA    0.5
+30 -0.886389751  0.41019936     1    -1    19  black  1.5   NA    NA    0.5
+31 -0.853818454 -1.29134932     1    -1    19  black  1.5   NA    NA    0.5
+32 -0.989994331  2.63504537     1    -1    19  black  1.5   NA    NA    0.5
+33 -0.650877737  0.48707229     1    -1    19  black  1.5   NA    NA    0.5
+34  1.053946660  0.85389232     1    -1    19  black  1.5   NA    NA    0.5
+35 -0.390878033  1.08844271     1    -1    19  black  1.5   NA    NA    0.5
+36 -0.070586394  0.22601396     1    -1    19  black  1.5   NA    NA    0.5
+37 -0.462050809  0.06819884     1    -1    19  black  1.5   NA    NA    0.5
+38  0.540908267 -0.98481553     1    -1    19  black  1.5   NA    NA    0.5
+39  0.931634971 -1.31085442     1    -1    19  black  1.5   NA    NA    0.5
+40 -0.209274345  2.46405534     1    -1    19  black  1.5   NA    NA    0.5
+41  0.617350048 -0.66542807     1    -1    19  black  1.5   NA    NA    0.5
+42 -0.405077513  0.91286265     1    -1    19  black  1.5   NA    NA    0.5
+43  1.053103763  0.96466423     1    -1    19  black  1.5   NA    NA    0.5
+44  0.602284246  1.60800294     1    -1    19  black  1.5   NA    NA    0.5
+45  1.017461177  1.83539952     1    -1    19  black  1.5   NA    NA    0.5
+46  0.608167318  0.70246273     1    -1    19  black  1.5   NA    NA    0.5
+47  0.206735995  1.21785408     1    -1    19  black  1.5   NA    NA    0.5
+48 -1.897727292 -1.12365383     1    -1    19  black  1.5   NA    NA    0.5
+49 -0.682582832  0.66833012     1    -1    19  black  1.5   NA    NA    0.5
+50  0.481338415  1.21641149     1    -1    19  black  1.5   NA    NA    0.5
+51 -0.463031038  0.23457535     1    -1    19  black  1.5   NA    NA    0.5
+52 -0.279741696 -0.41869659     1    -1    19  black  1.5   NA    NA    0.5
+53 -0.413690145  0.23822009     1    -1    19  black  1.5   NA    NA    0.5
+54  1.618766521 -0.55058819     1    -1    19  black  1.5   NA    NA    0.5
+55 -0.721055711 -0.50060277     1    -1    19  black  1.5   NA    NA    0.5
+56 -0.453093157  1.16389749     1    -1    19  black  1.5   NA    NA    0.5
+57  0.014257161  2.15553695     1    -1    19  black  1.5   NA    NA    0.5
+58  0.215764621 -1.70915701     1    -1    19  black  1.5   NA    NA    0.5
+59  0.188870195 -1.60082262     1    -1    19  black  1.5   NA    NA    0.5
+60 -0.050148494 -1.03855341     1    -1    19  black  1.5   NA    NA    0.5
+
+
+$layout
+<ggproto object: Class Layout, gg>
+    coord: <ggproto object: Class CoordCartesian, Coord, gg>
+        aspect: function
+        backtransform_range: function
+        clip: on
+        default: TRUE
+        distance: function
+        expand: TRUE
+        is_free: function
+        is_linear: function
+        labels: function
+        limits: list
+        modify_scales: function
+        range: function
+        render_axis_h: function
+        render_axis_v: function
+        render_bg: function
+        render_fg: function
+        setup_data: function
+        setup_layout: function
+        setup_panel_guides: function
+        setup_panel_params: function
+        setup_params: function
+        train_panel_guides: function
+        transform: function
+        super:  <ggproto object: Class CoordCartesian, Coord, gg>
+    coord_params: list
+    facet: <ggproto object: Class FacetNull, Facet, gg>
+        compute_layout: function
+        draw_back: function
+        draw_front: function
+        draw_labels: function
+        draw_panels: function
+        finish_data: function
+        init_scales: function
+        map_data: function
+        params: list
+        setup_data: function
+        setup_params: function
+        shrink: TRUE
+        train_scales: function
+        vars: function
+        super:  <ggproto object: Class FacetNull, Facet, gg>
+    facet_params: list
+    finish_data: function
+    get_scales: function
+    layout: data.frame
+    map_position: function
+    panel_params: list
+    panel_scales_x: list
+    panel_scales_y: list
+    render: function
+    render_labels: function
+    reset_scales: function
+    resolve_label: function
+    setup: function
+    setup_panel_guides: function
+    setup_panel_params: function
+    train_position: function
+    super:  <ggproto object: Class Layout, gg>
+
+$plot
+
+attr(,"class")
+[1] "ggplot_built"
+aes_string warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information. 
+[PASS] aes_string deprecation warning fires
+[PASS] aes(x = !!sym(x_var)) works

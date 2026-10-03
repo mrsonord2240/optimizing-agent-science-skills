@@ -1,0 +1,40 @@
+ggplot2 3.5.2 
+create_volcano build warnings: none 
+[PASS] GG-001 plotted y == -log10(padj) recomputed from CSV
+classes Up/Down/NS (independent): 541/497/17200 | helper: 541/497/17200 
+[PASS] GG-001 classes equal independent
+[PASS] GG-001 hline layer y = 1.3010 = -log10(0.05)
+[PASS] GG-001 smallest coloured -log10(padj) >= line; largest grey |LFC|>1 point <= line
+[PASS] GG-001 y axis title is -log10 adjusted P
+[PASS] fdr_threshold=0.01 moves hline to 2
+[PASS] default Ensembl labels = 3 smallest padj
+[PASS] top_n = 5 override draws 5 labels
+png px default: 1051x826 (expect ~1051x827) ; 183x120: 2161x1417 (expect 2161x1417)
+[PASS] GG-003 theme_publication: blank panel grid
+[PASS] GG-003 okabe_ito has 8 colours, first two #0072B2/#D55E00
+boxplot fills: #0072B2 #D55E00 #009E73 
+[PASS] GG-003 boxplot fills are Okabe-Ito 1-3
+PCA colours: #D55E00 #0072B2 #009E73 
+[PASS] GG-003 PCA colours are Okabe-Ito 1-3
+[PASS] GG-003 multi-panel keeps theme_publication in every sub-plot
+[PASS] GG-008 boxplot jitter reproducible across calls
+[PASS] GG-008 boxplot median == raw median (A,B,C)
+no var_explained -> pca_df needs a 'var_explained' column (percent variance, first two rows = PC1, PC2) 
+[PASS] GG-008 missing var_explained error clear
+12 groups -> Okabe-Ito has 8 colours; got 12 groups. Collapse groups or facet. 
+[PASS] GG-008 >8 groups error clear
+[PASS] PCA labels equal prcomp variance
+[PASS] boxplot without fill_var builds
+[PASS] missing padj column raises an error (not silent)
+Warning message:
+In max(nchar(lead)) : no non-missing arguments to max; returning -Inf
+bad label_col -> ℹ In argument: `label = ifelse(...)`.
+Caused by error in `.data[["nope"]]`:
+! Column `nope 
+[PASS] bad label_col raises error
+[PASS] 9-char labels -> 3 labels
+[FAIL] 8-char labels -> 10 labels
+4-row input -> ok, 1 labels 
+factor label col -> ok, 3 labels 
+no significant genes -> builds 
+NA label among top10 -> missing value where TRUE/FALSE needed 

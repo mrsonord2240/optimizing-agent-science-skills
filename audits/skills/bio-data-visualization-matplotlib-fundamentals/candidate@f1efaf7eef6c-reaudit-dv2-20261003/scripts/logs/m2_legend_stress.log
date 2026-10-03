@@ -1,0 +1,20 @@
+matplotlib 3.11.2 seaborn 0.13.2
+A_skill_labels                     legend x 0.815-0.988 y 0.406-0.594 | axes tight x1 0.750 | inside page True | clear of axes True | page (89.0, 70.0)
+B_long_title                       legend x 0.299-0.988 y 0.406-0.594 | axes tight x1 0.750 | inside page True | clear of axes False | page (89.0, 70.0)
+C_long_labels                      legend x 0.757-0.988 y 0.403-0.597 | axes tight x1 0.750 | inside page True | clear of axes True | page (89.0, 70.0)
+D_long_title_long_labels           legend x 0.604-0.988 y 0.403-0.597 | axes tight x1 0.750 | inside page True | clear of axes False | page (89.0, 70.0)
+E_eight_classes                    legend x 0.820-0.988 y 0.292-0.708 | axes tight x1 0.750 | inside page True | clear of axes True | page (89.0, 70.0)
+F_twelve_classes                   legend x 0.808-0.988 y 0.202-0.798 | axes tight x1 0.750 | inside page True | clear of axes True | page (89.0, 70.0)
+G_long_title_wider_extent_0.70     legend x 0.604-0.988 y 0.403-0.597 | axes tight x1 0.671 | inside page True | clear of axes False | page (89.0, 70.0)
+--- summary
+A_skill_labels                     inside=True clear=True page=(89.0, 70.0)
+B_long_title                       inside=True clear=False page=(89.0, 70.0)
+C_long_labels                      inside=True clear=True page=(89.0, 70.0)
+D_long_title_long_labels           inside=True clear=False page=(89.0, 70.0)
+E_eight_classes                    inside=True clear=True page=(89.0, 70.0)
+F_twelve_classes                   inside=True clear=True page=(89.0, 70.0)
+G_long_title_wider_extent_0.70     inside=True clear=False page=(89.0, 70.0)
+public route: figure legends 1 | axes 1 | fig mm [89. 70.]
+public route legend bbox x 0.992 1.165 inside page False
+public route page (89.0, 70.0)
+public route complete: legend x 0.815-0.988 | axes tight x1 0.760 | inside page True | clear True | page (89.0, 70.0)

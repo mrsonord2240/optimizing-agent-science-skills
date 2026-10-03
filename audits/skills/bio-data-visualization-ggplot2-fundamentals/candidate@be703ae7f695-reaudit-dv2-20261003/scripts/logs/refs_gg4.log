@@ -1,0 +1,41 @@
+ggplot2 4.0.3  ggrepel 0.9.8 
+default: drawn 120 of 300; conditions: none 
+Inf: drawn 300 of 300; conditions: none 
+verbose=TRUE: drawn 120 ; conditions: message: ggrepel: 0.500000s elapsed for 450 iterations, 174 overlaps. Consider increasing 'max.time'.
+ message: ggrepel: 180 unlabeled data points (too many overlaps). Consider increasing 'max.overlaps'
+ message: ggrepel: 0.500000s elapsed for 490 iterations, 170 overlaps. Consider increasing 'max.time'.
+ 
+[PASS] default drops labels silently (no warning/message)
+[PASS] Inf draws all 300
+[PASS] verbose=TRUE emits a message
+[PASS] default: nothing printed to stdout
+[PASS] sparse plot: all 30 drawn at default (30)
+[PASS] options(ggrepel.max.overlaps=Inf) draws all (300)
+[PASS] geoms-scales-facets: geom_point
+[PASS] geoms-scales-facets: geom_line
+[PASS] geoms-scales-facets: geom_col
+[PASS] geoms-scales-facets: geom_bar
+[PASS] geoms-scales-facets: geom_boxplot
+[PASS] geoms-scales-facets: geom_violin
+[PASS] geoms-scales-facets: geom_histogram
+[PASS] geoms-scales-facets: geom_density
+[PASS] geoms-scales-facets: geom_tile
+[PASS] geoms-scales-facets: geom_text
+[PASS] geoms-scales-facets: geom_text_repel
+[PASS] geoms-scales-facets: mapping
+[PASS] geoms-scales-facets: const
+[PASS] geoms-scales-facets: sx_cont
+[PASS] geoms-scales-facets: sy_log10
+[PASS] geoms-scales-facets: sy_sqrt
+[PASS] geoms-scales-facets: disc
+[PASS] geoms-scales-facets: manual
+[PASS] geoms-scales-facets: viridis
+[PASS] geoms-scales-facets: grad2
+[PASS] geoms-scales-facets: date
+[PASS] geoms-scales-facets: fwrap
+[PASS] geoms-scales-facets: fgrid
+[PASS] geoms-scales-facets: fgrid2
+[PASS] scale_color_scico(palette='batlow') (needs library(scico), listed in usage-guide install)
+pdf 
+  2 
+png px: 1051x826 (expect 1051x827)
