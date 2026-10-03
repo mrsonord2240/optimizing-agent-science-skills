@@ -1,0 +1,10 @@
+python blocks: 2
+--- block 1 (31 lines)
+alpha=0.3968, nonzero coefficients: 3 of 9
+--- block 2 (19 lines)
+Uno C: 0.669  mean AUC(t): 0.728  IBS: 0.161 vs KM-only IBS: 0.178
+OK in 11.3s
+c_uno 0.6691
+mean_auc 0.7284
+ibs 0.1611
+ibs_km 0.1775

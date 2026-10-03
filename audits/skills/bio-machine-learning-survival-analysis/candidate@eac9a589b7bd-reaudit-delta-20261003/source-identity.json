@@ -1,0 +1,72 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/survival-analysis",
+    "subtree": "14de0450cb651dfaf9ee1706bd758889e244187d",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-survival-analysis",
+    "content_sha256": "eac9a589b7bdc8b56d0f832c060d837a502e4e4c3fd355310ed00582195d71fb",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "uncommitted by design; skill directory untracked, bytes unchanged by the audit",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 34007
+    }
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 20526,
+      "sha256": "eb817774e42d8f415ed76d1c5e2c70d13b539b2848af13c98e031d892fe92a2b"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 1989,
+      "sha256": "033956d160e6bb622c13dba97128d7800f60c02af624907df6d256c4e830536e"
+    },
+    {
+      "path": "scripts/competing_risks_cif.py",
+      "bytes": 1704,
+      "sha256": "3a315ddf91c31792b7a4a146ed6e282255327844fad774db672963b28bc49f89"
+    },
+    {
+      "path": "scripts/cox_regression.py",
+      "bytes": 5397,
+      "sha256": "22d2e13cd0c247c4fa0606b61280166bd7c742816d66dac930e9bb5db5091ebc"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4391,
+      "sha256": "2d697c85c3830eb3ec905fdc822380a6292c9a1b68570366982704e596b98205"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ],
+    "tools_md_sha256": "4a6085401794e7b5f4dea829cdcca688faa191caa3340ae3d5c2aa136ada4c1b",
+    "tools_md_path": "F:\\OpenScience\\audits\\bio-machine-learning-survival-analysis\\TOOLS.md",
+    "environment_fingerprint_sha256": "20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6",
+    "environment": "Native Windows venvs under F:\\OpenScience\\audit-envs\\cheminformatics-hit-triage-analyst\\tools: survival-venv (scikit-survival 0.28.0, lifelines 0.30.3, scikit-learn 1.9.1, numpy 2.5.3, pandas 2.3.3) and pycox-venv (pycox 0.3.0, torch 2.14.1 CPU, scikit-survival 0.28.0, pandas 3.0.6); data: GBSG2 bundled in scikit-survival (686 patients), synthetic",
+    "audit_local_repair": "none; no Skill bytes changed"
+  },
+  "prior_audit": {
+    "identity": "c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39",
+    "path": "F:\\optimizing-agent-science-skills\\audits\\skills\\bio-machine-learning-survival-analysis\\candidate@c60f873f52f6-reaudit-lane3b-20261003",
+    "score": 86,
+    "grade": "Production Ready"
+  },
+  "fix_evidence": "F:\\OpenScience\\audits\\bio-machine-learning-survival-analysis\\fix-lane3b-20261003",
+  "candidate_cache_artifacts_after_execution": [],
+  "delta": {
+    "mode": "text-only delta re-audit",
+    "qualification": "Four of five files (references/failure-modes.md, both scripts, usage-guide.md) are byte-identical to the certified per-file sha256 values; only SKILL.md differs (20410 to 20526 bytes), one Common Errors table row per the fix log. The pre-fix SKILL.md bytes were not retained anywhere, so the scratch-copy revert could not be reproduced by hash; instead both SKILL.md python blocks were run verbatim and give the certified numbers.",
+    "fix_log": "F:\\OpenScience\\audits\\bio-machine-learning-survival-analysis\\fix-textbatch-20261003\\fix-log.md"
+  }
+}

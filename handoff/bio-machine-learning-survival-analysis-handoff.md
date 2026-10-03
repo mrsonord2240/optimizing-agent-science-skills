@@ -1,37 +1,39 @@
-# Handoff: bio-machine-learning-survival-analysis / reaudit-scientific-skill (delta mode)
+# Handoff: bio-machine-learning-survival-analysis / orchestrator (commit, intake)
 
 - Updated: 2026-10-03
-- Status: fixed, awaiting delta re-audit
-- Owner leaving: text-only fix worker (fix-textbatch-20261003)
-- Next role: reaudit-scientific-skill, delta mode (revert each changed file to confirm the certified bytes reappear)
+- Lane: 3 (delta re-audit lane D2)
+- Status: candidate-ready
+- Owner leaving: delta re-audit worker D2 (fresh auditor)
+- Next role: orchestrator (commit exact bytes to make them ready)
 
-## Identities
+## Source identity
 
-- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis
-- Certified identity (keep): c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39, files=5, bytes=33891
-- Certifying record (keep): F:\optimizing-agent-science-skills\audits\skills\bio-machine-learning-survival-analysis\candidate@c60f873f52f6-reaudit-lane3b-20261003
-- New candidate identity: eac9a589b7bdc8b56d0f832c060d837a502e4e4c3fd355310ed00582195d71fb, files=5, bytes=34007; `skill_preflight --offline` PASS (expected no-Skill-root-LICENSE warning)
+- Working tree: F:\OpenScience\wt\ml-lane3-normalize\skills\bio-machine-learning-survival-analysis (untracked by design)
+- Candidate identity: eac9a589b7bdc8b56d0f832c060d837a502e4e4c3fd355310ed00582195d71fb, files=5, bytes=34007 (preflight PASS before and after)
+- Applicable audit: F:\optimizing-agent-science-skills\audits\skills\bio-machine-learning-survival-analysis\candidate@eac9a589b7bd-reaudit-delta-20261003 (supersedes candidate@c60f873f52f6-reaudit-lane3b-20261003)
 
-## Dispositions
+## Completed this phase
 
-| ID | State | Note |
-|---|---|---|
-| SA-006 | fixed (text only) | see fix log |
-| none | open, untouched | needs code; waits for a later run |
+- Delta partly qualified: 4 of 5 files (both scripts, reference, usage-guide) byte-identical to the certified manifest; only SKILL.md differs (+116 bytes, one table row). The pre-fix SKILL.md bytes were not retained anywhere, so the revert-to-certified-hash check could not be reproduced; corroborated instead by the verbatim run of both SKILL.md python blocks matching certified output.
+- SA-006 resolved: AUC and IBS both run at t=2092, 2324, 2555 and raise ValueError at 2556 and 2566 (largest test time 2556, censored; largest uncensored 2093).
+- Score 87 (static 88, execution 85.6, assertions 24/24, L1 34.6, L2 51.0). No open finding remains.
 
-Other previously open findings: unchanged, see certifying record.
+## Open findings
 
-## Changed files (before/after sha256 in the fix log)
+None. Optional: corner case of a largest test time that is an event was not exercised.
 
-- SKILL.md: Common Errors time-grid row reworded (error at or above largest test time of any status)
+## Environment and evidence
 
-## Evidence
-
-- Fix log: F:\OpenScience\audits\bio-machine-learning-survival-analysis\fix-textbatch-20261003\fix-log.md
-- No scripts executed beyond syntax checks; no executable statement changed.
-
-## Safety
-
+- TOOLS.md: F:\OpenScience\audits\bio-machine-learning-survival-analysis\TOOLS.md (unchanged)
+- Run evidence: F:\OpenScience\audits\bio-machine-learning-survival-analysis\reaudit-delta-20261003\
 - Tooling impact: none
-- Touched only this Skill directory (plus this handoff and the fix log); no commit or push
-- Untouched: records test/validate.bats, shelf .vscode/
+
+## Worktree safety
+
+- Run-owned changes: reaudit-delta-20261003 run dir, published record, this handoff, regenerated audit views
+- Pre-existing/user-owned: records test/validate.bats, shelf .vscode/; sibling Skill dirs in the worktree untouched
+- Product commits/pushes: none
+
+## Transition assertion
+
+- Next-phase prerequisites met: yes

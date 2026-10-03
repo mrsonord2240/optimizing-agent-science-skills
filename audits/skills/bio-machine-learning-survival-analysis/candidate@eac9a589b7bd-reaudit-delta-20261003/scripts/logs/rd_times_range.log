@@ -1,0 +1,11 @@
+largest test time 2556 censored=True; largest uncensored 2093
+AUC below largest uncensored (t=2092): 0.738
+IBS below largest uncensored (t=2092): 0.207
+AUC between uncensored and max test (t=2324): 0.742
+IBS between uncensored and max test (t=2324): 0.211
+AUC max test time-1 (t=2555): 0.749
+IBS max test time-1 (t=2555): 0.209
+AUC at max test time (t=2556): ERROR ValueError: all times must be within follow-up time of test data: [8.0; 2556.0[
+IBS at max test time (t=2556): ERROR ValueError: all times must be within follow-up time of test data: [8.0; 2556.0[
+AUC above (t=2566): ERROR ValueError: all times must be within follow-up time of test data: [8.0; 2556.0[
+IBS above (t=2566): ERROR ValueError: all times must be within follow-up time of test data: [8.0; 2556.0[

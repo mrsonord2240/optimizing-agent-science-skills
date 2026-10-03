@@ -346,7 +346,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (160)
+## P2 (159)
 
 ### `bio-machine-learning-omics-classifiers` — OC-005: XGBoost early stopping: val set reuse and degenerate at tiny n
 
@@ -510,19 +510,19 @@ None open.
 
 ### `bio-splicing-quantification` — parse_rmats_output raises a raw KeyError on an rMATS file with zero events
 
-- Skill: 85, Production Ready · candidate `0c0354add99b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@0c0354add99b-run-reaudit-1/viewer.md)
+- Skill: 85, Production Ready · candidate `247bcf26db18` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@247bcf26db18-run-reaudit-2/viewer.md)
 - Observed in inputs: 4
 - Problem: A header-only MATS file (an event type with no events, as in the planted rMATS run for A5SS, A3SS, MXE and RI) makes DataFrame.apply return an empty frame, then df['min_reads_per_replicate'] raises KeyError.
 - Root cause: The per-row statistics are added with concat on an apply result that is empty for an empty table.
 - Fix: Return an empty frame with the expected columns (or raise a ValueError naming the empty file) when the table has no rows; add a header-only test. (SQ-12)
 
-### `bio-splicing-quantification` — JC IncFormLen/SkipFormLen stated as constants
+### `bio-splicing-quantification` — SQ-13 rewording gives an inexact condition for the maxima
 
-- Skill: 85, Production Ready · candidate `0c0354add99b` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@0c0354add99b-run-reaudit-1/viewer.md)
+- Skill: 85, Production Ready · candidate `247bcf26db18` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@247bcf26db18-run-reaudit-2/viewer.md)
 - Observed in inputs: 2
-- Problem: SKILL.md says JC lengths are 2*(readLength-1) and readLength-1; on real chrX data only 719 of 958 SE rows have 148/74 (58 distinct pairs), the rest are smaller where short exons or introns limit read positions.
-- Root cause: Planted single-exon data (98/49) was generalised to all events.
-- Fix: Say the values are the maximum for exons and introns longer than a read, and that rMATS prints the per-event lengths in the file. (SQ-13)
+- Problem: SKILL.md says IncFormLen/SkipFormLen maxima are 'reached only for exons at least read-length long; short exons shorten them'. On the real chrX JC file SkipFormLen is 74 in all 958 rows (a 1 nt exon included), and exons of 74 nt (readLength - 1) already reach 148.
+- Root cause: The exon-length condition belongs to IncFormLen alone and its threshold is readLength - 1, not readLength.
+- Fix: Say 'IncFormLen reaches 2*(readLength - 1) for exons of at least readLength - 1 nt; SkipFormLen was readLength - 1 in every SE row here'. Text only. The operative advice (use the per-row lengths) is correct. (SQ-14)
 
 ### `bio-atac-seq-atac-qc` — Fragment-size PDF never visually inspected
 
@@ -595,14 +595,6 @@ None open.
 - Problem: 430 lines load SV/CNV/mtDNA catalogs and pushback tables for one-variant queries.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
-
-### `bio-machine-learning-survival-analysis` — Common Errors row misstates the time-grid limit
-
-- Skill: 86, Production Ready · candidate `c60f873f52f6` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/survival-analysis) · [viewer](skills/bio-machine-learning-survival-analysis/candidate@c60f873f52f6-reaudit-lane3b-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: The row says AUC/IBS times fail 'beyond largest uncensored test time'; sksurv accepts times up to the largest test time of any status and raises at or above it.
-- Root cause: The bound was paraphrased from the usual case where the last test subject is an event.
-- Fix: Reword the cause to 'at or beyond the largest test follow-up time (event or censored)' and keep the clip-to-follow-up solution. Text only.
 
 ### `bio-phylo-species-trees` — Add a leaf-name consistency check before ASTRAL
 
