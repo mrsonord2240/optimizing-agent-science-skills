@@ -8,15 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (38)
-
-### `bio-machine-learning-biomarker-discovery` — BD-001: Stability snippet is scale-dependent and not null-calibrated
-
-- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: On raw Golub intensities the snippet (C=0.1) reports 61-64 "stable" probes at pi>0.6 and, with labels permuted, still reports 35 stable probes (Nogueira 0.38); on standardized probes the same C gives 0 stable probes for real labels (Nogueira 0.18).
-- Root cause: A fixed C on unstandardized features sets the effective penalty by feature variance, and no permuted-label reference is given for the stability index.
-- Fix: Standardize inside each subsample (as the elastic-net text already requires), choose C by CV or state its units, add a label-permutation null for the stable set and the Nogueira index, and say stability does not imply a real signal.
+## P1 (37)
 
 ### `bio-outlier-splicing-detection` — AE reproducibility recipe is wrong in SKILL.md and incomplete in the example
 
@@ -314,47 +306,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (156)
-
-### `bio-machine-learning-biomarker-discovery` — BD-002: scoring/legacy-attribute choice unexplained; it sets signature size
-
-- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 3
-- Problem: The normalizer replaced the default (accuracy) with scoring=neg_log_loss and use_legacy_attributes=False without a word in this Skill (the omics-classifiers sibling explains it); on Golub the selected signature is 329 probes (neg_log_loss), 152 (accuracy), 96 (roc_auc).
-- Root cause: The change tracks sklearn announced defaults (1.10 attributes, 1.11 scoring) and is defensible, but the Version Compatibility section and the "small signature" claim do not mention it.
-- Fix: Add one sentence to Version Compatibility naming both parameters and the sklearn schedule, and state that the scoring metric controls signature size (neg_log_loss tolerates weaker penalty; use roc_auc or a 1-SE rule for a minimal panel).
-
-### `bio-machine-learning-biomarker-discovery` — BD-003: Leakage-safe snippet: no scaler, "Nested-safe" label
-
-- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 1
-- Problem: The Pipeline has no StandardScaler although the Skill says the penalty is scale-sensitive: AUC 0.920 +/- 0.126 raw vs 0.990 +/- 0.030 scaled on Golub (pessimistic, not optimistic). The print label calls a single-level fixed-k CV "Nested-safe", and no nested-CV code is given although the text says to estimate by nested CV when tuning.
-- Root cause: Snippet written for the leakage point only; tuning k or C would need an outer loop that is not shown (deferred to model-validation without a pointer in the snippet).
-- Fix: Add StandardScaler as the first Pipeline step, rename the label (e.g. "In-pipeline CV AUC (k fixed)"), and add a one-line note or snippet showing GridSearchCV inside cross_val_score when k is tuned. The tooling ConvergenceWarning lead did not reproduce on real labels; do not add a convergence caveat for it.
-
-### `bio-machine-learning-biomarker-discovery` — BD-004: Stability snippet unseeded; empty selection gives silent NaN
-
-- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 4
-- Problem: np.random.choice is unseeded so two runs disagree (61/64 stable, 0.519/0.527) and the Nogueira expression divides by zero when no feature is ever selected (prints nan).
-- Root cause: Snippet omits a Generator seed and a guard on k.mean() in (0, p).
-- Fix: Use rng = np.random.default_rng(0) for subsampling and guard the index: report "no features selected" when k.mean() == 0.
-
-### `bio-machine-learning-biomarker-discovery` — BD-005: Script narrative strings not tied to measured output
-
-- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 5
-- Problem: boruta_feature_selection.py prints that a minimal-optimal selector "would keep ~1" module member without running one; CV-chosen L1 logistic on the same data keeps 5/5 (4/5 at C=0.05). lasso_biomarker.py comments the leaky AUC as "~0.7+" while it prints 1.00.
-- Root cause: Static comments/print strings assert results the scripts do not compute; the module members (r ~ 0.92) are not redundant enough for L1 to drop them.
-- Fix: Either run an L1/elastic-net baseline in the Boruta script and print the count it actually keeps (tighten the module noise, e.g. scale 0.05, if the contrast is the point) or soften the sentence; update the "~0.7+" comment to the observed range.
-
-### `bio-machine-learning-biomarker-discovery` — BD-006: mRMR advertised but no in-fold pattern; not labelled unexecuted
-
-- Skill: 81, Beta Only · candidate `e0d8efc0e1b0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md)
-- Observed in inputs: 6
-- Problem: mRMR appears in the description, taxonomy and usage-guide but no snippet shows it; mRMR selected on the full matrix with permuted labels gives CV AUC 0.94, the same leakage the Skill warns about, and nothing shows how to keep it inside the fold.
-- Root cause: Method listed from the origin Skill without a worked example; the normalizer believed the package was absent (it is installed and works).
-- Fix: Add a short in-fold mRMR transformer (or GridSearch-compatible FunctionTransformer) snippet using mrmr_classif with a DataFrame/Series, or state in the Skill that mRMR is described but not exemplified.
+## P2 (153)
 
 ### `bio-outlier-splicing-detection` — FRASER block stops at its last line when no sample has a call
 
@@ -731,6 +683,22 @@ None open.
 - Problem: On raw BAM fragments the wrong setting (--shift 4,-5) gave a larger CTCF bound-minus-unbound centre score than the correct 0,0 (mode 10: 0.629 vs 0.281; mode 30: 0.663 vs 0.419). A reader who tries both and keeps the stronger contrast would pick the wrong shift.
 - Root cause: The usage guide says which shift fits which fragment source but not how to tell when it is wrong.
 - Fix: Add one sentence to the fragment section of references/usage-guide.md: set --shift from how the fragments were made, never from which setting gives the stronger contrast; the wrong shift scored higher in the tested slice.
+
+### `bio-machine-learning-biomarker-discovery` — RA-001: stability_selection fails obscurely on rare-class labels
+
+- Skill: 88, Production Ready · candidate `27580088c038` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@27580088c038-reaudit-lane3a1-20261003/viewer.md)
+- Observed in inputs: 6
+- Problem: Subsamples of n/2 are not stratified; with 8 or fewer positives of 72 some subsample has one class and the call raises a ValueError citing liblinear multiclass (n_classes >= 3). The failure is loud but misleading, and neither SKILL.md nor the docstring states the both-classes requirement.
+- Root cause: Plain rng.choice subsampling and no pre-check of the class counts in each subsample.
+- Fix: Text-only: state in SKILL.md that labels must be binary with enough minority samples that every n/2 subsample keeps both classes. Optional script change: stratified subsampling plus a clear error.
+
+### `bio-machine-learning-biomarker-discovery` — RA-002: roc_auc signature size is partition-dependent, accuracy is not
+
+- Skill: 88, Production Ready · candidate `27580088c038` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/biomarker-discovery) · [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@27580088c038-reaudit-lane3a1-20261003/viewer.md)
+- Observed in inputs: 3
+- Problem: The stated table (601/203/148) is honestly labelled one dataset and partition, but on two other inner partitions roc_auc selected 53 and 96 probes (below accuracy 150) and neg_log_loss 436 and 437; a reader can take roc_auc as always larger than accuracy.
+- Root cause: Only one partition was measured and tabulated.
+- Fix: Text-only: add one clause that over three partitions neg_log_loss gave 436-601, roc_auc 53-203 and accuracy 148-150 probes, which is also the reason accuracy is the stable pin.
 
 ### `bio-machine-learning-omics-classifiers` — OC-012 Quoted demo and 1-SE figures are setup-specific
 
