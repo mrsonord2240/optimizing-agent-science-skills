@@ -288,5 +288,36 @@ class PromotionTests(unittest.TestCase):
         self.assertEqual(changed, ["SKILL.md"])
 
 
+class RenderRemainingUsageTest(unittest.TestCase):
+    def test_usage_snapshot_orders_folders_and_skills(self):
+        remaining = {
+            "source": "GPTomics/bioSkills@abc",
+            "reconciliation": {"skills_in_source_tree": 3},
+            "remaining": [
+                {"id": "a-one", "upstream_path": "alpha/one"},
+                {"id": "b-one", "upstream_path": "beta/one"},
+                {"id": "b-two", "upstream_path": "beta/two"},
+            ],
+            "excluded": [],
+            "out_of_scope": [],
+        }
+        catalog = {row["id"]: row["upstream_path"] for row in remaining["remaining"]}
+        usage = {
+            "a-one": {"score": 10.0, "primary_tool": "x", "workflow_fan_in": 0},
+            "b-one": {"score": 40.0, "primary_tool": "y", "workflow_fan_in": 0},
+            "b-two": {"score": 60.0, "primary_tool": "z", "workflow_fan_in": 2},
+        }
+        plain = promote._render_remaining(remaining, [], catalog)
+        ranked = promote._render_remaining(remaining, [], catalog, usage)
+        self.assertIn("| beta | 2 | 0 |\n| alpha | 1 | 0 |", plain)
+        self.assertNotIn("usage", plain)
+        self.assertIn("| beta | 2 | 0 | 50 |\n| alpha | 1 | 0 | 10 |", ranked)
+        self.assertIn(
+            "- `b-two` — `beta/two` — usage 60 (z, in 2 workflows)\n"
+            "- `b-one` — `beta/one` — usage 40 (y)",
+            ranked,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

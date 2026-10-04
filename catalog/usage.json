@@ -1,0 +1,5506 @@
+{
+  "schema_version": 1,
+  "generated": "2026-10-03",
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
+  "tools": {
+    "ALDEx2": {
+      "channel": "bioconda",
+      "package": "bioconductor-aldex2",
+      "downloads": 53365
+    },
+    "AMRFinderPlus": {
+      "channel": "bioconda",
+      "package": "ncbi-amrfinderplus",
+      "downloads": 214578
+    },
+    "ASTRAL-III": {
+      "channel": "bioconda",
+      "package": "astral-tree",
+      "downloads": 6769
+    },
+    "AmpliconArchitect": {
+      "channel": "bioconda",
+      "package": "ampliconsuite",
+      "downloads": 22576
+    },
+    "AutoDock Vina": {
+      "channel": "bioconda",
+      "package": "autodock-vina",
+      "downloads": 48159
+    },
+    "BEAST2": {
+      "channel": "bioconda",
+      "package": "beast2",
+      "downloads": 45645
+    },
+    "BLAST+": {
+      "channel": "bioconda",
+      "package": "blast",
+      "downloads": 3402819
+    },
+    "BRAKER3": {
+      "channel": "bioconda",
+      "package": "braker3",
+      "downloads": 10858
+    },
+    "BUSCO": {
+      "channel": "bioconda",
+      "package": "busco",
+      "downloads": 457976
+    },
+    "Bakta": {
+      "channel": "bioconda",
+      "package": "bakta",
+      "downloads": 124640
+    },
+    "Beagle": {
+      "channel": "bioconda",
+      "package": "beagle",
+      "downloads": 48259
+    },
+    "Bio.Align": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.AlignIO": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.Blast.NCBIWWW": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.Entrez": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.PDB": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.Phylo": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.Phylo.TreeConstruction": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.Restriction": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.Seq": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.SeqIO": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.SeqUtils": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.SeqUtils.CodonAdaptationIndex": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.bgzf": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bio.motifs": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "BioPython": {
+      "channel": "conda-forge",
+      "package": "biopython",
+      "downloads": 7660860
+    },
+    "Bismark": {
+      "channel": "bioconda",
+      "package": "bismark",
+      "downloads": 127210
+    },
+    "Bracken": {
+      "channel": "bioconda",
+      "package": "bracken",
+      "downloads": 128136
+    },
+    "CAFE5": {
+      "channel": "bioconda",
+      "package": "cafe",
+      "downloads": 35520
+    },
+    "CATALYST": {
+      "channel": "bioconda",
+      "package": "bioconductor-catalyst",
+      "downloads": 27576
+    },
+    "CLIPper": {
+      "channel": "bioconda",
+      "package": "clipper",
+      "downloads": 2626
+    },
+    "CNVkit": {
+      "channel": "bioconda",
+      "package": "cnvkit",
+      "downloads": 267952
+    },
+    "CRISPResso2": {
+      "channel": "bioconda",
+      "package": "crispresso2",
+      "downloads": 188630
+    },
+    "Cactus": {
+      "channel": "bioconda",
+      "package": "cactus",
+      "downloads": 34484
+    },
+    "CarveMe": {
+      "channel": "bioconda",
+      "package": "carveme",
+      "downloads": 5571
+    },
+    "Cas-OFFinder": {
+      "channel": "bioconda",
+      "package": "cas-offinder",
+      "downloads": 12537
+    },
+    "Cassiopeia": {
+      "channel": "bioconda",
+      "package": "cassiopeia",
+      "downloads": 5058
+    },
+    "CellTypist": {
+      "channel": "bioconda",
+      "package": "celltypist",
+      "downloads": 95107
+    },
+    "ChIPseeker": {
+      "channel": "bioconda",
+      "package": "bioconductor-chipseeker",
+      "downloads": 85857
+    },
+    "CheckM2": {
+      "channel": "bioconda",
+      "package": "checkm2",
+      "downloads": 26227
+    },
+    "ChromHMM": {
+      "channel": "bioconda",
+      "package": "chromhmm",
+      "downloads": 40907
+    },
+    "Clair3": {
+      "channel": "bioconda",
+      "package": "clair3",
+      "downloads": 87183
+    },
+    "ClipKIT": {
+      "channel": "bioconda",
+      "package": "clipkit",
+      "downloads": 54033
+    },
+    "ComplexHeatmap": {
+      "channel": "bioconda",
+      "package": "bioconductor-complexheatmap",
+      "downloads": 179144
+    },
+    "ComplexUpset": {
+      "channel": "conda-forge",
+      "package": "r-complexupset",
+      "downloads": 56551
+    },
+    "DADA2": {
+      "channel": "bioconda",
+      "package": "bioconductor-dada2",
+      "downloads": 723951
+    },
+    "DESeq2": {
+      "channel": "bioconda",
+      "package": "bioconductor-deseq2",
+      "downloads": 766260
+    },
+    "DEWSeq": {
+      "channel": "bioconda",
+      "package": "bioconductor-dewseq",
+      "downloads": 23884
+    },
+    "DNAcopy": {
+      "channel": "bioconda",
+      "package": "bioconductor-dnacopy",
+      "downloads": 240575
+    },
+    "DeepVariant": {
+      "channel": "bioconda",
+      "package": "deepvariant",
+      "downloads": 88372
+    },
+    "DiffBind": {
+      "channel": "bioconda",
+      "package": "bioconductor-diffbind",
+      "downloads": 222114
+    },
+    "EpiDISH": {
+      "channel": "bioconda",
+      "package": "bioconductor-epidish",
+      "downloads": 30419
+    },
+    "FLAIR": {
+      "channel": "bioconda",
+      "package": "flair",
+      "downloads": 21867
+    },
+    "FRASER": {
+      "channel": "bioconda",
+      "package": "bioconductor-fraser",
+      "downloads": 69404
+    },
+    "FinaleToolkit": {
+      "channel": "bioconda",
+      "package": "finaletoolkit",
+      "downloads": 1381
+    },
+    "Flye": {
+      "channel": "bioconda",
+      "package": "flye",
+      "downloads": 275209
+    },
+    "Foldseek": {
+      "channel": "bioconda",
+      "package": "foldseek",
+      "downloads": 620551
+    },
+    "GATK": {
+      "channel": "bioconda",
+      "package": "gatk4",
+      "downloads": 1241463
+    },
+    "GATK Mutect2": {
+      "channel": "bioconda",
+      "package": "gatk4",
+      "downloads": 1241463
+    },
+    "GenomeScope2": {
+      "channel": "bioconda",
+      "package": "genomescope2",
+      "downloads": 30011
+    },
+    "Guitar": {
+      "channel": "bioconda",
+      "package": "bioconductor-guitar",
+      "downloads": 31400
+    },
+    "HISAT2": {
+      "channel": "bioconda",
+      "package": "hisat2",
+      "downloads": 460240
+    },
+    "HMMER": {
+      "channel": "bioconda",
+      "package": "hmmer",
+      "downloads": 2615518
+    },
+    "HOMER": {
+      "channel": "bioconda",
+      "package": "homer",
+      "downloads": 125549
+    },
+    "HUMAnN": {
+      "channel": "bioconda",
+      "package": "humann",
+      "downloads": 196292
+    },
+    "Harmony": {
+      "channel": "conda-forge",
+      "package": "r-harmony",
+      "downloads": 70131
+    },
+    "IQ-TREE2": {
+      "channel": "bioconda",
+      "package": "iqtree",
+      "downloads": 1146232
+    },
+    "Infernal": {
+      "channel": "bioconda",
+      "package": "infernal",
+      "downloads": 441595
+    },
+    "IsoformSwitchAnalyzeR": {
+      "channel": "bioconda",
+      "package": "bioconductor-isoformswitchanalyzer",
+      "downloads": 49283
+    },
+    "Kraken2": {
+      "channel": "bioconda",
+      "package": "kraken2",
+      "downloads": 227938
+    },
+    "LEA": {
+      "channel": "bioconda",
+      "package": "bioconductor-lea",
+      "downloads": 38922
+    },
+    "LIANA": {
+      "channel": "bioconda",
+      "package": "liana",
+      "downloads": 4957
+    },
+    "Liftoff": {
+      "channel": "bioconda",
+      "package": "liftoff",
+      "downloads": 39625
+    },
+    "MACS3": {
+      "channel": "bioconda",
+      "package": "macs3",
+      "downloads": 38691
+    },
+    "MAFFT": {
+      "channel": "bioconda",
+      "package": "mafft",
+      "downloads": 1508114
+    },
+    "MAGeCK": {
+      "channel": "bioconda",
+      "package": "mageck",
+      "downloads": 162115
+    },
+    "MAGeCK-VISPR": {
+      "channel": "bioconda",
+      "package": "mageck-vispr",
+      "downloads": 53248
+    },
+    "MCScanX": {
+      "channel": "bioconda",
+      "package": "mcscanx",
+      "downloads": 5386
+    },
+    "MINTmap": {
+      "channel": "bioconda",
+      "package": "mintmap",
+      "downloads": 11029
+    },
+    "MOFA2": {
+      "channel": "bioconda",
+      "package": "bioconductor-mofa2",
+      "downloads": 23252
+    },
+    "MSIsensor-pro": {
+      "channel": "bioconda",
+      "package": "msisensor-pro",
+      "downloads": 133751
+    },
+    "MSstats": {
+      "channel": "bioconda",
+      "package": "bioconductor-msstats",
+      "downloads": 56745
+    },
+    "MSstatsPTM": {
+      "channel": "bioconda",
+      "package": "bioconductor-msstatsptm",
+      "downloads": 14896
+    },
+    "MetaPhlAn": {
+      "channel": "bioconda",
+      "package": "metaphlan",
+      "downloads": 451203
+    },
+    "MethylDackel": {
+      "channel": "bioconda",
+      "package": "methyldackel",
+      "downloads": 70027
+    },
+    "Mfuzz": {
+      "channel": "bioconda",
+      "package": "bioconductor-mfuzz",
+      "downloads": 30609
+    },
+    "Milo": {
+      "channel": "bioconda",
+      "package": "bioconductor-milor",
+      "downloads": 15813
+    },
+    "Monocle3": {
+      "channel": "bioconda",
+      "package": "r-monocle3",
+      "downloads": 47345
+    },
+    "MrBayes": {
+      "channel": "bioconda",
+      "package": "mrbayes",
+      "downloads": 34156
+    },
+    "MultiAssayExperiment": {
+      "channel": "bioconda",
+      "package": "bioconductor-multiassayexperiment",
+      "downloads": 233734
+    },
+    "NCBI Datasets CLI": {
+      "channel": "conda-forge",
+      "package": "ncbi-datasets-cli",
+      "downloads": 1379165
+    },
+    "NeoFox": {
+      "channel": "bioconda",
+      "package": "neofox",
+      "downloads": 3053
+    },
+    "NetworkX": {
+      "channel": "conda-forge",
+      "package": "networkx",
+      "downloads": 37725459
+    },
+    "Nextflow": {
+      "channel": "bioconda",
+      "package": "nextflow",
+      "downloads": 648599
+    },
+    "NucleoATAC": {
+      "channel": "bioconda",
+      "package": "nucleoatac",
+      "downloads": 14093
+    },
+    "OpenFE": {
+      "channel": "conda-forge",
+      "package": "openfe",
+      "downloads": 223321
+    },
+    "OrthoFinder": {
+      "channel": "bioconda",
+      "package": "orthofinder",
+      "downloads": 154602
+    },
+    "PAML": {
+      "channel": "bioconda",
+      "package": "paml",
+      "downloads": 420471
+    },
+    "PDBFixer": {
+      "channel": "conda-forge",
+      "package": "pdbfixer",
+      "downloads": 1879887
+    },
+    "PGS Catalog Calculator": {
+      "channel": "bioconda",
+      "package": "pgscatalog.calc",
+      "downloads": 5133
+    },
+    "PICRUSt2": {
+      "channel": "bioconda",
+      "package": "picrust2",
+      "downloads": 70744
+    },
+    "PLINK2": {
+      "channel": "bioconda",
+      "package": "plink2",
+      "downloads": 121665
+    },
+    "Panaroo": {
+      "channel": "bioconda",
+      "package": "panaroo",
+      "downloads": 66243
+    },
+    "Pangolin": {
+      "channel": "bioconda",
+      "package": "pangolin",
+      "downloads": 173196
+    },
+    "Pertpy": {
+      "channel": "conda-forge",
+      "package": "pertpy",
+      "downloads": 11314
+    },
+    "Pilon": {
+      "channel": "bioconda",
+      "package": "pilon",
+      "downloads": 143945
+    },
+    "Plastid": {
+      "channel": "bioconda",
+      "package": "plastid",
+      "downloads": 42501
+    },
+    "PoseBusters": {
+      "channel": "conda-forge",
+      "package": "posebusters",
+      "downloads": 34825
+    },
+    "PureCLIP": {
+      "channel": "bioconda",
+      "package": "pureclip",
+      "downloads": 47842
+    },
+    "QUAST": {
+      "channel": "bioconda",
+      "package": "quast",
+      "downloads": 403173
+    },
+    "Quarto": {
+      "channel": "conda-forge",
+      "package": "quarto",
+      "downloads": 260661
+    },
+    "R-scape": {
+      "channel": "bioconda",
+      "package": "rscape",
+      "downloads": 157893
+    },
+    "RDKit": {
+      "channel": "conda-forge",
+      "package": "rdkit",
+      "downloads": 7117215
+    },
+    "RNASeqPower": {
+      "channel": "bioconda",
+      "package": "bioconductor-rnaseqpower",
+      "downloads": 50060
+    },
+    "RSeQC": {
+      "channel": "bioconda",
+      "package": "rseqc",
+      "downloads": 189482
+    },
+    "ReactomePA": {
+      "channel": "bioconda",
+      "package": "bioconductor-reactomepa",
+      "downloads": 49022
+    },
+    "RepeatMasker": {
+      "channel": "bioconda",
+      "package": "repeatmasker",
+      "downloads": 150858
+    },
+    "Ribo-TISH": {
+      "channel": "bioconda",
+      "package": "ribotish",
+      "downloads": 28569
+    },
+    "RiboCode": {
+      "channel": "bioconda",
+      "package": "ribocode",
+      "downloads": 47940
+    },
+    "SCENIC+": {
+      "channel": "bioconda",
+      "package": "scenicplus",
+      "downloads": 396
+    },
+    "SEACR": {
+      "channel": "bioconda",
+      "package": "seacr",
+      "downloads": 10256
+    },
+    "SHAPEIT5": {
+      "channel": "bioconda",
+      "package": "shapeit5",
+      "downloads": 8250
+    },
+    "SNFtool": {
+      "channel": "conda-forge",
+      "package": "r-snftool",
+      "downloads": 125615
+    },
+    "SPAdes": {
+      "channel": "bioconda",
+      "package": "spades",
+      "downloads": 927170
+    },
+    "SQANTI3": {
+      "channel": "bioconda",
+      "package": "sqanti3",
+      "downloads": 554
+    },
+    "STAR": {
+      "channel": "bioconda",
+      "package": "star",
+      "downloads": 1782742
+    },
+    "Seurat": {
+      "channel": "conda-forge",
+      "package": "r-seurat",
+      "downloads": 598835
+    },
+    "ShapeMapper2": {
+      "channel": "bioconda",
+      "package": "shapemapper",
+      "downloads": 6170
+    },
+    "SigProfilerAssignment": {
+      "channel": "bioconda",
+      "package": "sigprofilerassignment",
+      "downloads": 7908
+    },
+    "Signac": {
+      "channel": "bioconda",
+      "package": "r-signac",
+      "downloads": 231435
+    },
+    "Snakemake": {
+      "channel": "bioconda",
+      "package": "snakemake",
+      "downloads": 1961611
+    },
+    "Sniffles": {
+      "channel": "bioconda",
+      "package": "sniffles",
+      "downloads": 94952
+    },
+    "SpliceAI": {
+      "channel": "bioconda",
+      "package": "spliceai",
+      "downloads": 18423
+    },
+    "Squidpy": {
+      "channel": "conda-forge",
+      "package": "squidpy",
+      "downloads": 68638
+    },
+    "T1K": {
+      "channel": "bioconda",
+      "package": "t1k",
+      "downloads": 18858
+    },
+    "TransPhylo": {
+      "channel": "conda-forge",
+      "package": "r-transphylo",
+      "downloads": 60116
+    },
+    "VEP": {
+      "channel": "bioconda",
+      "package": "ensembl-vep",
+      "downloads": 464603
+    },
+    "VIPER": {
+      "channel": "bioconda",
+      "package": "bioconductor-viper",
+      "downloads": 46833
+    },
+    "VarDict": {
+      "channel": "bioconda",
+      "package": "vardict",
+      "downloads": 135310
+    },
+    "ViennaRNA": {
+      "channel": "bioconda",
+      "package": "viennarna",
+      "downloads": 1503058
+    },
+    "WGCNA": {
+      "channel": "bioconda",
+      "package": "r-wgcna",
+      "downloads": 80265
+    },
+    "YaHS": {
+      "channel": "bioconda",
+      "package": "yahs",
+      "downloads": 21994
+    },
+    "alakazam": {
+      "channel": "conda-forge",
+      "package": "r-alakazam",
+      "downloads": 195299
+    },
+    "ascat": {
+      "channel": "bioconda",
+      "package": "ascat",
+      "downloads": 29497
+    },
+    "bcftools": {
+      "channel": "bioconda",
+      "package": "bcftools",
+      "downloads": 4694542
+    },
+    "bedtools": {
+      "channel": "bioconda",
+      "package": "bedtools",
+      "downloads": 4102051
+    },
+    "bin2cell": {
+      "channel": "bioconda",
+      "package": "bin2cell",
+      "downloads": 1130
+    },
+    "biomaRt": {
+      "channel": "bioconda",
+      "package": "bioconductor-biomart",
+      "downloads": 424468
+    },
+    "boruta": {
+      "channel": "conda-forge",
+      "package": "r-boruta",
+      "downloads": 90115
+    },
+    "bowtie2": {
+      "channel": "bioconda",
+      "package": "bowtie2",
+      "downloads": 3899449
+    },
+    "bwa-mem2": {
+      "channel": "bioconda",
+      "package": "bwa-mem2",
+      "downloads": 146226
+    },
+    "chemprop": {
+      "channel": "conda-forge",
+      "package": "chemprop",
+      "downloads": 75177
+    },
+    "chewBBACA": {
+      "channel": "bioconda",
+      "package": "chewbbaca",
+      "downloads": 109777
+    },
+    "chromVAR": {
+      "channel": "bioconda",
+      "package": "bioconductor-chromvar",
+      "downloads": 64078
+    },
+    "cicero": {
+      "channel": "bioconda",
+      "package": "bioconductor-cicero",
+      "downloads": 33413
+    },
+    "circlize": {
+      "channel": "conda-forge",
+      "package": "r-circlize",
+      "downloads": 418478
+    },
+    "clusterProfiler": {
+      "channel": "bioconda",
+      "package": "bioconductor-clusterprofiler",
+      "downloads": 204868
+    },
+    "cnvkit": {
+      "channel": "bioconda",
+      "package": "cnvkit",
+      "downloads": 267952
+    },
+    "cobrapy": {
+      "channel": "conda-forge",
+      "package": "cobra",
+      "downloads": 74913
+    },
+    "coloc": {
+      "channel": "conda-forge",
+      "package": "r-coloc",
+      "downloads": 242959
+    },
+    "cooler": {
+      "channel": "bioconda",
+      "package": "cooler",
+      "downloads": 325587
+    },
+    "cooltools": {
+      "channel": "bioconda",
+      "package": "cooltools",
+      "downloads": 367278
+    },
+    "cromwell": {
+      "channel": "conda-forge",
+      "package": "cromwell",
+      "downloads": 277410
+    },
+    "cutadapt": {
+      "channel": "bioconda",
+      "package": "cutadapt",
+      "downloads": 1588237
+    },
+    "cwltool": {
+      "channel": "conda-forge",
+      "package": "cwltool",
+      "downloads": 2576505
+    },
+    "cyvcf2": {
+      "channel": "bioconda",
+      "package": "cyvcf2",
+      "downloads": 1207810
+    },
+    "dada2": {
+      "channel": "bioconda",
+      "package": "bioconductor-dada2",
+      "downloads": 723951
+    },
+    "decontam": {
+      "channel": "bioconda",
+      "package": "bioconductor-decontam",
+      "downloads": 228219
+    },
+    "deepTools": {
+      "channel": "bioconda",
+      "package": "deeptools",
+      "downloads": 1235321
+    },
+    "deeptools": {
+      "channel": "bioconda",
+      "package": "deeptools",
+      "downloads": 1235321
+    },
+    "diffcyt": {
+      "channel": "bioconda",
+      "package": "bioconductor-diffcyt",
+      "downloads": 26118
+    },
+    "dmrseq": {
+      "channel": "bioconda",
+      "package": "bioconductor-dmrseq",
+      "downloads": 32957
+    },
+    "edgeR": {
+      "channel": "bioconda",
+      "package": "bioconductor-edger",
+      "downloads": 747291
+    },
+    "eggNOG-mapper": {
+      "channel": "bioconda",
+      "package": "eggnog-mapper",
+      "downloads": 130955
+    },
+    "encyclopedia": {
+      "channel": "bioconda",
+      "package": "encyclopedia",
+      "downloads": 15729
+    },
+    "enrichplot": {
+      "channel": "bioconda",
+      "package": "bioconductor-enrichplot",
+      "downloads": 169354
+    },
+    "exomePeak2": {
+      "channel": "bioconda",
+      "package": "bioconductor-exomepeak2",
+      "downloads": 15919
+    },
+    "fastp": {
+      "channel": "bioconda",
+      "package": "fastp",
+      "downloads": 828712
+    },
+    "fastq_screen": {
+      "channel": "bioconda",
+      "package": "fastq-screen",
+      "downloads": 87356
+    },
+    "fastqc": {
+      "channel": "bioconda",
+      "package": "fastqc",
+      "downloads": 1512199
+    },
+    "featureCounts": {
+      "channel": "bioconda",
+      "package": "subread",
+      "downloads": 448263
+    },
+    "fgbio": {
+      "channel": "bioconda",
+      "package": "fgbio",
+      "downloads": 443122
+    },
+    "flowAI": {
+      "channel": "bioconda",
+      "package": "bioconductor-flowai",
+      "downloads": 70543
+    },
+    "flowCore": {
+      "channel": "bioconda",
+      "package": "bioconductor-flowcore",
+      "downloads": 127065
+    },
+    "flowWorkspace": {
+      "channel": "bioconda",
+      "package": "bioconductor-flowworkspace",
+      "downloads": 66186
+    },
+    "fpocket": {
+      "channel": "conda-forge",
+      "package": "fpocket",
+      "downloads": 149688
+    },
+    "gatk": {
+      "channel": "bioconda",
+      "package": "gatk4",
+      "downloads": 1241463
+    },
+    "gffutils": {
+      "channel": "bioconda",
+      "package": "gffutils",
+      "downloads": 288437
+    },
+    "ggalluvial": {
+      "channel": "conda-forge",
+      "package": "r-ggalluvial",
+      "downloads": 119334
+    },
+    "ggplot2": {
+      "channel": "conda-forge",
+      "package": "r-ggplot2",
+      "downloads": 5276703
+    },
+    "ggpubr": {
+      "channel": "conda-forge",
+      "package": "r-ggpubr",
+      "downloads": 401680
+    },
+    "ggseqlogo": {
+      "channel": "conda-forge",
+      "package": "r-ggseqlogo",
+      "downloads": 128603
+    },
+    "gtsummary": {
+      "channel": "conda-forge",
+      "package": "r-gtsummary",
+      "downloads": 197777
+    },
+    "hierfstat": {
+      "channel": "conda-forge",
+      "package": "r-hierfstat",
+      "downloads": 59080
+    },
+    "hifiasm": {
+      "channel": "bioconda",
+      "package": "hifiasm",
+      "downloads": 134612
+    },
+    "iNEXT": {
+      "channel": "conda-forge",
+      "package": "r-inext",
+      "downloads": 49855
+    },
+    "ichorCNA": {
+      "channel": "bioconda",
+      "package": "r-ichorcna",
+      "downloads": 32450
+    },
+    "inStrain": {
+      "channel": "bioconda",
+      "package": "instrain",
+      "downloads": 104631
+    },
+    "inferCNV": {
+      "channel": "bioconda",
+      "package": "bioconductor-infercnv",
+      "downloads": 32442
+    },
+    "isocor": {
+      "channel": "bioconda",
+      "package": "isocor",
+      "downloads": 21461
+    },
+    "ldsc": {
+      "channel": "bioconda",
+      "package": "ldsc",
+      "downloads": 4087
+    },
+    "lifelines": {
+      "channel": "conda-forge",
+      "package": "lifelines",
+      "downloads": 753182
+    },
+    "limma": {
+      "channel": "bioconda",
+      "package": "bioconductor-limma",
+      "downloads": 941568
+    },
+    "lipidr": {
+      "channel": "bioconda",
+      "package": "bioconductor-lipidr",
+      "downloads": 18720
+    },
+    "m6Anet": {
+      "channel": "bioconda",
+      "package": "m6anet",
+      "downloads": 3987
+    },
+    "macs3": {
+      "channel": "bioconda",
+      "package": "macs3",
+      "downloads": 38691
+    },
+    "maftools": {
+      "channel": "bioconda",
+      "package": "bioconductor-maftools",
+      "downloads": 57641
+    },
+    "manta": {
+      "channel": "bioconda",
+      "package": "manta",
+      "downloads": 118799
+    },
+    "matchms": {
+      "channel": "bioconda",
+      "package": "matchms",
+      "downloads": 116394
+    },
+    "matplotlib": {
+      "channel": "conda-forge",
+      "package": "matplotlib",
+      "downloads": 43845600
+    },
+    "medaka": {
+      "channel": "bioconda",
+      "package": "medaka",
+      "downloads": 352089
+    },
+    "mediation": {
+      "channel": "conda-forge",
+      "package": "r-mediation",
+      "downloads": 16265
+    },
+    "memote": {
+      "channel": "bioconda",
+      "package": "memote",
+      "downloads": 2139
+    },
+    "metaFlye": {
+      "channel": "bioconda",
+      "package": "flye",
+      "downloads": 275209
+    },
+    "metafor": {
+      "channel": "conda-forge",
+      "package": "r-metafor",
+      "downloads": 124576
+    },
+    "methylKit": {
+      "channel": "bioconda",
+      "package": "bioconductor-methylkit",
+      "downloads": 82722
+    },
+    "methylclock": {
+      "channel": "bioconda",
+      "package": "bioconductor-methylclock",
+      "downloads": 13925
+    },
+    "mgcv": {
+      "channel": "conda-forge",
+      "package": "r-mgcv",
+      "downloads": 4999959
+    },
+    "mhcflurry": {
+      "channel": "bioconda",
+      "package": "mhcflurry",
+      "downloads": 46893
+    },
+    "miRDeep2": {
+      "channel": "bioconda",
+      "package": "mirdeep2",
+      "downloads": 47665
+    },
+    "miRanda": {
+      "channel": "bioconda",
+      "package": "miranda",
+      "downloads": 17890
+    },
+    "miRge3": {
+      "channel": "bioconda",
+      "package": "mirge3",
+      "downloads": 28550
+    },
+    "miRge3.0": {
+      "channel": "bioconda",
+      "package": "mirge3",
+      "downloads": 28550
+    },
+    "micom": {
+      "channel": "bioconda",
+      "package": "micom",
+      "downloads": 42492
+    },
+    "minfi": {
+      "channel": "bioconda",
+      "package": "bioconductor-minfi",
+      "downloads": 76360
+    },
+    "minimap2": {
+      "channel": "bioconda",
+      "package": "minimap2",
+      "downloads": 1548585
+    },
+    "mixOmics": {
+      "channel": "conda-forge",
+      "package": "r-mixomics",
+      "downloads": 113151
+    },
+    "mlst": {
+      "channel": "bioconda",
+      "package": "mlst",
+      "downloads": 354028
+    },
+    "modkit": {
+      "channel": "bioconda",
+      "package": "ont-modkit",
+      "downloads": 37894
+    },
+    "multiqc": {
+      "channel": "bioconda",
+      "package": "multiqc",
+      "downloads": 934491
+    },
+    "muon": {
+      "channel": "conda-forge",
+      "package": "muon",
+      "downloads": 45270
+    },
+    "nanoplot": {
+      "channel": "bioconda",
+      "package": "nanoplot",
+      "downloads": 248235
+    },
+    "napari": {
+      "channel": "conda-forge",
+      "package": "napari",
+      "downloads": 289770
+    },
+    "nf-core": {
+      "channel": "bioconda",
+      "package": "nf-core",
+      "downloads": 155801
+    },
+    "obitools3": {
+      "channel": "bioconda",
+      "package": "obitools",
+      "downloads": 27966
+    },
+    "pVACtools": {
+      "channel": "bioconda",
+      "package": "pvactools",
+      "downloads": 1659
+    },
+    "pairtools": {
+      "channel": "bioconda",
+      "package": "pairtools",
+      "downloads": 69663
+    },
+    "pandas": {
+      "channel": "conda-forge",
+      "package": "pandas",
+      "downloads": 97404706
+    },
+    "papermill": {
+      "channel": "conda-forge",
+      "package": "papermill",
+      "downloads": 1143034
+    },
+    "patchwork": {
+      "channel": "conda-forge",
+      "package": "r-patchwork",
+      "downloads": 687942
+    },
+    "phyloseq": {
+      "channel": "bioconda",
+      "package": "bioconductor-phyloseq",
+      "downloads": 307082
+    },
+    "plink": {
+      "channel": "bioconda",
+      "package": "plink",
+      "downloads": 192453
+    },
+    "plink2": {
+      "channel": "bioconda",
+      "package": "plink2",
+      "downloads": 121665
+    },
+    "plotly": {
+      "channel": "conda-forge",
+      "package": "plotly",
+      "downloads": 16825224
+    },
+    "pmp": {
+      "channel": "bioconda",
+      "package": "bioconductor-pmp",
+      "downloads": 16474
+    },
+    "preseq": {
+      "channel": "bioconda",
+      "package": "preseq",
+      "downloads": 63469
+    },
+    "primer3-py": {
+      "channel": "bioconda",
+      "package": "primer3-py",
+      "downloads": 208592
+    },
+    "pyBigWig": {
+      "channel": "bioconda",
+      "package": "pybigwig",
+      "downloads": 1094486
+    },
+    "pyComBat": {
+      "channel": "bioconda",
+      "package": "inmoose",
+      "downloads": 13826
+    },
+    "pyGenomeTracks": {
+      "channel": "bioconda",
+      "package": "pygenometracks",
+      "downloads": 93739
+    },
+    "pyOpenMS": {
+      "channel": "bioconda",
+      "package": "pyopenms",
+      "downloads": 67793
+    },
+    "pySCENIC": {
+      "channel": "bioconda",
+      "package": "pyscenic",
+      "downloads": 5281
+    },
+    "pybiomart": {
+      "channel": "bioconda",
+      "package": "pybiomart",
+      "downloads": 22262
+    },
+    "pyreadstat": {
+      "channel": "conda-forge",
+      "package": "pyreadstat",
+      "downloads": 2016560
+    },
+    "qqman": {
+      "channel": "conda-forge",
+      "package": "r-qqman",
+      "downloads": 56685
+    },
+    "qvalue": {
+      "channel": "bioconda",
+      "package": "bioconductor-qvalue",
+      "downloads": 309551
+    },
+    "rMATS-turbo": {
+      "channel": "bioconda",
+      "package": "rmats",
+      "downloads": 95159
+    },
+    "rWikiPathways": {
+      "channel": "bioconda",
+      "package": "bioconductor-rwikipathways",
+      "downloads": 31453
+    },
+    "regenie": {
+      "channel": "bioconda",
+      "package": "regenie",
+      "downloads": 88512
+    },
+    "regioneR": {
+      "channel": "bioconda",
+      "package": "bioconductor-regioner",
+      "downloads": 79118
+    },
+    "requests": {
+      "channel": "conda-forge",
+      "package": "requests",
+      "downloads": 96978213
+    },
+    "riboWaltz": {
+      "channel": "bioconda",
+      "package": "ribowaltz",
+      "downloads": 5650
+    },
+    "riborex": {
+      "channel": "bioconda",
+      "package": "riborex",
+      "downloads": 8577
+    },
+    "rmarkdown": {
+      "channel": "conda-forge",
+      "package": "r-rmarkdown",
+      "downloads": 3761133
+    },
+    "ropls": {
+      "channel": "bioconda",
+      "package": "bioconductor-ropls",
+      "downloads": 83092
+    },
+    "rpact": {
+      "channel": "conda-forge",
+      "package": "r-rpact",
+      "downloads": 81910
+    },
+    "salmon": {
+      "channel": "bioconda",
+      "package": "salmon",
+      "downloads": 849686
+    },
+    "samtools": {
+      "channel": "bioconda",
+      "package": "samtools",
+      "downloads": 9767134
+    },
+    "scDblFinder": {
+      "channel": "bioconda",
+      "package": "bioconductor-scdblfinder",
+      "downloads": 43309
+    },
+    "scanpy": {
+      "channel": "conda-forge",
+      "package": "scanpy",
+      "downloads": 577636
+    },
+    "scikit-allel": {
+      "channel": "conda-forge",
+      "package": "scikit-allel",
+      "downloads": 2147852
+    },
+    "scikit-survival": {
+      "channel": "conda-forge",
+      "package": "scikit-survival",
+      "downloads": 410670
+    },
+    "scipy": {
+      "channel": "conda-forge",
+      "package": "scipy",
+      "downloads": 95297165
+    },
+    "scipy.sparse": {
+      "channel": "conda-forge",
+      "package": "scipy",
+      "downloads": 95297165
+    },
+    "scirpy": {
+      "channel": "bioconda",
+      "package": "scirpy",
+      "downloads": 81404
+    },
+    "scvi-tools": {
+      "channel": "conda-forge",
+      "package": "scvi-tools",
+      "downloads": 231119
+    },
+    "sesame": {
+      "channel": "bioconda",
+      "package": "bioconductor-sesame",
+      "downloads": 31304
+    },
+    "shap": {
+      "channel": "conda-forge",
+      "package": "shap",
+      "downloads": 10498322
+    },
+    "skani": {
+      "channel": "bioconda",
+      "package": "skani",
+      "downloads": 81479
+    },
+    "sklearn": {
+      "channel": "conda-forge",
+      "package": "scikit-learn",
+      "downloads": 52858187
+    },
+    "sniffles": {
+      "channel": "bioconda",
+      "package": "sniffles",
+      "downloads": 94952
+    },
+    "spatialdata": {
+      "channel": "conda-forge",
+      "package": "spatialdata",
+      "downloads": 53828
+    },
+    "squidpy": {
+      "channel": "conda-forge",
+      "package": "squidpy",
+      "downloads": 68638
+    },
+    "sra-tools": {
+      "channel": "bioconda",
+      "package": "sra-tools",
+      "downloads": 796998
+    },
+    "statsmodels": {
+      "channel": "conda-forge",
+      "package": "statsmodels",
+      "downloads": 29369237
+    },
+    "steinbock": {
+      "channel": "conda-forge",
+      "package": "steinbock",
+      "downloads": 2215
+    },
+    "straindesign": {
+      "channel": "bioconda",
+      "package": "straindesign",
+      "downloads": 8584
+    },
+    "susieR": {
+      "channel": "conda-forge",
+      "package": "r-susier",
+      "downloads": 293567
+    },
+    "sva": {
+      "channel": "bioconda",
+      "package": "bioconductor-sva",
+      "downloads": 143287
+    },
+    "tableone": {
+      "channel": "conda-forge",
+      "package": "tableone",
+      "downloads": 225111
+    },
+    "tobias": {
+      "channel": "bioconda",
+      "package": "tobias",
+      "downloads": 153027
+    },
+    "trimmomatic": {
+      "channel": "bioconda",
+      "package": "trimmomatic",
+      "downloads": 448596
+    },
+    "tximport": {
+      "channel": "bioconda",
+      "package": "bioconductor-tximport",
+      "downloads": 212653
+    },
+    "umi_tools": {
+      "channel": "bioconda",
+      "package": "umi_tools",
+      "downloads": 282316
+    },
+    "vegan": {
+      "channel": "conda-forge",
+      "package": "r-vegan",
+      "downloads": 1556302
+    },
+    "viridis": {
+      "channel": "conda-forge",
+      "package": "r-viridis",
+      "downloads": 1432055
+    },
+    "wgd": {
+      "channel": "bioconda",
+      "package": "wgd",
+      "downloads": 29144
+    },
+    "whatshap": {
+      "channel": "bioconda",
+      "package": "whatshap",
+      "downloads": 250858
+    },
+    "xcms": {
+      "channel": "bioconda",
+      "package": "bioconductor-xcms",
+      "downloads": 122559
+    }
+  },
+  "unresolved": [
+    "ABC-Enhancer-Gene-Prediction",
+    "ADMETlab",
+    "ALE",
+    "ASAP",
+    "AiZynthFinder",
+    "BAGEL2",
+    "BepiPred",
+    "CRISPOR",
+    "CRISPRcleanR",
+    "CellOracle",
+    "ClassifyCNV",
+    "CosinorPy",
+    "DiffCorr",
+    "DiffDock",
+    "Dsuite",
+    "ESMFold",
+    "FUSION",
+    "GenomicSEM",
+    "HGTector",
+    "JACKS",
+    "MAGMA",
+    "MARVEL",
+    "MeboCost",
+    "MetaboAnalystR",
+    "MiXCR",
+    "NetMHCIIpan",
+    "PRIDICT2",
+    "PRosettaC",
+    "PharmCAT",
+    "PrimeDesign",
+    "QIIME2",
+    "RBPNet",
+    "RBesT",
+    "REINVENT",
+    "ROSE",
+    "STAMP",
+    "TOGA",
+    "TwoSampleMR",
+    "VDJtools",
+    "WASP",
+    "battenberg",
+    "cell2location",
+    "chimeric-eCLIP",
+    "chrombpnet",
+    "deepcell",
+    "designit",
+    "diann",
+    "dorado",
+    "drugZ",
+    "enCas12a",
+    "fithichip",
+    "gMCP",
+    "ggsashimi",
+    "gistic2",
+    "limorhyde",
+    "meffil",
+    "mfeprimer",
+    "miCLIP2",
+    "msdial",
+    "myvariant",
+    "rbmi",
+    "scarHRD",
+    "scimap",
+    "skyline",
+    "ssizeRNA",
+    "tcrdist3"
+  ],
+  "skills": {
+    "bio-admet-prediction": {
+      "upstream_path": "chemoinformatics/admet-prediction",
+      "primary_tool": "ADMETlab",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-alignment-amplicon-clipping": {
+      "upstream_path": "alignment-files/alignment-amplicon-clipping",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-alignment-filtering": {
+      "upstream_path": "alignment-files/alignment-filtering",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-alignment-indexing": {
+      "upstream_path": "alignment-files/alignment-indexing",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-alignment-io": {
+      "upstream_path": "alignment/alignment-io",
+      "primary_tool": "Bio.AlignIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-alignment-msa-parsing": {
+      "upstream_path": "alignment/msa-parsing",
+      "primary_tool": "Bio.AlignIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-alignment-msa-statistics": {
+      "upstream_path": "alignment/msa-statistics",
+      "primary_tool": "Bio.Align",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-alignment-multiple": {
+      "upstream_path": "alignment/multiple-alignment",
+      "primary_tool": "MAFFT",
+      "downloads": 1508114,
+      "workflow_fan_in": 0,
+      "score": 38.7
+    },
+    "bio-alignment-pairwise": {
+      "upstream_path": "alignment/pairwise-alignment",
+      "primary_tool": "Bio.Align",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-alignment-sorting": {
+      "upstream_path": "alignment-files/alignment-sorting",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 1,
+      "score": 58.8
+    },
+    "bio-alignment-structural": {
+      "upstream_path": "alignment/structural-alignment",
+      "primary_tool": "Foldseek",
+      "downloads": 620551,
+      "workflow_fan_in": 0,
+      "score": 36.3
+    },
+    "bio-alignment-trimming": {
+      "upstream_path": "alignment/alignment-trimming",
+      "primary_tool": "ClipKIT",
+      "downloads": 54033,
+      "workflow_fan_in": 0,
+      "score": 29.6
+    },
+    "bio-alignment-validation": {
+      "upstream_path": "alignment-files/alignment-validation",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-analytical-validation": {
+      "upstream_path": "liquid-biopsy/analytical-validation",
+      "primary_tool": "scipy",
+      "downloads": 95297165,
+      "workflow_fan_in": 1,
+      "score": 65.0
+    },
+    "bio-atac-seq-allele-specific-accessibility": {
+      "upstream_path": "atac-seq/allele-specific-accessibility",
+      "primary_tool": "WASP",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-atac-seq-atac-peak-calling": {
+      "upstream_path": "atac-seq/atac-peak-calling",
+      "primary_tool": "macs3",
+      "downloads": 38691,
+      "workflow_fan_in": 1,
+      "score": 43.8
+    },
+    "bio-atac-seq-atac-qc": {
+      "upstream_path": "atac-seq/atac-qc",
+      "primary_tool": "deeptools",
+      "downloads": 1235321,
+      "workflow_fan_in": 1,
+      "score": 53.2
+    },
+    "bio-atac-seq-co-accessibility": {
+      "upstream_path": "atac-seq/co-accessibility",
+      "primary_tool": "cicero",
+      "downloads": 33413,
+      "workflow_fan_in": 1,
+      "score": 43.4
+    },
+    "bio-atac-seq-consensus-peakset": {
+      "upstream_path": "atac-seq/consensus-peakset",
+      "primary_tool": "bedtools",
+      "downloads": 4102051,
+      "workflow_fan_in": 1,
+      "score": 56.4
+    },
+    "bio-atac-seq-deep-learning-atac": {
+      "upstream_path": "atac-seq/deep-learning-atac",
+      "primary_tool": "chrombpnet",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-atac-seq-differential-accessibility": {
+      "upstream_path": "atac-seq/differential-accessibility",
+      "primary_tool": "DiffBind",
+      "downloads": 222114,
+      "workflow_fan_in": 1,
+      "score": 48.5
+    },
+    "bio-atac-seq-enhancer-gene-linking": {
+      "upstream_path": "atac-seq/enhancer-gene-linking",
+      "primary_tool": "ABC-Enhancer-Gene-Prediction",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-atac-seq-footprinting": {
+      "upstream_path": "atac-seq/footprinting",
+      "primary_tool": "tobias",
+      "downloads": 153027,
+      "workflow_fan_in": 1,
+      "score": 47.5
+    },
+    "bio-atac-seq-motif-deviation": {
+      "upstream_path": "atac-seq/motif-deviation",
+      "primary_tool": "chromVAR",
+      "downloads": 64078,
+      "workflow_fan_in": 2,
+      "score": 53.9
+    },
+    "bio-atac-seq-nucleosome-positioning": {
+      "upstream_path": "atac-seq/nucleosome-positioning",
+      "primary_tool": "NucleoATAC",
+      "downloads": 14093,
+      "workflow_fan_in": 1,
+      "score": 41.0
+    },
+    "bio-atac-seq-single-cell-atac": {
+      "upstream_path": "atac-seq/single-cell-atac",
+      "primary_tool": "Signac",
+      "downloads": 231435,
+      "workflow_fan_in": 1,
+      "score": 48.6
+    },
+    "bio-bam-statistics": {
+      "upstream_path": "alignment-files/bam-statistics",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-batch-downloads": {
+      "upstream_path": "database-access/batch-downloads",
+      "primary_tool": "Bio.Entrez",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-batch-processing": {
+      "upstream_path": "sequence-io/batch-processing",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-biomart-queries": {
+      "upstream_path": "database-access/biomart-queries",
+      "primary_tool": "pybiomart",
+      "downloads": 22262,
+      "workflow_fan_in": 0,
+      "score": 27.2
+    },
+    "bio-blast-searches": {
+      "upstream_path": "database-access/blast-searches",
+      "primary_tool": "Bio.Blast.NCBIWWW",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-causal-genomics-colocalization-analysis": {
+      "upstream_path": "causal-genomics/colocalization-analysis",
+      "primary_tool": "coloc",
+      "downloads": 242959,
+      "workflow_fan_in": 1,
+      "score": 48.8
+    },
+    "bio-causal-genomics-effector-gene-prioritization": {
+      "upstream_path": "causal-genomics/effector-gene-prioritization",
+      "primary_tool": "MAGMA",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-causal-genomics-fine-mapping": {
+      "upstream_path": "causal-genomics/fine-mapping",
+      "primary_tool": "susieR",
+      "downloads": 293567,
+      "workflow_fan_in": 1,
+      "score": 49.3
+    },
+    "bio-causal-genomics-genetic-correlation": {
+      "upstream_path": "causal-genomics/genetic-correlation",
+      "primary_tool": "ldsc",
+      "downloads": 4087,
+      "workflow_fan_in": 1,
+      "score": 37.7
+    },
+    "bio-causal-genomics-genomic-sem": {
+      "upstream_path": "causal-genomics/genomic-sem",
+      "primary_tool": "GenomicSEM",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-causal-genomics-heritability-partitioning": {
+      "upstream_path": "causal-genomics/heritability-partitioning",
+      "primary_tool": "ldsc",
+      "downloads": 4087,
+      "workflow_fan_in": 1,
+      "score": 37.7
+    },
+    "bio-causal-genomics-mediation-analysis": {
+      "upstream_path": "causal-genomics/mediation-analysis",
+      "primary_tool": "mediation",
+      "downloads": 16265,
+      "workflow_fan_in": 1,
+      "score": 41.4
+    },
+    "bio-causal-genomics-mendelian-randomization": {
+      "upstream_path": "causal-genomics/mendelian-randomization",
+      "primary_tool": "TwoSampleMR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-causal-genomics-pleiotropy-detection": {
+      "upstream_path": "causal-genomics/pleiotropy-detection",
+      "primary_tool": "TwoSampleMR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-causal-genomics-proteome-mr-drug-target": {
+      "upstream_path": "causal-genomics/proteome-mr-drug-target",
+      "primary_tool": "TwoSampleMR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-causal-genomics-transcriptome-wide-association": {
+      "upstream_path": "causal-genomics/transcriptome-wide-association",
+      "primary_tool": "FUSION",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-cfdna-preprocessing": {
+      "upstream_path": "liquid-biopsy/cfdna-preprocessing",
+      "primary_tool": "fgbio",
+      "downloads": 443122,
+      "workflow_fan_in": 1,
+      "score": 50.4
+    },
+    "bio-chipseq-allele-specific-binding": {
+      "upstream_path": "chip-seq/allele-specific-binding",
+      "primary_tool": "WASP",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-chipseq-chip-deep-learning": {
+      "upstream_path": "chip-seq/chip-deep-learning",
+      "primary_tool": "chrombpnet",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-chipseq-chromatin-state-segmentation": {
+      "upstream_path": "chip-seq/chromatin-state-segmentation",
+      "primary_tool": "ChromHMM",
+      "downloads": 40907,
+      "workflow_fan_in": 0,
+      "score": 28.9
+    },
+    "bio-chipseq-cut-and-run-tag": {
+      "upstream_path": "chip-seq/cut-and-run-tag",
+      "primary_tool": "SEACR",
+      "downloads": 10256,
+      "workflow_fan_in": 0,
+      "score": 25.1
+    },
+    "bio-chipseq-differential-binding": {
+      "upstream_path": "chip-seq/differential-binding",
+      "primary_tool": "DiffBind",
+      "downloads": 222114,
+      "workflow_fan_in": 1,
+      "score": 48.5
+    },
+    "bio-chipseq-motif-analysis": {
+      "upstream_path": "chip-seq/motif-analysis",
+      "primary_tool": "HOMER",
+      "downloads": 125549,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-chipseq-peak-annotation": {
+      "upstream_path": "chip-seq/peak-annotation",
+      "primary_tool": "ChIPseeker",
+      "downloads": 85857,
+      "workflow_fan_in": 1,
+      "score": 45.9
+    },
+    "bio-chipseq-peak-calling": {
+      "upstream_path": "chip-seq/peak-calling",
+      "primary_tool": "macs3",
+      "downloads": 38691,
+      "workflow_fan_in": 1,
+      "score": 43.8
+    },
+    "bio-chipseq-qc": {
+      "upstream_path": "chip-seq/chipseq-qc",
+      "primary_tool": "deepTools",
+      "downloads": 1235321,
+      "workflow_fan_in": 1,
+      "score": 53.2
+    },
+    "bio-chipseq-spike-in-normalization": {
+      "upstream_path": "chip-seq/spike-in-normalization",
+      "primary_tool": "DiffBind",
+      "downloads": 222114,
+      "workflow_fan_in": 0,
+      "score": 33.5
+    },
+    "bio-chipseq-super-enhancers": {
+      "upstream_path": "chip-seq/super-enhancers",
+      "primary_tool": "ROSE",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-chipseq-visualization": {
+      "upstream_path": "chip-seq/chipseq-visualization",
+      "primary_tool": "deepTools",
+      "downloads": 1235321,
+      "workflow_fan_in": 1,
+      "score": 53.2
+    },
+    "bio-clinical-biostatistics-adaptive-designs": {
+      "upstream_path": "clinical-biostatistics/adaptive-designs",
+      "primary_tool": "rpact",
+      "downloads": 81910,
+      "workflow_fan_in": 0,
+      "score": 30.8
+    },
+    "bio-clinical-biostatistics-bayesian-trials": {
+      "upstream_path": "clinical-biostatistics/bayesian-trials",
+      "primary_tool": "RBesT",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-clinical-biostatistics-categorical-tests": {
+      "upstream_path": "clinical-biostatistics/categorical-tests",
+      "primary_tool": "scipy",
+      "downloads": 95297165,
+      "workflow_fan_in": 1,
+      "score": 65.0
+    },
+    "bio-clinical-biostatistics-cdisc-data": {
+      "upstream_path": "clinical-biostatistics/cdisc-data-handling",
+      "primary_tool": "pyreadstat",
+      "downloads": 2016560,
+      "workflow_fan_in": 1,
+      "score": 54.5
+    },
+    "bio-clinical-biostatistics-effect-measures": {
+      "upstream_path": "clinical-biostatistics/effect-measures",
+      "primary_tool": "statsmodels",
+      "downloads": 29369237,
+      "workflow_fan_in": 1,
+      "score": 61.8
+    },
+    "bio-clinical-biostatistics-logistic-regression": {
+      "upstream_path": "clinical-biostatistics/logistic-regression",
+      "primary_tool": "statsmodels",
+      "downloads": 29369237,
+      "workflow_fan_in": 1,
+      "score": 61.8
+    },
+    "bio-clinical-biostatistics-missing-data": {
+      "upstream_path": "clinical-biostatistics/missing-data-sensitivity",
+      "primary_tool": "rbmi",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-clinical-biostatistics-multiplicity-graphical": {
+      "upstream_path": "clinical-biostatistics/multiplicity-graphical",
+      "primary_tool": "gMCP",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-clinical-biostatistics-power-sample-size": {
+      "upstream_path": "clinical-biostatistics/power-and-sample-size",
+      "primary_tool": "statsmodels",
+      "downloads": 29369237,
+      "workflow_fan_in": 1,
+      "score": 61.8
+    },
+    "bio-clinical-biostatistics-subgroup-analysis": {
+      "upstream_path": "clinical-biostatistics/subgroup-analysis",
+      "primary_tool": "statsmodels",
+      "downloads": 29369237,
+      "workflow_fan_in": 1,
+      "score": 61.8
+    },
+    "bio-clinical-biostatistics-survival-analysis": {
+      "upstream_path": "clinical-biostatistics/survival-analysis",
+      "primary_tool": "lifelines",
+      "downloads": 753182,
+      "workflow_fan_in": 1,
+      "score": 51.8
+    },
+    "bio-clinical-biostatistics-trial-reporting": {
+      "upstream_path": "clinical-biostatistics/trial-reporting",
+      "primary_tool": "tableone",
+      "downloads": 225111,
+      "workflow_fan_in": 1,
+      "score": 48.6
+    },
+    "bio-clinical-databases-acmg-classification": {
+      "upstream_path": "clinical-databases/acmg-classification",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-clinical-databases-clinvar-lookup": {
+      "upstream_path": "clinical-databases/clinvar-lookup",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-clinical-databases-dbsnp-queries": {
+      "upstream_path": "clinical-databases/dbsnp-queries",
+      "primary_tool": "myvariant",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-clinical-databases-gnomad-frequencies": {
+      "upstream_path": "clinical-databases/gnomad-frequencies",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-clinical-databases-hla-typing": {
+      "upstream_path": "clinical-databases/hla-typing",
+      "primary_tool": "T1K",
+      "downloads": 18858,
+      "workflow_fan_in": 1,
+      "score": 41.8
+    },
+    "bio-clinical-databases-msi-detection": {
+      "upstream_path": "clinical-databases/msi-detection",
+      "primary_tool": "MSIsensor-pro",
+      "downloads": 133751,
+      "workflow_fan_in": 0,
+      "score": 32.1
+    },
+    "bio-clinical-databases-myvariant-queries": {
+      "upstream_path": "clinical-databases/myvariant-queries",
+      "primary_tool": "myvariant",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-clinical-databases-pharmacogenomics": {
+      "upstream_path": "clinical-databases/pharmacogenomics",
+      "primary_tool": "PharmCAT",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-clinical-databases-polygenic-risk": {
+      "upstream_path": "clinical-databases/polygenic-risk",
+      "primary_tool": "PGS Catalog Calculator",
+      "downloads": 5133,
+      "workflow_fan_in": 0,
+      "score": 23.2
+    },
+    "bio-clinical-databases-somatic-signatures": {
+      "upstream_path": "clinical-databases/somatic-signatures",
+      "primary_tool": "SigProfilerAssignment",
+      "downloads": 7908,
+      "workflow_fan_in": 0,
+      "score": 24.4
+    },
+    "bio-clinical-databases-tumor-mutational-burden": {
+      "upstream_path": "clinical-databases/tumor-mutational-burden",
+      "primary_tool": "cyvcf2",
+      "downloads": 1207810,
+      "workflow_fan_in": 0,
+      "score": 38.1
+    },
+    "bio-clinical-databases-variant-prioritization": {
+      "upstream_path": "clinical-databases/variant-prioritization",
+      "primary_tool": "pandas",
+      "downloads": 97404706,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-clip-seq-ago-clip-mirna-targets": {
+      "upstream_path": "clip-seq/ago-clip-mirna-targets",
+      "primary_tool": "chimeric-eCLIP",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-clip-seq-binding-site-annotation": {
+      "upstream_path": "clip-seq/binding-site-annotation",
+      "primary_tool": "ChIPseeker",
+      "downloads": 85857,
+      "workflow_fan_in": 0,
+      "score": 30.9
+    },
+    "bio-clip-seq-clip-alignment": {
+      "upstream_path": "clip-seq/clip-alignment",
+      "primary_tool": "STAR",
+      "downloads": 1782742,
+      "workflow_fan_in": 0,
+      "score": 39.1
+    },
+    "bio-clip-seq-clip-deep-learning": {
+      "upstream_path": "clip-seq/clip-deep-learning",
+      "primary_tool": "RBPNet",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-clip-seq-clip-motif-analysis": {
+      "upstream_path": "clip-seq/clip-motif-analysis",
+      "primary_tool": "HOMER",
+      "downloads": 125549,
+      "workflow_fan_in": 0,
+      "score": 31.9
+    },
+    "bio-clip-seq-clip-peak-calling": {
+      "upstream_path": "clip-seq/clip-peak-calling",
+      "primary_tool": "CLIPper",
+      "downloads": 2626,
+      "workflow_fan_in": 0,
+      "score": 21.4
+    },
+    "bio-clip-seq-clip-preprocessing": {
+      "upstream_path": "clip-seq/clip-preprocessing",
+      "primary_tool": "umi_tools",
+      "downloads": 282316,
+      "workflow_fan_in": 0,
+      "score": 34.1
+    },
+    "bio-clip-seq-clip-qc": {
+      "upstream_path": "clip-seq/clip-qc",
+      "primary_tool": "preseq",
+      "downloads": 63469,
+      "workflow_fan_in": 0,
+      "score": 30.1
+    },
+    "bio-clip-seq-crosslink-site-detection": {
+      "upstream_path": "clip-seq/crosslink-site-detection",
+      "primary_tool": "PureCLIP",
+      "downloads": 47842,
+      "workflow_fan_in": 0,
+      "score": 29.3
+    },
+    "bio-clip-seq-differential-clip": {
+      "upstream_path": "clip-seq/differential-clip",
+      "primary_tool": "DEWSeq",
+      "downloads": 23884,
+      "workflow_fan_in": 0,
+      "score": 27.4
+    },
+    "bio-clip-seq-m6a-clip": {
+      "upstream_path": "clip-seq/m6a-clip",
+      "primary_tool": "miCLIP2",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-clip-seq-stamp-antibody-free": {
+      "upstream_path": "clip-seq/stamp-antibody-free",
+      "primary_tool": "STAMP",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-codon-usage": {
+      "upstream_path": "sequence-manipulation/codon-usage",
+      "primary_tool": "Bio.SeqUtils.CodonAdaptationIndex",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-comparative-genomics-ancestral-reconstruction": {
+      "upstream_path": "comparative-genomics/ancestral-reconstruction",
+      "primary_tool": "PAML",
+      "downloads": 420471,
+      "workflow_fan_in": 0,
+      "score": 35.2
+    },
+    "bio-comparative-genomics-comparative-annotation-projection": {
+      "upstream_path": "comparative-genomics/comparative-annotation-projection",
+      "primary_tool": "TOGA",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-comparative-genomics-gene-family-evolution": {
+      "upstream_path": "comparative-genomics/gene-family-evolution",
+      "primary_tool": "CAFE5",
+      "downloads": 35520,
+      "workflow_fan_in": 0,
+      "score": 28.5
+    },
+    "bio-comparative-genomics-gene-tree-species-tree-reconciliation": {
+      "upstream_path": "comparative-genomics/gene-tree-species-tree-reconciliation",
+      "primary_tool": "ALE",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-comparative-genomics-genome-distance-and-species-delineation": {
+      "upstream_path": "comparative-genomics/genome-distance-and-species-delineation",
+      "primary_tool": "skani",
+      "downloads": 81479,
+      "workflow_fan_in": 0,
+      "score": 30.7
+    },
+    "bio-comparative-genomics-hgt-detection": {
+      "upstream_path": "comparative-genomics/hgt-detection",
+      "primary_tool": "HGTector",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-comparative-genomics-introgression-detection": {
+      "upstream_path": "comparative-genomics/introgression-detection",
+      "primary_tool": "Dsuite",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-comparative-genomics-ortholog-inference": {
+      "upstream_path": "comparative-genomics/ortholog-inference",
+      "primary_tool": "OrthoFinder",
+      "downloads": 154602,
+      "workflow_fan_in": 0,
+      "score": 32.5
+    },
+    "bio-comparative-genomics-pangenome-analysis": {
+      "upstream_path": "comparative-genomics/pangenome-analysis",
+      "primary_tool": "Panaroo",
+      "downloads": 66243,
+      "workflow_fan_in": 0,
+      "score": 30.2
+    },
+    "bio-comparative-genomics-positive-selection": {
+      "upstream_path": "comparative-genomics/positive-selection",
+      "primary_tool": "PAML",
+      "downloads": 420471,
+      "workflow_fan_in": 0,
+      "score": 35.2
+    },
+    "bio-comparative-genomics-synteny-analysis": {
+      "upstream_path": "comparative-genomics/synteny-analysis",
+      "primary_tool": "MCScanX",
+      "downloads": 5386,
+      "workflow_fan_in": 0,
+      "score": 23.4
+    },
+    "bio-comparative-genomics-whole-genome-alignment": {
+      "upstream_path": "comparative-genomics/whole-genome-alignment",
+      "primary_tool": "Cactus",
+      "downloads": 34484,
+      "workflow_fan_in": 0,
+      "score": 28.4
+    },
+    "bio-comparative-genomics-whole-genome-duplication": {
+      "upstream_path": "comparative-genomics/whole-genome-duplication",
+      "primary_tool": "wgd",
+      "downloads": 29144,
+      "workflow_fan_in": 0,
+      "score": 27.9
+    },
+    "bio-compressed-files": {
+      "upstream_path": "sequence-io/compressed-files",
+      "primary_tool": "Bio.bgzf",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-conformer-generation": {
+      "upstream_path": "chemoinformatics/conformer-generation",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-consensus-sequences": {
+      "upstream_path": "variant-calling/consensus-sequences",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 0,
+      "score": 41.8
+    },
+    "bio-copy-number-allele-specific-copy-number": {
+      "upstream_path": "copy-number/allele-specific-copy-number",
+      "primary_tool": "ascat",
+      "downloads": 29497,
+      "workflow_fan_in": 1,
+      "score": 43.0
+    },
+    "bio-copy-number-cnv-annotation": {
+      "upstream_path": "copy-number/cnv-annotation",
+      "primary_tool": "bedtools",
+      "downloads": 4102051,
+      "workflow_fan_in": 1,
+      "score": 56.4
+    },
+    "bio-copy-number-cnv-visualization": {
+      "upstream_path": "copy-number/cnv-visualization",
+      "primary_tool": "matplotlib",
+      "downloads": 43845600,
+      "workflow_fan_in": 1,
+      "score": 62.9
+    },
+    "bio-copy-number-cnvkit-analysis": {
+      "upstream_path": "copy-number/cnvkit-analysis",
+      "primary_tool": "cnvkit",
+      "downloads": 267952,
+      "workflow_fan_in": 2,
+      "score": 57.8
+    },
+    "bio-copy-number-copy-ratio-segmentation": {
+      "upstream_path": "copy-number/copy-ratio-segmentation",
+      "primary_tool": "DNAcopy",
+      "downloads": 240575,
+      "workflow_fan_in": 1,
+      "score": 48.7
+    },
+    "bio-copy-number-focal-amplification-ecdna": {
+      "upstream_path": "copy-number/focal-amplification-ecdna",
+      "primary_tool": "AmpliconArchitect",
+      "downloads": 22576,
+      "workflow_fan_in": 0,
+      "score": 27.2
+    },
+    "bio-copy-number-gatk-cnv": {
+      "upstream_path": "copy-number/gatk-cnv",
+      "primary_tool": "gatk",
+      "downloads": 1241463,
+      "workflow_fan_in": 1,
+      "score": 53.2
+    },
+    "bio-copy-number-germline-cnv-interpretation": {
+      "upstream_path": "copy-number/germline-cnv-interpretation",
+      "primary_tool": "ClassifyCNV",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-copy-number-hrd-scoring": {
+      "upstream_path": "copy-number/hrd-scoring",
+      "primary_tool": "scarHRD",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-copy-number-recurrent-cnv": {
+      "upstream_path": "copy-number/recurrent-cnv",
+      "primary_tool": "gistic2",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-copy-number-subclonal-copy-number": {
+      "upstream_path": "copy-number/subclonal-copy-number",
+      "primary_tool": "battenberg",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-covalent-design": {
+      "upstream_path": "chemoinformatics/covalent-design",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-crispr-screens-bagel-essentiality": {
+      "upstream_path": "crispr-screens/bagel-essentiality",
+      "primary_tool": "BAGEL2",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-crispr-screens-base-editing-analysis": {
+      "upstream_path": "crispr-screens/base-editing-analysis",
+      "primary_tool": "CRISPResso2",
+      "downloads": 188630,
+      "workflow_fan_in": 1,
+      "score": 48.1
+    },
+    "bio-crispr-screens-batch-correction": {
+      "upstream_path": "crispr-screens/batch-correction",
+      "primary_tool": "pyComBat",
+      "downloads": 13826,
+      "workflow_fan_in": 1,
+      "score": 41.0
+    },
+    "bio-crispr-screens-combinatorial-screens": {
+      "upstream_path": "crispr-screens/combinatorial-screens",
+      "primary_tool": "enCas12a",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-crispr-screens-copy-number-correction": {
+      "upstream_path": "crispr-screens/copy-number-correction",
+      "primary_tool": "CRISPRcleanR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-crispr-screens-crispresso-editing": {
+      "upstream_path": "crispr-screens/crispresso-editing",
+      "primary_tool": "CRISPResso2",
+      "downloads": 188630,
+      "workflow_fan_in": 1,
+      "score": 48.1
+    },
+    "bio-crispr-screens-drugz-chemogenomic": {
+      "upstream_path": "crispr-screens/drugz-chemogenomic",
+      "primary_tool": "drugZ",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-crispr-screens-hit-calling": {
+      "upstream_path": "crispr-screens/hit-calling",
+      "primary_tool": "MAGeCK",
+      "downloads": 162115,
+      "workflow_fan_in": 1,
+      "score": 47.7
+    },
+    "bio-crispr-screens-in-vivo-screens": {
+      "upstream_path": "crispr-screens/in-vivo-screens",
+      "primary_tool": "MAGeCK",
+      "downloads": 162115,
+      "workflow_fan_in": 1,
+      "score": 47.7
+    },
+    "bio-crispr-screens-jacks-analysis": {
+      "upstream_path": "crispr-screens/jacks-analysis",
+      "primary_tool": "JACKS",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-crispr-screens-library-design": {
+      "upstream_path": "crispr-screens/library-design",
+      "primary_tool": "CRISPOR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-crispr-screens-mageck-analysis": {
+      "upstream_path": "crispr-screens/mageck-analysis",
+      "primary_tool": "MAGeCK",
+      "downloads": 162115,
+      "workflow_fan_in": 1,
+      "score": 47.7
+    },
+    "bio-crispr-screens-perturb-seq-analysis": {
+      "upstream_path": "crispr-screens/perturb-seq-analysis",
+      "primary_tool": "Pertpy",
+      "downloads": 11314,
+      "workflow_fan_in": 1,
+      "score": 40.4
+    },
+    "bio-crispr-screens-prime-editing-screens": {
+      "upstream_path": "crispr-screens/prime-editing-screens",
+      "primary_tool": "PRIDICT2",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-crispr-screens-screen-qc": {
+      "upstream_path": "crispr-screens/screen-qc",
+      "primary_tool": "MAGeCK-VISPR",
+      "downloads": 53248,
+      "workflow_fan_in": 1,
+      "score": 44.6
+    },
+    "bio-ctdna-mutation-detection": {
+      "upstream_path": "liquid-biopsy/ctdna-mutation-detection",
+      "primary_tool": "VarDict",
+      "downloads": 135310,
+      "workflow_fan_in": 1,
+      "score": 47.2
+    },
+    "bio-data-visualization-circos-plots": {
+      "upstream_path": "data-visualization/circos-plots",
+      "primary_tool": "circlize",
+      "downloads": 418478,
+      "workflow_fan_in": 0,
+      "score": 35.2
+    },
+    "bio-data-visualization-color-palettes": {
+      "upstream_path": "data-visualization/color-palettes",
+      "primary_tool": "viridis",
+      "downloads": 1432055,
+      "workflow_fan_in": 0,
+      "score": 38.5
+    },
+    "bio-data-visualization-dimensionality-reduction-plots": {
+      "upstream_path": "data-visualization/dimensionality-reduction-plots",
+      "primary_tool": "scanpy",
+      "downloads": 577636,
+      "workflow_fan_in": 0,
+      "score": 36.1
+    },
+    "bio-data-visualization-distribution-plots": {
+      "upstream_path": "data-visualization/distribution-plots",
+      "primary_tool": "ggplot2",
+      "downloads": 5276703,
+      "workflow_fan_in": 0,
+      "score": 42.1
+    },
+    "bio-data-visualization-flow-and-transition-plots": {
+      "upstream_path": "data-visualization/flow-and-transition-plots",
+      "primary_tool": "ggalluvial",
+      "downloads": 119334,
+      "workflow_fan_in": 0,
+      "score": 31.8
+    },
+    "bio-data-visualization-forest-funnel-plots": {
+      "upstream_path": "data-visualization/forest-funnel-plots",
+      "primary_tool": "metafor",
+      "downloads": 124576,
+      "workflow_fan_in": 0,
+      "score": 31.9
+    },
+    "bio-data-visualization-genome-tracks": {
+      "upstream_path": "data-visualization/genome-tracks",
+      "primary_tool": "pyGenomeTracks",
+      "downloads": 93739,
+      "workflow_fan_in": 0,
+      "score": 31.1
+    },
+    "bio-data-visualization-ggplot2-fundamentals": {
+      "upstream_path": "data-visualization/ggplot2-fundamentals",
+      "primary_tool": "ggplot2",
+      "downloads": 5276703,
+      "workflow_fan_in": 0,
+      "score": 42.1
+    },
+    "bio-data-visualization-heatmaps-clustering": {
+      "upstream_path": "data-visualization/heatmaps-clustering",
+      "primary_tool": "ComplexHeatmap",
+      "downloads": 179144,
+      "workflow_fan_in": 0,
+      "score": 32.9
+    },
+    "bio-data-visualization-interactive-visualization": {
+      "upstream_path": "data-visualization/interactive-visualization",
+      "primary_tool": "plotly",
+      "downloads": 16825224,
+      "workflow_fan_in": 0,
+      "score": 45.2
+    },
+    "bio-data-visualization-lollipop-protein-maps": {
+      "upstream_path": "data-visualization/lollipop-protein-maps",
+      "primary_tool": "maftools",
+      "downloads": 57641,
+      "workflow_fan_in": 0,
+      "score": 29.8
+    },
+    "bio-data-visualization-manhattan-qq-locuszoom": {
+      "upstream_path": "data-visualization/manhattan-qq-locuszoom",
+      "primary_tool": "qqman",
+      "downloads": 56685,
+      "workflow_fan_in": 0,
+      "score": 29.8
+    },
+    "bio-data-visualization-matplotlib-fundamentals": {
+      "upstream_path": "data-visualization/matplotlib-fundamentals",
+      "primary_tool": "matplotlib",
+      "downloads": 43845600,
+      "workflow_fan_in": 0,
+      "score": 47.8
+    },
+    "bio-data-visualization-multipanel-figures": {
+      "upstream_path": "data-visualization/multipanel-figures",
+      "primary_tool": "patchwork",
+      "downloads": 687942,
+      "workflow_fan_in": 0,
+      "score": 36.5
+    },
+    "bio-data-visualization-network-visualization": {
+      "upstream_path": "data-visualization/network-visualization",
+      "primary_tool": "NetworkX",
+      "downloads": 37725459,
+      "workflow_fan_in": 0,
+      "score": 47.4
+    },
+    "bio-data-visualization-oncoprint-mutation-matrices": {
+      "upstream_path": "data-visualization/oncoprint-mutation-matrices",
+      "primary_tool": "ComplexHeatmap",
+      "downloads": 179144,
+      "workflow_fan_in": 0,
+      "score": 32.9
+    },
+    "bio-data-visualization-sequence-logos": {
+      "upstream_path": "data-visualization/sequence-logos",
+      "primary_tool": "ggseqlogo",
+      "downloads": 128603,
+      "workflow_fan_in": 0,
+      "score": 32.0
+    },
+    "bio-data-visualization-statistical-annotation": {
+      "upstream_path": "data-visualization/statistical-annotation",
+      "primary_tool": "ggpubr",
+      "downloads": 401680,
+      "workflow_fan_in": 0,
+      "score": 35.1
+    },
+    "bio-data-visualization-upset-plots": {
+      "upstream_path": "data-visualization/upset-plots",
+      "primary_tool": "ComplexUpset",
+      "downloads": 56551,
+      "workflow_fan_in": 0,
+      "score": 29.7
+    },
+    "bio-data-visualization-volcano-and-ma-plots": {
+      "upstream_path": "data-visualization/volcano-and-ma-plots",
+      "primary_tool": "ggplot2",
+      "downloads": 5276703,
+      "workflow_fan_in": 0,
+      "score": 42.1
+    },
+    "bio-differential-expression-batch-correction": {
+      "upstream_path": "differential-expression/batch-correction",
+      "primary_tool": "sva",
+      "downloads": 143287,
+      "workflow_fan_in": 0,
+      "score": 32.3
+    },
+    "bio-differential-expression-de-results": {
+      "upstream_path": "differential-expression/de-results",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 1,
+      "score": 51.9
+    },
+    "bio-differential-expression-de-visualization": {
+      "upstream_path": "differential-expression/de-visualization",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 1,
+      "score": 51.9
+    },
+    "bio-differential-expression-deseq2-basics": {
+      "upstream_path": "differential-expression/deseq2-basics",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 1,
+      "score": 51.9
+    },
+    "bio-differential-expression-edger-basics": {
+      "upstream_path": "differential-expression/edger-basics",
+      "primary_tool": "edgeR",
+      "downloads": 747291,
+      "workflow_fan_in": 1,
+      "score": 51.8
+    },
+    "bio-differential-expression-timeseries-de": {
+      "upstream_path": "differential-expression/timeseries-de",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 1,
+      "score": 51.9
+    },
+    "bio-differential-splicing": {
+      "upstream_path": "alternative-splicing/differential-splicing",
+      "primary_tool": "rMATS-turbo",
+      "downloads": 95159,
+      "workflow_fan_in": 1,
+      "score": 46.2
+    },
+    "bio-duplicate-handling": {
+      "upstream_path": "alignment-files/duplicate-handling",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 3,
+      "score": 73.9
+    },
+    "bio-ecological-genomics-biodiversity-metrics": {
+      "upstream_path": "ecological-genomics/biodiversity-metrics",
+      "primary_tool": "iNEXT",
+      "downloads": 49855,
+      "workflow_fan_in": 1,
+      "score": 44.5
+    },
+    "bio-ecological-genomics-community-ecology": {
+      "upstream_path": "ecological-genomics/community-ecology",
+      "primary_tool": "vegan",
+      "downloads": 1556302,
+      "workflow_fan_in": 1,
+      "score": 53.8
+    },
+    "bio-ecological-genomics-conservation-genetics": {
+      "upstream_path": "ecological-genomics/conservation-genetics",
+      "primary_tool": "hierfstat",
+      "downloads": 59080,
+      "workflow_fan_in": 0,
+      "score": 29.9
+    },
+    "bio-ecological-genomics-edna-metabarcoding": {
+      "upstream_path": "ecological-genomics/edna-metabarcoding",
+      "primary_tool": "dada2",
+      "downloads": 723951,
+      "workflow_fan_in": 1,
+      "score": 51.7
+    },
+    "bio-ecological-genomics-landscape-genomics": {
+      "upstream_path": "ecological-genomics/landscape-genomics",
+      "primary_tool": "LEA",
+      "downloads": 38922,
+      "workflow_fan_in": 0,
+      "score": 28.7
+    },
+    "bio-ecological-genomics-species-delimitation": {
+      "upstream_path": "ecological-genomics/species-delimitation",
+      "primary_tool": "ASAP",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-ensembl-rest": {
+      "upstream_path": "database-access/ensembl-rest",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-entrez-fetch": {
+      "upstream_path": "database-access/entrez-fetch",
+      "primary_tool": "Bio.Entrez",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-entrez-link": {
+      "upstream_path": "database-access/entrez-link",
+      "primary_tool": "Bio.Entrez",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-entrez-search": {
+      "upstream_path": "database-access/entrez-search",
+      "primary_tool": "Bio.Entrez",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-epidemiological-genomics-amr-surveillance": {
+      "upstream_path": "epidemiological-genomics/amr-surveillance",
+      "primary_tool": "AMRFinderPlus",
+      "downloads": 214578,
+      "workflow_fan_in": 1,
+      "score": 48.4
+    },
+    "bio-epidemiological-genomics-pathogen-typing": {
+      "upstream_path": "epidemiological-genomics/pathogen-typing",
+      "primary_tool": "chewBBACA",
+      "downloads": 109777,
+      "workflow_fan_in": 1,
+      "score": 46.6
+    },
+    "bio-epidemiological-genomics-phylodynamics": {
+      "upstream_path": "epidemiological-genomics/phylodynamics",
+      "primary_tool": "BEAST2",
+      "downloads": 45645,
+      "workflow_fan_in": 1,
+      "score": 44.2
+    },
+    "bio-epidemiological-genomics-transmission-inference": {
+      "upstream_path": "epidemiological-genomics/transmission-inference",
+      "primary_tool": "TransPhylo",
+      "downloads": 60116,
+      "workflow_fan_in": 1,
+      "score": 45.0
+    },
+    "bio-epidemiological-genomics-variant-surveillance": {
+      "upstream_path": "epidemiological-genomics/variant-surveillance",
+      "primary_tool": "Pangolin",
+      "downloads": 173196,
+      "workflow_fan_in": 1,
+      "score": 47.8
+    },
+    "bio-epitranscriptomics-m6a-differential": {
+      "upstream_path": "epitranscriptomics/m6a-differential",
+      "primary_tool": "exomePeak2",
+      "downloads": 15919,
+      "workflow_fan_in": 1,
+      "score": 41.4
+    },
+    "bio-epitranscriptomics-m6a-peak-calling": {
+      "upstream_path": "epitranscriptomics/m6a-peak-calling",
+      "primary_tool": "exomePeak2",
+      "downloads": 15919,
+      "workflow_fan_in": 1,
+      "score": 41.4
+    },
+    "bio-epitranscriptomics-m6anet-analysis": {
+      "upstream_path": "epitranscriptomics/m6anet-analysis",
+      "primary_tool": "m6Anet",
+      "downloads": 3987,
+      "workflow_fan_in": 0,
+      "score": 22.5
+    },
+    "bio-epitranscriptomics-merip-preprocessing": {
+      "upstream_path": "epitranscriptomics/merip-preprocessing",
+      "primary_tool": "STAR",
+      "downloads": 1782742,
+      "workflow_fan_in": 1,
+      "score": 54.2
+    },
+    "bio-epitranscriptomics-modification-visualization": {
+      "upstream_path": "epitranscriptomics/modification-visualization",
+      "primary_tool": "Guitar",
+      "downloads": 31400,
+      "workflow_fan_in": 1,
+      "score": 43.2
+    },
+    "bio-experimental-design-batch-design": {
+      "upstream_path": "experimental-design/batch-design",
+      "primary_tool": "designit",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-experimental-design-multiple-testing": {
+      "upstream_path": "experimental-design/multiple-testing",
+      "primary_tool": "qvalue",
+      "downloads": 309551,
+      "workflow_fan_in": 0,
+      "score": 34.4
+    },
+    "bio-experimental-design-power-analysis": {
+      "upstream_path": "experimental-design/power-analysis",
+      "primary_tool": "RNASeqPower",
+      "downloads": 50060,
+      "workflow_fan_in": 0,
+      "score": 29.4
+    },
+    "bio-experimental-design-randomization-blocking": {
+      "upstream_path": "experimental-design/randomization-blocking",
+      "primary_tool": "designit",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-experimental-design-sample-size": {
+      "upstream_path": "experimental-design/sample-size",
+      "primary_tool": "ssizeRNA",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-expression-matrix-counts-ingest": {
+      "upstream_path": "expression-matrix/counts-ingest",
+      "primary_tool": "tximport",
+      "downloads": 212653,
+      "workflow_fan_in": 0,
+      "score": 33.3
+    },
+    "bio-expression-matrix-gene-id-mapping": {
+      "upstream_path": "expression-matrix/gene-id-mapping",
+      "primary_tool": "biomaRt",
+      "downloads": 424468,
+      "workflow_fan_in": 0,
+      "score": 35.2
+    },
+    "bio-expression-matrix-metadata-joins": {
+      "upstream_path": "expression-matrix/metadata-joins",
+      "primary_tool": "pandas",
+      "downloads": 97404706,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-expression-matrix-normalization": {
+      "upstream_path": "expression-matrix/normalization",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 0,
+      "score": 36.8
+    },
+    "bio-expression-matrix-sparse-handling": {
+      "upstream_path": "expression-matrix/sparse-handling",
+      "primary_tool": "scipy.sparse",
+      "downloads": 95297165,
+      "workflow_fan_in": 0,
+      "score": 49.9
+    },
+    "bio-fastq-quality": {
+      "upstream_path": "sequence-io/fastq-quality",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-filter-sequences": {
+      "upstream_path": "sequence-io/filter-sequences",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-flow-cytometry-bead-normalization": {
+      "upstream_path": "flow-cytometry/bead-normalization",
+      "primary_tool": "CATALYST",
+      "downloads": 27576,
+      "workflow_fan_in": 1,
+      "score": 42.8
+    },
+    "bio-flow-cytometry-clustering-phenotyping": {
+      "upstream_path": "flow-cytometry/clustering-phenotyping",
+      "primary_tool": "CATALYST",
+      "downloads": 27576,
+      "workflow_fan_in": 1,
+      "score": 42.8
+    },
+    "bio-flow-cytometry-compensation-transformation": {
+      "upstream_path": "flow-cytometry/compensation-transformation",
+      "primary_tool": "flowCore",
+      "downloads": 127065,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-flow-cytometry-cytometry-qc": {
+      "upstream_path": "flow-cytometry/cytometry-qc",
+      "primary_tool": "flowAI",
+      "downloads": 70543,
+      "workflow_fan_in": 1,
+      "score": 45.4
+    },
+    "bio-flow-cytometry-differential-analysis": {
+      "upstream_path": "flow-cytometry/differential-analysis",
+      "primary_tool": "diffcyt",
+      "downloads": 26118,
+      "workflow_fan_in": 1,
+      "score": 42.7
+    },
+    "bio-flow-cytometry-doublet-detection": {
+      "upstream_path": "flow-cytometry/doublet-detection",
+      "primary_tool": "flowCore",
+      "downloads": 127065,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-flow-cytometry-fcs-handling": {
+      "upstream_path": "flow-cytometry/fcs-handling",
+      "primary_tool": "flowCore",
+      "downloads": 127065,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-flow-cytometry-gating-analysis": {
+      "upstream_path": "flow-cytometry/gating-analysis",
+      "primary_tool": "flowWorkspace",
+      "downloads": 66186,
+      "workflow_fan_in": 1,
+      "score": 45.2
+    },
+    "bio-format-conversion": {
+      "upstream_path": "sequence-io/format-conversion",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-fragment-analysis": {
+      "upstream_path": "liquid-biopsy/fragment-analysis",
+      "primary_tool": "FinaleToolkit",
+      "downloads": 1381,
+      "workflow_fan_in": 1,
+      "score": 34.7
+    },
+    "bio-free-energy-calculations": {
+      "upstream_path": "chemoinformatics/free-energy-calculations",
+      "primary_tool": "OpenFE",
+      "downloads": 223321,
+      "workflow_fan_in": 0,
+      "score": 33.5
+    },
+    "bio-gatk-variant-calling": {
+      "upstream_path": "variant-calling/gatk-variant-calling",
+      "primary_tool": "gatk",
+      "downloads": 1241463,
+      "workflow_fan_in": 1,
+      "score": 53.2
+    },
+    "bio-gene-regulatory-networks-coexpression-networks": {
+      "upstream_path": "gene-regulatory-networks/coexpression-networks",
+      "primary_tool": "WGCNA",
+      "downloads": 80265,
+      "workflow_fan_in": 0,
+      "score": 30.7
+    },
+    "bio-gene-regulatory-networks-differential-networks": {
+      "upstream_path": "gene-regulatory-networks/differential-networks",
+      "primary_tool": "DiffCorr",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-gene-regulatory-networks-grn-inference": {
+      "upstream_path": "gene-regulatory-networks/grn-inference",
+      "primary_tool": "VIPER",
+      "downloads": 46833,
+      "workflow_fan_in": 0,
+      "score": 29.2
+    },
+    "bio-gene-regulatory-networks-multiomics-grn": {
+      "upstream_path": "gene-regulatory-networks/multiomics-grn",
+      "primary_tool": "SCENIC+",
+      "downloads": 396,
+      "workflow_fan_in": 1,
+      "score": 31.3
+    },
+    "bio-gene-regulatory-networks-perturbation-simulation": {
+      "upstream_path": "gene-regulatory-networks/perturbation-simulation",
+      "primary_tool": "CellOracle",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-gene-regulatory-networks-scenic-regulons": {
+      "upstream_path": "gene-regulatory-networks/scenic-regulons",
+      "primary_tool": "pySCENIC",
+      "downloads": 5281,
+      "workflow_fan_in": 1,
+      "score": 38.4
+    },
+    "bio-generative-design": {
+      "upstream_path": "chemoinformatics/generative-design",
+      "primary_tool": "REINVENT",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-genome-annotation-annotation-qc": {
+      "upstream_path": "genome-annotation/annotation-qc",
+      "primary_tool": "BUSCO",
+      "downloads": 457976,
+      "workflow_fan_in": 1,
+      "score": 50.5
+    },
+    "bio-genome-annotation-annotation-transfer": {
+      "upstream_path": "genome-annotation/annotation-transfer",
+      "primary_tool": "Liftoff",
+      "downloads": 39625,
+      "workflow_fan_in": 0,
+      "score": 28.8
+    },
+    "bio-genome-annotation-eukaryotic-gene-prediction": {
+      "upstream_path": "genome-annotation/eukaryotic-gene-prediction",
+      "primary_tool": "BRAKER3",
+      "downloads": 10858,
+      "workflow_fan_in": 1,
+      "score": 40.3
+    },
+    "bio-genome-annotation-functional-annotation": {
+      "upstream_path": "genome-annotation/functional-annotation",
+      "primary_tool": "eggNOG-mapper",
+      "downloads": 130955,
+      "workflow_fan_in": 1,
+      "score": 47.1
+    },
+    "bio-genome-annotation-ncrna-annotation": {
+      "upstream_path": "genome-annotation/ncrna-annotation",
+      "primary_tool": "Infernal",
+      "downloads": 441595,
+      "workflow_fan_in": 1,
+      "score": 50.4
+    },
+    "bio-genome-annotation-prokaryotic-annotation": {
+      "upstream_path": "genome-annotation/prokaryotic-annotation",
+      "primary_tool": "Bakta",
+      "downloads": 124640,
+      "workflow_fan_in": 1,
+      "score": 46.9
+    },
+    "bio-genome-annotation-repeat-annotation": {
+      "upstream_path": "genome-annotation/repeat-annotation",
+      "primary_tool": "RepeatMasker",
+      "downloads": 150858,
+      "workflow_fan_in": 1,
+      "score": 47.5
+    },
+    "bio-genome-assembly-assembly-polishing": {
+      "upstream_path": "genome-assembly/assembly-polishing",
+      "primary_tool": "Pilon",
+      "downloads": 143945,
+      "workflow_fan_in": 1,
+      "score": 47.3
+    },
+    "bio-genome-assembly-assembly-qc": {
+      "upstream_path": "genome-assembly/assembly-qc",
+      "primary_tool": "QUAST",
+      "downloads": 403173,
+      "workflow_fan_in": 2,
+      "score": 58.9
+    },
+    "bio-genome-assembly-contamination-detection": {
+      "upstream_path": "genome-assembly/contamination-detection",
+      "primary_tool": "CheckM2",
+      "downloads": 26227,
+      "workflow_fan_in": 1,
+      "score": 42.7
+    },
+    "bio-genome-assembly-genome-profiling": {
+      "upstream_path": "genome-assembly/genome-profiling",
+      "primary_tool": "GenomeScope2",
+      "downloads": 30011,
+      "workflow_fan_in": 1,
+      "score": 43.1
+    },
+    "bio-genome-assembly-hifi-assembly": {
+      "upstream_path": "genome-assembly/hifi-assembly",
+      "primary_tool": "hifiasm",
+      "downloads": 134612,
+      "workflow_fan_in": 1,
+      "score": 47.2
+    },
+    "bio-genome-assembly-long-read-assembly": {
+      "upstream_path": "genome-assembly/long-read-assembly",
+      "primary_tool": "Flye",
+      "downloads": 275209,
+      "workflow_fan_in": 1,
+      "score": 49.1
+    },
+    "bio-genome-assembly-metagenome-assembly": {
+      "upstream_path": "genome-assembly/metagenome-assembly",
+      "primary_tool": "metaFlye",
+      "downloads": 275209,
+      "workflow_fan_in": 1,
+      "score": 49.1
+    },
+    "bio-genome-assembly-scaffolding": {
+      "upstream_path": "genome-assembly/scaffolding",
+      "primary_tool": "YaHS",
+      "downloads": 21994,
+      "workflow_fan_in": 1,
+      "score": 42.2
+    },
+    "bio-genome-assembly-short-read-assembly": {
+      "upstream_path": "genome-assembly/short-read-assembly",
+      "primary_tool": "SPAdes",
+      "downloads": 927170,
+      "workflow_fan_in": 1,
+      "score": 52.4
+    },
+    "bio-genome-engineering-base-editing-design": {
+      "upstream_path": "genome-engineering/base-editing-design",
+      "primary_tool": "BioPython",
+      "downloads": 7660860,
+      "workflow_fan_in": 1,
+      "score": 58.1
+    },
+    "bio-genome-engineering-grna-design": {
+      "upstream_path": "genome-engineering/grna-design",
+      "primary_tool": "CRISPOR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-genome-engineering-hdr-template-design": {
+      "upstream_path": "genome-engineering/hdr-template-design",
+      "primary_tool": "primer3-py",
+      "downloads": 208592,
+      "workflow_fan_in": 1,
+      "score": 48.3
+    },
+    "bio-genome-engineering-off-target-prediction": {
+      "upstream_path": "genome-engineering/off-target-prediction",
+      "primary_tool": "Cas-OFFinder",
+      "downloads": 12537,
+      "workflow_fan_in": 1,
+      "score": 40.7
+    },
+    "bio-genome-engineering-prime-editing-design": {
+      "upstream_path": "genome-engineering/prime-editing-design",
+      "primary_tool": "PrimeDesign",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-genome-intervals-bed-file-basics": {
+      "upstream_path": "genome-intervals/bed-file-basics",
+      "primary_tool": "bedtools",
+      "downloads": 4102051,
+      "workflow_fan_in": 0,
+      "score": 41.4
+    },
+    "bio-genome-intervals-bedgraph-handling": {
+      "upstream_path": "genome-intervals/bedgraph-handling",
+      "primary_tool": "deeptools",
+      "downloads": 1235321,
+      "workflow_fan_in": 0,
+      "score": 38.1
+    },
+    "bio-genome-intervals-bigwig-tracks": {
+      "upstream_path": "genome-intervals/bigwig-tracks",
+      "primary_tool": "pyBigWig",
+      "downloads": 1094486,
+      "workflow_fan_in": 0,
+      "score": 37.8
+    },
+    "bio-genome-intervals-coverage-analysis": {
+      "upstream_path": "genome-intervals/coverage-analysis",
+      "primary_tool": "bedtools",
+      "downloads": 4102051,
+      "workflow_fan_in": 0,
+      "score": 41.4
+    },
+    "bio-genome-intervals-gtf-gff-handling": {
+      "upstream_path": "genome-intervals/gtf-gff-handling",
+      "primary_tool": "gffutils",
+      "downloads": 288437,
+      "workflow_fan_in": 0,
+      "score": 34.2
+    },
+    "bio-genome-intervals-interval-arithmetic": {
+      "upstream_path": "genome-intervals/interval-arithmetic",
+      "primary_tool": "bedtools",
+      "downloads": 4102051,
+      "workflow_fan_in": 0,
+      "score": 41.4
+    },
+    "bio-genome-intervals-overlap-significance": {
+      "upstream_path": "genome-intervals/overlap-significance",
+      "primary_tool": "regioneR",
+      "downloads": 79118,
+      "workflow_fan_in": 0,
+      "score": 30.7
+    },
+    "bio-genome-intervals-proximity-operations": {
+      "upstream_path": "genome-intervals/proximity-operations",
+      "primary_tool": "bedtools",
+      "downloads": 4102051,
+      "workflow_fan_in": 0,
+      "score": 41.4
+    },
+    "bio-geo-data": {
+      "upstream_path": "database-access/geo-data",
+      "primary_tool": "Bio.Entrez",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-hi-c-analysis-compartment-analysis": {
+      "upstream_path": "hi-c-analysis/compartment-analysis",
+      "primary_tool": "cooltools",
+      "downloads": 367278,
+      "workflow_fan_in": 1,
+      "score": 49.9
+    },
+    "bio-hi-c-analysis-contact-pairs": {
+      "upstream_path": "hi-c-analysis/contact-pairs",
+      "primary_tool": "pairtools",
+      "downloads": 69663,
+      "workflow_fan_in": 1,
+      "score": 45.4
+    },
+    "bio-hi-c-analysis-hic-data-io": {
+      "upstream_path": "hi-c-analysis/hic-data-io",
+      "primary_tool": "cooler",
+      "downloads": 325587,
+      "workflow_fan_in": 1,
+      "score": 49.6
+    },
+    "bio-hi-c-analysis-hic-differential": {
+      "upstream_path": "hi-c-analysis/hic-differential",
+      "primary_tool": "cooltools",
+      "downloads": 367278,
+      "workflow_fan_in": 1,
+      "score": 49.9
+    },
+    "bio-hi-c-analysis-hic-visualization": {
+      "upstream_path": "hi-c-analysis/hic-visualization",
+      "primary_tool": "matplotlib",
+      "downloads": 43845600,
+      "workflow_fan_in": 1,
+      "score": 62.9
+    },
+    "bio-hi-c-analysis-hichip-plac-loops": {
+      "upstream_path": "hi-c-analysis/hichip-plac-loops",
+      "primary_tool": "fithichip",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-hi-c-analysis-loop-calling": {
+      "upstream_path": "hi-c-analysis/loop-calling",
+      "primary_tool": "cooltools",
+      "downloads": 367278,
+      "workflow_fan_in": 1,
+      "score": 49.9
+    },
+    "bio-hi-c-analysis-matrix-operations": {
+      "upstream_path": "hi-c-analysis/matrix-operations",
+      "primary_tool": "cooler",
+      "downloads": 325587,
+      "workflow_fan_in": 1,
+      "score": 49.6
+    },
+    "bio-hi-c-analysis-tad-detection": {
+      "upstream_path": "hi-c-analysis/tad-detection",
+      "primary_tool": "cooltools",
+      "downloads": 367278,
+      "workflow_fan_in": 1,
+      "score": 49.9
+    },
+    "bio-imaging-mass-cytometry-cell-segmentation": {
+      "upstream_path": "imaging-mass-cytometry/cell-segmentation",
+      "primary_tool": "deepcell",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-imaging-mass-cytometry-data-preprocessing": {
+      "upstream_path": "imaging-mass-cytometry/data-preprocessing",
+      "primary_tool": "steinbock",
+      "downloads": 2215,
+      "workflow_fan_in": 1,
+      "score": 36.0
+    },
+    "bio-imaging-mass-cytometry-differential-analysis": {
+      "upstream_path": "imaging-mass-cytometry/differential-analysis",
+      "primary_tool": "diffcyt",
+      "downloads": 26118,
+      "workflow_fan_in": 1,
+      "score": 42.7
+    },
+    "bio-imaging-mass-cytometry-interactive-annotation": {
+      "upstream_path": "imaging-mass-cytometry/interactive-annotation",
+      "primary_tool": "napari",
+      "downloads": 289770,
+      "workflow_fan_in": 1,
+      "score": 49.2
+    },
+    "bio-imaging-mass-cytometry-phenotyping": {
+      "upstream_path": "imaging-mass-cytometry/phenotyping",
+      "primary_tool": "scanpy",
+      "downloads": 577636,
+      "workflow_fan_in": 1,
+      "score": 51.1
+    },
+    "bio-imaging-mass-cytometry-quality-metrics": {
+      "upstream_path": "imaging-mass-cytometry/quality-metrics",
+      "primary_tool": "CATALYST",
+      "downloads": 27576,
+      "workflow_fan_in": 1,
+      "score": 42.8
+    },
+    "bio-imaging-mass-cytometry-spatial-analysis": {
+      "upstream_path": "imaging-mass-cytometry/spatial-analysis",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-immunoinformatics-epitope-prediction": {
+      "upstream_path": "immunoinformatics/epitope-prediction",
+      "primary_tool": "BepiPred",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-immunoinformatics-immunogenicity-scoring": {
+      "upstream_path": "immunoinformatics/immunogenicity-scoring",
+      "primary_tool": "NeoFox",
+      "downloads": 3053,
+      "workflow_fan_in": 1,
+      "score": 36.9
+    },
+    "bio-immunoinformatics-mhc-binding-prediction": {
+      "upstream_path": "immunoinformatics/mhc-binding-prediction",
+      "primary_tool": "mhcflurry",
+      "downloads": 46893,
+      "workflow_fan_in": 1,
+      "score": 44.3
+    },
+    "bio-immunoinformatics-mhc-class-ii-prediction": {
+      "upstream_path": "immunoinformatics/mhc-class-ii-prediction",
+      "primary_tool": "NetMHCIIpan",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-immunoinformatics-neoantigen-prediction": {
+      "upstream_path": "immunoinformatics/neoantigen-prediction",
+      "primary_tool": "pVACtools",
+      "downloads": 1659,
+      "workflow_fan_in": 1,
+      "score": 35.2
+    },
+    "bio-immunoinformatics-tcr-epitope-binding": {
+      "upstream_path": "immunoinformatics/tcr-epitope-binding",
+      "primary_tool": "tcrdist3",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-interaction-databases": {
+      "upstream_path": "database-access/interaction-databases",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-isoform-switching": {
+      "upstream_path": "alternative-splicing/isoform-switching",
+      "primary_tool": "IsoformSwitchAnalyzeR",
+      "downloads": 49283,
+      "workflow_fan_in": 1,
+      "score": 44.4
+    },
+    "bio-local-blast": {
+      "upstream_path": "database-access/local-blast",
+      "primary_tool": "BLAST+",
+      "downloads": 3402819,
+      "workflow_fan_in": 0,
+      "score": 40.9
+    },
+    "bio-long-read-sequencing-basecalling": {
+      "upstream_path": "long-read-sequencing/basecalling",
+      "primary_tool": "dorado",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-long-read-sequencing-clair3-variants": {
+      "upstream_path": "long-read-sequencing/clair3-variants",
+      "primary_tool": "Clair3",
+      "downloads": 87183,
+      "workflow_fan_in": 0,
+      "score": 30.9
+    },
+    "bio-long-read-sequencing-haplotype-phasing": {
+      "upstream_path": "long-read-sequencing/haplotype-phasing",
+      "primary_tool": "whatshap",
+      "downloads": 250858,
+      "workflow_fan_in": 0,
+      "score": 33.8
+    },
+    "bio-long-read-sequencing-isoseq-analysis": {
+      "upstream_path": "long-read-sequencing/isoseq-analysis",
+      "primary_tool": "SQANTI3",
+      "downloads": 554,
+      "workflow_fan_in": 0,
+      "score": 17.2
+    },
+    "bio-long-read-sequencing-long-read-alignment": {
+      "upstream_path": "long-read-sequencing/long-read-alignment",
+      "primary_tool": "minimap2",
+      "downloads": 1548585,
+      "workflow_fan_in": 1,
+      "score": 53.8
+    },
+    "bio-long-read-sequencing-long-read-qc": {
+      "upstream_path": "long-read-sequencing/long-read-qc",
+      "primary_tool": "nanoplot",
+      "downloads": 248235,
+      "workflow_fan_in": 2,
+      "score": 57.6
+    },
+    "bio-long-read-sequencing-medaka-polishing": {
+      "upstream_path": "long-read-sequencing/medaka-polishing",
+      "primary_tool": "medaka",
+      "downloads": 352089,
+      "workflow_fan_in": 0,
+      "score": 34.7
+    },
+    "bio-long-read-sequencing-nanopore-methylation": {
+      "upstream_path": "long-read-sequencing/nanopore-methylation",
+      "primary_tool": "modkit",
+      "downloads": 37894,
+      "workflow_fan_in": 0,
+      "score": 28.7
+    },
+    "bio-long-read-sequencing-structural-variants": {
+      "upstream_path": "long-read-sequencing/structural-variants",
+      "primary_tool": "sniffles",
+      "downloads": 94952,
+      "workflow_fan_in": 1,
+      "score": 46.2
+    },
+    "bio-long-read-splicing": {
+      "upstream_path": "alternative-splicing/long-read-splicing",
+      "primary_tool": "FLAIR",
+      "downloads": 21867,
+      "workflow_fan_in": 0,
+      "score": 27.2
+    },
+    "bio-longitudinal-monitoring": {
+      "upstream_path": "liquid-biopsy/longitudinal-monitoring",
+      "primary_tool": "pandas",
+      "downloads": 97404706,
+      "workflow_fan_in": 1,
+      "score": 65.1
+    },
+    "bio-machine-learning-atlas-mapping": {
+      "upstream_path": "machine-learning/atlas-mapping",
+      "primary_tool": "scvi-tools",
+      "downloads": 231119,
+      "workflow_fan_in": 0,
+      "score": 33.6
+    },
+    "bio-machine-learning-biomarker-discovery": {
+      "upstream_path": "machine-learning/biomarker-discovery",
+      "primary_tool": "boruta",
+      "downloads": 90115,
+      "workflow_fan_in": 1,
+      "score": 46.1
+    },
+    "bio-machine-learning-model-validation": {
+      "upstream_path": "machine-learning/model-validation",
+      "primary_tool": "sklearn",
+      "downloads": 52858187,
+      "workflow_fan_in": 1,
+      "score": 63.4
+    },
+    "bio-machine-learning-omics-classifiers": {
+      "upstream_path": "machine-learning/omics-classifiers",
+      "primary_tool": "sklearn",
+      "downloads": 52858187,
+      "workflow_fan_in": 1,
+      "score": 63.4
+    },
+    "bio-machine-learning-prediction-explanation": {
+      "upstream_path": "machine-learning/prediction-explanation",
+      "primary_tool": "shap",
+      "downloads": 10498322,
+      "workflow_fan_in": 1,
+      "score": 59.0
+    },
+    "bio-machine-learning-survival-analysis": {
+      "upstream_path": "machine-learning/survival-analysis",
+      "primary_tool": "scikit-survival",
+      "downloads": 410670,
+      "workflow_fan_in": 0,
+      "score": 35.1
+    },
+    "bio-metabolomics-isotope-tracing": {
+      "upstream_path": "metabolomics/isotope-tracing",
+      "primary_tool": "isocor",
+      "downloads": 21461,
+      "workflow_fan_in": 0,
+      "score": 27.1
+    },
+    "bio-metabolomics-lipidomics": {
+      "upstream_path": "metabolomics/lipidomics",
+      "primary_tool": "lipidr",
+      "downloads": 18720,
+      "workflow_fan_in": 1,
+      "score": 41.8
+    },
+    "bio-metabolomics-metabolite-annotation": {
+      "upstream_path": "metabolomics/metabolite-annotation",
+      "primary_tool": "matchms",
+      "downloads": 116394,
+      "workflow_fan_in": 1,
+      "score": 46.8
+    },
+    "bio-metabolomics-msdial-preprocessing": {
+      "upstream_path": "metabolomics/msdial-preprocessing",
+      "primary_tool": "msdial",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-metabolomics-normalization-qc": {
+      "upstream_path": "metabolomics/normalization-qc",
+      "primary_tool": "pmp",
+      "downloads": 16474,
+      "workflow_fan_in": 1,
+      "score": 41.4
+    },
+    "bio-metabolomics-pathway-mapping": {
+      "upstream_path": "metabolomics/pathway-mapping",
+      "primary_tool": "MetaboAnalystR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-metabolomics-statistical-analysis": {
+      "upstream_path": "metabolomics/statistical-analysis",
+      "primary_tool": "ropls",
+      "downloads": 83092,
+      "workflow_fan_in": 1,
+      "score": 45.8
+    },
+    "bio-metabolomics-targeted-analysis": {
+      "upstream_path": "metabolomics/targeted-analysis",
+      "primary_tool": "skyline",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-metabolomics-xcms-preprocessing": {
+      "upstream_path": "metabolomics/xcms-preprocessing",
+      "primary_tool": "xcms",
+      "downloads": 122559,
+      "workflow_fan_in": 1,
+      "score": 46.9
+    },
+    "bio-metagenomics-abundance": {
+      "upstream_path": "metagenomics/abundance-estimation",
+      "primary_tool": "Bracken",
+      "downloads": 128136,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-metagenomics-amr-detection": {
+      "upstream_path": "metagenomics/amr-detection",
+      "primary_tool": "AMRFinderPlus",
+      "downloads": 214578,
+      "workflow_fan_in": 0,
+      "score": 33.4
+    },
+    "bio-metagenomics-contamination-controls": {
+      "upstream_path": "metagenomics/contamination-controls",
+      "primary_tool": "decontam",
+      "downloads": 228219,
+      "workflow_fan_in": 1,
+      "score": 48.6
+    },
+    "bio-metagenomics-functional-profiling": {
+      "upstream_path": "metagenomics/functional-profiling",
+      "primary_tool": "HUMAnN",
+      "downloads": 196292,
+      "workflow_fan_in": 1,
+      "score": 48.2
+    },
+    "bio-metagenomics-kraken": {
+      "upstream_path": "metagenomics/kraken-classification",
+      "primary_tool": "Kraken2",
+      "downloads": 227938,
+      "workflow_fan_in": 1,
+      "score": 48.6
+    },
+    "bio-metagenomics-metaphlan": {
+      "upstream_path": "metagenomics/metaphlan-profiling",
+      "primary_tool": "MetaPhlAn",
+      "downloads": 451203,
+      "workflow_fan_in": 1,
+      "score": 50.4
+    },
+    "bio-metagenomics-strain-tracking": {
+      "upstream_path": "metagenomics/strain-tracking",
+      "primary_tool": "inStrain",
+      "downloads": 104631,
+      "workflow_fan_in": 0,
+      "score": 31.4
+    },
+    "bio-metagenomics-visualization": {
+      "upstream_path": "metagenomics/metagenome-visualization",
+      "primary_tool": "phyloseq",
+      "downloads": 307082,
+      "workflow_fan_in": 1,
+      "score": 49.4
+    },
+    "bio-methylation-array-preprocessing": {
+      "upstream_path": "methylation-analysis/array-preprocessing",
+      "primary_tool": "sesame",
+      "downloads": 31304,
+      "workflow_fan_in": 0,
+      "score": 28.1
+    },
+    "bio-methylation-array-qc-filtering": {
+      "upstream_path": "methylation-analysis/array-qc-filtering",
+      "primary_tool": "minfi",
+      "downloads": 76360,
+      "workflow_fan_in": 0,
+      "score": 30.6
+    },
+    "bio-methylation-based-detection": {
+      "upstream_path": "liquid-biopsy/methylation-based-detection",
+      "primary_tool": "MethylDackel",
+      "downloads": 70027,
+      "workflow_fan_in": 1,
+      "score": 45.4
+    },
+    "bio-methylation-bismark-alignment": {
+      "upstream_path": "methylation-analysis/bismark-alignment",
+      "primary_tool": "Bismark",
+      "downloads": 127210,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-methylation-calling": {
+      "upstream_path": "methylation-analysis/methylation-calling",
+      "primary_tool": "Bismark",
+      "downloads": 127210,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-methylation-cell-type-deconvolution": {
+      "upstream_path": "methylation-analysis/cell-type-deconvolution",
+      "primary_tool": "EpiDISH",
+      "downloads": 30419,
+      "workflow_fan_in": 0,
+      "score": 28.1
+    },
+    "bio-methylation-differential-cpg": {
+      "upstream_path": "methylation-analysis/differential-cpg-testing",
+      "primary_tool": "limma",
+      "downloads": 941568,
+      "workflow_fan_in": 1,
+      "score": 52.4
+    },
+    "bio-methylation-dmr-detection": {
+      "upstream_path": "methylation-analysis/dmr-detection",
+      "primary_tool": "dmrseq",
+      "downloads": 32957,
+      "workflow_fan_in": 1,
+      "score": 43.3
+    },
+    "bio-methylation-epigenetic-clocks": {
+      "upstream_path": "methylation-analysis/epigenetic-clocks",
+      "primary_tool": "methylclock",
+      "downloads": 13925,
+      "workflow_fan_in": 0,
+      "score": 25.9
+    },
+    "bio-methylation-ewas-design": {
+      "upstream_path": "methylation-analysis/ewas-design",
+      "primary_tool": "meffil",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-methylation-methylkit": {
+      "upstream_path": "methylation-analysis/methylkit-analysis",
+      "primary_tool": "methylKit",
+      "downloads": 82722,
+      "workflow_fan_in": 1,
+      "score": 45.8
+    },
+    "bio-microbiome-amplicon-processing": {
+      "upstream_path": "microbiome/amplicon-processing",
+      "primary_tool": "DADA2",
+      "downloads": 723951,
+      "workflow_fan_in": 1,
+      "score": 51.7
+    },
+    "bio-microbiome-differential-abundance": {
+      "upstream_path": "microbiome/differential-abundance",
+      "primary_tool": "ALDEx2",
+      "downloads": 53365,
+      "workflow_fan_in": 1,
+      "score": 44.6
+    },
+    "bio-microbiome-diversity-analysis": {
+      "upstream_path": "microbiome/diversity-analysis",
+      "primary_tool": "phyloseq",
+      "downloads": 307082,
+      "workflow_fan_in": 1,
+      "score": 49.4
+    },
+    "bio-microbiome-functional-prediction": {
+      "upstream_path": "microbiome/functional-prediction",
+      "primary_tool": "PICRUSt2",
+      "downloads": 70744,
+      "workflow_fan_in": 1,
+      "score": 45.4
+    },
+    "bio-microbiome-qiime2-workflow": {
+      "upstream_path": "microbiome/qiime2-workflow",
+      "primary_tool": "QIIME2",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-microbiome-taxonomy-assignment": {
+      "upstream_path": "microbiome/taxonomy-assignment",
+      "primary_tool": "DADA2",
+      "downloads": 723951,
+      "workflow_fan_in": 1,
+      "score": 51.7
+    },
+    "bio-ml-docking-rescoring": {
+      "upstream_path": "chemoinformatics/ml-docking-rescoring",
+      "primary_tool": "DiffDock",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-molecular-descriptors": {
+      "upstream_path": "chemoinformatics/molecular-descriptors",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-molecular-io": {
+      "upstream_path": "chemoinformatics/molecular-io",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-molecular-standardization": {
+      "upstream_path": "chemoinformatics/molecular-standardization",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-motif-search": {
+      "upstream_path": "sequence-manipulation/motif-search",
+      "primary_tool": "Bio.motifs",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-multi-omics-data-harmonization": {
+      "upstream_path": "multi-omics-integration/data-harmonization",
+      "primary_tool": "MultiAssayExperiment",
+      "downloads": 233734,
+      "workflow_fan_in": 1,
+      "score": 48.7
+    },
+    "bio-multi-omics-integration-design": {
+      "upstream_path": "multi-omics-integration/integration-design",
+      "primary_tool": "MultiAssayExperiment",
+      "downloads": 233734,
+      "workflow_fan_in": 1,
+      "score": 48.7
+    },
+    "bio-multi-omics-mixomics-analysis": {
+      "upstream_path": "multi-omics-integration/mixomics-analysis",
+      "primary_tool": "mixOmics",
+      "downloads": 113151,
+      "workflow_fan_in": 1,
+      "score": 46.7
+    },
+    "bio-multi-omics-mofa-integration": {
+      "upstream_path": "multi-omics-integration/mofa-integration",
+      "primary_tool": "MOFA2",
+      "downloads": 23252,
+      "workflow_fan_in": 1,
+      "score": 42.4
+    },
+    "bio-multi-omics-similarity-network": {
+      "upstream_path": "multi-omics-integration/similarity-network",
+      "primary_tool": "SNFtool",
+      "downloads": 125615,
+      "workflow_fan_in": 1,
+      "score": 47.0
+    },
+    "bio-ncbi-datasets-cli": {
+      "upstream_path": "database-access/ncbi-datasets-cli",
+      "primary_tool": "NCBI Datasets CLI",
+      "downloads": 1379165,
+      "workflow_fan_in": 0,
+      "score": 38.4
+    },
+    "bio-ortholog-inference": {
+      "upstream_path": "database-access/ortholog-inference",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-outlier-splicing-detection": {
+      "upstream_path": "alternative-splicing/outlier-splicing-detection",
+      "primary_tool": "FRASER",
+      "downloads": 69404,
+      "workflow_fan_in": 0,
+      "score": 30.3
+    },
+    "bio-paired-end-fastq": {
+      "upstream_path": "sequence-io/paired-end-fastq",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-pathway-enrichment-visualization": {
+      "upstream_path": "pathway-analysis/enrichment-visualization",
+      "primary_tool": "enrichplot",
+      "downloads": 169354,
+      "workflow_fan_in": 1,
+      "score": 47.8
+    },
+    "bio-pathway-go-enrichment": {
+      "upstream_path": "pathway-analysis/go-enrichment",
+      "primary_tool": "clusterProfiler",
+      "downloads": 204868,
+      "workflow_fan_in": 2,
+      "score": 57.1
+    },
+    "bio-pathway-gsea": {
+      "upstream_path": "pathway-analysis/gsea",
+      "primary_tool": "clusterProfiler",
+      "downloads": 204868,
+      "workflow_fan_in": 1,
+      "score": 48.3
+    },
+    "bio-pathway-kegg-pathways": {
+      "upstream_path": "pathway-analysis/kegg-pathways",
+      "primary_tool": "clusterProfiler",
+      "downloads": 204868,
+      "workflow_fan_in": 1,
+      "score": 48.3
+    },
+    "bio-pathway-reactome": {
+      "upstream_path": "pathway-analysis/reactome-pathways",
+      "primary_tool": "ReactomePA",
+      "downloads": 49022,
+      "workflow_fan_in": 1,
+      "score": 44.4
+    },
+    "bio-pathway-wikipathways": {
+      "upstream_path": "pathway-analysis/wikipathways",
+      "primary_tool": "rWikiPathways",
+      "downloads": 31453,
+      "workflow_fan_in": 1,
+      "score": 43.2
+    },
+    "bio-pharmacophore-modeling": {
+      "upstream_path": "chemoinformatics/pharmacophore-modeling",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-phasing-imputation-genotype-imputation": {
+      "upstream_path": "phasing-imputation/genotype-imputation",
+      "primary_tool": "Beagle",
+      "downloads": 48259,
+      "workflow_fan_in": 1,
+      "score": 44.4
+    },
+    "bio-phasing-imputation-haplotype-phasing": {
+      "upstream_path": "phasing-imputation/haplotype-phasing",
+      "primary_tool": "SHAPEIT5",
+      "downloads": 8250,
+      "workflow_fan_in": 1,
+      "score": 39.6
+    },
+    "bio-phasing-imputation-imputation-qc": {
+      "upstream_path": "phasing-imputation/imputation-qc",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 1,
+      "score": 56.8
+    },
+    "bio-phasing-imputation-reference-panels": {
+      "upstream_path": "phasing-imputation/reference-panels",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 1,
+      "score": 56.8
+    },
+    "bio-phylo-bayesian-inference": {
+      "upstream_path": "phylogenetics/bayesian-inference",
+      "primary_tool": "MrBayes",
+      "downloads": 34156,
+      "workflow_fan_in": 0,
+      "score": 28.4
+    },
+    "bio-phylo-distance-calculations": {
+      "upstream_path": "phylogenetics/distance-calculations",
+      "primary_tool": "Bio.Phylo.TreeConstruction",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-phylo-divergence-dating": {
+      "upstream_path": "phylogenetics/divergence-dating",
+      "primary_tool": "BEAST2",
+      "downloads": 45645,
+      "workflow_fan_in": 0,
+      "score": 29.2
+    },
+    "bio-phylo-modern-tree-inference": {
+      "upstream_path": "phylogenetics/modern-tree-inference",
+      "primary_tool": "IQ-TREE2",
+      "downloads": 1146232,
+      "workflow_fan_in": 0,
+      "score": 37.9
+    },
+    "bio-phylo-species-trees": {
+      "upstream_path": "phylogenetics/species-trees",
+      "primary_tool": "ASTRAL-III",
+      "downloads": 6769,
+      "workflow_fan_in": 0,
+      "score": 24.0
+    },
+    "bio-phylo-tree-io": {
+      "upstream_path": "phylogenetics/tree-io",
+      "primary_tool": "Bio.Phylo",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-phylo-tree-manipulation": {
+      "upstream_path": "phylogenetics/tree-manipulation",
+      "primary_tool": "Bio.Phylo",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-phylo-tree-visualization": {
+      "upstream_path": "phylogenetics/tree-visualization",
+      "primary_tool": "Bio.Phylo",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-pileup-generation": {
+      "upstream_path": "alignment-files/pileup-generation",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-population-genetics-association-testing": {
+      "upstream_path": "population-genetics/association-testing",
+      "primary_tool": "plink2",
+      "downloads": 121665,
+      "workflow_fan_in": 1,
+      "score": 46.9
+    },
+    "bio-population-genetics-linkage-disequilibrium": {
+      "upstream_path": "population-genetics/linkage-disequilibrium",
+      "primary_tool": "plink2",
+      "downloads": 121665,
+      "workflow_fan_in": 1,
+      "score": 46.9
+    },
+    "bio-population-genetics-plink-basics": {
+      "upstream_path": "population-genetics/plink-basics",
+      "primary_tool": "plink",
+      "downloads": 192453,
+      "workflow_fan_in": 1,
+      "score": 48.1
+    },
+    "bio-population-genetics-population-structure": {
+      "upstream_path": "population-genetics/population-structure",
+      "primary_tool": "plink2",
+      "downloads": 121665,
+      "workflow_fan_in": 1,
+      "score": 46.9
+    },
+    "bio-population-genetics-rare-variant-association": {
+      "upstream_path": "population-genetics/rare-variant-association",
+      "primary_tool": "regenie",
+      "downloads": 88512,
+      "workflow_fan_in": 1,
+      "score": 46.0
+    },
+    "bio-population-genetics-scikit-allel-analysis": {
+      "upstream_path": "population-genetics/scikit-allel-analysis",
+      "primary_tool": "scikit-allel",
+      "downloads": 2147852,
+      "workflow_fan_in": 0,
+      "score": 39.6
+    },
+    "bio-population-genetics-selection-statistics": {
+      "upstream_path": "population-genetics/selection-statistics",
+      "primary_tool": "scikit-allel",
+      "downloads": 2147852,
+      "workflow_fan_in": 0,
+      "score": 39.6
+    },
+    "bio-pose-validation": {
+      "upstream_path": "chemoinformatics/pose-validation",
+      "primary_tool": "PoseBusters",
+      "downloads": 34825,
+      "workflow_fan_in": 0,
+      "score": 28.4
+    },
+    "bio-primer-design-primer-basics": {
+      "upstream_path": "primer-design/primer-basics",
+      "primary_tool": "primer3-py",
+      "downloads": 208592,
+      "workflow_fan_in": 0,
+      "score": 33.3
+    },
+    "bio-primer-design-primer-specificity": {
+      "upstream_path": "primer-design/primer-specificity",
+      "primary_tool": "mfeprimer",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-primer-design-primer-validation": {
+      "upstream_path": "primer-design/primer-validation",
+      "primary_tool": "primer3-py",
+      "downloads": 208592,
+      "workflow_fan_in": 0,
+      "score": 33.3
+    },
+    "bio-primer-design-qpcr-primers": {
+      "upstream_path": "primer-design/qpcr-primers",
+      "primary_tool": "primer3-py",
+      "downloads": 208592,
+      "workflow_fan_in": 0,
+      "score": 33.3
+    },
+    "bio-protac-degraders": {
+      "upstream_path": "chemoinformatics/protac-degraders",
+      "primary_tool": "PRosettaC",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-proteomics-data-import": {
+      "upstream_path": "proteomics/data-import",
+      "primary_tool": "pyOpenMS",
+      "downloads": 67793,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-proteomics-dia-analysis": {
+      "upstream_path": "proteomics/dia-analysis",
+      "primary_tool": "diann",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-proteomics-differential-abundance": {
+      "upstream_path": "proteomics/differential-abundance",
+      "primary_tool": "limma",
+      "downloads": 941568,
+      "workflow_fan_in": 1,
+      "score": 52.4
+    },
+    "bio-proteomics-peptide-identification": {
+      "upstream_path": "proteomics/peptide-identification",
+      "primary_tool": "pyOpenMS",
+      "downloads": 67793,
+      "workflow_fan_in": 0,
+      "score": 30.2
+    },
+    "bio-proteomics-protein-inference": {
+      "upstream_path": "proteomics/protein-inference",
+      "primary_tool": "pyOpenMS",
+      "downloads": 67793,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-proteomics-proteomics-qc": {
+      "upstream_path": "proteomics/proteomics-qc",
+      "primary_tool": "pandas",
+      "downloads": 97404706,
+      "workflow_fan_in": 1,
+      "score": 65.1
+    },
+    "bio-proteomics-ptm-analysis": {
+      "upstream_path": "proteomics/ptm-analysis",
+      "primary_tool": "MSstatsPTM",
+      "downloads": 14896,
+      "workflow_fan_in": 0,
+      "score": 26.1
+    },
+    "bio-proteomics-quantification": {
+      "upstream_path": "proteomics/quantification",
+      "primary_tool": "MSstats",
+      "downloads": 56745,
+      "workflow_fan_in": 1,
+      "score": 44.8
+    },
+    "bio-proteomics-spectral-libraries": {
+      "upstream_path": "proteomics/spectral-libraries",
+      "primary_tool": "encyclopedia",
+      "downloads": 15729,
+      "workflow_fan_in": 0,
+      "score": 26.3
+    },
+    "bio-qsar-modeling": {
+      "upstream_path": "chemoinformatics/qsar-modeling",
+      "primary_tool": "chemprop",
+      "downloads": 75177,
+      "workflow_fan_in": 0,
+      "score": 30.5
+    },
+    "bio-reaction-enumeration": {
+      "upstream_path": "chemoinformatics/reaction-enumeration",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-read-alignment-bowtie2-alignment": {
+      "upstream_path": "read-alignment/bowtie2-alignment",
+      "primary_tool": "bowtie2",
+      "downloads": 3899449,
+      "workflow_fan_in": 2,
+      "score": 65.1
+    },
+    "bio-read-alignment-bwa-alignment": {
+      "upstream_path": "read-alignment/bwa-alignment",
+      "primary_tool": "bwa-mem2",
+      "downloads": 146226,
+      "workflow_fan_in": 2,
+      "score": 56.2
+    },
+    "bio-read-alignment-hisat2-alignment": {
+      "upstream_path": "read-alignment/hisat2-alignment",
+      "primary_tool": "HISAT2",
+      "downloads": 460240,
+      "workflow_fan_in": 0,
+      "score": 35.4
+    },
+    "bio-read-alignment-star-alignment": {
+      "upstream_path": "read-alignment/star-alignment",
+      "primary_tool": "STAR",
+      "downloads": 1782742,
+      "workflow_fan_in": 3,
+      "score": 69.2
+    },
+    "bio-read-qc-adapter-trimming": {
+      "upstream_path": "read-qc/adapter-trimming",
+      "primary_tool": "cutadapt",
+      "downloads": 1588237,
+      "workflow_fan_in": 1,
+      "score": 53.9
+    },
+    "bio-read-qc-contamination-screening": {
+      "upstream_path": "read-qc/contamination-screening",
+      "primary_tool": "fastq_screen",
+      "downloads": 87356,
+      "workflow_fan_in": 0,
+      "score": 30.9
+    },
+    "bio-read-qc-fastp-workflow": {
+      "upstream_path": "read-qc/fastp-workflow",
+      "primary_tool": "fastp",
+      "downloads": 828712,
+      "workflow_fan_in": 9,
+      "score": 87.0
+    },
+    "bio-read-qc-quality-filtering": {
+      "upstream_path": "read-qc/quality-filtering",
+      "primary_tool": "trimmomatic",
+      "downloads": 448596,
+      "workflow_fan_in": 0,
+      "score": 35.4
+    },
+    "bio-read-qc-quality-reports": {
+      "upstream_path": "read-qc/quality-reports",
+      "primary_tool": "fastqc",
+      "downloads": 1512199,
+      "workflow_fan_in": 1,
+      "score": 53.7
+    },
+    "bio-read-qc-rnaseq-qc": {
+      "upstream_path": "read-qc/rnaseq-qc",
+      "primary_tool": "RSeQC",
+      "downloads": 189482,
+      "workflow_fan_in": 1,
+      "score": 48.1
+    },
+    "bio-read-qc-umi-processing": {
+      "upstream_path": "read-qc/umi-processing",
+      "primary_tool": "umi_tools",
+      "downloads": 282316,
+      "workflow_fan_in": 0,
+      "score": 34.1
+    },
+    "bio-read-sequences": {
+      "upstream_path": "sequence-io/read-sequences",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-reference-operations": {
+      "upstream_path": "alignment-files/reference-operations",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-remote-homology": {
+      "upstream_path": "database-access/remote-homology",
+      "primary_tool": "HMMER",
+      "downloads": 2615518,
+      "workflow_fan_in": 0,
+      "score": 40.2
+    },
+    "bio-reporting-automated-qc-reports": {
+      "upstream_path": "reporting/automated-qc-reports",
+      "primary_tool": "multiqc",
+      "downloads": 934491,
+      "workflow_fan_in": 0,
+      "score": 37.4
+    },
+    "bio-reporting-figure-export": {
+      "upstream_path": "reporting/figure-export",
+      "primary_tool": "matplotlib",
+      "downloads": 43845600,
+      "workflow_fan_in": 0,
+      "score": 47.8
+    },
+    "bio-reporting-jupyter-reports": {
+      "upstream_path": "reporting/jupyter-reports",
+      "primary_tool": "papermill",
+      "downloads": 1143034,
+      "workflow_fan_in": 0,
+      "score": 37.9
+    },
+    "bio-reporting-publication-tables": {
+      "upstream_path": "reporting/publication-tables",
+      "primary_tool": "gtsummary",
+      "downloads": 197777,
+      "workflow_fan_in": 0,
+      "score": 33.1
+    },
+    "bio-reporting-quarto-reports": {
+      "upstream_path": "reporting/quarto-reports",
+      "primary_tool": "Quarto",
+      "downloads": 260661,
+      "workflow_fan_in": 0,
+      "score": 33.9
+    },
+    "bio-reporting-rmarkdown-reports": {
+      "upstream_path": "reporting/rmarkdown-reports",
+      "primary_tool": "rmarkdown",
+      "downloads": 3761133,
+      "workflow_fan_in": 0,
+      "score": 41.2
+    },
+    "bio-restriction-enzyme-selection": {
+      "upstream_path": "restriction-analysis/enzyme-selection",
+      "primary_tool": "Bio.Restriction",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-restriction-fragment-analysis": {
+      "upstream_path": "restriction-analysis/fragment-analysis",
+      "primary_tool": "Bio.Restriction",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-restriction-golden-gate-assembly": {
+      "upstream_path": "restriction-analysis/golden-gate-assembly",
+      "primary_tool": "Bio.Restriction",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-restriction-mapping": {
+      "upstream_path": "restriction-analysis/restriction-mapping",
+      "primary_tool": "Bio.Restriction",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-restriction-sites": {
+      "upstream_path": "restriction-analysis/restriction-sites",
+      "primary_tool": "Bio.Restriction",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-retrosynthesis": {
+      "upstream_path": "chemoinformatics/retrosynthesis",
+      "primary_tool": "AiZynthFinder",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-reverse-complement": {
+      "upstream_path": "sequence-manipulation/reverse-complement",
+      "primary_tool": "Bio.Seq",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-ribo-seq-initiation-site-mapping": {
+      "upstream_path": "ribo-seq/initiation-site-mapping",
+      "primary_tool": "Ribo-TISH",
+      "downloads": 28569,
+      "workflow_fan_in": 1,
+      "score": 42.9
+    },
+    "bio-ribo-seq-orf-detection": {
+      "upstream_path": "ribo-seq/orf-detection",
+      "primary_tool": "RiboCode",
+      "downloads": 47940,
+      "workflow_fan_in": 1,
+      "score": 44.3
+    },
+    "bio-ribo-seq-riboseq-preprocessing": {
+      "upstream_path": "ribo-seq/riboseq-preprocessing",
+      "primary_tool": "STAR",
+      "downloads": 1782742,
+      "workflow_fan_in": 1,
+      "score": 54.2
+    },
+    "bio-ribo-seq-ribosome-periodicity": {
+      "upstream_path": "ribo-seq/ribosome-periodicity",
+      "primary_tool": "riboWaltz",
+      "downloads": 5650,
+      "workflow_fan_in": 1,
+      "score": 38.5
+    },
+    "bio-ribo-seq-ribosome-stalling": {
+      "upstream_path": "ribo-seq/ribosome-stalling",
+      "primary_tool": "Plastid",
+      "downloads": 42501,
+      "workflow_fan_in": 1,
+      "score": 44.0
+    },
+    "bio-ribo-seq-translation-efficiency": {
+      "upstream_path": "ribo-seq/translation-efficiency",
+      "primary_tool": "riborex",
+      "downloads": 8577,
+      "workflow_fan_in": 1,
+      "score": 39.7
+    },
+    "bio-rna-quantification-alignment-free-quant": {
+      "upstream_path": "rna-quantification/alignment-free-quant",
+      "primary_tool": "salmon",
+      "downloads": 849686,
+      "workflow_fan_in": 2,
+      "score": 61.0
+    },
+    "bio-rna-quantification-count-matrix-qc": {
+      "upstream_path": "rna-quantification/count-matrix-qc",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 1,
+      "score": 51.9
+    },
+    "bio-rna-quantification-featurecounts-counting": {
+      "upstream_path": "rna-quantification/featurecounts-counting",
+      "primary_tool": "featureCounts",
+      "downloads": 448263,
+      "workflow_fan_in": 0,
+      "score": 35.4
+    },
+    "bio-rna-quantification-tximport-workflow": {
+      "upstream_path": "rna-quantification/tximport-workflow",
+      "primary_tool": "tximport",
+      "downloads": 212653,
+      "workflow_fan_in": 2,
+      "score": 57.2
+    },
+    "bio-rna-structure-covariation-analysis": {
+      "upstream_path": "rna-structure/covariation-analysis",
+      "primary_tool": "R-scape",
+      "downloads": 157893,
+      "workflow_fan_in": 0,
+      "score": 32.5
+    },
+    "bio-rna-structure-ncrna-search": {
+      "upstream_path": "rna-structure/ncrna-search",
+      "primary_tool": "Infernal",
+      "downloads": 441595,
+      "workflow_fan_in": 0,
+      "score": 35.3
+    },
+    "bio-rna-structure-secondary-structure-prediction": {
+      "upstream_path": "rna-structure/secondary-structure-prediction",
+      "primary_tool": "ViennaRNA",
+      "downloads": 1503058,
+      "workflow_fan_in": 0,
+      "score": 38.7
+    },
+    "bio-rna-structure-structure-probing": {
+      "upstream_path": "rna-structure/structure-probing",
+      "primary_tool": "ShapeMapper2",
+      "downloads": 6170,
+      "workflow_fan_in": 0,
+      "score": 23.7
+    },
+    "bio-sam-bam-basics": {
+      "upstream_path": "alignment-files/sam-bam-basics",
+      "primary_tool": "samtools",
+      "downloads": 9767134,
+      "workflow_fan_in": 0,
+      "score": 43.7
+    },
+    "bio-sashimi-plots": {
+      "upstream_path": "alternative-splicing/sashimi-plots",
+      "primary_tool": "ggsashimi",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-scaffold-analysis": {
+      "upstream_path": "chemoinformatics/scaffold-analysis",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-seq-objects": {
+      "upstream_path": "sequence-manipulation/seq-objects",
+      "primary_tool": "Bio.Seq",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-sequence-properties": {
+      "upstream_path": "sequence-manipulation/sequence-properties",
+      "primary_tool": "Bio.SeqUtils",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-sequence-slicing": {
+      "upstream_path": "sequence-manipulation/sequence-slicing",
+      "primary_tool": "Bio.Seq",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-sequence-statistics": {
+      "upstream_path": "sequence-io/sequence-statistics",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-shape-similarity": {
+      "upstream_path": "chemoinformatics/shape-similarity",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-similarity-searching": {
+      "upstream_path": "chemoinformatics/similarity-searching",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-single-cell-batch-integration": {
+      "upstream_path": "single-cell/batch-integration",
+      "primary_tool": "Harmony",
+      "downloads": 70131,
+      "workflow_fan_in": 0,
+      "score": 30.3
+    },
+    "bio-single-cell-cell-annotation": {
+      "upstream_path": "single-cell/cell-annotation",
+      "primary_tool": "CellTypist",
+      "downloads": 95107,
+      "workflow_fan_in": 0,
+      "score": 31.2
+    },
+    "bio-single-cell-cell-communication": {
+      "upstream_path": "single-cell/cell-communication",
+      "primary_tool": "LIANA",
+      "downloads": 4957,
+      "workflow_fan_in": 0,
+      "score": 23.1
+    },
+    "bio-single-cell-clustering": {
+      "upstream_path": "single-cell/clustering",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 3,
+      "score": 66.3
+    },
+    "bio-single-cell-cnv-inference": {
+      "upstream_path": "single-cell/cnv-inference",
+      "primary_tool": "inferCNV",
+      "downloads": 32442,
+      "workflow_fan_in": 0,
+      "score": 28.2
+    },
+    "bio-single-cell-data-io": {
+      "upstream_path": "single-cell/data-io",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 2,
+      "score": 60.0
+    },
+    "bio-single-cell-differential-abundance": {
+      "upstream_path": "single-cell/differential-abundance",
+      "primary_tool": "Milo",
+      "downloads": 15813,
+      "workflow_fan_in": 0,
+      "score": 26.3
+    },
+    "bio-single-cell-doublet-detection": {
+      "upstream_path": "single-cell/doublet-detection",
+      "primary_tool": "scDblFinder",
+      "downloads": 43309,
+      "workflow_fan_in": 1,
+      "score": 44.1
+    },
+    "bio-single-cell-hashing-demultiplexing": {
+      "upstream_path": "single-cell/hashing-demultiplexing",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 0,
+      "score": 36.2
+    },
+    "bio-single-cell-lineage-tracing": {
+      "upstream_path": "single-cell/lineage-tracing",
+      "primary_tool": "Cassiopeia",
+      "downloads": 5058,
+      "workflow_fan_in": 0,
+      "score": 23.2
+    },
+    "bio-single-cell-markers-annotation": {
+      "upstream_path": "single-cell/markers-annotation",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 1,
+      "score": 51.2
+    },
+    "bio-single-cell-metabolite-communication": {
+      "upstream_path": "single-cell/metabolite-communication",
+      "primary_tool": "MeboCost",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-single-cell-multimodal-integration": {
+      "upstream_path": "single-cell/multimodal-integration",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 1,
+      "score": 51.2
+    },
+    "bio-single-cell-perturb-seq": {
+      "upstream_path": "single-cell/perturb-seq",
+      "primary_tool": "Pertpy",
+      "downloads": 11314,
+      "workflow_fan_in": 0,
+      "score": 25.4
+    },
+    "bio-single-cell-preprocessing": {
+      "upstream_path": "single-cell/preprocessing",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 2,
+      "score": 60.0
+    },
+    "bio-single-cell-scatac-analysis": {
+      "upstream_path": "single-cell/scatac-analysis",
+      "primary_tool": "Signac",
+      "downloads": 231435,
+      "workflow_fan_in": 1,
+      "score": 48.6
+    },
+    "bio-single-cell-splicing": {
+      "upstream_path": "alternative-splicing/single-cell-splicing",
+      "primary_tool": "MARVEL",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-single-cell-trajectory-inference": {
+      "upstream_path": "single-cell/trajectory-inference",
+      "primary_tool": "Monocle3",
+      "downloads": 47345,
+      "workflow_fan_in": 0,
+      "score": 29.3
+    },
+    "bio-small-rna-seq-differential-mirna": {
+      "upstream_path": "small-rna-seq/differential-mirna",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 1,
+      "score": 51.9
+    },
+    "bio-small-rna-seq-mirdeep2-analysis": {
+      "upstream_path": "small-rna-seq/mirdeep2-analysis",
+      "primary_tool": "miRDeep2",
+      "downloads": 47665,
+      "workflow_fan_in": 1,
+      "score": 44.3
+    },
+    "bio-small-rna-seq-mirge3-analysis": {
+      "upstream_path": "small-rna-seq/mirge3-analysis",
+      "primary_tool": "miRge3",
+      "downloads": 28550,
+      "workflow_fan_in": 1,
+      "score": 42.9
+    },
+    "bio-small-rna-seq-smrna-preprocessing": {
+      "upstream_path": "small-rna-seq/smrna-preprocessing",
+      "primary_tool": "cutadapt",
+      "downloads": 1588237,
+      "workflow_fan_in": 1,
+      "score": 53.9
+    },
+    "bio-small-rna-seq-target-prediction": {
+      "upstream_path": "small-rna-seq/target-prediction",
+      "primary_tool": "miRanda",
+      "downloads": 17890,
+      "workflow_fan_in": 1,
+      "score": 41.7
+    },
+    "bio-small-rna-seq-trf-pirna-profiling": {
+      "upstream_path": "small-rna-seq/trf-pirna-profiling",
+      "primary_tool": "MINTmap",
+      "downloads": 11029,
+      "workflow_fan_in": 1,
+      "score": 40.4
+    },
+    "bio-spatial-transcriptomics-high-resolution-binning": {
+      "upstream_path": "spatial-transcriptomics/high-resolution-binning",
+      "primary_tool": "bin2cell",
+      "downloads": 1130,
+      "workflow_fan_in": 0,
+      "score": 19.1
+    },
+    "bio-spatial-transcriptomics-image-analysis": {
+      "upstream_path": "spatial-transcriptomics/image-analysis",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-spatial-transcriptomics-spatial-communication": {
+      "upstream_path": "spatial-transcriptomics/spatial-communication",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 0,
+      "score": 30.3
+    },
+    "bio-spatial-transcriptomics-spatial-data-io": {
+      "upstream_path": "spatial-transcriptomics/spatial-data-io",
+      "primary_tool": "spatialdata",
+      "downloads": 53828,
+      "workflow_fan_in": 1,
+      "score": 44.7
+    },
+    "bio-spatial-transcriptomics-spatial-deconvolution": {
+      "upstream_path": "spatial-transcriptomics/spatial-deconvolution",
+      "primary_tool": "cell2location",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-spatial-transcriptomics-spatial-domains": {
+      "upstream_path": "spatial-transcriptomics/spatial-domains",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-spatial-transcriptomics-spatial-multiomics": {
+      "upstream_path": "spatial-transcriptomics/spatial-multiomics",
+      "primary_tool": "muon",
+      "downloads": 45270,
+      "workflow_fan_in": 0,
+      "score": 29.1
+    },
+    "bio-spatial-transcriptomics-spatial-neighbors": {
+      "upstream_path": "spatial-transcriptomics/spatial-neighbors",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-spatial-transcriptomics-spatial-preprocessing": {
+      "upstream_path": "spatial-transcriptomics/spatial-preprocessing",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-spatial-transcriptomics-spatial-proteomics": {
+      "upstream_path": "spatial-transcriptomics/spatial-proteomics",
+      "primary_tool": "scimap",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-spatial-transcriptomics-spatial-statistics": {
+      "upstream_path": "spatial-transcriptomics/spatial-statistics",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-spatial-transcriptomics-spatial-visualization": {
+      "upstream_path": "spatial-transcriptomics/spatial-visualization",
+      "primary_tool": "squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 1,
+      "score": 45.3
+    },
+    "bio-splice-variant-prediction": {
+      "upstream_path": "alternative-splicing/splice-variant-prediction",
+      "primary_tool": "SpliceAI",
+      "downloads": 18423,
+      "workflow_fan_in": 0,
+      "score": 26.7
+    },
+    "bio-splicing-qc": {
+      "upstream_path": "alternative-splicing/splicing-qc",
+      "primary_tool": "RSeQC",
+      "downloads": 189482,
+      "workflow_fan_in": 1,
+      "score": 48.1
+    },
+    "bio-splicing-quantification": {
+      "upstream_path": "alternative-splicing/splicing-quantification",
+      "primary_tool": "rMATS-turbo",
+      "downloads": 95159,
+      "workflow_fan_in": 1,
+      "score": 46.2
+    },
+    "bio-sra-data": {
+      "upstream_path": "database-access/sra-data",
+      "primary_tool": "sra-tools",
+      "downloads": 796998,
+      "workflow_fan_in": 0,
+      "score": 36.9
+    },
+    "bio-structural-biology-alphafold-predictions": {
+      "upstream_path": "structural-biology/alphafold-predictions",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-structural-biology-binding-site-detection": {
+      "upstream_path": "structural-biology/binding-site-detection",
+      "primary_tool": "fpocket",
+      "downloads": 149688,
+      "workflow_fan_in": 0,
+      "score": 32.4
+    },
+    "bio-structural-biology-geometric-analysis": {
+      "upstream_path": "structural-biology/geometric-analysis",
+      "primary_tool": "Bio.PDB",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-structural-biology-interface-analysis": {
+      "upstream_path": "structural-biology/interface-analysis",
+      "primary_tool": "Bio.PDB",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-structural-biology-modern-structure-prediction": {
+      "upstream_path": "structural-biology/modern-structure-prediction",
+      "primary_tool": "ESMFold",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-structural-biology-structure-io": {
+      "upstream_path": "structural-biology/structure-io",
+      "primary_tool": "Bio.PDB",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-structural-biology-structure-modification": {
+      "upstream_path": "structural-biology/structure-modification",
+      "primary_tool": "Bio.PDB",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-structural-biology-structure-navigation": {
+      "upstream_path": "structural-biology/structure-navigation",
+      "primary_tool": "Bio.PDB",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-structural-biology-structure-preparation": {
+      "upstream_path": "structural-biology/structure-preparation",
+      "primary_tool": "PDBFixer",
+      "downloads": 1879887,
+      "workflow_fan_in": 0,
+      "score": 39.3
+    },
+    "bio-structural-biology-structure-validation": {
+      "upstream_path": "structural-biology/structure-validation",
+      "primary_tool": "Bio.PDB",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-substructure-search": {
+      "upstream_path": "chemoinformatics/substructure-search",
+      "primary_tool": "RDKit",
+      "downloads": 7117215,
+      "workflow_fan_in": 0,
+      "score": 42.9
+    },
+    "bio-systems-biology-community-metabolic-modeling": {
+      "upstream_path": "systems-biology/community-metabolic-modeling",
+      "primary_tool": "micom",
+      "downloads": 42492,
+      "workflow_fan_in": 0,
+      "score": 29.0
+    },
+    "bio-systems-biology-context-specific-models": {
+      "upstream_path": "systems-biology/context-specific-models",
+      "primary_tool": "cobrapy",
+      "downloads": 74913,
+      "workflow_fan_in": 1,
+      "score": 45.6
+    },
+    "bio-systems-biology-flux-balance-analysis": {
+      "upstream_path": "systems-biology/flux-balance-analysis",
+      "primary_tool": "cobrapy",
+      "downloads": 74913,
+      "workflow_fan_in": 1,
+      "score": 45.6
+    },
+    "bio-systems-biology-gene-essentiality": {
+      "upstream_path": "systems-biology/gene-essentiality",
+      "primary_tool": "cobrapy",
+      "downloads": 74913,
+      "workflow_fan_in": 1,
+      "score": 45.6
+    },
+    "bio-systems-biology-metabolic-reconstruction": {
+      "upstream_path": "systems-biology/metabolic-reconstruction",
+      "primary_tool": "CarveMe",
+      "downloads": 5571,
+      "workflow_fan_in": 1,
+      "score": 38.5
+    },
+    "bio-systems-biology-model-curation": {
+      "upstream_path": "systems-biology/model-curation",
+      "primary_tool": "memote",
+      "downloads": 2139,
+      "workflow_fan_in": 1,
+      "score": 35.9
+    },
+    "bio-systems-biology-strain-design": {
+      "upstream_path": "systems-biology/strain-design",
+      "primary_tool": "straindesign",
+      "downloads": 8584,
+      "workflow_fan_in": 0,
+      "score": 24.6
+    },
+    "bio-tcr-bcr-analysis-immcantation-analysis": {
+      "upstream_path": "tcr-bcr-analysis/immcantation-analysis",
+      "primary_tool": "alakazam",
+      "downloads": 195299,
+      "workflow_fan_in": 1,
+      "score": 48.2
+    },
+    "bio-tcr-bcr-analysis-mixcr-analysis": {
+      "upstream_path": "tcr-bcr-analysis/mixcr-analysis",
+      "primary_tool": "MiXCR",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-tcr-bcr-analysis-repertoire-visualization": {
+      "upstream_path": "tcr-bcr-analysis/repertoire-visualization",
+      "primary_tool": "VDJtools",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-tcr-bcr-analysis-scirpy-analysis": {
+      "upstream_path": "tcr-bcr-analysis/scirpy-analysis",
+      "primary_tool": "scirpy",
+      "downloads": 81404,
+      "workflow_fan_in": 1,
+      "score": 45.8
+    },
+    "bio-tcr-bcr-analysis-specificity-annotation": {
+      "upstream_path": "tcr-bcr-analysis/specificity-annotation",
+      "primary_tool": "tcrdist3",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-tcr-bcr-analysis-vdjtools-analysis": {
+      "upstream_path": "tcr-bcr-analysis/vdjtools-analysis",
+      "primary_tool": "VDJtools",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-temporal-genomics-circadian-rhythms": {
+      "upstream_path": "temporal-genomics/circadian-rhythms",
+      "primary_tool": "CosinorPy",
+      "downloads": null,
+      "workflow_fan_in": 1,
+      "score": 15.1
+    },
+    "bio-temporal-genomics-differential-rhythmicity": {
+      "upstream_path": "temporal-genomics/differential-rhythmicity",
+      "primary_tool": "limorhyde",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-temporal-genomics-periodicity-detection": {
+      "upstream_path": "temporal-genomics/periodicity-detection",
+      "primary_tool": "scipy",
+      "downloads": 95297165,
+      "workflow_fan_in": 0,
+      "score": 49.9
+    },
+    "bio-temporal-genomics-temporal-clustering": {
+      "upstream_path": "temporal-genomics/temporal-clustering",
+      "primary_tool": "Mfuzz",
+      "downloads": 30609,
+      "workflow_fan_in": 1,
+      "score": 43.1
+    },
+    "bio-temporal-genomics-temporal-grn": {
+      "upstream_path": "temporal-genomics/temporal-grn",
+      "primary_tool": "statsmodels",
+      "downloads": 29369237,
+      "workflow_fan_in": 0,
+      "score": 46.7
+    },
+    "bio-temporal-genomics-trajectory-modeling": {
+      "upstream_path": "temporal-genomics/trajectory-modeling",
+      "primary_tool": "mgcv",
+      "downloads": 4999959,
+      "workflow_fan_in": 1,
+      "score": 57.0
+    },
+    "bio-transcription-translation": {
+      "upstream_path": "sequence-manipulation/transcription-translation",
+      "primary_tool": "Bio.Seq",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "bio-tumor-fraction-estimation": {
+      "upstream_path": "liquid-biopsy/tumor-fraction-estimation",
+      "primary_tool": "ichorCNA",
+      "downloads": 32450,
+      "workflow_fan_in": 1,
+      "score": 43.3
+    },
+    "bio-uniprot-access": {
+      "upstream_path": "database-access/uniprot-access",
+      "primary_tool": "requests",
+      "downloads": 96978213,
+      "workflow_fan_in": 0,
+      "score": 50.0
+    },
+    "bio-variant-annotation": {
+      "upstream_path": "variant-calling/variant-annotation",
+      "primary_tool": "VEP",
+      "downloads": 464603,
+      "workflow_fan_in": 2,
+      "score": 59.3
+    },
+    "bio-variant-calling": {
+      "upstream_path": "variant-calling/variant-calling",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 1,
+      "score": 56.8
+    },
+    "bio-variant-calling-clinical-interpretation": {
+      "upstream_path": "variant-calling/clinical-interpretation",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 1,
+      "score": 56.8
+    },
+    "bio-variant-calling-deepvariant": {
+      "upstream_path": "variant-calling/deepvariant",
+      "primary_tool": "DeepVariant",
+      "downloads": 88372,
+      "workflow_fan_in": 0,
+      "score": 31.0
+    },
+    "bio-variant-calling-filtering-best-practices": {
+      "upstream_path": "variant-calling/filtering-best-practices",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 2,
+      "score": 65.6
+    },
+    "bio-variant-calling-joint-calling": {
+      "upstream_path": "variant-calling/joint-calling",
+      "primary_tool": "GATK",
+      "downloads": 1241463,
+      "workflow_fan_in": 1,
+      "score": 53.2
+    },
+    "bio-variant-calling-structural-variant-calling": {
+      "upstream_path": "variant-calling/structural-variant-calling",
+      "primary_tool": "manta",
+      "downloads": 118799,
+      "workflow_fan_in": 1,
+      "score": 46.8
+    },
+    "bio-variant-normalization": {
+      "upstream_path": "variant-calling/variant-normalization",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 1,
+      "score": 56.8
+    },
+    "bio-vcf-basics": {
+      "upstream_path": "variant-calling/vcf-basics",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 0,
+      "score": 41.8
+    },
+    "bio-vcf-manipulation": {
+      "upstream_path": "variant-calling/vcf-manipulation",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 0,
+      "score": 41.8
+    },
+    "bio-vcf-statistics": {
+      "upstream_path": "variant-calling/vcf-statistics",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 1,
+      "score": 56.8
+    },
+    "bio-virtual-screening": {
+      "upstream_path": "chemoinformatics/virtual-screening",
+      "primary_tool": "AutoDock Vina",
+      "downloads": 48159,
+      "workflow_fan_in": 0,
+      "score": 29.3
+    },
+    "bio-workflow-management-cwl-workflows": {
+      "upstream_path": "workflow-management/cwl-workflows",
+      "primary_tool": "cwltool",
+      "downloads": 2576505,
+      "workflow_fan_in": 0,
+      "score": 40.1
+    },
+    "bio-workflow-management-nextflow-pipelines": {
+      "upstream_path": "workflow-management/nextflow-pipelines",
+      "primary_tool": "Nextflow",
+      "downloads": 648599,
+      "workflow_fan_in": 0,
+      "score": 36.4
+    },
+    "bio-workflow-management-nf-core-pipelines": {
+      "upstream_path": "workflow-management/nf-core-pipelines",
+      "primary_tool": "nf-core",
+      "downloads": 155801,
+      "workflow_fan_in": 0,
+      "score": 32.5
+    },
+    "bio-workflow-management-snakemake-workflows": {
+      "upstream_path": "workflow-management/snakemake-workflows",
+      "primary_tool": "Snakemake",
+      "downloads": 1961611,
+      "workflow_fan_in": 0,
+      "score": 39.4
+    },
+    "bio-workflow-management-wdl-workflows": {
+      "upstream_path": "workflow-management/wdl-workflows",
+      "primary_tool": "cromwell",
+      "downloads": 277410,
+      "workflow_fan_in": 0,
+      "score": 34.1
+    },
+    "bio-workflows-atacseq-pipeline": {
+      "upstream_path": "workflows/atacseq-pipeline",
+      "primary_tool": "MACS3",
+      "downloads": 38691,
+      "workflow_fan_in": 0,
+      "score": 28.7
+    },
+    "bio-workflows-biomarker-pipeline": {
+      "upstream_path": "workflows/biomarker-pipeline",
+      "primary_tool": "sklearn",
+      "downloads": 52858187,
+      "workflow_fan_in": 0,
+      "score": 48.3
+    },
+    "bio-workflows-causal-genomics-pipeline": {
+      "upstream_path": "workflows/causal-genomics-pipeline",
+      "primary_tool": "TwoSampleMR",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-workflows-chipseq-pipeline": {
+      "upstream_path": "workflows/chipseq-pipeline",
+      "primary_tool": "MACS3",
+      "downloads": 38691,
+      "workflow_fan_in": 0,
+      "score": 28.7
+    },
+    "bio-workflows-clinical-trial-pipeline": {
+      "upstream_path": "workflows/clinical-trial-pipeline",
+      "primary_tool": "statsmodels",
+      "downloads": 29369237,
+      "workflow_fan_in": 0,
+      "score": 46.7
+    },
+    "bio-workflows-clip-pipeline": {
+      "upstream_path": "workflows/clip-pipeline",
+      "primary_tool": "CLIPper",
+      "downloads": 2626,
+      "workflow_fan_in": 0,
+      "score": 21.4
+    },
+    "bio-workflows-cnv-pipeline": {
+      "upstream_path": "workflows/cnv-pipeline",
+      "primary_tool": "CNVkit",
+      "downloads": 267952,
+      "workflow_fan_in": 0,
+      "score": 34.0
+    },
+    "bio-workflows-crispr-editing-pipeline": {
+      "upstream_path": "workflows/crispr-editing-pipeline",
+      "primary_tool": "CRISPOR",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-workflows-crispr-screen-pipeline": {
+      "upstream_path": "workflows/crispr-screen-pipeline",
+      "primary_tool": "MAGeCK",
+      "downloads": 162115,
+      "workflow_fan_in": 0,
+      "score": 32.6
+    },
+    "bio-workflows-cytometry-pipeline": {
+      "upstream_path": "workflows/cytometry-pipeline",
+      "primary_tool": "CATALYST",
+      "downloads": 27576,
+      "workflow_fan_in": 0,
+      "score": 27.8
+    },
+    "bio-workflows-edna-pipeline": {
+      "upstream_path": "workflows/edna-pipeline",
+      "primary_tool": "obitools3",
+      "downloads": 27966,
+      "workflow_fan_in": 0,
+      "score": 27.8
+    },
+    "bio-workflows-expression-to-pathways": {
+      "upstream_path": "workflows/expression-to-pathways",
+      "primary_tool": "clusterProfiler",
+      "downloads": 204868,
+      "workflow_fan_in": 0,
+      "score": 33.2
+    },
+    "bio-workflows-fastq-to-variants": {
+      "upstream_path": "workflows/fastq-to-variants",
+      "primary_tool": "bcftools",
+      "downloads": 4694542,
+      "workflow_fan_in": 0,
+      "score": 41.8
+    },
+    "bio-workflows-genome-annotation-pipeline": {
+      "upstream_path": "workflows/genome-annotation-pipeline",
+      "primary_tool": "Bakta",
+      "downloads": 124640,
+      "workflow_fan_in": 0,
+      "score": 31.9
+    },
+    "bio-workflows-genome-assembly-pipeline": {
+      "upstream_path": "workflows/genome-assembly-pipeline",
+      "primary_tool": "Flye",
+      "downloads": 275209,
+      "workflow_fan_in": 0,
+      "score": 34.0
+    },
+    "bio-workflows-grn-pipeline": {
+      "upstream_path": "workflows/grn-pipeline",
+      "primary_tool": "pySCENIC",
+      "downloads": 5281,
+      "workflow_fan_in": 0,
+      "score": 23.3
+    },
+    "bio-workflows-gwas-pipeline": {
+      "upstream_path": "workflows/gwas-pipeline",
+      "primary_tool": "PLINK2",
+      "downloads": 121665,
+      "workflow_fan_in": 0,
+      "score": 31.8
+    },
+    "bio-workflows-hic-pipeline": {
+      "upstream_path": "workflows/hic-pipeline",
+      "primary_tool": "cooler",
+      "downloads": 325587,
+      "workflow_fan_in": 0,
+      "score": 34.5
+    },
+    "bio-workflows-imc-pipeline": {
+      "upstream_path": "workflows/imc-pipeline",
+      "primary_tool": "steinbock",
+      "downloads": 2215,
+      "workflow_fan_in": 0,
+      "score": 20.9
+    },
+    "bio-workflows-liquid-biopsy-pipeline": {
+      "upstream_path": "workflows/liquid-biopsy-pipeline",
+      "primary_tool": "ichorCNA",
+      "downloads": 32450,
+      "workflow_fan_in": 0,
+      "score": 28.2
+    },
+    "bio-workflows-longread-sv-pipeline": {
+      "upstream_path": "workflows/longread-sv-pipeline",
+      "primary_tool": "Sniffles",
+      "downloads": 94952,
+      "workflow_fan_in": 0,
+      "score": 31.2
+    },
+    "bio-workflows-merip-pipeline": {
+      "upstream_path": "workflows/merip-pipeline",
+      "primary_tool": "exomePeak2",
+      "downloads": 15919,
+      "workflow_fan_in": 0,
+      "score": 26.3
+    },
+    "bio-workflows-metabolic-modeling-pipeline": {
+      "upstream_path": "workflows/metabolic-modeling-pipeline",
+      "primary_tool": "cobrapy",
+      "downloads": 74913,
+      "workflow_fan_in": 0,
+      "score": 30.5
+    },
+    "bio-workflows-metabolomics-pipeline": {
+      "upstream_path": "workflows/metabolomics-pipeline",
+      "primary_tool": "xcms",
+      "downloads": 122559,
+      "workflow_fan_in": 0,
+      "score": 31.8
+    },
+    "bio-workflows-metagenomics-pipeline": {
+      "upstream_path": "workflows/metagenomics-pipeline",
+      "primary_tool": "Kraken2",
+      "downloads": 227938,
+      "workflow_fan_in": 0,
+      "score": 33.5
+    },
+    "bio-workflows-methylation-pipeline": {
+      "upstream_path": "workflows/methylation-pipeline",
+      "primary_tool": "Bismark",
+      "downloads": 127210,
+      "workflow_fan_in": 0,
+      "score": 31.9
+    },
+    "bio-workflows-microbiome-pipeline": {
+      "upstream_path": "workflows/microbiome-pipeline",
+      "primary_tool": "DADA2",
+      "downloads": 723951,
+      "workflow_fan_in": 0,
+      "score": 36.7
+    },
+    "bio-workflows-multi-omics-pipeline": {
+      "upstream_path": "workflows/multi-omics-pipeline",
+      "primary_tool": "MOFA2",
+      "downloads": 23252,
+      "workflow_fan_in": 0,
+      "score": 27.3
+    },
+    "bio-workflows-multiome-pipeline": {
+      "upstream_path": "workflows/multiome-pipeline",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 0,
+      "score": 36.2
+    },
+    "bio-workflows-neoantigen-pipeline": {
+      "upstream_path": "workflows/neoantigen-pipeline",
+      "primary_tool": "pVACtools",
+      "downloads": 1659,
+      "workflow_fan_in": 0,
+      "score": 20.2
+    },
+    "bio-workflows-outbreak-pipeline": {
+      "upstream_path": "workflows/outbreak-pipeline",
+      "primary_tool": "mlst",
+      "downloads": 354028,
+      "workflow_fan_in": 0,
+      "score": 34.7
+    },
+    "bio-workflows-proteomics-pipeline": {
+      "upstream_path": "workflows/proteomics-pipeline",
+      "primary_tool": "limma",
+      "downloads": 941568,
+      "workflow_fan_in": 0,
+      "score": 37.4
+    },
+    "bio-workflows-riboseq-pipeline": {
+      "upstream_path": "workflows/riboseq-pipeline",
+      "primary_tool": "STAR",
+      "downloads": 1782742,
+      "workflow_fan_in": 0,
+      "score": 39.1
+    },
+    "bio-workflows-rnaseq-to-de": {
+      "upstream_path": "workflows/rnaseq-to-de",
+      "primary_tool": "DESeq2",
+      "downloads": 766260,
+      "workflow_fan_in": 0,
+      "score": 36.8
+    },
+    "bio-workflows-scrnaseq-pipeline": {
+      "upstream_path": "workflows/scrnaseq-pipeline",
+      "primary_tool": "Seurat",
+      "downloads": 598835,
+      "workflow_fan_in": 0,
+      "score": 36.2
+    },
+    "bio-workflows-smrna-pipeline": {
+      "upstream_path": "workflows/smrna-pipeline",
+      "primary_tool": "miRge3.0",
+      "downloads": 28550,
+      "workflow_fan_in": 0,
+      "score": 27.9
+    },
+    "bio-workflows-somatic-variant-pipeline": {
+      "upstream_path": "workflows/somatic-variant-pipeline",
+      "primary_tool": "GATK Mutect2",
+      "downloads": 1241463,
+      "workflow_fan_in": 0,
+      "score": 38.1
+    },
+    "bio-workflows-spatial-pipeline": {
+      "upstream_path": "workflows/spatial-pipeline",
+      "primary_tool": "Squidpy",
+      "downloads": 68638,
+      "workflow_fan_in": 0,
+      "score": 30.3
+    },
+    "bio-workflows-splicing-pipeline": {
+      "upstream_path": "workflows/splicing-pipeline",
+      "primary_tool": "rMATS-turbo",
+      "downloads": 95159,
+      "workflow_fan_in": 0,
+      "score": 31.2
+    },
+    "bio-workflows-tcr-pipeline": {
+      "upstream_path": "workflows/tcr-pipeline",
+      "primary_tool": "MiXCR",
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    },
+    "bio-workflows-timecourse-pipeline": {
+      "upstream_path": "workflows/timecourse-pipeline",
+      "primary_tool": "Mfuzz",
+      "downloads": 30609,
+      "workflow_fan_in": 0,
+      "score": 28.1
+    },
+    "bio-write-sequences": {
+      "upstream_path": "sequence-io/write-sequences",
+      "primary_tool": "Bio.SeqIO",
+      "downloads": 7660860,
+      "workflow_fan_in": 0,
+      "score": 43.1
+    },
+    "clawhub-installer": {
+      "upstream_path": "clawhub-installer",
+      "primary_tool": null,
+      "downloads": null,
+      "workflow_fan_in": 0,
+      "score": 0.0
+    }
+  }
+}

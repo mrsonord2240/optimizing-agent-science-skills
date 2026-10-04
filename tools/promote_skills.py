@@ -35,6 +35,7 @@ OUT = Path("F:/optimized-scientific-skills")
 PROVIDER_REF = "main"
 PROVIDER_REPOSITORY = "mrsonord2240/optimized-scientific-skills"
 MARKETPLACE_HOLDS = REC / "config" / "marketplace_submission_holds.json"
+USAGE = Path("catalog") / "usage.json"
 
 VALID_CATEGORIES = {
     "Evidence Insight",
@@ -350,7 +351,20 @@ def _audit_date(row):
     return value if isinstance(value, str) else ""
 
 
-def _render_remaining(remaining, finished, catalog):
+def _load_usage(records_repo):
+    """Load the usage_rank.py snapshot as Skill id -> row, or {} when none has been written."""
+    path = Path(records_repo) / USAGE
+    if not path.is_file():
+        return {}
+    return _read_json(path, "usage snapshot")["skills"]
+
+
+def _render_remaining(remaining, finished, catalog, usage=None):
+    usage = usage or {}
+
+    def score(skill_id):
+        return usage.get(skill_id, {}).get("score", 0)
+
     pending = remaining["remaining"]
     excluded = remaining["excluded"]
     out_of_scope = remaining["out_of_scope"]
@@ -376,10 +390,24 @@ def _render_remaining(remaining, finished, catalog):
             f"{len(finished)} refined, {len(excluded)} audited and excluded, "
             f"{len(out_of_scope)} out of scope, {len(pending)} remaining."
         ), "",
-        "| folder | remaining | refined |", "| --- | ---: | ---: |",
     ]
-    for folder in sorted(by, key=lambda name: (-len(by[name]), name)):
-        lines.append(f"| {folder} | {len(by[folder])} | {done.get(folder, 0)} |")
+    if usage:
+        mean = {folder: sum(map(score, ids)) / len(ids) for folder, ids in by.items()}
+        lines += [
+            "Folders are ordered by `usage`, the mean score of their remaining Skills. A score is",
+            "0-100: half conda downloads of the Skill's primary tool, half how many workflow Skills",
+            "depend on it. It is a proxy from `tools/usage_rank.py` in the records repository, not",
+            "measured use.", "",
+            "| folder | remaining | refined | usage |", "| --- | ---: | ---: | ---: |",
+        ]
+        for folder in sorted(by, key=lambda name: (-mean[name], name)):
+            lines.append(
+                f"| {folder} | {len(by[folder])} | {done.get(folder, 0)} | {mean[folder]:.0f} |"
+            )
+    else:
+        lines += ["| folder | remaining | refined |", "| --- | ---: | ---: |"]
+        for folder in sorted(by, key=lambda name: (-len(by[name]), name)):
+            lines.append(f"| {folder} | {len(by[folder])} | {done.get(folder, 0)} |")
     lines += [
         "", "## Promoted, fix pass still needed", "",
         "These Skills are in `skills/` because their audit found them deployable with no open P0.",
@@ -413,8 +441,16 @@ def _render_remaining(remaining, finished, catalog):
     lines += ["", "## The list", ""]
     for folder in sorted(by):
         lines += [f"### {folder}", ""]
-        for skill_id in sorted(by[folder]):
-            lines.append(f"- `{skill_id}` — `{catalog[skill_id]}`")
+        for skill_id in sorted(by[folder], key=lambda name: (-score(name), name)):
+            line = f"- `{skill_id}` — `{catalog[skill_id]}`"
+            row = usage.get(skill_id)
+            if row:
+                line += f" — usage {row['score']:.0f} ({row['primary_tool']}"
+                if row["workflow_fan_in"]:
+                    plural = "" if row["workflow_fan_in"] == 1 else "s"
+                    line += f", in {row['workflow_fan_in']} workflow{plural}"
+                line += ")"
+            lines.append(line)
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
@@ -586,7 +622,7 @@ def build_metadata(records_repo=REC, provider_repo=OUT, upstream_repo=UPSTREAM,
         raise SystemExit(
             f"metadata accounts for {accounted} Skills but upstream has {len(upstream_index)}"
         )
-    remaining_md = _render_remaining(new_remaining, rows, catalog)
+    remaining_md = _render_remaining(new_remaining, rows, catalog, _load_usage(records_repo))
     return PromotionResult(new_provenance, new_remaining, remaining_md, messages, added)
 
 
