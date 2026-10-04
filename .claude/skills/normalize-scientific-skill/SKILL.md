@@ -48,6 +48,20 @@ conditions, caveats, and scientific meaning.
 
 - Keep `SKILL.md` concise and imperative, with the always-needed workflow and
   routing to conditional resources.
+- Start with the point. The first thing under the title is the route table or
+  the default command, within 15 lines of the title. Tested versions shrink to
+  one line at the end of the file.
+- `SKILL.md` and route files hold only what an agent needs to do the task:
+  what to run, what to choose between, when to stop, and what breaks. Move the
+  rest to `references/background.md`: essays on why a method is right, tool
+  taxonomies that describe mechanisms, history, and the provenance of a number
+  ("measured on one 4 v 4 set"). Nothing routes there for doing the task.
+- Keep a reason only when it changes what the agent does, and keep it to one
+  clause: "sum raw counts, never normalized values" stays; a paragraph on why
+  pseudoreplication inflates false discoveries goes. Test each sentence by
+  deleting it: if the agent would act the same, it moves. Sam, 2026-10-04:
+  too much language justifying techniques and giving provenance, so a reader
+  reaches line 57 before the Skill gets to the point.
 - Move substantial reusable executable code to `scripts/`.
 - Move conditional, method-specific, or large lookup material to
   `references/` when it has a real routing purpose.
