@@ -89,7 +89,9 @@ workflow, user action, and rerun steps.
 
 ## Write `TOOLS.md`
 
-Place `TOOLS.md` in the lane's durable records area, not the product Skill. It
+Place the Skill's `TOOLS.md` in the records repository at
+`audits/skills/<skill-id>/tooling/`, not in the product Skill; shared rows link
+the ecosystem `TOOLS.md` under the staging root. It
 must contain:
 
 - full or delta mode and candidate tree identity;
@@ -105,7 +107,8 @@ must contain:
 
 ## Write the routing cases
 
-For a router-shaped Skill, write `routing-cases.json` beside `TOOLS.md`: one
+For a router-shaped Skill, write `routing-cases.json` beside the Skill's
+`TOOLS.md`: one
 case per route in the first table of `SKILL.md`. The audit worker runs them
 with `tools/routing_check.py`, whose header documents the format.
 
@@ -117,7 +120,10 @@ with `tools/routing_check.py`, whose header documents the format.
   with the script that made it. An agent that finds empty or placeholder files
   stops to report them and never reaches the route.
 - `expect`: only when the route sends this request to a reference instead of a
-  script; name that reference.
+  script; name that reference. Leave it out for a route whose command is a
+  tool call shown in the route.
+- A route with no staged input gets one cut or simulated from real data, with
+  the script that made it; say in `TOOLS.md` what is simulated.
 
 ## Hand off
 

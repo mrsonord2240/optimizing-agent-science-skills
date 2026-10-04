@@ -1,0 +1,57 @@
+[
+  {
+    "route": "routes/count.md",
+    "request": "I have FASTQ files from a pooled CRISPR knockout screen (one plasmid pool and three day-18 replicates) and the guide library CSV. I need the per-guide read counts.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/count"
+  },
+  {
+    "route": "routes/qc.md",
+    "request": "This is a guide count table from my HAP1 knockout screen; HAP1_T0 is the plasmid pool and HAP1_T18A, HAP1_T18B and HAP1_T18C are the day-18 replicates. Is the screen good enough to analyze?",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/qc"
+  },
+  {
+    "route": "routes/cn-correction.md",
+    "request": "This count table is from a knockout screen in the A375 melanoma cancer cell line (first sample column is the plasmid pool). Before I call any hits I need the amplified regions of this line handled.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/cn-correction"
+  },
+  {
+    "route": "routes/rra.md",
+    "request": "HAP1_T0 is the baseline and HAP1_T18A, HAP1_T18B, HAP1_T18C are three endpoint replicates of a knockout dropout screen. Which genes are depleted or enriched?",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/rra"
+  },
+  {
+    "route": "routes/bagel2.md",
+    "request": "From this HAP1 count table I want essential-gene calls scored against the core-essential and non-essential reference gene lists in the same folder.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/bagel2"
+  },
+  {
+    "route": "routes/mle.md",
+    "request": "Here are counts from a leukemia knockout screen in two cell lines (HL60 and KBM7) at initial and final time points, with my design matrix. I want a selection score per cell line.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/mle"
+  },
+  {
+    "route": "routes/drugz.md",
+    "request": "These counts come from a drug screen: Veh_r1 and Veh_r2 are vehicle-treated, Drug_r1 is drug-treated, and Day0 is the starting pool. Which genes change sensitivity to the drug?",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/drugz"
+  },
+  {
+    "route": "routes/jacks.md",
+    "request": "I screened five cell lines with the same guide library; the count table, a replicate map and a guide-to-gene map are here. I want gene effect scores for each cell line.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/jacks"
+  },
+  {
+    "route": "routes/chronos.md",
+    "request": "This is a DepMap-style panel of five cancer cell lines screened with one library, with a plasmid pool and a replicate map. I want copy-number-aware gene effect scores.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/chronos"
+  },
+  {
+    "route": "routes/consensus.md",
+    "request": "I have hit results for the same screen from three different analysis methods. I want one merged list that says how many methods support each gene.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/consensus"
+  },
+  {
+    "route": "routes/branches.md",
+    "request": "This is a single-cell CRISPR screen: 400 cells with RNA counts and per-cell guide counts. How do I find which perturbations changed expression?",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/branches"
+  }
+]
