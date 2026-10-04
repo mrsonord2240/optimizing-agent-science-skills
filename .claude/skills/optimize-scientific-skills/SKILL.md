@@ -177,7 +177,13 @@ already disqualifies.
 
 Run `normalize-scientific-skill` before tooling or behavioral audit. Accept a
 normalize handoff only when `tools/skill_preflight.py` reports `PASS` for the
-normalized tree and its identity equals the handoff's. A prior
+normalized tree and its identity equals the handoff's, and its frontmatter
+`description` is a single `Use when <task or situation>.` trigger with no tool
+lists, coverage summaries, or pointers to other Skills. Check that line
+yourself at transition and reject a handoff that kept the long form. A Skill
+already certified with a long description takes the one-line edit, with the
+exact old and new strings recorded in `edits.json` in its fix run directory,
+then a delta re-audit. A prior
 audit is reusable only when it applies to the exact normalized candidate bytes,
 uses the current report schema, and retains its evidence. A structural
 change normally makes an older audit diagnostic history rather than the active

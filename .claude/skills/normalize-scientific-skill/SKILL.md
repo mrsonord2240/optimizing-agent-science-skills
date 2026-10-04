@@ -70,6 +70,13 @@ conditions, caveats, and scientific meaning.
   `Data Analysis`, `Evidence Insight`, `Other`, `Protocol Design`, chosen from
   what the Skill does; add `author:` with the original author credit from the
   provider (for GPTomics bioSkills: `author: GPTomics`).
+- Reduce the frontmatter `description` to its trigger: one sentence of the
+  form `Use when <task or situation>.` Remove tool and method lists, coverage
+  summaries, and "for X see <other Skill>" pointers; keep that material in the
+  body. Name the domain and task precisely enough to tell the Skill apart from
+  its siblings in the same category, and state nothing the Skill does not do.
+  In a small trial (Sam, 2026-10-03) trimmed descriptions made agents more
+  likely to select a Skill, select the right one, and finish the task.
 - Write every text file as UTF-8 without BOM, with LF line endings. Remove
   `__pycache__`, `*.pyc`, dot-prefixed paths, and LICENSE copies below the
   Skill root.
