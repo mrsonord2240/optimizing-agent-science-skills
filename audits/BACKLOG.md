@@ -314,7 +314,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (157)
+## P2 (156)
 
 ### `bio-machine-learning-biomarker-discovery` — BD-002: scoring/legacy-attribute choice unexplained; it sets signature size
 
@@ -548,22 +548,6 @@ None open.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
 
-### `bio-machine-learning-atlas-mapping` — AM-008 Marker check: no message when nothing is checkable, and no listed-versus-used marker count
-
-- Skill: 86, Production Ready · candidate `becbe61423e7` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@becbe61423e7-reaudit-delta2-20261003/viewer.md)
-- Observed in inputs: 6
-- Problem: With a marker file that matches no predicted label (empty {} or genes absent from the gene set for every label) label_marker_check.py prints NOT CHECKED then dies with AttributeError (rc 1) and never prints the UNVERIFIED line. Separately a label can be judged on one marker (DC retained 1.000 on 1 of 3 listed) with only the n_markers column as evidence.
-- Root cause: res.flagged is read on an empty DataFrame; n_markers counts markers used but the number listed is not recorded or compared.
-- Fix: Guard the empty result (print the UNVERIFIED line and exit non-zero with a message), add an n_listed column and warn when n_markers is below 3. Small script change; the SKILL.md wording needs no change.
-
-### `bio-machine-learning-atlas-mapping` — AM-009 Description no longer separates it from cell-annotation
-
-- Skill: 86, Production Ready · candidate `becbe61423e7` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@becbe61423e7-reaudit-delta2-20261003/viewer.md)
-- Observed in inputs: —
-- Problem: The trimmed description (annotate against a pre-trained reference atlas, pick a mapping method, judge transferred labels) matches bio-single-cell-cell-annotation, which on the shelf says annotate from a reference atlas or pretrained model, transfer labels onto a query, assess confidence and rejection. The old tool list and the cell-annotation pointer were the separators, and the body has no hand-off to cell-annotation either.
-- Root cause: Description reduced to a generic clause that omits the Skill-specific mechanism (projection into a fixed reference latent space with out-of-distribution gating).
-- Fix: Add one clause to the description, e.g. 'projecting a query into a fixed reference latent space (scArches, Symphony) and gating labels on out-of-distribution distance', and add a Related Skills hand-off to cell-annotation for classifier-only annotation. Text only.
-
 ### `bio-phylo-species-trees` — Add a leaf-name consistency check before ASTRAL
 
 - Skill: 86, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/species-trees) · [viewer](skills/bio-phylo-species-trees/mrsonord2240-bioSkills@966f838/viewer.md)
@@ -619,6 +603,14 @@ None open.
 - Problem: examples/interaction_query.py overwrites signed_effect and mechanism with the last SIGNOR record for a pair, so exported edge attributes differ between runs (MDM2->CDKN1A: destabilization/binding in one run, repression/empty in another).
 - Root cause: Records repeat per site/paper and are applied in server order with last-write-wins.
 - Fix: Collect effects and mechanisms per edge as sorted sets (or keep the first by a deterministic key) and say so in the example.
+
+### `bio-machine-learning-atlas-mapping` — AM-008 Marker check: no message when nothing is checkable, and no listed-versus-used marker count
+
+- Skill: 87, Production Ready · candidate `a579d86464c9` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@a579d86464c9-reaudit-delta3-20261003/viewer.md)
+- Observed in inputs: 6
+- Problem: With a marker file that matches no predicted label (empty {} or genes absent from the gene set for every label) label_marker_check.py prints NOT CHECKED then dies with AttributeError (rc 1) and never prints the UNVERIFIED line. Separately a label can be judged on one marker (DC retained 1.000 on 1 of 3 listed) with only the n_markers column as evidence.
+- Root cause: res.flagged is read on an empty DataFrame; n_markers counts markers used but the number listed is not recorded or compared.
+- Fix: Guard the empty result (print the UNVERIFIED line and exit non-zero with a message), add an n_listed column and warn when n_markers is below 3. Small script change; the SKILL.md wording needs no change.
 
 ### `bio-ortholog-inference` — OI-11 Batch statuses undocumented in SKILL.md; snippet drops failed symbols
 
