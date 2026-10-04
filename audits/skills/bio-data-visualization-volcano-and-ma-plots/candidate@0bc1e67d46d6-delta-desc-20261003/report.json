@@ -1,0 +1,320 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-volcano-and-ma-plots",
+    "description": "Use when visualizing differential-expression results (RNA-seq, ChIP-seq, ATAC-seq, proteomics) or any per-feature effect-size and p-value table as a volcano or MA plot.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Quoted airway counts re-measured; two stale numbers (49 vs 39 hidden genes, median 0.77 vs 0.76) are minor and recorded as VOL-009, none are fabricated identifiers or results."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Plotting guidance only; no clinical or prescriptive content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Plotted quantity -log10(padj) equals the threshold line quantity; Up/Down colour boundary equals the line; 817 significant genes plotted equals 817 in the table; shrunken LFC used and svalue/apeglm/ashr statements verified."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "volcano_phd.R, volcano_plot.R, ma_plot.py and all three SKILL.md R blocks run verbatim on the airway dds; no unrunnable code found."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Covers shrinkage choice, ggplot2, EnhancedVolcano, MA and sanbomics with verified API facts; the quoted airway numbers now equal the re-measured values (VOL-009 closed); the capped-axis labelling is still unreadable (VOL-010)."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "NA padj reported, absent label genes warn, zero-length repel segments suppressed; the cap-with-top-labels path still overplots."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md about 160 lines with detail routed to two references; some measured numbers repeat across four files."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Operational rule and design choices are explicit and each tested; the numbers in failure-modes and reconciliation now match a re-measurement on real data (39 hidden genes, median 0.7648 printed as 0.76)."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger language and example prompts; the y_cap prompt in usage-guide produces overlapping labels."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network or shell strings; local plot files only."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Three scripts with documented signatures and comments; no test ties the quoted counts to the airway data, so they drifted when the y axis changed."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Precise trigger, version note, escape hatches for raw-p input and svalue; Python volcano labelling is only pointed at, not shipped."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 23,
+      "total": 24
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scripts/volcano_phd.R unchanged on the fitted airway dds (29,391 genes, 17,994 with padj): volcano, MA, cairo_pdf, EnhancedVolcano",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran to the end; both PDFs at stated size, TrueType, counts and boundary consistent, EnhancedVolcano Up and Down differ.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "volcano.pdf and ma_plot.pdf have the stated 89x90 and 89x70 mm page sizes.",
+            "result": "PASS",
+            "note": "pdfinfo 252x255 pt and 252x198 pt (88.9x90.0 and 88.9x69.9 mm)."
+          },
+          {
+            "text": "pdffonts reports embedded TrueType only for both PDFs.",
+            "result": "PASS",
+            "note": "ArialMT, SymbolMT, Arial-ItalicMT TrueType, no Type 3."
+          },
+          {
+            "text": "The volcano plots every non-NA-padj gene and its Up and Down counts equal the table counts (451 Up, 366 Down).",
+            "result": "PASS",
+            "note": "17,994 points drawn; 451/366 coloured vs 451/366 in the shrunken results."
+          },
+          {
+            "text": "The dashed threshold line equals the colour boundary in the plotted quantity.",
+            "result": "PASS",
+            "note": "yintercept 1.30103 = -log10(0.05); all 817 coloured points at y>=1.349, all 14,000 points below the line grey."
+          },
+          {
+            "text": "The EnhancedVolcano figure colours Up orange and Down blue, labels TP53/MYC/BRCA1 and names the adjusted P axis.",
+            "result": "PASS",
+            "note": "Distinct #D55E00/#0072B2/#999999; figure opened, labels present, y label adjusted P."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "scripts/volcano_plot.R volcano_plot(): uncapped, y_cap = 30, other fdr/lfc cutoffs, absent label gene",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Counts and boundaries are exact with and without the cap; capped labels collide.",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Without y_cap every non-NA-padj gene is plotted, Up/Down equal the table, the maximum y is 131 and the NA count is reported.",
+            "result": "PASS",
+            "note": "17,994 points; 451/366; max 131.4; message '11397 genes with padj = NA are not drawn'."
+          },
+          {
+            "text": "With y_cap = 30 no gene is dropped, capped genes are exactly those above 30 and are triangles with a legend entry.",
+            "result": "PASS",
+            "note": "118 triangles (115 significant) = genes with -log10(padj)>30; all 17,994 still plotted; legend 'capped at 30'."
+          },
+          {
+            "text": "The threshold line equals the colour boundary for fdr 0.05 and for fdr 0.01 with lfc 1.5, with and without the cap.",
+            "result": "PASS",
+            "note": "hline at 1.301 and 2.0; coloured points on or above it; vlines at +-1.5."
+          },
+          {
+            "text": "An absent label gene warns by name and a plain data.frame input works.",
+            "result": "PASS",
+            "note": "Warning names NOT_A_GENE; 3,000-row data.frame ran."
+          },
+          {
+            "text": "The y_cap = 30 figure with default top-10 labels is legible at 89 mm.",
+            "result": "FAIL",
+            "note": "Several top-rank labels all sit at y = 30 and print on top of each other (DUSP1, SAMHD1, ZBTB16, SPARCL1, GPX3) (VOL-010)."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Every SKILL.md R block verbatim: DESeq + lfcShrink apeglm/ashr/svalue, EnhancedVolcano with colCustom, plotMA; shrinkage and svalue statements",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three blocks ran verbatim; svalue, contrast, normal and default-type statements reproduce.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All three SKILL.md R blocks execute verbatim without error.",
+            "result": "PASS",
+            "note": "DESeq refit and three lfcShrink calls 80 s; EnhancedVolcano with setNames(okabe_ito[sig], sig); plotMA wrote a plot."
+          },
+          {
+            "text": "The EnhancedVolcano block draws Up and Down in different colours matching the table counts.",
+            "result": "PASS",
+            "note": "#D55E00 count = 451, #0072B2 count = 366."
+          },
+          {
+            "text": "svalue = TRUE returns columns baseMean, log2FoldChange, lfcSE, svalue (no pvalue/padj) for apeglm and ashr and errors for type='normal'.",
+            "result": "PASS",
+            "note": "Columns identical; normal errors (object 'coefAlphaSpaces' not found)."
+          },
+          {
+            "text": "apeglm rejects contrast=, ashr accepts coef=, and the default lfcShrink type is apeglm in DESeq2 1.46.0.",
+            "result": "PASS",
+            "note": "apeglm error 'only for use with coef'; ashr coef ran; formals first choice apeglm."
+          },
+          {
+            "text": "The s-value and shrinkage counts reproduce (4,684 vs 3,994, 3,842 shared; 108 genes raised by apeglm, ashr 0, 9.51 to 10.99).",
+            "result": "PASS",
+            "note": "All reproduced exactly on the airway dds."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "scripts/ma_plot.py on the real shrunken airway table, matplotlib size claim, sanbomics.plots.volcano statements",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "ma_plot draws all 29,391 rows; sanbomics statements reproduce; size claim reproduces on all rows.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "ma_plot() draws every row and colours exactly the padj<0.05 genes orange.",
+            "result": "PASS",
+            "note": "25,397 grey + 3,994 orange = 29,391; 3,994 equals the table."
+          },
+          {
+            "text": "The rasterized-versus-vector size statement (23 KB vs 444 KB) reproduces for ma_plot() at 3.5 x 3 in.",
+            "result": "PASS",
+            "note": "444 KB vector, 23 KB rasterized on all 29,391 rows."
+          },
+          {
+            "text": "sanbomics.plots.volcano exists with symbol and padj defaults and draws every DE point in one grey class, no Up/Down colours; sanbomics.tools is not importable.",
+            "result": "PASS",
+            "note": "1,319 DE points (701+618) in dimgrey/black, legend DE/not DE/picked; sanbomics.tools fails on pkg_resources."
+          },
+          {
+            "text": "The matplotlib MA figure is legible and shows the low-count fan with significant genes highlighted.",
+            "result": "PASS",
+            "note": "Opened: axes labelled, orange significant, grey fan at low baseMean."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "failure-modes.md and reconciliation-thresholds-pushback.md quoted behaviours and numbers re-measured",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "API behaviour reproduces and the quoted numbers equal the re-measured values: cap 50 hides 39 significant genes, median |LFC| 0.7648 (printed 0.76), 17,994 drawn points, PDFs 555,573 and 685,915 B (0.56 and 0.69 MB), MA 444/23 KB on all 29,391 rows.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "selectLab keeps a listed non-significant gene, ignores a name absent from lab and an NA-padj gene, and EnhancedVolcano draws only non-NA-padj rows.",
+            "result": "PASS",
+            "note": "SCYL3 (padj 0.91) labelled; absent and NA genes not drawn; 17,994 of 29,391 points drawn."
+          },
+          {
+            "text": "Default EnhancedVolcano col gives Up and Down one shared colour and ggbreak scale_y_break draws on the volcano.",
+            "result": "PASS",
+            "note": "817 points in one colour; ggbreak PNG written."
+          },
+          {
+            "text": "Rasterizing the point layer cuts the 17,994-point PDF by an order of magnitude.",
+            "result": "PASS",
+            "note": "ggrastr 1.0.2: 540 to 38 KB on a bare geom_point plot; 638 to 66 KB with the volcano's alpha and size."
+          },
+          {
+            "text": "Measured numbers quoted in the references equal re-measured values.",
+            "result": "PASS",
+            "note": "39 hidden genes (r2b), 0.7648 printed as 0.76 (r3), 17,994 drawn points and 555,573 / 685,915 B PDFs (d1_core), 444 / 23 KB on 29,391 rows (r5), all re-run on the candidate bytes."
+          },
+          {
+            "text": "The common-errors table and reviewer pushback rows give correct actions for padj=NA, threshold-line mismatch and max.overlaps.",
+            "result": "PASS",
+            "note": "Verified by the line-versus-boundary assertions and the NA-count message."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 53.3,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The plotted quantity, threshold line and colour boundary now agree exactly: -log10(padj) on y, line at 1.30103, 817 significant genes plotted equals 817 in the table, with and without y_cap.",
+    "y_cap draws capped genes as marked triangles with a legend entry and none are dropped (118 triangles, 115 significant), replacing the old silent clipping.",
+    "EnhancedVolcano Up and Down now differ via colCustom; svalue, apeglm contrast, ashr coef and sanbomics.plots.volcano statements reproduce on the real airway dds.",
+    "All shipped code and all three SKILL.md R blocks run verbatim; PDFs are exact mm with embedded TrueType."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "VOL-010 y_cap labels pile onto the cap and overlap",
+      "observed_in": [
+        2
+      ],
+      "problem": "volcano_plot(res, y_cap = 30) with default top_n labels places every high-rank label at y = 30, where ggrepel with max.overlaps = Inf prints them on top of each other; usage-guide suggests exactly this cap.",
+      "root_cause": "Capped genes share one y value and the repel has no free space above the panel edge.",
+      "fix": "Document label_genes with capped genes excluded or spread horizontally (direction = 'x', ylim expansion), or default top_n labels to genes below the cap."
+    }
+  ]
+}

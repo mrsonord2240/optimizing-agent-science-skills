@@ -1,0 +1,10 @@
+reverted identity: 228c088cf299564fd21d2b9d79a3963e5c0b4a500158bcb4732a1b277e6160e6 files 5 bytes 23322
+CERT MATCH
+CHANGED SKILL.md 2 diff lines
+    -description: Build publication-quality figures in R with ggplot2 using the grammar of graphics (data + aesthetics + geo ...
+    +description: Use when producing static publication-quality figures in R with ggplot2 for papers, presentations, or repo ...
+file-set differences: none
+same line count: True differing line numbers: [3] ['description:']
+yaml keys: ['name', 'description', 'tool_type', 'primary_tool', 'goal_approach_exempt', 'license', 'author', 'category'] | description type: str
+description: Use when producing static publication-quality figures in R with ggplot2 for papers, presentations, or reports.
+starts with 'Use when': True | len 110 | name==dir: True
