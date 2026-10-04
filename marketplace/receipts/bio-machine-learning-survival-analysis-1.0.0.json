@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-machine-learning-survival-analysis",
+  "version": "1.0.0",
+  "result": "pass",
+  "validated_at": "2026-10-04T00:49:08+00:00",
+  "validator_repository": "openscience-skill-marketplace",
+  "validator_commit": "a1d820df61b3c8a72992916178ae8e3836aabe66",
+  "command": "npm run --silent intake:skill -- --manifest <release.config.json> --source F:\\optimized-scientific-skills (eight manifests in one invocation)",
+  "optimized_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "source_path": "skills/bio-machine-learning-survival-analysis",
+  "manifest_sha256": "f9edad56216a79349b290bc6d3c9c9c4eddba5344f87e6a243dfbb72345e9ce6",
+  "intake_entry": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+    "source_path": "skills/bio-machine-learning-survival-analysis",
+    "manifest_sha256": "f9edad56216a79349b290bc6d3c9c9c4eddba5344f87e6a243dfbb72345e9ce6",
+    "content_sha256": "d34d86206600219699932ec7b13795bf222c7cadd3a21590d0ac180774e511f1",
+    "file_count": 5,
+    "total_bytes": 33616,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      }
+    ]
+  },
+  "entry_count": 8,
+  "stderr": "",
+  "note": "Local unsigned intake compatibility check only; no review, approval, build, submission, registration, release, publication, or remote write was performed."
+}

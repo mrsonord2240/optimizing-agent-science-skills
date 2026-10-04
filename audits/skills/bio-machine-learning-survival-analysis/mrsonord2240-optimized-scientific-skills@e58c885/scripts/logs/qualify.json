@@ -1,0 +1,29 @@
+{
+ "current": "6fb42410e7b70eff829bac23fce3c05a0a9941abff229c15570619de1f7f62d3",
+ "after_desc_revert": "eac9a589b7bdc8b56d0f832c060d837a502e4e4c3fd355310ed00582195d71fb",
+ "reproduces_certified": true,
+ "files_differing": [
+  "SKILL.md"
+ ],
+ "skillmd_line_diff": [
+  "-description: Builds and validates predictive time-to-event ",
+  "+description: Use when building an individualized time-to-ev"
+ ],
+ "skillmd_diff_is_one_description_line": true,
+ "chain_fix-textbatch-20261003": "c60f873f52f63ad78a5009b351f8451510f86bbae3f7d46886c03e3bcf9eaf39",
+ "chain_reproduces": true,
+ "yaml_keys": [
+  "name",
+  "category",
+  "description",
+  "tool_type",
+  "primary_tool",
+  "license",
+  "author"
+ ],
+ "yaml_description": "Use when building an individualized time-to-event risk predictor or prognostic omics signature, choosing a survival model, or evaluating one beyond the C-index.",
+ "yaml_description_type": "str",
+ "yaml_name": "bio-machine-learning-survival-analysis",
+ "old_description_len": null,
+ "new_description_len": 160
+}

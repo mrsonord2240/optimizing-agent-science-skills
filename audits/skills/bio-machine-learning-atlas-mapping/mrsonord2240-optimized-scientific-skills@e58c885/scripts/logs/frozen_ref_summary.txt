@@ -1,0 +1,5 @@
+trainable params after load_query_data: ['z_encoder.encoder.fc_layers.Layer 0.0.weight', 'z_encoder.encoder.fc_layers.Layer 0.0.bias', 'l_encoder.encoder.fc_layers.Layer 0.0.weight', 'l_encoder.encoder.fc_layers.Layer 0.0.bias', 'l_encoder.encoder.fc_layers.Layer 0.1.weight', 'l_encoder.encoder.fc_layers.Layer 0.1.bias', 'l_encoder.mean_encoder.weight', 'l_encoder.mean_encoder.bias', 'l_encoder.var_encoder.weight', 'l_encoder.var_encoder.bias', 'decoder.px_decoder.fc_layers.Layer 0.0.weight', 'decoder.px_decoder.fc_layers.Layer 0.0.bias', 'decoder.px_decoder.fc_layers.Layer 0.1.weight', 'decoder.px_decoder.fc_layers.Layer 0.1.bias']
+unchanged tensors: 33
+changed/new tensors: ['decoder.px_decoder.fc_layers.Layer 0.0.weight (shape/new)', 'decoder.px_decoder.fc_layers.Layer 0.1.weight', 'decoder.px_decoder.fc_layers.Layer 0.1.bias']
+ref model object unchanged: True
+saved ref reloads identical: True

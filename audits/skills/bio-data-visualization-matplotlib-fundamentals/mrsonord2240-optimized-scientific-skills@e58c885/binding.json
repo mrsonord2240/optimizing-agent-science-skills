@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-data-visualization-matplotlib-fundamentals",
+  "candidate_version": "candidate@f5acfdfb5250-delta-desc-20261003",
+  "candidate_identity": "f5acfdfb52509e5422c25f3dec2481ef4f182e5c0730398f2bd5bcd2d7fb2a90",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "provider_path": "skills/bio-data-visualization-matplotlib-fundamentals",
+  "provider_tree": "d7de0dbdd541035ce80765e4d301be3cd3c145bd",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "f5acfdfb52509e5422c25f3dec2481ef4f182e5c0730398f2bd5bcd2d7fb2a90",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 8707,
+      "sha256": "3d35311a130fd1e9b98040152eadedf9ec232e8e0ae591f03ebc7a298a9383f2"
+    },
+    {
+      "path": "references/chart-recipes.md",
+      "bytes": 1772,
+      "sha256": "40f030d3324e53496f947ddd8cfce81220d1fc2ead164d058680ea0b884b533e"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 4312,
+      "sha256": "beea486948019190e27bcbf0056fd3abd18068b25d727211b8d1c4a64a0ad011"
+    },
+    {
+      "path": "scripts/matplotlib_phd.py",
+      "bytes": 5723,
+      "sha256": "fcd7894115f6b88c5933d3809c297e103b425b056b1d3e2fdbbfd5cc799cfe53"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4069,
+      "sha256": "eb8851413a30d312248c402244a98e6ced41d850ec4fb56489a9016a0e936c85"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

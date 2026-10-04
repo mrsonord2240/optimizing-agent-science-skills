@@ -1,0 +1,91 @@
+{
+  "skill_id": "bio-machine-learning-omics-classifiers",
+  "version": "mrsonord2240-optimized-scientific-skills@e58c885",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+    "path": "skills/bio-machine-learning-omics-classifiers",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/e58c8855faaf8dcba2341453d73b62bcade3e78c/skills/bio-machine-learning-omics-classifiers"
+  },
+  "candidate": {
+    "identity": "a2d417f41e37007d7a2a3ea4d76b744cf1be42485be95576f42dee806584616f",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "a2d417f41e37007d7a2a3ea4d76b744cf1be42485be95576f42dee806584616f",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-omics-classifiers",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "44ed2cf314af3b997fe0d097e07237e2137c8ee60951255aa765e92400050b95",
+        "bytes": 25773
+      },
+      {
+        "path": "references/failure-modes.md",
+        "sha256": "1df907dd05c96952866660048ba315949aab9737c5123f70481ce97ed2305f98",
+        "bytes": 2973
+      },
+      {
+        "path": "scripts/batch_checks.py",
+        "sha256": "bcc9a59ab72ea5b51b4784323ebc24052e874e5cbba5b3203356c149ddabb308",
+        "bytes": 4073
+      },
+      {
+        "path": "scripts/calibration_check.py",
+        "sha256": "f8fb4129599c285046f90ae20a6c27907bb77f211b17ac7351e7efb7bd69befb",
+        "bytes": 6330
+      },
+      {
+        "path": "scripts/logistic_regression.py",
+        "sha256": "06cf62e8d860827a640158dc1ccf5986025636ebcc09b1ea4cd382a30d6fa5d9",
+        "bytes": 2954
+      },
+      {
+        "path": "scripts/rf_xgboost_classifier.py",
+        "sha256": "09c3f58ed0d9ada23ef253dbbc0bdab5e923547fabcf950d9f008db87d62aeab",
+        "bytes": 3612
+      },
+      {
+        "path": "usage-guide.md",
+        "sha256": "5af260128318ca7cd5ec99b44ed09396c729b9d802515853c5cf33a667a891f0",
+        "bytes": 4648
+      }
+    ],
+    "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+    "provider_tree": "d01a48c57b16dec8f69433c8345793556c2c8927"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs",
+    "auditor_independent": true
+  },
+  "supersedes": "candidate@a2d417f41e37-reaudit-delta-20261003",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 2,
+    "provider_binding": "binding.json"
+  }
+}

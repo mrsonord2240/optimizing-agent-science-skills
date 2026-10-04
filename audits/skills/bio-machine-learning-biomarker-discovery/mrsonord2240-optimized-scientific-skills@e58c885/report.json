@@ -1,0 +1,385 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-biomarker-discovery",
+    "description": "Use when identifying candidate biomarkers from high-dimensional omics data, deciding between an all-relevant and a minimal-optimal selector, or judging whether a selected gene set is reproducible.",
+    "evaluated_on": "2026-10-03",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number stated in SKILL.md for stability selection and scoring was re-measured and matches (see Lead verification); citations are named works; the Meinshausen-Buhlmann bound is quoted correctly as q^2/((2*pi_thr-1)*p) under exchangeability."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-use selection guidance; routes unbiased performance to model-validation, refuses to read a minimal-optimal list as \"the biomarkers\", states that stability is not evidence of signal and that the Golub numbers are one dataset and partition."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Selection, scaling and tuning verified to be fit on training rows only (held-out rows replaced by garbage with labels flipped leave scaler, selected columns, coefficients, best_params_ and inner CV scores bit-identical); the select-before-CV leak is real (positive control) and reproduced on permuted labels; the null control for stability selection holds on real and self-built data."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped runnable surfaces execute; one robustness gap (rare-class labels give a misleading ValueError, RA-001) fails loudly, never silently."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Method taxonomy, all-relevant vs minimal-optimal framing and the leakage-safe Pipeline, nested GridSearchCV, in-fold mRMR, Boruta, elastic-net and stability selection blocks are accurate and executable. Deduction: stability_selection assumes both classes survive every n/2 subsample (RA-001)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Seeded, bit-reproducible, explicit empty-selection message instead of silent NaN, explicit scoring pin. Deduction: rare-class labels crash with a misleading liblinear \"multiclass\" ValueError and the limitation is undocumented (RA-001)."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Progressive disclosure is correct (failure modes routed, scripts referenced); wall times are stated and match measured ones (elastic-net 34/263 s stated vs 39/278 s measured under load and 33/250 s in the tooling log; stability call 1-6 s / 15-24 s vs 1-3 s / 15-24 s). Boruta (about 60-100 s) has no stated time, only \"Slow\"."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Cold start is clear, the decision rule is explicit, the description is a pure trigger and separates the Skill from model-validation, prediction-explanation, omics-classifiers, survival-analysis and atlas-mapping. SKILL.md is long (21 KB) but the detail is routed."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Usage-guide prompts are natural; scientific strictness (loud failures) is appropriate."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network or destructive operation; array inputs only."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Clean split of SKILL.md, failure-modes, three scripts and a usage guide; script narrative strings now match what runs (lasso label reworded, Boruta/L1 counts computed). Snippets have no bundled tests."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Honest scope and caveats (approximate unit invariance, non-zero null possible, one dataset and partition), explicit escape hatches, correct sklearn migration notes. Deduction: the R glmnet row has no explicit \"not executed\" marker (prose only, no claim of execution)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 27,
+      "total": 29
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Leakage-safe Pipeline, nested GridSearchCV and in-fold MRMRSelect (SKILL.md blocks 0-2) on Golub, with held-out perturbation and permuted-label null",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Blocks 0-2 rc 0 under -W error::FutureWarning at 1,000 probes (2/14/20 s) and 7,129 probes (7/90/78 s): AUC 0.990 +/- 0.030, nested 0.99, mRMR 1.0. Perturbing held-out rows (values and labels) on folds 0 and 3 left scaler mean, selected columns, coefficients, best_params_, inner CV scores and mRMR cols_ bit-identical; the same perturbation changes a select-on-all-rows control (6 of 20 columns). Permuted labels, 5 draws, 1,000 probes: select-before-CV AUC 0.66 mean (0.55-0.78) vs in-pipeline 0.48 vs nested 0.47.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Scaler and SelectKBest inside the Pipeline are fit on training rows only",
+            "result": "PASS",
+            "note": "leakage_tests.py: scaler.mean_, get_support() and coef_ identical after held-out rows replaced by N(500,300) with labels flipped (folds 0, 3)"
+          },
+          {
+            "text": "Nested GridSearchCV never lets tuning see the outer test fold",
+            "result": "PASS",
+            "note": "best_params_ and inner mean_test_score identical after the same perturbation; outer fold score changes (1.0 -> 0.4/0.8)"
+          },
+          {
+            "text": "MRMRSelect runs and selects inside the fold",
+            "result": "PASS",
+            "note": "cols_ identical after perturbation; K=20; AUC 1.0"
+          },
+          {
+            "text": "The leaky select-before-CV gap reproduces on permuted labels",
+            "result": "PASS",
+            "note": "0.66 vs 0.48 (1,000 probes, k=20); script p=5000 shows 1.00 vs 0.56; positive control confirms test power"
+          },
+          {
+            "text": "Every block runs warning-free under -W error::FutureWarning at both sizes",
+            "result": "PASS",
+            "note": "logs/snip012_1000.log, snip012_full.log"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "BorutaPy snippet and boruta_feature_selection.py",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md block 3: real labels 90 confirmed / 20 tentative at 1,000 probes (71 s; 96 s at 7,129); permuted labels (default_rng(1)) 8 confirmed. Script: 5/5 module members confirmed by Boruta, L1 4/5, both counts computed and printed.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Snippet returns confirmed/tentative masks on numpy input without warnings",
+            "result": "PASS",
+            "note": "logs/boruta_inspect.log, snip3_1000.log, snip3_full.log"
+          },
+          {
+            "text": "Permuted labels confirm few features",
+            "result": "PASS",
+            "note": "8 of 1,000 probes (0.8 percent) with perc=100"
+          },
+          {
+            "text": "Script printed counts equal what runs (BD-005)",
+            "result": "PASS",
+            "note": "prints Boruta 5/5 and L1 4/5 from computed values; the old \"~1\" claim is gone"
+          },
+          {
+            "text": "Script is seeded and warning-free",
+            "result": "PASS",
+            "note": "logs/boruta_1000.log rc 0"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Elastic-net LogisticRegressionCV with scoring pinned to accuracy: stated size table and partition dependence",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Stated table reproduced exactly on the stated partition (1,000 probes, cv=5): selected 601 / 203 / 148 for neg_log_loss / roc_auc / accuracy; permuted labels 16 / 0 / 0; outer AUC 0.991 / 0.983 / 0.991. Other inner partitions (shuffled seeds 1, 2): neg_log_loss 436 / 437, roc_auc 53 / 96, accuracy 150 / 150. sklearn 1.9.1 emits the FutureWarning naming the 1.11 default change to neg_log_loss. Block 4: 39 s at 1,000 and 278 s at 7,129 under load.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Stated 601/203/148 and permuted 16/0/0 reproduce",
+            "result": "PASS",
+            "note": "logs/bd002.log STATED PARTITION"
+          },
+          {
+            "text": "Stated held-out AUC 0.991/0.983/0.991 reproduces and is within 0.01",
+            "result": "PASS",
+            "note": "same log"
+          },
+          {
+            "text": "The sklearn 1.11 default-change statement is accurate and the pin is explicit",
+            "result": "PASS",
+            "note": "scoring_default_warn.py: FutureWarning text names accuracy -> neg_log_loss in 1.11"
+          },
+          {
+            "text": "The Skill does not overgeneralize the size table from one partition",
+            "result": "PASS",
+            "note": "text says one dataset and partition and to re-check on your data; accuracy is the most partition-stable (148-150) so the pin is defensible for a compact signature, though roc_auc size swings 53-203 (RA-002)"
+          },
+          {
+            "text": "Snippet runs warning-free at both sizes",
+            "result": "PASS",
+            "note": "logs/snip4_1000.log, snip4_full.log"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "scripts/stability_selection.py on Golub: determinism, unit invariance, permuted-label null and every stated number at both sizes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1,000 probes (q=14): real labels 2 / 2 / 2 stable (raw / standardized / rescaled), Nogueira 0.25; 11 permutations: 0 stable in 10, one probe (454) at 0.81 in perm_109. 7,129 probes (q=37): 5 / 5 / 5 stable (probes 1778, 1833, 2287, 4846, 4950), Nogueira 0.228; 0 stable in all 11 permutations, highest frequency 0.57 (the snippet permutation; the 10 staged sets reach 0.52). Same seed bit-identical, seed 1 differs (maxdiff 0.16 / 0.15). One call 1-3 s and 15-24 s.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Identical seed gives identical frequencies; a different seed differs",
+            "result": "PASS",
+            "note": "determinism_1000.log, determinism_full.log: maxdiff 0.0 vs 0.16/0.15"
+          },
+          {
+            "text": "Real-label counts 2/2/2 and 5/5/5 across raw, standardized and rescaled input match SKILL.md",
+            "result": "PASS",
+            "note": "stab_1000.log, stab_full.log; frequencies identical"
+          },
+          {
+            "text": "Permuted null matches the stated 0-in-10-of-11 (1,000) and 0-in-all-11 with highest 0.57 (7,129)",
+            "result": "PASS",
+            "note": "NULL SUMMARY lines in both logs"
+          },
+          {
+            "text": "Empty selection is reported rather than silent NaN",
+            "result": "PASS",
+            "note": "q=0 returns a NaN index; the snippet prints \"no features selected\""
+          },
+          {
+            "text": "Wording is honest: approximate invariance, non-zero null possible, count over runs",
+            "result": "PASS",
+            "note": "one probe at 0.81 in a 1,000-probe permutation is exactly the case the text warns about"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Independent self-built null: pure-noise features, planted true features, units, determinism (n=100-120, p=2000)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pure-noise X and y, 8 draws, q=19: 0 stable in all (max frequency 0.22-0.57; EV bound is 1). Planted 5 of 2000 (moderate signal), 6 draws: 0-2 of 5 recovered, 0 false. Planted beta 2.5 (n=120), 6 draws: 1/4/0/4/1/4 of 5 recovered, 0 false stable; permuted-label nulls gave 0 stable in 5 draws and 1 (frequency 0.74) in one. Rescaled exp(N(0,2))*X+5, standardized and x1000 inputs give identical frequencies (maxdiff 0.00).",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Near-zero stable features under pure noise",
+            "result": "PASS",
+            "note": "0 stable in 8 independent draws; mean 0.0 vs bound EV=1"
+          },
+          {
+            "text": "Planted features dominate the stable set and no false feature is called stable on real signal",
+            "result": "PASS",
+            "note": "strong planting: 14 true vs 0 false over 6 draws; moderate: 7 true vs 0 false"
+          },
+          {
+            "text": "Unit invariance on raw, standardized, rescaled and x1000 input",
+            "result": "PASS",
+            "note": "maxdiff 0.00 in all comparisons"
+          },
+          {
+            "text": "Recall is not oversold",
+            "result": "PASS",
+            "note": "recall is low to moderate (0-4 of 5): the Skill claims control of false selections and says a count not clearly above its null is not a signature; it makes no recall claim"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "Rare-class labels in stability_selection (n=72, p=300, subsamples of 36 are not stratified)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "With 20 positives of 72 the function runs and recovers the 3 planted features. With 8, 4 or 2 positives some n/2 subsample lacks a class and the call raises a ValueError whose text blames liblinear \"multiclass classification (n_classes >= 3)\", which misleads: the cause is a single-class subsample. The failure is loud, never silent.",
+        "basic": 28,
+        "specialized": 40,
+        "total": 68,
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Rare-class input fails loudly rather than returning wrong frequencies",
+            "result": "PASS",
+            "note": "ValueError raised (logs/imbalance.log)"
+          },
+          {
+            "text": "The error message identifies the cause (single-class subsample)",
+            "result": "FAIL",
+            "note": "message cites multiclass/liblinear, not class absence"
+          },
+          {
+            "text": "SKILL.md or the script docstring states the both-classes-per-subsample requirement",
+            "result": "FAIL",
+            "note": "not stated; subsampling is unstratified (RA-001)"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "lasso_biomarker.py narrative, R glmnet prose row, constant-column and empty-selection guards",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "lasso_biomarker.py: noise AUC 1.00 select-before-CV vs 0.56 in-pipeline; stable [g0,g1,g2,g3] under the reworded label \"[planted signal: g0..g4; a missing one was not recovered]\" (4 of 5, now stated honestly); permuted 0; rescaled 4 (same set True); identical when run from the Skill directory. Constant column handled (frequency 0). glmnet is one troubleshooting row, no R code, nothing claimed executed.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Script print labels match what runs (BD-005 incl. the lasso reword)",
+            "result": "PASS",
+            "note": "output shows 4 stable and the label says a missing one was not recovered; Boruta script prints 5/5 and 4/5 from computed values"
+          },
+          {
+            "text": "R glmnet is not presented as executed or bundled",
+            "result": "PASS",
+            "note": "single prose row in Common Errors, no code; static-only (no explicit \"not executed\" marker, noted as a deduction)"
+          },
+          {
+            "text": "Degenerate inputs (constant column, q=0) do not crash or silently mislead",
+            "result": "PASS",
+            "note": "frequency 0.0 for the constant feature; q=0 gives a NaN index and the snippet prints \"no features selected\""
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 51.4,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The stability-selection function controls false discoveries as claimed: 0 stable features in 8 self-built pure-noise datasets and in 11 of 11 (7,129 probes) permuted-label sets, bit-reproducible per seed and invariant to feature units.",
+    "Selection, scaling and tuning provably stay in the training fold: perturbing held-out rows (values and labels) leaves scaler, selected columns, coefficients, best_params_ and inner CV scores bit-identical across Pipeline, nested GridSearchCV and in-fold mRMR, while a select-before-CV control changes.",
+    "Every number the Skill states about size, stability and cost reproduces (601/203/148, 16/0/0, 2/2/2, 5/5/5, 0.57, wall times), with honest caveats about one dataset and partition and approximate invariance.",
+    "The pure-trigger description parses and separates the Skill from the validation, explanation, classifier, survival and atlas siblings."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "RA-001: stability_selection fails obscurely on rare-class labels",
+      "observed_in": [
+        6
+      ],
+      "problem": "Subsamples of n/2 are not stratified; with 8 or fewer positives of 72 some subsample has one class and the call raises a ValueError citing liblinear multiclass (n_classes >= 3). The failure is loud but misleading, and neither SKILL.md nor the docstring states the both-classes requirement.",
+      "root_cause": "Plain rng.choice subsampling and no pre-check of the class counts in each subsample.",
+      "fix": "Text-only: state in SKILL.md that labels must be binary with enough minority samples that every n/2 subsample keeps both classes. Optional script change: stratified subsampling plus a clear error."
+    },
+    {
+      "priority": "P2",
+      "title": "RA-002: roc_auc signature size is partition-dependent, accuracy is not",
+      "observed_in": [
+        3
+      ],
+      "problem": "The stated table (601/203/148) is honestly labelled one dataset and partition, but on two other inner partitions roc_auc selected 53 and 96 probes (below accuracy 150) and neg_log_loss 436 and 437; a reader can take roc_auc as always larger than accuracy.",
+      "root_cause": "Only one partition was measured and tabulated.",
+      "fix": "Text-only: add one clause that over three partitions neg_log_loss gave 436-601, roc_auc 53-203 and accuracy 148-150 probes, which is also the reason accuracy is the stable pin."
+    }
+  ]
+}

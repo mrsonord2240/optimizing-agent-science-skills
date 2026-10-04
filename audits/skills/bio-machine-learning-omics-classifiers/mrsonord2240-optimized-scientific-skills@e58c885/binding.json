@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-machine-learning-omics-classifiers",
+  "candidate_version": "candidate@a2d417f41e37-reaudit-delta-20261003",
+  "candidate_identity": "a2d417f41e37007d7a2a3ea4d76b744cf1be42485be95576f42dee806584616f",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "provider_path": "skills/bio-machine-learning-omics-classifiers",
+  "provider_tree": "d01a48c57b16dec8f69433c8345793556c2c8927",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "a2d417f41e37007d7a2a3ea4d76b744cf1be42485be95576f42dee806584616f",
+  "file_count": 7,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 25773,
+      "sha256": "44ed2cf314af3b997fe0d097e07237e2137c8ee60951255aa765e92400050b95"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 2973,
+      "sha256": "1df907dd05c96952866660048ba315949aab9737c5123f70481ce97ed2305f98"
+    },
+    {
+      "path": "scripts/batch_checks.py",
+      "bytes": 4073,
+      "sha256": "bcc9a59ab72ea5b51b4784323ebc24052e874e5cbba5b3203356c149ddabb308"
+    },
+    {
+      "path": "scripts/calibration_check.py",
+      "bytes": 6330,
+      "sha256": "f8fb4129599c285046f90ae20a6c27907bb77f211b17ac7351e7efb7bd69befb"
+    },
+    {
+      "path": "scripts/logistic_regression.py",
+      "bytes": 2954,
+      "sha256": "06cf62e8d860827a640158dc1ccf5986025636ebcc09b1ea4cd382a30d6fa5d9"
+    },
+    {
+      "path": "scripts/rf_xgboost_classifier.py",
+      "bytes": 3612,
+      "sha256": "09c3f58ed0d9ada23ef253dbbc0bdab5e923547fabcf950d9f008db87d62aeab"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4648,
+      "sha256": "5af260128318ca7cd5ec99b44ed09396c729b9d802515853c5cf33a667a891f0"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

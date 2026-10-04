@@ -1,0 +1,27 @@
+{
+ "current": "a579d86464c9fd84579b6645107d0f6c72b87f091da33839966cc6b08c8a75ef",
+ "after_revert": "becbe61423e78eaae064b907ae4dc929d87852078244bf2586f218ca69b7eab3",
+ "reproduces_certified": true,
+ "files_differing": [
+  "SKILL.md"
+ ],
+ "skillmd_line_diff": [
+  "-description: Use when annotating new single-cell datasets against a p",
+  "+description: Use when projecting a new single-cell dataset into an ex"
+ ],
+ "one_description_line": true,
+ "yaml_keys": [
+  "name",
+  "category",
+  "description",
+  "tool_type",
+  "primary_tool",
+  "license",
+  "author"
+ ],
+ "yaml_description": "Use when projecting a new single-cell dataset into an existing reference atlas embedding without retraining the reference, choosing a reference-mapping method, or judging whether labels transferred from the atlas are trustworthy.",
+ "yaml_type": "str",
+ "yaml_name": "bio-machine-learning-atlas-mapping",
+ "new_len": 229,
+ "description_sentences_use_when": true
+}

@@ -2,9 +2,10 @@
 
 - Updated: 2026-10-03
 - Lane: 3 (delta re-audit lane E2, description trim)
-- Status: candidate-ready
+- Status: done (shelf e58c885, intake accepted at validator a1d820d, exported to bioSkills-Improved fff47bd; worktree removed)
 - Owner leaving: delta re-audit worker E2 (fresh auditor)
-- Next role: orchestrator (commit exact bytes to make them ready)
+- Next role: none; open P2s wait for a later refinement run
+- Delta qualification for the SA-006 text fix, recorded as partial in `candidate@eac9a589b7bd-reaudit-delta-20261003`, was completed afterwards: reverting `fix-textbatch-20261003\edits.json` reproduces `c60f873f52f6`, confirmed again in `candidate@6fb42410e7b7-reaudit-delta2-20261003`.
 
 ## Source identity
 

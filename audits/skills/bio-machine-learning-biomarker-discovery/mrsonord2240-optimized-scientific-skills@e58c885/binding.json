@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-machine-learning-biomarker-discovery",
+  "candidate_version": "candidate@27580088c038-reaudit-lane3a1-20261003",
+  "candidate_identity": "27580088c038f830586abc45faa573419e8cf255ef355932b40840c41eda3134",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "provider_path": "skills/bio-machine-learning-biomarker-discovery",
+  "provider_tree": "dc228b2e587ea54b0ffbf872e35c10fc76b3d0ac",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "27580088c038f830586abc45faa573419e8cf255ef355932b40840c41eda3134",
+  "file_count": 6,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 21325,
+      "sha256": "a0ab8b3e3050089a4f1a111dd55192a36c8ec0b34e3c13c8712a38f96a0b227f"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 3604,
+      "sha256": "ef6e4bffe18595ace9bd8c0d3e6623428a017b9f4939aa01330b76a1dc04c926"
+    },
+    {
+      "path": "scripts/boruta_feature_selection.py",
+      "bytes": 2443,
+      "sha256": "e0abeb3b6ec7a2f6b7a878a7b5b340f6b36a6a3120ec8b3273e2ddb7245a5767"
+    },
+    {
+      "path": "scripts/lasso_biomarker.py",
+      "bytes": 3195,
+      "sha256": "4f9dfc79b39a5cf5d53518f3422bdf20bc79fb968772df2bdee697afbf7bebdc"
+    },
+    {
+      "path": "scripts/stability_selection.py",
+      "bytes": 2217,
+      "sha256": "eeb005501e74b19431049a0819c44733917bb220a2ac76174050e22de514fa8e"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4297,
+      "sha256": "fd57827b55537784fef6b5f7918b17678b66f98053f17fe6e8d52be0b60b8457"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

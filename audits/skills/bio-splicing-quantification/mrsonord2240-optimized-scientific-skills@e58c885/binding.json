@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-splicing-quantification",
+  "candidate_version": "candidate@1010225625de-reaudit-delta2-20261003",
+  "candidate_identity": "1010225625de8bd6106b0c187dd8b1459d3ae84e91abeb44a7df95a8bdef792d",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "provider_path": "skills/bio-splicing-quantification",
+  "provider_tree": "879dc2cc62791adbff4165ba1e3623272f9c05da",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "1010225625de8bd6106b0c187dd8b1459d3ae84e91abeb44a7df95a8bdef792d",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 22972,
+      "sha256": "0b00e894e3395542664bfa4e3c401f3ff482cf02e02c4937ed44d55bd4641211"
+    },
+    {
+      "path": "references/failure-modes-and-errors.md",
+      "bytes": 5112,
+      "sha256": "12b85deb0af38d824f20ebee76689f4c12e664c44ef9ac6735c9d1b1aaff6e14"
+    },
+    {
+      "path": "references/intron-retention-and-microexons.md",
+      "bytes": 2779,
+      "sha256": "aaa647ac460e855c7e7cfa0bab54318b759d4387a47eea818e744dc2b93b66ad"
+    },
+    {
+      "path": "scripts/quantify_splicing.py",
+      "bytes": 6917,
+      "sha256": "4ce74bfa606cd0f28b8bfd1d1c468b820ca1d33d4849e113744348de1831d69a"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 3927,
+      "sha256": "20545299c848af694a40dbdfcac9a2a2442f16189ad63e91b6e57d941bd459a5"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

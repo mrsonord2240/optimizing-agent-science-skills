@@ -6,7 +6,7 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 
 - Audit coverage: **200 / 561 (35.7%)** in-scope Skills
 - Untouched: **361**
-- Ready on the optimized shelf: **187**
+- Ready on the optimized shelf: **195**
 - Out of scope: **1**
 
 `Audited` includes every in-scope Skill with a published latest audit, including ready Skills. `Ready` means the provider records a score of at least 85 with a Production Ready grade, deployable exact bytes, no open P0, a completed fix pass, and no pending re-audit. Marketplace intake is a separate gate before a run may call newly completed work done.
@@ -17,9 +17,9 @@ Corpus snapshot: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
 |---|---:|---:|---:|---:|---:|
 | Evidence Insight | 1 | 1 | 0 | 1 | 0 |
 | Protocol Design | 7 | 7 | 0 | 7 | 0 |
-| Data Analysis | 192 | 192 | 0 | 179 | 0 |
+| Data Analysis | 192 | 192 | 0 | 187 | 0 |
 | Unclassified | 362 | 0 | 361 | 0 | 1 |
-| **Total** | **562** | **200** | **361** | **187** | **1** |
+| **Total** | **562** | **200** | **361** | **195** | **1** |
 
 `Unclassified` contains Skills for which neither the current audit nor the corpus snapshot supplies an authoritative category. This generator does not guess from directory names.
 
@@ -31,7 +31,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 |---|---:|---:|---:|---:|---:|
 | alignment | 7 | 0 | 0 | 0 | 7 |
 | alignment-files | 10 | 0 | 0 | 0 | 10 |
-| alternative-splicing | 8 | 1 | 0 | 0 | 9 |
+| alternative-splicing | 9 | 0 | 0 | 0 | 9 |
 | atac-seq | 12 | 0 | 0 | 0 | 12 |
 | causal-genomics | 11 | 0 | 0 | 0 | 11 |
 | chemoinformatics | 15 | 0 | 5 | 0 | 20 |
@@ -43,7 +43,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | comparative-genomics | 1 | 0 | 12 | 0 | 13 |
 | copy-number | 0 | 0 | 11 | 0 | 11 |
 | crispr-screens | 15 | 0 | 0 | 0 | 15 |
-| data-visualization | 7 | 5 | 5 | 3 | 20 |
+| data-visualization | 10 | 5 | 5 | 0 | 20 |
 | database-access | 15 | 0 | 0 | 0 | 15 |
 | differential-expression | 1 | 0 | 5 | 0 | 6 |
 | ecological-genomics | 0 | 0 | 6 | 0 | 6 |
@@ -62,7 +62,7 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | immunoinformatics | 0 | 0 | 6 | 0 | 6 |
 | liquid-biopsy | 2 | 0 | 5 | 0 | 7 |
 | long-read-sequencing | 0 | 0 | 9 | 0 | 9 |
-| machine-learning | 2 | 4 | 0 | 0 | 6 |
+| machine-learning | 6 | 0 | 0 | 0 | 6 |
 | metabolomics | 9 | 0 | 0 | 0 | 9 |
 | metagenomics | 0 | 0 | 8 | 0 | 8 |
 | methylation-analysis | 0 | 0 | 10 | 0 | 10 |
@@ -93,24 +93,16 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | variant-calling | 6 | 0 | 7 | 0 | 13 |
 | workflow-management | 0 | 0 | 5 | 0 | 5 |
 | workflows | 4 | 0 | 37 | 0 | 41 |
-| **Total** | **187** | **10** | **361** | **4** | **562** |
+| **Total** | **195** | **5** | **361** | **1** | **562** |
 
 ## Audited but not ready
 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
-| `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 90 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d1247b0d8cd-delta-desc-20261003/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |
 | `bio-data-visualization-lollipop-protein-maps` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@4f5e4c0/viewer.md) |
-| `bio-data-visualization-matplotlib-fundamentals` | Data Analysis | 90 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@f5acfdfb5250-delta-desc-20261003/viewer.md) |
 | `bio-data-visualization-multipanel-figures` | Data Analysis | 94.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@3749f31/viewer.md) |
 | `bio-data-visualization-upset-plots` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md) |
-| `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 89 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@0bc1e67d46d6-delta-desc-20261003/viewer.md) |
-| `bio-machine-learning-atlas-mapping` | Data Analysis | 87 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-machine-learning-atlas-mapping/candidate@a579d86464c9-reaudit-delta3-20261003/viewer.md) |
-| `bio-machine-learning-biomarker-discovery` | Data Analysis | 88 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@27580088c038-reaudit-lane3a1-20261003/viewer.md) |
-| `bio-machine-learning-omics-classifiers` | Data Analysis | 88 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-machine-learning-omics-classifiers/candidate@a2d417f41e37-reaudit-delta-20261003/viewer.md) |
-| `bio-machine-learning-survival-analysis` | Data Analysis | 87 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-machine-learning-survival-analysis/candidate@6fb42410e7b7-reaudit-delta2-20261003/viewer.md) |
-| `bio-splicing-quantification` | Data Analysis | 85 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-splicing-quantification/candidate@1010225625de-reaudit-delta2-20261003/viewer.md) |
 
 Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.

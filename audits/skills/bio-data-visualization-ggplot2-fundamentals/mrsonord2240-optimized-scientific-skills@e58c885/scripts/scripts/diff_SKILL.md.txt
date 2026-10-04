@@ -1,0 +1,2 @@
+-description: Build publication-quality figures in R with ggplot2 using the grammar of graphics (data + aesthetics + geometries + scales + facets + themes) with CVD-safe palettes, cairo_pdf TrueType embedding, programmatic aes via tidy evaluation, and the theme_classic publication baseline. Use when producing static figures in R for papers, presentations, or reports.
++description: Use when producing static publication-quality figures in R with ggplot2 for papers, presentations, or reports.

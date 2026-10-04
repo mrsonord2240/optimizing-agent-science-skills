@@ -2,9 +2,9 @@
 
 - Updated: 2026-10-03
 - Lane: 1
-- Status: candidate-ready (delta re-audit, description trim)
+- Status: done (shelf e58c885, intake accepted at validator a1d820d, exported to bioSkills-Improved fff47bd; worktree removed)
 - Owner leaving: delta re-audit worker (lane E1, run delta-desc-20261003)
-- Next role: orchestrator (commit at run close, local intake; or fix-scientific-skill for the open P2 first)
+- Next role: none; open P2s wait for a later refinement run
 
 ## Source identity
 

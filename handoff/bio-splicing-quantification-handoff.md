@@ -2,9 +2,9 @@
 
 - Updated: 2026-10-03
 - Lane: 2 (delta re-audit lane E2, description trim)
-- Status: candidate-ready
+- Status: done (shelf e58c885, intake accepted at validator a1d820d, exported to bioSkills-Improved fff47bd; worktree removed)
 - Owner leaving: delta re-audit worker E2 (fresh auditor)
-- Next role: orchestrator (commit exact bytes to make them ready); fix-scientific-skill for SQ-12 and SQ-14 when scheduled
+- Next role: none; open P2s wait for a later refinement run
 
 ## Source identity
 

@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "skill_name": "bio-splicing-quantification",
+    "description": "Use when measuring splice-site usage or isoform inclusion ratios (PSI) from short-read RNA-seq.",
+    "evaluated_on": "2026-10-03",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "performed_by": "Claude (Anthropic) delta re-audit worker E2",
+    "auditor_independent": true
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; planted PSI, formula, SUPPA2 and rMATS values reproduce; unexecuted tools and literature figures are labelled"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-method Skill with no clinical conclusions; disease signatures are cited literature"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Effective-length PSI, both-group replicate reliability, tool-family reconciliation and sign conventions held"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Inline snippet and parse_rmats_output run on real rMATS output for all five event types, JC and JCEC, and match an independent oracle; SUPPA2, regtools/leafcutter and IRFinder commands run as written; a zero-event file raises a loud KeyError (SQ-12, P2)"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Taxonomy, tool selection, effective-length PSI, SUPPA2, regtools/leafcutter and IRFinder commands all reproduce on real tool output; the shipped parser agrees with an independent oracle for all five event types; JC length statement now states maxima and per-event use (SQ-13 resolved), with one imprecise condition clause (SQ-14)"
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "XS-tag prerequisite and strand check, SUPPA2 header and pin, and clear unsupported-event errors; a legitimate zero-event rMATS file still raises a raw KeyError (SQ-12) and leafcutter exits 0 with zero clusters on untagged BAMs (documented)"
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md 294 lines with failure modes and IR/microexon detail routed to references; tool matrix and decision tree still overlap"
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Decision tables, thresholds and reconciliation rules are clear; BAM-list format, TPM header contract, XS prerequisite and JC/JCEC lengths are now stated"
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Good pitfalls and prompts; literature figures are labelled; one unhelpful raw error on empty rMATS files"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials; subprocess calls use argument lists; no shell interpolation"
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Small modular script with per-type column map and parameterised thresholds and docstrings; no tests and a single dependency pin"
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger is now the Use-when clause only (tool list, taxonomy prose removed at Sam's request); 'short-read' and 'measuring PSI' still separate it from bio-long-read-splicing and bio-differential-splicing, and Related Skills in the body carry the routing; progressive disclosure works; restricted and heavy surfaces are labelled not executed"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 35,
+      "total": 37
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Fresh rMATS-turbo 4.4.0 on real chrX 2v2 BAMs, then parse per the Skill (inline snippet, 5 types x JC/JCEC)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rMATS rc 0 (SE 958, A5SS 216, A3SS 251, MXE 51, RI 174); SKILL.md snippet extracted and executed verbatim (20 reliable SE rows); parse_rmats_output vs an independent stdlib-csv oracle on 36 file x min-reads cases: 0 failures, max error 0",
+        "basic": 36,
+        "specialized": 53,
+        "assertions": [
+          {
+            "text": "rMATS runs with the flags the Skill states and writes all five JC and JCEC files",
+            "result": "PASS",
+            "note": "rc 0; row counts equal the earlier audit (958/216/251/51/174)"
+          },
+          {
+            "text": "SKILL.md inline snippet runs on the real JC output",
+            "result": "PASS",
+            "note": "executed verbatim from the extracted code block; 20 reliable rows (was TypeError)"
+          },
+          {
+            "text": "mean_PSI, mean_PSI_group1/2 equal an independent mean of IncLevel1+IncLevel2 for every event type, JC and JCEC",
+            "result": "PASS",
+            "note": "30 real-data cases (5 types x JC/JCEC x min reads 0/10/20): maxerr 0.0 vs independent oracle (SQ-03)"
+          },
+          {
+            "text": "Reliability keeps an event only if every replicate of BOTH groups has IJC+SJC >= N",
+            "result": "PASS",
+            "note": "kept ID sets equal the oracle in all 30 cases; e.g. JC SE 958/38/20, A5SS 216/12/9, A3SS 251/12/6, MXE 51/0/0, RI 174/10/7 at N 0/10/20 (SQ-03)"
+          },
+          {
+            "text": "Per-event coordinate columns exist for A5SS, A3SS, MXE and RI",
+            "result": "PASS",
+            "note": "no KeyError for any of the five types, JC or JCEC (SQ-02)"
+          },
+          {
+            "text": "IncLevelDifference never enters mean_PSI",
+            "result": "PASS",
+            "note": "engineered and real tables: pooled mean equals the hand value (SQ-03)"
+          }
+        ],
+        "total": 89,
+        "assertions_passed": 6,
+        "assertions_total": 6
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Planted hand-checkable SE data: effective-length PSI and IncFormLen statements",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Planted IJC 80/SJC 10 gives IncLevel 0.8 (naive 0.889); mean_PSI_group1/2 0.7897/0.2027; JC IncFormLen 98 / SkipFormLen 49, JCEC 149; formula reproduces IncLevel (maxabs 0.0005, 1465 real replicate values); real JC IncFormLen is 148 in only 719 of 958 SE rows; delta re-check of the reworded SQ-13 sentence on the same real rMATS output: 719 of 958 SE rows 148/74, max 148/74, formula still reproduces IncLevel (maxabs 0.0005)",
+        "basic": 35,
+        "specialized": 53,
+        "assertions": [
+          {
+            "text": "rMATS IncLevel on planted data equals the hand value",
+            "result": "PASS",
+            "note": "0.8/0.8/0.769 and 0.2/0.2/0.208; mean 0.7897/0.2027 equal expected.json"
+          },
+          {
+            "text": "Skill formula reproduces IncLevel on real JC and JCEC output",
+            "result": "PASS",
+            "note": "real JC n=1465 maxabs 0.0005; JCEC n=1549 maxabs 0.0005; planted 0.0003/0.0004"
+          },
+          {
+            "text": "JC vs JCEC IncFormLen description matches the files (SQ-08)",
+            "result": "PASS",
+            "note": "planted JC 98/49, JCEC 149/49; naive 0.889 vs normalised 0.800"
+          },
+          {
+            "text": "IncLevelDifference sign matches b1 minus b2",
+            "result": "PASS",
+            "note": "planted +0.587 with b1 the high group"
+          },
+          {
+            "text": "SKILL.md states JC IncFormLen/SkipFormLen as maxima and tells the reader to use the per-event values (SQ-13)",
+            "result": "PASS",
+            "note": "text now says maxima 2*(readLength-1) and readLength-1, 719 of 958 chrX SE rows 148/74, use per-row lengths; counts reproduced from the real JC file (max 148/74, 58 distinct pairs)"
+          },
+          {
+            "text": "The condition given for reaching the maxima is exact",
+            "result": "FAIL",
+            "note": "text says maxima are 'reached only for exons at least read-length long; short exons shorten them'; on the real file SkipFormLen is 74 in all 958 rows including a 1 nt exon, and a 74 nt exon (below read length 75) already gives 148 (SQ-14)"
+          }
+        ],
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 6
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "SUPPA2 PSI via run_suppa2_quantification, write_suppa_tpm and filter_reliable_events on planted and real chrX TPM",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Planted PSI 0.8/0.2/0.5 exact; all seven psi files; 3,903 real PSI events (6,475 values) checked across 7 classes against an independent ioe+TPM recomputation (max error 1.1e-16); filter counts equal hand counts at default 0.05-0.95 and at 0.1-0.9; pandas-default header reproducibly fails, written header works; as-core statsmodels 0.15 breaks suppa.py as stated",
+        "basic": 36,
+        "specialized": 53,
+        "assertions": [
+          {
+            "text": "SUPPA2 PSI equals the planted PSI through write_suppa_tpm",
+            "result": "PASS",
+            "note": "header line is A<TAB>B<TAB>C; G1;SE row 0.8 0.2 0.5 (SQ-06)"
+          },
+          {
+            "text": "Real chrX PSI equals an independent recomputation from the .ioe and TPM",
+            "result": "PASS",
+            "note": "7 classes, 3,903 events and 6,475 values, max |diff| 1.1e-16"
+          },
+          {
+            "text": "filter_reliable_events default range 0.05-0.95 matches hand counts, and psi_range is a parameter (SQ-07)",
+            "result": "PASS",
+            "note": "SE 185, A5 87, A3 102, MX 11, RI 42, AF 215, AL 71; (0.1,0.9) gives 159/75/84/10/32/182/62, all equal hand"
+          },
+          {
+            "text": "Skill states a TPM header contract and a SUPPA2 dependency pin that work",
+            "result": "PASS",
+            "note": "pandas-default header: \"N expected, N-1 given\", no psi file; as-suppa statsmodels 0.14.6 works; as-core 0.15.0 raises ImportError multipletests"
+          },
+          {
+            "text": "Skill does not over-claim filter defaults",
+            "result": "PASS",
+            "note": "text says psi_range is a script filter, not a rMATS or SUPPA2 default"
+          }
+        ],
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "parse_rmats_output on engineered NA/low-read tables for all 5 types x JC/JCEC, and on zero-event files",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "Engineered hand-valued tables pass for all 10 type/count combinations (low-read replicate in group 2 only, in group 1 only, NA replicate); a legitimate header-only rMATS file (type with zero events, as in the planted run) raises a raw KeyError",
+        "basic": 33,
+        "specialized": 48,
+        "assertions": [
+          {
+            "text": "Low-read replicate in either group removes the event",
+            "result": "PASS",
+            "note": "group-2-only and group-1-only low-read events excluded at N=20 in all 10 combinations (SQ-03)"
+          },
+          {
+            "text": "NA replicate values are excluded from the mean, not read as zero",
+            "result": "PASS",
+            "note": "group-1 mean 0.9 and pooled (0.9+0.1+0.3)/3 at N=0"
+          },
+          {
+            "text": "Output carries the event-specific coordinate columns",
+            "result": "PASS",
+            "note": "column order equals RMATS_COORD_COLUMNS for every type"
+          },
+          {
+            "text": "A header-only rMATS file (zero events of a type) is handled",
+            "result": "FAIL",
+            "note": "KeyError: 'min_reads_per_replicate' on planted A5SS/A3SS/MXE/RI (SQ-12)"
+          },
+          {
+            "text": "Unsupported event_type gives an actionable message",
+            "result": "PASS",
+            "note": "ValueError: event_type must be one of ['A3SS', 'A5SS', 'MXE', 'RI', 'SE']"
+          }
+        ],
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "regtools junctions + leafcutter clustering on STAR BAMs with and without XS tags, using the Skill strand check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Untagged BAMs: strand ? for all 2,838 junctions, 0 clusters at -m 50 and -m 5, rc 0; XS-tagged: + 1398, - 1343, ? 99 and 115 clusters at -m 5 (0 at -m 50 on this tiny data, as the Skill states)",
+        "basic": 34,
+        "specialized": 51,
+        "assertions": [
+          {
+            "text": "Skill states the XS prerequisite beside the regtools command (SQ-04)",
+            "result": "PASS",
+            "note": "prerequisite paragraph with STAR --outSAMstrandField intronMotif and HISAT2 note"
+          },
+          {
+            "text": "The Skill strand-check command distinguishes tagged from untagged junction files",
+            "result": "PASS",
+            "note": "tail -n +2 | cut -f6 | sort | uniq -c gives only ? versus + - ?"
+          },
+          {
+            "text": "Tagged route yields clusters",
+            "result": "PASS",
+            "note": "115 clusters at -m 5 from XS-tagged BAMs"
+          },
+          {
+            "text": "Zero clusters with rc 0 on untagged BAMs is warned about",
+            "result": "PASS",
+            "note": "Skill says the run still exits 0 with zero clusters; reproduced"
+          },
+          {
+            "text": "leafcutter_cluster_regtools.py source is named and exists",
+            "result": "PASS",
+            "note": "clustering/ of davidaknowles/leafcutter; file present in the staged clone"
+          }
+        ],
+        "total": 85,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "IRFinder 1.3.1 reference build and FastQ quantification exactly as references/ states",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Old syntax rc 1 (-r is required); BuildRefFromSTARRef rc 0 in 4m12s through the repaired staged wrapper; -m FastQ single-end and paired-end rc 0, 7,955 intron rows each, SE IRratio identical (r 1.0) to the tooling-delta rebuild, SE vs PE r 0.85",
+        "basic": 35,
+        "specialized": 51,
+        "assertions": [
+          {
+            "text": "BuildRefFromSTARRef command runs as documented",
+            "result": "PASS",
+            "note": "rc 0; ref holds IRFinder, Mapability, STAR, genome.fa, transcripts.gtf (SQ-05)"
+          },
+          {
+            "text": "IRFinder -m FastQ single-end runs and writes IRFinder-IR-nondir.txt",
+            "result": "PASS",
+            "note": "rc 0; 7,955 rows; IRratio 0-1"
+          },
+          {
+            "text": "Paired-end form (two FASTQ) runs",
+            "result": "PASS",
+            "note": "rc 0; 7,955 rows; 98 vs 74 introns above IRratio 0.1 (PE vs SE of the same sample)"
+          },
+          {
+            "text": "Old broken syntax is gone from the Skill",
+            "result": "PASS",
+            "note": "literal old form rc 1 reproduced; Skill now shows -m FastQ"
+          },
+          {
+            "text": "IRFinder-S 2.0 is not presented as executed",
+            "result": "PASS",
+            "note": "labelled \"not executed\" in SKILL.md and the reference"
+          },
+          {
+            "text": "Scope: IR route stays within quantification",
+            "result": "PASS",
+            "note": "no differential testing claimed"
+          }
+        ],
+        "total": 86,
+        "assertions_passed": 6,
+        "assertions_total": 6
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Restricted and heavy surfaces (MAJIQ V3/VOILA, VAST-TOOLS) and unreproduced figures: must not be presented as verified",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Document inspection by design: MAJIQ V3/VOILA (restricted licence) and VAST-TOOLS (6.7 GB VASTDB) were not executed and not bypassed; the Skill labels both, Shiba, MicroExonator, S-IRFindeR, iREAD and IRFinder-S 2.0 as not executed, and literature figures as not reproduced",
+        "basic": 35,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "MAJIQ V3/VOILA commands carry a not-executed label with the licence reason",
+            "result": "PASS",
+            "note": "\"Not executed here\" block precedes the commands"
+          },
+          {
+            "text": "VAST-TOOLS and the other unexecuted tools are labelled",
+            "result": "PASS",
+            "note": "Version Compatibility paragraph and matrix cells"
+          },
+          {
+            "text": "Benchmark figures are marked as literature, not reproduced",
+            "result": "PASS",
+            "note": "FDR 15-30%, ~14% junctions, ~70% microexons, 94% marked reported/not reproduced"
+          },
+          {
+            "text": "Related Skills resolve on the shelf (SQ-10)",
+            "result": "PASS",
+            "note": "all seven shelf IDs exist under F:\\optimized-scientific-skills\\skills"
+          }
+        ],
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 51.8,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Silent wrong-answer defects of the initial audit (mean PSI polluted by IncLevelDifference, group-1-only reliability filter) are fixed: independent recomputation matches on 30 real-output cases and all engineered cases",
+    "Every runnable surface the Skill states now runs as written: inline snippet, five-type parser, SUPPA2 with header writer, regtools/leafcutter with XS check, IRFinder BuildRefFromSTARRef and FastQ SE/PE",
+    "Restricted (MAJIQ V3/VOILA) and heavy (VAST-TOOLS) surfaces are labelled not executed and not bypassed",
+    "No credentials, and subprocess calls use argument lists"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "parse_rmats_output raises a raw KeyError on an rMATS file with zero events",
+      "observed_in": [
+        4
+      ],
+      "problem": "A header-only MATS file (an event type with no events, as in the planted rMATS run for A5SS, A3SS, MXE and RI) makes DataFrame.apply return an empty frame, then df['min_reads_per_replicate'] raises KeyError.",
+      "root_cause": "The per-row statistics are added with concat on an apply result that is empty for an empty table.",
+      "fix": "Return an empty frame with the expected columns (or raise a ValueError naming the empty file) when the table has no rows; add a header-only test. (SQ-12)"
+    },
+    {
+      "priority": "P2",
+      "title": "SQ-13 rewording gives an inexact condition for the maxima",
+      "observed_in": [
+        2
+      ],
+      "problem": "SKILL.md says IncFormLen/SkipFormLen maxima are 'reached only for exons at least read-length long; short exons shorten them'. On the real chrX JC file SkipFormLen is 74 in all 958 rows (a 1 nt exon included), and exons of 74 nt (readLength - 1) already reach 148.",
+      "root_cause": "The exon-length condition belongs to IncFormLen alone and its threshold is readLength - 1, not readLength.",
+      "fix": "Say 'IncFormLen reaches 2*(readLength - 1) for exons of at least readLength - 1 nt; SkipFormLen was readLength - 1 in every SE row here'. Text only. The operative advice (use the per-row lengths) is correct. (SQ-14)"
+    }
+  ]
+}

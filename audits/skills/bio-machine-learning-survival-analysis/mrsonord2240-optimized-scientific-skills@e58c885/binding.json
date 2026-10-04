@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-machine-learning-survival-analysis",
+  "candidate_version": "candidate@6fb42410e7b7-reaudit-delta2-20261003",
+  "candidate_identity": "6fb42410e7b70eff829bac23fce3c05a0a9941abff229c15570619de1f7f62d3",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "provider_path": "skills/bio-machine-learning-survival-analysis",
+  "provider_tree": "6b8c0d4193028d43fc94e28ecd106c5ab75ef9b1",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "6fb42410e7b70eff829bac23fce3c05a0a9941abff229c15570619de1f7f62d3",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 20135,
+      "sha256": "c7ff424719328bc8d0a8d819a7fb6bfc9708c08e1f2617df9bd004a9b4bd323d"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 1989,
+      "sha256": "033956d160e6bb622c13dba97128d7800f60c02af624907df6d256c4e830536e"
+    },
+    {
+      "path": "scripts/competing_risks_cif.py",
+      "bytes": 1704,
+      "sha256": "3a315ddf91c31792b7a4a146ed6e282255327844fad774db672963b28bc49f89"
+    },
+    {
+      "path": "scripts/cox_regression.py",
+      "bytes": 5397,
+      "sha256": "22d2e13cd0c247c4fa0606b61280166bd7c742816d66dac930e9bb5db5091ebc"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4391,
+      "sha256": "2d697c85c3830eb3ec905fdc822380a6292c9a1b68570366982704e596b98205"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

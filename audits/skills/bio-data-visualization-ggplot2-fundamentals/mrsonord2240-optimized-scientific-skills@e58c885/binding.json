@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-data-visualization-ggplot2-fundamentals",
+  "candidate_version": "candidate@9d1247b0d8cd-delta-desc-20261003",
+  "candidate_identity": "9d1247b0d8cd48c336a6e7ca866603cc3499b667e759af8f866583d076f0507b",
+  "provider_repository": "mrsonord2240/optimized-scientific-skills",
+  "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "provider_path": "skills/bio-data-visualization-ggplot2-fundamentals",
+  "provider_tree": "88c45c860925feaf74494aa8f73572742a4de5eb",
+  "verification": "every committed provider file compared byte-for-byte with the audited candidate worktree",
+  "manifest_recipe": "relative POSIX path, byte count, lowercase SHA-256; UTF-8 LF joins; ordinal UTF-8 byte ordering; no trailing LF",
+  "manifest_sha256": "9d1247b0d8cd48c336a6e7ca866603cc3499b667e759af8f866583d076f0507b",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 7546,
+      "sha256": "c13b9ab462ddd2c04bf7e7a9ba8ad796f2b29bd51cd82a6a40afca7cfe29eb9b"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 3095,
+      "sha256": "669284acee6c5b3cabd03cf9b24346f0836a192bbcb7e42388518e8ff6c20b5d"
+    },
+    {
+      "path": "references/geoms-scales-facets.md",
+      "bytes": 2798,
+      "sha256": "7b0fb494de5fb18da7b738e2474ada2cb0580bad082e0b19e3f3f0b84a008ed0"
+    },
+    {
+      "path": "scripts/publication_figures.R",
+      "bytes": 5713,
+      "sha256": "0598f83060bbbfaa89bd82de2883f11505b170d8a87a9e33720152441e01c43e"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 3925,
+      "sha256": "ecc6958a11c3d01fdaa2a19931563375b47e13e32da20a4b566c40c4d3c77c30"
+    }
+  ],
+  "report_reexecuted": false,
+  "report_rewritten": false
+}

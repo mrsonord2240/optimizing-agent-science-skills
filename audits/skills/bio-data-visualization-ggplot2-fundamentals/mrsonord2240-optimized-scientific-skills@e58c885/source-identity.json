@@ -1,0 +1,55 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "data-visualization/ggplot2-fundamentals",
+    "subtree": "03298c3bd8f4cdd7d7aa919935f776ca850c7725",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "normalize/dv-lane1",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "F:\\OpenScience\\wt\\normalize-dv-lane1\\skills\\bio-data-visualization-ggplot2-fundamentals",
+    "content_sha256": "9d1247b0d8cd48c336a6e7ca866603cc3499b667e759af8f866583d076f0507b",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "?? skills/bio-data-visualization-ggplot2-fundamentals/; ?? skills/bio-data-visualization-matplotlib-fundamentals/; ?? skills/bio-data-visualization-volcano-and-ma-plots/",
+    "content_manifest": {
+      "file_count": 5,
+      "bytes": 23077
+    }
+  },
+  "files": [
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 3095,
+      "sha256": "669284acee6c5b3cabd03cf9b24346f0836a192bbcb7e42388518e8ff6c20b5d"
+    },
+    {
+      "path": "references/geoms-scales-facets.md",
+      "bytes": 2798,
+      "sha256": "7b0fb494de5fb18da7b738e2474ada2cb0580bad082e0b19e3f3f0b84a008ed0"
+    },
+    {
+      "path": "scripts/publication_figures.R",
+      "bytes": 5713,
+      "sha256": "0598f83060bbbfaa89bd82de2883f11505b170d8a87a9e33720152441e01c43e"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 7546,
+      "sha256": "c13b9ab462ddd2c04bf7e7a9ba8ad796f2b29bd51cd82a6a40afca7cfe29eb9b"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 3925,
+      "sha256": "ecc6958a11c3d01fdaa2a19931563375b47e13e32da20a4b566c40c4d3c77c30"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ]
+  },
+  "candidate_cache_artifacts_after_execution": []
+}

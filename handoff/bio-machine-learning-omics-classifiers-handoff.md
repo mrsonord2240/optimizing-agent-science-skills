@@ -2,9 +2,9 @@
 
 - Updated: 2026-10-03
 - Lane: 3
-- Status: candidate-ready
+- Status: done (shelf e58c885, intake accepted at validator a1d820d, exported to bioSkills-Improved fff47bd; worktree removed)
 - Owner leaving: delta re-auditor (lane E3, fresh, did not normalize, tool, audit or fix)
-- Next role: orchestrator (commit the exact bytes, then Marketplace intake); optional fix-scientific-skill for OC-012 / OC-013 (text-only)
+- Next role: none; open P2s wait for a later refinement run
 
 ## Source identity
 

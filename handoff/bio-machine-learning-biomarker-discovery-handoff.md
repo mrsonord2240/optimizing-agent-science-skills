@@ -2,9 +2,9 @@
 
 - Updated: 2026-10-03T23:30:00-07:00
 - Lane: 3 (3a-1)
-- Status: candidate-ready
+- Status: done (shelf e58c885, intake accepted at validator a1d820d, exported to bioSkills-Improved fff47bd; worktree removed)
 - Owner leaving: reaudit worker (fresh auditor, FULL mode; did not normalize, tool, audit or fix this Skill)
-- Next role: orchestrator (commit exact bytes to make them `ready`, then intake). Optional text-only fix for RA-001/RA-002 first (needs delta re-audit).
+- Next role: none; open P2s wait for a later refinement run
 
 ## Source identity
 

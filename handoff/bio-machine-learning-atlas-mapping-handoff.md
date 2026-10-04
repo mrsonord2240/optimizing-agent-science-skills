@@ -2,9 +2,9 @@
 
 - Updated: 2026-10-03
 - Lane: 3 (delta re-audit lane E4, description reword for AM-009)
-- Status: candidate-ready
+- Status: done (shelf e58c885, intake accepted at validator a1d820d, exported to bioSkills-Improved fff47bd; worktree removed)
 - Owner leaving: delta re-audit worker E4 (fresh auditor)
-- Next role: orchestrator (commit exact bytes to make them ready)
+- Next role: none; open P2s wait for a later refinement run
 
 ## Source identity
 

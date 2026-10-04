@@ -1,0 +1,81 @@
+{
+  "skill_id": "bio-machine-learning-survival-analysis",
+  "version": "mrsonord2240-optimized-scientific-skills@e58c885",
+  "source": {
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+    "path": "skills/bio-machine-learning-survival-analysis",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/e58c8855faaf8dcba2341453d73b62bcade3e78c/skills/bio-machine-learning-survival-analysis"
+  },
+  "candidate": {
+    "identity": "6fb42410e7b70eff829bac23fce3c05a0a9941abff229c15570619de1f7f62d3",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "6fb42410e7b70eff829bac23fce3c05a0a9941abff229c15570619de1f7f62d3",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-survival-analysis",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "bytes": 20135,
+        "sha256": "c7ff424719328bc8d0a8d819a7fb6bfc9708c08e1f2617df9bd004a9b4bd323d"
+      },
+      {
+        "path": "references/failure-modes.md",
+        "bytes": 1989,
+        "sha256": "033956d160e6bb622c13dba97128d7800f60c02af624907df6d256c4e830536e"
+      },
+      {
+        "path": "scripts/competing_risks_cif.py",
+        "bytes": 1704,
+        "sha256": "3a315ddf91c31792b7a4a146ed6e282255327844fad774db672963b28bc49f89"
+      },
+      {
+        "path": "scripts/cox_regression.py",
+        "bytes": 5397,
+        "sha256": "22d2e13cd0c247c4fa0606b61280166bd7c742816d66dac930e9bb5db5091ebc"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 4391,
+        "sha256": "2d697c85c3830eb3ec905fdc822380a6292c9a1b68570366982704e596b98205"
+      }
+    ],
+    "provider_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+    "provider_tree": "6b8c0d4193028d43fc94e28ecd106c5ab75ef9b1"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) delta re-audit worker E2",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs",
+    "auditor_independent": true
+  },
+  "supersedes": "candidate@6fb42410e7b7-reaudit-delta2-20261003",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 4,
+    "provider_binding": "binding.json"
+  }
+}

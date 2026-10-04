@@ -5,7 +5,7 @@
     "upstream": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
     "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
     "provider_ref": "main",
-    "provider_skills_tree": "17e25937ba6050424e66b28b73c99fb84f76dd98"
+    "provider_skills_tree": "a951fe04f8713889870c43a384c2678e1a60c10b"
   },
   "skills": [
     {
@@ -869,8 +869,8 @@
     {
       "id": "bio-data-visualization-ggplot2-fundamentals",
       "upstream_path": "data-visualization/ggplot2-fundamentals",
-      "category": null,
-      "state": "excluded"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-data-visualization-heatmaps-clustering",
@@ -899,8 +899,8 @@
     {
       "id": "bio-data-visualization-matplotlib-fundamentals",
       "upstream_path": "data-visualization/matplotlib-fundamentals",
-      "category": null,
-      "state": "excluded"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-data-visualization-multipanel-figures",
@@ -941,8 +941,8 @@
     {
       "id": "bio-data-visualization-volcano-and-ma-plots",
       "upstream_path": "data-visualization/volcano-and-ma-plots",
-      "category": null,
-      "state": "excluded"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-differential-expression-batch-correction",
@@ -1697,14 +1697,14 @@
     {
       "id": "bio-machine-learning-atlas-mapping",
       "upstream_path": "machine-learning/atlas-mapping",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-machine-learning-biomarker-discovery",
       "upstream_path": "machine-learning/biomarker-discovery",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-machine-learning-model-validation",
@@ -1715,8 +1715,8 @@
     {
       "id": "bio-machine-learning-omics-classifiers",
       "upstream_path": "machine-learning/omics-classifiers",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-machine-learning-prediction-explanation",
@@ -1727,8 +1727,8 @@
     {
       "id": "bio-machine-learning-survival-analysis",
       "upstream_path": "machine-learning/survival-analysis",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-metabolomics-isotope-tracing",
@@ -2813,8 +2813,8 @@
     {
       "id": "bio-splicing-quantification",
       "upstream_path": "alternative-splicing/splicing-quantification",
-      "category": null,
-      "state": "remaining"
+      "category": "Data Analysis",
+      "state": "ready"
     },
     {
       "id": "bio-sra-data",

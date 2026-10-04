@@ -1,0 +1,85 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/atlas-mapping",
+    "subtree": "9f657dd85ae1791817b7ec962c3da32f24228b1d",
+    "checkout": "F:\\optimizing-agent-science-skills\\external\\GPTomics__bioSkills"
+  },
+  "candidate": {
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-atlas-mapping",
+    "content_sha256": "a579d86464c9fd84579b6645107d0f6c72b87f091da33839966cc6b08c8a75ef",
+    "identity_kind": "sha256-manifest-v1",
+    "status_after_execution": "candidate files unchanged (identity re-verified with skill_preflight --offline before and after)",
+    "content_manifest": {
+      "file_count": 7,
+      "bytes": 39483,
+      "recipe": "relative POSIX path, byte count, and lowercase SHA-256 separated by TAB; records sorted by path and separated by LF; no trailing LF"
+    }
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "bytes": 19114,
+      "sha256": "3fa9917d621dba19a812a47114afb998c0dea9e50e662e3d36d186d9a75ff0f7"
+    },
+    {
+      "path": "references/failure-modes.md",
+      "bytes": 6146,
+      "sha256": "353f0e437faa60e08d6066ef268300d4708f036c404771d75c99bf96150d4ec9"
+    },
+    {
+      "path": "references/pbmc-markers.json",
+      "bytes": 507,
+      "sha256": "a43984d1550600e657b2c25af4f9bded0edcc5adf7c0b509f3c391ffb80dbc39"
+    },
+    {
+      "path": "scripts/label_marker_check.py",
+      "bytes": 3568,
+      "sha256": "6bcb0e77b028ade7eac987db63b647bca2b4f9a1e9ef9c23ccfa59b6fce3e661"
+    },
+    {
+      "path": "scripts/ood_gating_demo.py",
+      "bytes": 2567,
+      "sha256": "12681401bc4090f202a0efc0adf3605294701c9122bc00f8fd317b3b510b6cb3"
+    },
+    {
+      "path": "scripts/scarches_annotation.py",
+      "bytes": 3120,
+      "sha256": "42048c6ef4bf7d2e124ffb6d7f4cb2c01f8e5293c97e16563927ab8e3cabf88b"
+    },
+    {
+      "path": "usage-guide.md",
+      "bytes": 4461,
+      "sha256": "1becbc138c92884bbc1126fc75d58d78596edc6a9833d450b203fe11ffc2b497"
+    }
+  ],
+  "tooling": {
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de",
+    "preflight_warn": [
+      "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+    ],
+    "tools_md_path": "F:\\OpenScience\\audits\\bio-machine-learning-atlas-mapping\\TOOLS.md",
+    "tools_md_sha256": "35fbb5d8b27d7b76a9e1cfd1390ddc6315ef2156d15ff8f75c3e75d6516e9d40",
+    "environment_fingerprint_sha256": "20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6",
+    "environment": "Native Windows venv F:\\OpenScience\\audit-envs\\single-cell-transcriptomics-analyst (Python 3.12; scvi-tools 1.5.1, scanpy 1.12.4, anndata 0.13.3.post0, scikit-learn 1.9.1, torch 2.14.0 CPU); inputs from audit-envs\\cheminformatics-hit-triage-analyst\\derived\\atlas-pair and atlas-pair-holdout",
+    "audit_local_repair": "none; no Skill bytes changed",
+    "frozen_ref_check": "scripts/frozen_ref_check.py, logs/frozen_ref.log (scvi-tools 1.5.1, single-cell venv, no Skill bytes touched)"
+  },
+  "candidate_cache_artifacts_after_execution": [],
+  "prior_audit": {
+    "identity": "becbe61423e78eaae064b907ae4dc929d87852078244bf2586f218ca69b7eab3",
+    "run": "candidate@becbe61423e7-reaudit-delta2-20261003",
+    "path": "F:\\optimizing-agent-science-skills\\audits\\skills\\bio-machine-learning-atlas-mapping\\candidate@becbe61423e7-reaudit-delta2-20261003",
+    "score": 86,
+    "grade": "Production Ready",
+    "static": 87
+  },
+  "delta": {
+    "mode": "text-only delta re-audit (description reword, AM-009 fix)",
+    "qualification": "Only SKILL.md differs from certified identity becbe61423e7; the other 6 files are byte-identical. SKILL.md differs by exactly one line, the frontmatter description (old 174 to new 229 chars). Reverting fix-description2-20261003/edits.json on a scratch copy reproduces becbe61423e78eaae064b907ae4dc929d87852078244bf2586f218ca69b7eab3 exactly. Frontmatter parsed with PyYAML safe_load: one string, name and all other keys intact. Body byte-identical, so the certified execution evidence applies; one extra independent check (scripts/frozen_ref_check.py) was run on the accuracy of 'without retraining the reference'.",
+    "fix_log": "F:\\OpenScience\\audits\\bio-machine-learning-atlas-mapping\\fix-description2-20261003\\fix-log.md"
+  }
+}

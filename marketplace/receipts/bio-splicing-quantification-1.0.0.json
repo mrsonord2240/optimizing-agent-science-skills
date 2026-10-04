@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "skill_id": "bio-splicing-quantification",
+  "version": "1.0.0",
+  "result": "pass",
+  "validated_at": "2026-10-04T00:49:08+00:00",
+  "validator_repository": "openscience-skill-marketplace",
+  "validator_commit": "a1d820df61b3c8a72992916178ae8e3836aabe66",
+  "command": "npm run --silent intake:skill -- --manifest <release.config.json> --source F:\\optimized-scientific-skills (eight manifests in one invocation)",
+  "optimized_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+  "source_path": "skills/bio-splicing-quantification",
+  "manifest_sha256": "0ef06f0ca5ff74f933dd44606eaab6f66cdabb4eea018b9394f90133b9df2e2b",
+  "intake_entry": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "e58c8855faaf8dcba2341453d73b62bcade3e78c",
+    "source_path": "skills/bio-splicing-quantification",
+    "manifest_sha256": "0ef06f0ca5ff74f933dd44606eaab6f66cdabb4eea018b9394f90133b9df2e2b",
+    "content_sha256": "8f7d0f4eec5505cf4338ded142138e64edd0ae473b5807589eaab8ca002ad4c7",
+    "file_count": 5,
+    "total_bytes": 41707,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      }
+    ]
+  },
+  "entry_count": 8,
+  "stderr": "",
+  "note": "Local unsigned intake compatibility check only; no review, approval, build, submission, registration, release, publication, or remote write was performed."
+}
