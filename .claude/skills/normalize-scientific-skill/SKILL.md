@@ -67,6 +67,8 @@ conditions, caveats, and scientific meaning.
     eval agent that skipped the route file guessed a script name from the
     route name, found nothing, and invented its output.
   - `references/`: per-tool and per-topic detail a route points to by name.
+  - Work that belongs to a sibling Skill gets one route: a table from the
+    design or need to that Skill's name, and nothing that repeats it.
 - Start with the point. The first thing under the title is the route table or
   the default command, within 15 lines of the title. Tested versions shrink to
   one line at the end of the file.

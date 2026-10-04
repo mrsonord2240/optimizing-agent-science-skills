@@ -25,6 +25,10 @@ to a log file; a command passed inline or left attached to the terminal hangs:
 MSYS_NO_PATHCONV=1 timeout 250 wsl -d science -- bash -l /mnt/openscience/<path>/run.sh > run.log 2>&1 < /dev/null; cat run.log
 ```
 
+`wsl: Failed to start the systemd user session for 'sci'` is a harmless
+warning; the command still runs. An ecosystem whose environment is a native
+Windows one (the staging `TOOLS.md` says so) runs there.
+
 Inside the script call an environment's interpreter by its full path
 (`<env>/bin/python`, `<env>/bin/Rscript`); piping `micromamba run` scrambles
 the output order.
