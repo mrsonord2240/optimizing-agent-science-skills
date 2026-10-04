@@ -77,6 +77,16 @@ conditions, caveats, and scientific meaning.
   its siblings in the same category, and state nothing the Skill does not do.
   In a small trial (Sam, 2026-10-03) trimmed descriptions made agents more
   likely to select a Skill, select the right one, and finish the task.
+- Move literature citations out of `SKILL.md` and every routed instruction
+  file into `references/citations.md`: the `## References` section, and inline
+  author-year or journal citations in prose and table cells. Keep the
+  instruction, threshold, or number the citation supported and delete only the
+  attribution; never drop a rule because its source moved. List each source
+  once in `citations.md` beside the claim it supports. Nothing routes to that
+  file for doing the task; it is evidence for reviewers. A method's own name
+  (Benjamini-Hochberg, Wald test) is not a citation and stays. Sam,
+  2026-10-04: citations do nothing toward getting the task done and crowd the
+  text an agent has to read.
 - Write every text file as UTF-8 without BOM, with LF line endings. Remove
   `__pycache__`, `*.pyc`, dot-prefixed paths, and LICENSE copies below the
   Skill root.

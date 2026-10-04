@@ -180,7 +180,9 @@ normalize handoff only when `tools/skill_preflight.py` reports `PASS` for the
 normalized tree and its identity equals the handoff's, and its frontmatter
 `description` is a single `Use when <task or situation>.` trigger with no tool
 lists, coverage summaries, or pointers to other Skills. Check that line
-yourself at transition and reject a handoff that kept the long form. A Skill
+yourself at transition and reject a handoff that kept the long form. Reject
+one too whose `SKILL.md` still carries a `## References` section or inline
+literature citations; they belong in `references/citations.md`. A Skill
 already certified with a long description takes the one-line edit, with the
 exact old and new strings recorded in `edits.json` in its fix run directory,
 then a delta re-audit. A prior
