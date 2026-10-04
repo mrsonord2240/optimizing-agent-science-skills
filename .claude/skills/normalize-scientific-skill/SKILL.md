@@ -137,7 +137,9 @@ tooling and audit workers know what is left to run.
 Run each entry-point script whose packages an existing environment already
 has; install nothing. Use the `science` WSL distro as
 `.claude/skills/optimize-scientific-skills/references/environment-policy.md`
-describes, on a small real input staged under `F:\OpenScience`.
+describes, on a small real input staged under `F:\OpenScience`. Find the
+ecosystem's environments and inputs through `F:\OpenScience\audit-envs\INDEX.md`
+and the `TOOLS.md` files it leads to.
 
 - Run every script at two settings or more: one where each filter drops rows
   and one where it drops none. A script that passed its default run crashed
