@@ -1,0 +1,27 @@
+{
+ "current": "1010225625de8bd6106b0c187dd8b1459d3ae84e91abeb44a7df95a8bdef792d",
+ "after_desc_revert": "247bcf26db1833bc443dc9d651595ef84068f43a2593067f7c3bda72bd7e7adc",
+ "reproduces_certified": true,
+ "files_differing": [
+  "SKILL.md"
+ ],
+ "skillmd_line_diff": [
+  "-description: Quantifies alternative splicing as PSI (percen",
+  "+description: Use when measuring splice-site usage or isofor"
+ ],
+ "skillmd_diff_is_one_description_line": true,
+ "yaml_keys": [
+  "name",
+  "category",
+  "description",
+  "tool_type",
+  "primary_tool",
+  "license",
+  "author"
+ ],
+ "yaml_description": "Use when measuring splice-site usage or isoform inclusion ratios (PSI) from short-read RNA-seq.",
+ "yaml_description_type": "str",
+ "yaml_name": "bio-splicing-quantification",
+ "old_description_len": 694,
+ "new_description_len": 95
+}

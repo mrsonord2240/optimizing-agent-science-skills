@@ -1,0 +1,74 @@
+{
+  "skill_id": "bio-splicing-quantification",
+  "version": "candidate@1010225625de-reaudit-delta2-20261003",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "alternative-splicing/splicing-quantification",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification",
+    "subtree": "6e11b64e5f1c319983ec851f3d922655291db35a"
+  },
+  "candidate": {
+    "identity": "1010225625de8bd6106b0c187dd8b1459d3ae84e91abeb44a7df95a8bdef792d",
+    "identity_kind": "sha256-manifest",
+    "branch": "normalize/bio-splicing-quantification",
+    "commit": "29f5446",
+    "content_sha256": "1010225625de8bd6106b0c187dd8b1459d3ae84e91abeb44a7df95a8bdef792d",
+    "path": "F:\\OpenScience\\wt\\norm-bio-splicing-quantification\\skills\\bio-splicing-quantification",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "bytes": 22972,
+        "sha256": "0b00e894e3395542664bfa4e3c401f3ff482cf02e02c4937ed44d55bd4641211"
+      },
+      {
+        "path": "references/failure-modes-and-errors.md",
+        "bytes": 5112,
+        "sha256": "12b85deb0af38d824f20ebee76689f4c12e664c44ef9ac6735c9d1b1aaff6e14"
+      },
+      {
+        "path": "references/intron-retention-and-microexons.md",
+        "bytes": 2779,
+        "sha256": "aaa647ac460e855c7e7cfa0bab54318b759d4387a47eea818e744dc2b93b66ad"
+      },
+      {
+        "path": "scripts/quantify_splicing.py",
+        "bytes": 6917,
+        "sha256": "4ce74bfa606cd0f28b8bfd1d1c468b820ca1d33d4849e113744348de1831d69a"
+      },
+      {
+        "path": "usage-guide.md",
+        "bytes": 3927,
+        "sha256": "20545299c848af694a40dbdfcac9a2a2442f16189ad63e91b6e57d941bd459a5"
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-03",
+    "performed_by": "Claude (Anthropic) delta re-audit worker E2",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs",
+    "auditor_independent": true
+  },
+  "supersedes": "candidate@247bcf26db18-run-reaudit-2",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 4
+  }
+}

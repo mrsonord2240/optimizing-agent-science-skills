@@ -1,0 +1,311 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-survival-analysis",
+    "description": "Use when building an individualized time-to-event risk predictor or prognostic omics signature, choosing a survival model, or evaluating one beyond the C-index.",
+    "evaluated_on": "2026-10-03",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "evaluator_version": "skill-auditor@1.0",
+    "n_inputs": 5,
+    "performed_by": "Claude (Anthropic) delta re-audit worker E2",
+    "auditor_independent": true
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values or citations; the baseline IBS, the Aalen-Johansen versus 1-KM gap and the lifelines sign trap reproduce against hand tables and independent implementations."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Prediction-modelling guidance with TRIPOD+AI and external validation; no diagnostic or prescriptive medical conclusions."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The two prior P1 methodology defects are fixed: the baseline is a censoring-aware KM on the same grid and split, and Coxnet alpha is chosen by CV on training data only, verified by data-flow trace and test-set perturbation."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Both scripts and both SKILL.md blocks run unmodified with no warnings and deterministic output on CPU in seconds."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "SA-001 and SA-002 corrected and verified; prediction-versus-inference scope is drawn well; calibration, nested CV and boosting remain prose-only (labelled)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Hard failures from sksurv are informative and the Common Errors table covers the main traps, with the time-range row now accurate (SA-006 resolved); scripts do no explicit input or time-range validation."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is 212 lines with failure modes in a reference; scripts run in about 4 s."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Both code blocks now run chained and verbatim; IPCW training-y order, bool event and the sign trap are prevented explicitly."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Description, usage-guide prompts and the boundary to clinical-biostatistics/survival-analysis match how users ask."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network or shell execution; synthetic or bundled data only."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Script now exposes fit_coxnet_cv and km_baseline_surv and the SKILL.md blocks mirror it; no automated tests ship."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger is now the Use-when clause only; 'individualized risk predictor ... beyond the C-index' keeps the prediction regime distinct from inference, and the body retains the hand-off to clinical-biostatistics/survival-analysis; progressive disclosure, seeded scripts, and prose-only or R-only methods labelled not executed"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 24,
+      "total": 24
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "SKILL.md fit and evaluation blocks run verbatim on GBSG2 (686 patients), stratified held-out split",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both python blocks run unmodified in one namespace (3.6 s, rc 0): alpha 0.3968, 3 of 9 nonzero, Uno C 0.669, mean AUC(t) 0.728, IBS 0.161 vs KM-only 0.178.",
+        "basic": 34,
+        "specialized": 50,
+        "assertions": [
+          {
+            "text": "Fitting block (Surv.from_arrays, CV-selected Coxnet at one alpha, RSF) runs on real data",
+            "result": "PASS",
+            "note": "Ran on 480 training patients; coxnet.alphas_ has one entry"
+          },
+          {
+            "text": "Evaluation block copy-runs as written after the fitting block (SA-003)",
+            "result": "PASS",
+            "note": "t_horizon, y_train, y_test all defined by the blocks; no NameError"
+          },
+          {
+            "text": "Held-out Uno C is in a plausible range for GBSG2",
+            "result": "PASS",
+            "note": "0.669 Coxnet; script gives RSF 0.686"
+          },
+          {
+            "text": "Model IBS beats the censoring-aware KM-only IBS on the same grid and split",
+            "result": "PASS",
+            "note": "0.161 vs 0.178; KM equals hand table, an independent numpy KM and lifelines to 1.6e-15"
+          },
+          {
+            "text": "IPCW metrics receive the training y first and score the held-out set",
+            "result": "PASS",
+            "note": "concordance_index_ipcw(y_train, y_test, ...) on the 30% split"
+          }
+        ],
+        "total": 84,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "scripts/cox_regression.py on synthetic and GBSG2: Coxnet vs RSF, Uno C, AUC(t), IBS vs KM baseline (SA-001)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both modes rc 0 in about 4 s with no warnings under -W default and identical output on a second run. KM baseline IBS 0.178 (GBSG2) and 0.215 (synthetic) equal an independent numpy Graf IBS on an independent numpy KM to 4 decimals; the old event-only formula gives 0.263 and 0.258.",
+        "basic": 35,
+        "specialized": 51,
+        "assertions": [
+          {
+            "text": "Script runs end to end without warnings and is seeded",
+            "result": "PASS",
+            "note": "-W default, two runs identical for both --data modes"
+          },
+          {
+            "text": "Printed Kaplan-Meier baseline IBS equals the IBS of a true KM curve",
+            "result": "PASS",
+            "note": "GBSG2 0.1775 vs own numpy IBS 0.1775 vs lifelines-KM 0.1775; synthetic 0.2148 all three"
+          },
+          {
+            "text": "KM baseline uses the same estimator, time grid and held-out split as the models",
+            "result": "PASS",
+            "note": "km_baseline_surv(y_train, times, len(y_test)) feeds the same integrated_brier_score(y_train, y_test, ., times) call as the models"
+          },
+          {
+            "text": "A hand-computed KM table matches km_baseline_surv",
+            "result": "PASS",
+            "note": "(1,1)(2,0)(3,1)(4,0)(5,0): 1, 0.8, 0.8, 0.5333, 0.5333; the naive formula gives 0.5, 0, 0"
+          },
+          {
+            "text": "Models recover the planted signal and the direction of risk is correct",
+            "result": "PASS",
+            "note": "Coxnet Uno C 0.803 and RSF 0.784 on 5-of-40 planted features; 6 of 40 coefficients nonzero"
+          }
+        ],
+        "total": 86,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Competing risks: scripts/competing_risks_cif.py, hand-computed Aalen-Johansen table, sksurv equivalence",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Script and failure-modes.md are byte-identical to the audited identity. Five-subject hand table: CIF1 0.2, 0.2, 0.4, 0.4, 0.4 and 1-KM 0.2, 0.2, 0.4667 equal lifelines AJ and sksurv cumulative_incidence_competing_risks exactly; on the script data the two implementations differ by 2.5e-16 over 40 horizons; 1-KM 0.517 vs CIF 0.250 at t=3.",
+        "basic": 35,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "Script runs and shows 1-KM above the Aalen-Johansen CIF",
+            "result": "PASS",
+            "note": "0.517 vs 0.250 with 63% competing events; no warnings"
+          },
+          {
+            "text": "lifelines AalenJohansenFitter and sksurv cumulative_incidence_competing_risks equal the hand table (SA-004)",
+            "result": "PASS",
+            "note": "Exact at all 5 times, cause 1 and cause 2; row 0 sums to 1.0 at t=5"
+          },
+          {
+            "text": "1-KM >= CIF at every time, strictly above after a competing event",
+            "result": "PASS",
+            "note": "0 violations on 40 horizons; hand table 0.4667 vs 0.4"
+          },
+          {
+            "text": "Skill states which competing-risks methods have no Python implementation and labels them not executed (SA-004, SA-005)",
+            "result": "PASS",
+            "note": "No module with fine/gray/subdist in lifelines or sksurv; Fine-Gray, CIF Brier and randomForestSRC named as R and not bundled or executed"
+          }
+        ],
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Metric-direction traps, dependency statements and deep-model claims (lifelines 1-C, sksurv, pandas cap, pycox)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "lifelines concordance_index with +partial hazard 0.337 vs -partial hazard 0.663 (sum 1.0), sksurv 0.663. Installed metadata: scikit-survival requires pandas>=2.2 (no cap) and scikit-learn <1.10,>=1.9; lifelines requires pandas <3. pycox DeepSurv C-td 0.615 and DeepHit 0.620 reproduced (30 epochs, CPU), DeepHit.predict_cif and compute_baseline_hazards exist. SA-006 wording reinspected in delta: the reworded row matches the measured sksurv behaviour for both cumulative_dynamic_auc and integrated_brier_score.",
+        "basic": 34,
+        "specialized": 50,
+        "assertions": [
+          {
+            "text": "lifelines concordance sign trap reproduces on held-out GBSG2 and the Skill says to negate",
+            "result": "PASS",
+            "note": "0.337 with +ph, 0.663 with -ph; the Skill's Common Errors row prescribes the negation"
+          },
+          {
+            "text": "Skill's pandas and scikit-learn constraint statements match installed package metadata (SA-005)",
+            "result": "PASS",
+            "note": "pandas<3 attributed to lifelines alone; scikit-survival has no pandas cap"
+          },
+          {
+            "text": "Deep-survival claims are labelled as smoke-tested only, with no pycox code bundled (SA-005)",
+            "result": "PASS",
+            "note": "Taxonomy paragraph says smoke-tested, 30 epochs CPU, GBSG2, nothing bundled; rerun matches (0.615 / 0.620)"
+          },
+          {
+            "text": "Common Errors row on time-grid range states the actual sksurv limit (SA-006)",
+            "result": "PASS",
+            "note": "Row now says a time at or above the largest test time of any status errors and times below it are accepted. Measured on GBSG2 (largest test time 2556 censored, largest uncensored 2093): AUC and IBS run at t=2092, 2324 and 2555; AUC and IBS both raise ValueError at 2556 and 2566"
+          },
+          {
+            "text": "Harrell-versus-Uno censoring claim is stated at a usable strength",
+            "result": "PASS",
+            "note": "Reused unchanged evidence from the initial audit (Harrell 0.734, Uno 0.727, truth 0.723 at 74% censoring); the Skill text for this claim is unchanged"
+          }
+        ],
+        "total": 84,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "p>>n Coxnet (n=150, p=1000) and test-set invariance of alpha selection (SA-002)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Before/after reproduced: path-end default predict 161 nonzero, Uno C 0.708; fit_coxnet_cv alpha 0.1827, 6 nonzero, Uno C 0.791 (2.2 s). Every X row seen by Coxnet fit/predict inside fit_coxnet_cv (507 calls) is a training row; permuting, replacing with noise or truncating the test set leaves alpha and coefficients identical; shrinking the training set moves them.",
+        "basic": 35,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "The documented configuration yields a sparse penalized signature in p>>n",
+            "result": "PASS",
+            "note": "6 of 1000 nonzero at the CV alpha vs 161 at the old path-end default"
+          },
+          {
+            "text": "Held-out Uno C at the CV alpha is at or above the old default",
+            "result": "PASS",
+            "note": "0.791 vs 0.708"
+          },
+          {
+            "text": "Alpha selection uses training data only (by construction)",
+            "result": "PASS",
+            "note": "fit_coxnet_cv(X_train, y_train, l1_ratio, n_splits, seed) takes no test argument; data-flow spy found 0 test-only rows"
+          },
+          {
+            "text": "Changing or permuting the TEST set does not change alpha or coefficients; changing TRAIN does",
+            "result": "PASS",
+            "note": "GBSG2 alpha 0.396820 and p>>n 0.182652 identical in all three perturbations and in the SKILL.md fitting block with corrupted test data; positive control moved alpha to 0.399 and 0.253"
+          },
+          {
+            "text": "Evaluation is on held-out data with no selection leakage into the test split",
+            "result": "PASS",
+            "note": "alpha, path and folds derived from training rows only"
+          }
+        ],
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 51.4,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both prior P1 defects are corrected and independently verified: KM baseline IBS 0.178 on GBSG2 and alpha selected on training data only.",
+    "Every SKILL.md python block now runs verbatim and chained, reproducing the script's numbers.",
+    "Competing-risks claims hold against a hand table, lifelines and scikit-survival, and unsupported methods are named as R-only and not executed.",
+    "Clear prediction-versus-inference boundary with hand-offs to sibling Skills; failure modes kept in a reference file."
+  ],
+  "recommendations": []
+}

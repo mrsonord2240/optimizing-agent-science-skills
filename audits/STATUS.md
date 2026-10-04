@@ -100,17 +100,17 @@ The area is the first segment of each Skill's upstream path. `Done` is ready on 
 | Skill | Category | Score | Grade | Open P0 / P1 / P2 | Record |
 |---|---|---:|---|---:|---|
 | `bio-data-visualization-distribution-plots` | Data Analysis | 93.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md) |
-| `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 90 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@228c088cf299-delta-dv1-20261003/viewer.md) |
+| `bio-data-visualization-ggplot2-fundamentals` | Data Analysis | 90 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d1247b0d8cd-delta-desc-20261003/viewer.md) |
 | `bio-data-visualization-heatmaps-clustering` | Data Analysis | 90 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md) |
 | `bio-data-visualization-lollipop-protein-maps` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@4f5e4c0/viewer.md) |
-| `bio-data-visualization-matplotlib-fundamentals` | Data Analysis | 90 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@79a08cbdf533-delta-dv1-20261003/viewer.md) |
+| `bio-data-visualization-matplotlib-fundamentals` | Data Analysis | 90 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@f5acfdfb5250-delta-desc-20261003/viewer.md) |
 | `bio-data-visualization-multipanel-figures` | Data Analysis | 94.1 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@3749f31/viewer.md) |
 | `bio-data-visualization-upset-plots` | Data Analysis | 93 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md) |
-| `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 89 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@a86f2698a953-delta-dv1-20261003/viewer.md) |
-| `bio-machine-learning-atlas-mapping` | Data Analysis | 87 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-machine-learning-atlas-mapping/candidate@8b4d96ad2465-final-reaudit-lane3b-20261003/viewer.md) |
+| `bio-data-visualization-volcano-and-ma-plots` | Data Analysis | 89 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@0bc1e67d46d6-delta-desc-20261003/viewer.md) |
+| `bio-machine-learning-atlas-mapping` | Data Analysis | 86 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-machine-learning-atlas-mapping/candidate@becbe61423e7-reaudit-delta2-20261003/viewer.md) |
 | `bio-machine-learning-biomarker-discovery` | Data Analysis | 81 | Beta Only | 0 / 1 / 5 | [viewer](skills/bio-machine-learning-biomarker-discovery/candidate@e0d8efc0e1b0-initial-lane3-20261003/viewer.md) |
-| `bio-machine-learning-omics-classifiers` | Data Analysis | 88 | Production Ready | 0 / 0 / 1 | [viewer](skills/bio-machine-learning-omics-classifiers/candidate@906900fae480-reaudit2-lane3-20261003/viewer.md) |
-| `bio-machine-learning-survival-analysis` | Data Analysis | 87 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-machine-learning-survival-analysis/candidate@eac9a589b7bd-reaudit-delta-20261003/viewer.md) |
-| `bio-splicing-quantification` | Data Analysis | 85 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-splicing-quantification/candidate@247bcf26db18-run-reaudit-2/viewer.md) |
+| `bio-machine-learning-omics-classifiers` | Data Analysis | 88 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-machine-learning-omics-classifiers/candidate@a2d417f41e37-reaudit-delta-20261003/viewer.md) |
+| `bio-machine-learning-survival-analysis` | Data Analysis | 87 | Production Ready | 0 / 0 / 0 | [viewer](skills/bio-machine-learning-survival-analysis/candidate@6fb42410e7b7-reaudit-delta2-20261003/viewer.md) |
+| `bio-splicing-quantification` | Data Analysis | 85 | Production Ready | 0 / 0 / 2 | [viewer](skills/bio-splicing-quantification/candidate@1010225625de-reaudit-delta2-20261003/viewer.md) |
 
 Open the generated [HTML dashboard](STATUS.html), [INDEX.md](INDEX.md) for every latest audit, or [BACKLOG.md](BACKLOG.md) for open findings.

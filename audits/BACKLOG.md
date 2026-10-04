@@ -314,7 +314,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (155)
+## P2 (157)
 
 ### `bio-machine-learning-biomarker-discovery` — BD-002: scoring/legacy-attribute choice unexplained; it sets signature size
 
@@ -462,7 +462,7 @@ None open.
 
 ### `bio-splicing-quantification` — parse_rmats_output raises a raw KeyError on an rMATS file with zero events
 
-- Skill: 85, Production Ready · candidate `247bcf26db18` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@247bcf26db18-run-reaudit-2/viewer.md)
+- Skill: 85, Production Ready · candidate `1010225625de` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1010225625de-reaudit-delta2-20261003/viewer.md)
 - Observed in inputs: 4
 - Problem: A header-only MATS file (an event type with no events, as in the planted rMATS run for A5SS, A3SS, MXE and RI) makes DataFrame.apply return an empty frame, then df['min_reads_per_replicate'] raises KeyError.
 - Root cause: The per-row statistics are added with concat on an apply result that is empty for an empty table.
@@ -470,7 +470,7 @@ None open.
 
 ### `bio-splicing-quantification` — SQ-13 rewording gives an inexact condition for the maxima
 
-- Skill: 85, Production Ready · candidate `247bcf26db18` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@247bcf26db18-run-reaudit-2/viewer.md)
+- Skill: 85, Production Ready · candidate `1010225625de` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alternative-splicing/splicing-quantification) · [viewer](skills/bio-splicing-quantification/candidate@1010225625de-reaudit-delta2-20261003/viewer.md)
 - Observed in inputs: 2
 - Problem: SKILL.md says IncFormLen/SkipFormLen maxima are 'reached only for exons at least read-length long; short exons shorten them'. On the real chrX JC file SkipFormLen is 74 in all 958 rows (a 1 nt exon included), and exons of 74 nt (readLength - 1) already reach 148.
 - Root cause: The exon-length condition belongs to IncFormLen alone and its threshold is readLength - 1, not readLength.
@@ -548,6 +548,22 @@ None open.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
 
+### `bio-machine-learning-atlas-mapping` — AM-008 Marker check: no message when nothing is checkable, and no listed-versus-used marker count
+
+- Skill: 86, Production Ready · candidate `becbe61423e7` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@becbe61423e7-reaudit-delta2-20261003/viewer.md)
+- Observed in inputs: 6
+- Problem: With a marker file that matches no predicted label (empty {} or genes absent from the gene set for every label) label_marker_check.py prints NOT CHECKED then dies with AttributeError (rc 1) and never prints the UNVERIFIED line. Separately a label can be judged on one marker (DC retained 1.000 on 1 of 3 listed) with only the n_markers column as evidence.
+- Root cause: res.flagged is read on an empty DataFrame; n_markers counts markers used but the number listed is not recorded or compared.
+- Fix: Guard the empty result (print the UNVERIFIED line and exit non-zero with a message), add an n_listed column and warn when n_markers is below 3. Small script change; the SKILL.md wording needs no change.
+
+### `bio-machine-learning-atlas-mapping` — AM-009 Description no longer separates it from cell-annotation
+
+- Skill: 86, Production Ready · candidate `becbe61423e7` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@becbe61423e7-reaudit-delta2-20261003/viewer.md)
+- Observed in inputs: —
+- Problem: The trimmed description (annotate against a pre-trained reference atlas, pick a mapping method, judge transferred labels) matches bio-single-cell-cell-annotation, which on the shelf says annotate from a reference atlas or pretrained model, transfer labels onto a query, assess confidence and rejection. The old tool list and the cell-annotation pointer were the separators, and the body has no hand-off to cell-annotation either.
+- Root cause: Description reduced to a generic clause that omits the Skill-specific mechanism (projection into a fixed reference latent space with out-of-distribution gating).
+- Fix: Add one clause to the description, e.g. 'projecting a query into a fixed reference latent space (scArches, Symphony) and gating labels on out-of-distribution distance', and add a Related Skills hand-off to cell-annotation for classifier-only annotation. Text only.
+
 ### `bio-phylo-species-trees` — Add a leaf-name consistency check before ASTRAL
 
 - Skill: 86, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/species-trees) · [viewer](skills/bio-phylo-species-trees/mrsonord2240-bioSkills@966f838/viewer.md)
@@ -603,14 +619,6 @@ None open.
 - Problem: examples/interaction_query.py overwrites signed_effect and mechanism with the last SIGNOR record for a pair, so exported edge attributes differ between runs (MDM2->CDKN1A: destabilization/binding in one run, repression/empty in another).
 - Root cause: Records repeat per site/paper and are applied in server order with last-write-wins.
 - Fix: Collect effects and mechanisms per edge as sorted sets (or keep the first by a deterministic key) and say so in the example.
-
-### `bio-machine-learning-atlas-mapping` — AM-008 Marker check: no message when nothing is checkable, and no listed-versus-used marker count
-
-- Skill: 87, Production Ready · candidate `8b4d96ad2465` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/atlas-mapping) · [viewer](skills/bio-machine-learning-atlas-mapping/candidate@8b4d96ad2465-final-reaudit-lane3b-20261003/viewer.md)
-- Observed in inputs: 6
-- Problem: With a marker file that matches no predicted label (empty {} or genes absent from the gene set for every label) label_marker_check.py prints NOT CHECKED then dies with AttributeError (rc 1) and never prints the UNVERIFIED line. Separately a label can be judged on one marker (DC retained 1.000 on 1 of 3 listed) with only the n_markers column as evidence.
-- Root cause: res.flagged is read on an empty DataFrame; n_markers counts markers used but the number listed is not recorded or compared.
-- Fix: Guard the empty result (print the UNVERIFIED line and exit non-zero with a message), add an n_listed column and warn when n_markers is below 3. Small script change; the SKILL.md wording needs no change.
 
 ### `bio-ortholog-inference` — OI-11 Batch statuses undocumented in SKILL.md; snippet drops failed symbols
 
@@ -734,11 +742,19 @@ None open.
 
 ### `bio-machine-learning-omics-classifiers` — OC-012 Quoted demo and 1-SE figures are setup-specific
 
-- Skill: 88, Production Ready · candidate `906900fae480` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@906900fae480-reaudit2-lane3-20261003/viewer.md)
+- Skill: 88, Production Ready · candidate `a2d417f41e37` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@a2d417f41e37-reaudit-delta-20261003/viewer.md)
 - Observed in inputs: 1, 5, 6
 - Problem: XGBoost best round in rf_xgboost_classifier.py is 160 / 133 / 397 / 223 for n_jobs 1 / 2 / 4 / default (test AUC 0.83-0.84), but SKILL.md and the script comment quote round 223 and validation logloss 0.577 / 0.601 / 0.632 (n_jobs=4) as the result; Golub lasso + 1-SE counts quoted as 45 / 142 / 60 were 369 and 273 on two further splits; the 0.09-0.10 leave-one-batch-out spread names no setup (0.07-0.11 on mine).
 - Root cause: Single-configuration measurements were written as if they were stable properties.
 - Fix: Text-only: say the stopping round varies with thread count (about 130-400) while test AUC stays near 0.83, correct or drop the comment figures, give the Golub 1-SE range over five splits (45-369), and name the setup (40 per batch, 60 features) behind the 0.09-0.10 spread. Optionally pin n_jobs=1 in the demo.
+
+### `bio-machine-learning-omics-classifiers` — OC-013 Trimmed description drops the cues that separate this Skill from model-validation and prediction-explanation
+
+- Skill: 88, Production Ready · candidate `a2d417f41e37` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/omics-classifiers) · [viewer](skills/bio-machine-learning-omics-classifiers/candidate@a2d417f41e37-reaudit-delta-20261003/viewer.md)
+- Observed in inputs: 7
+- Problem: The trigger 'diagnosing a suspiciously perfect AUC' now stands alone; model-validation ('detecting leakage', 'estimating performance honestly') and prediction-explanation ('debugging shortcut/batch learning') both advertise overlapping cases, and the pointers that used to disambiguate were removed. Class imbalance, calibration of tree ensembles and batch shortcut learning, this Skill's distinctive content, no longer appear in the description, so an agent asked only about those may route elsewhere. The other siblings (biomarker-discovery, survival-analysis, atlas-mapping) stay well separated by their own triggers. Not a defect of the intentional trim; no behaviour changed.
+- Root cause: The description was reduced to the Use-when clause by request; the AUC clause was written to sit beside the hand-off pointers.
+- Fix: Optional, text-only: add the verb 'build' scoping to the AUC clause, e.g. 'diagnosing a suspiciously perfect AUC from a classifier you are building', and optionally name class imbalance and batch shortcuts in the Use-when list, if Sam wants routing sharper.
 
 ### `bio-phylo-modern-tree-inference` — Remove the false IQ-TREE flag-form warnings
 
@@ -806,7 +822,7 @@ None open.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — VOL-010 y_cap labels pile onto the cap and overlap
 
-- Skill: 89, Production Ready · candidate `a86f2698a953` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@a86f2698a953-delta-dv1-20261003/viewer.md)
+- Skill: 89, Production Ready · candidate `0bc1e67d46d6` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/candidate@0bc1e67d46d6-delta-desc-20261003/viewer.md)
 - Observed in inputs: 2
 - Problem: volcano_plot(res, y_cap = 30) with default top_n labels places every high-rank label at y = 30, where ggrepel with max.overlaps = Inf prints them on top of each other; usage-guide suggests exactly this cap.
 - Root cause: Capped genes share one y value and the repel has no free space above the panel edge.
@@ -838,7 +854,7 @@ None open.
 
 ### `bio-data-visualization-ggplot2-fundamentals` — GG-010 create_volcano stops with a cryptic error when a label among the smallest padj is NA
 
-- Skill: 90, Production Ready · candidate `228c088cf299` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@228c088cf299-delta-dv1-20261003/viewer.md)
+- Skill: 90, Production Ready · candidate `9d1247b0d8cd` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/candidate@9d1247b0d8cd-delta-desc-20261003/viewer.md)
 - Observed in inputs: 3
 - Problem: With the new default top_n = NULL the helper evaluates max(nchar(lead)); a NA label (an unmapped gene symbol, the usual result of an org.Hs.eg.db lookup) makes the result NA and `if` fails with 'missing value where TRUE/FALSE needed' on ggplot2 4.0.3 and 3.5.2; with an explicit top_n the same data builds.
 - Root cause: The second-loop heuristic does not handle NA in the label column.
@@ -846,7 +862,7 @@ None open.
 
 ### `bio-data-visualization-matplotlib-fundamentals` — MPL-011 the named public legend route omits margins and clips the x label
 
-- Skill: 90, Production Ready · candidate `79a08cbdf533` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@79a08cbdf533-delta-dv1-20261003/viewer.md)
+- Skill: 90, Production Ready · candidate `f5acfdfb5250` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/candidate@f5acfdfb5250-delta-desc-20261003/viewer.md)
 - Observed in inputs: 3
 - Problem: SKILL.md and the script comment name the public route as Plot.on(fig), move fig.legends[0], fig.subplots_adjust(right=0.76). Run exactly so on an 89 x 70 mm figure the legend sits inside the page and clear of the axes (x 0.815-0.988, axes end 0.760), but the axes tight box reaches y = -0.007 and the x-axis label is cut at the page edge (ink on the last pixel row, scripts/figures/right076_only.png). The measured route in the certifying run also set left = 0.13, bottom = 0.17 and top = 0.97 and is clean (44 px bottom margin).
 - Root cause: The disclosure wording kept only the right-margin argument of the measured subplots_adjust call.

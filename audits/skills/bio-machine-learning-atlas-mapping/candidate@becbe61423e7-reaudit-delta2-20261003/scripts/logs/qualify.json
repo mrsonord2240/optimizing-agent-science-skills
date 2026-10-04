@@ -1,0 +1,27 @@
+{
+ "current": "becbe61423e78eaae064b907ae4dc929d87852078244bf2586f218ca69b7eab3",
+ "after_desc_revert": "8b4d96ad2465bd169dffb835c808d5783981f4acdc1f1e1121dbd9ab78dfbc04",
+ "reproduces_certified": true,
+ "files_differing": [
+  "SKILL.md"
+ ],
+ "skillmd_line_diff": [
+  "-description: Maps query single-cell data onto reference atl",
+  "+description: Use when annotating new single-cell datasets a"
+ ],
+ "skillmd_diff_is_one_description_line": true,
+ "yaml_keys": [
+  "name",
+  "category",
+  "description",
+  "tool_type",
+  "primary_tool",
+  "license",
+  "author"
+ ],
+ "yaml_description": "Use when annotating new single-cell datasets against a pre-trained reference atlas, deciding which mapping method fits, or judging whether transferred labels are trustworthy.",
+ "yaml_description_type": "str",
+ "yaml_name": "bio-machine-learning-atlas-mapping",
+ "old_description_len": 577,
+ "new_description_len": 174
+}
