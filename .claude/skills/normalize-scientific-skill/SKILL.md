@@ -27,7 +27,11 @@ open a pull request, release, submit, or publish.
 
 ## Inventory before moving
 
-Read the entire Skill tree. Map:
+Read the worked example first, every file under its `SKILL.md`, `routes/` and
+`scripts/`: `references/example/bio-differential-expression-deseq2-basics/`.
+On the pseudobulk eval task that cut went from 2 of 5 to 5 of 5, with every
+run reading the route and calling its script. Then read the entire tree of
+the assigned Skill. Map:
 
 - every instruction and repeated passage;
 - inline and external runnable code;
@@ -57,11 +61,12 @@ conditions, caveats, and scientific meaning.
   - `scripts/`: one runnable entry point per route, which takes the user's
     files and writes one results file. Build traps into the script (refuse a
     missing reference level, stop on an un-normalized matrix) instead of
-    warning about them in prose.
+    warning about them in prose. A script that serves one route takes
+    the route's name (`routes/pseudobulk.md` runs `scripts/pseudobulk_de.R`);
+    one that serves several is named for what it runs (`deseq2_de.R`). An
+    eval agent that skipped the route file guessed a script name from the
+    route name, found nothing, and invented its output.
   - `references/`: per-tool and per-topic detail a route points to by name.
-  The worked example is `bio-differential-expression-deseq2-basics` on shelf
-  branch `eval/paved-paths`: on the pseudobulk eval task it went from 2 of 5
-  to 5 of 5, with every run reading the route and calling its script.
 - Start with the point. The first thing under the title is the route table or
   the default command, within 15 lines of the title. Tested versions shrink to
   one line at the end of the file.
@@ -124,21 +129,38 @@ the Skill did not offer, install tooling, or resolve behavioral findings
 unrelated to safe version normalization in this phase. Record such issues for
 audit. A route's entry-point script that wraps the Skill's existing method is
 structure, not a new analysis; list every script you wrote in the handoff as
-unexecuted, so the tooling and audit workers run it.
+executed (environment, input, settings, key numbers) or unexecuted, so the
+tooling and audit workers know what is left to run.
+
+## Run the scripts you wrote
+
+Run each entry-point script whose packages an existing environment already
+has; install nothing. Use the `science` WSL distro as
+`.claude/skills/optimize-scientific-skills/references/environment-policy.md`
+describes, on a small real input staged under `F:\OpenScience`.
+
+- Run every script at two settings or more: one where each filter drops rows
+  and one where it drops none. A script that passed its default run crashed
+  when a filter removed nothing (R cannot recycle a scalar into a zero-row
+  data frame).
+- Trip each trap once: the missing reference level, the un-normalized matrix.
+- A script whose packages are not installed stays unexecuted. Never report a
+  run that did not happen.
 
 ## Verify the normalized tree
 
-Check that every path named in `SKILL.md` and the route files exists, each
-route names a command that exists in `scripts/` or is shown in full, every
-analysis the Skill offered is reachable from the route table, and the first
-route table sits within 15 lines of the title. Run lightweight link, metadata,
-and syntax checks when available; leave behavioral execution to tooling and
-audit workers.
+Check that each route names a command that exists in `scripts/` or is shown in
+full, and that every analysis the Skill offered is reachable from the route
+table. Leave behavioral audit of the science to tooling and audit workers.
 
 Then run, from the records repository root,
-`python tools/skill_preflight.py <normalized-skill-dir>`. It must report
-`PASS`. Take the candidate identity from its output; never compute or copy an
-identity by hand. Carry any `warn` lines into the handoff.
+`python tools/skill_preflight.py --shape <normalized-skill-dir>`. It must
+report `PASS`. `--shape` fails a tree with no route table within 15 lines of
+the title, a route nothing names, a named `routes/`, `scripts/` or
+`references/` path that does not exist, a citation left in `SKILL.md` or a
+route, or a description that is not a `Use when` trigger. Take the candidate
+identity from its output; never compute or copy an identity by hand. Carry any
+`warn` lines into the handoff.
 
 Summarize migration at file or purpose level. Do not catalog every moved or
 deleted passage; the diff is that record.

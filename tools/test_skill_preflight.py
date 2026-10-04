@@ -64,6 +64,35 @@ class PreflightTests(unittest.TestCase):
             self.assertEqual(near["fail"], [])
             self.assertTrue(near["warn"])
 
+    def test_router_shape(self):
+        router_md = (b"---\nname: demo-skill\ndescription: Use when testing a demo.\nlicense: MIT\n"
+                     b"category: Data Analysis\nauthor: Someone\n---\n\n# Demo\n\n"
+                     b"| Your data | Read |\n|---|---|\n| A table | `routes/table.md` |\n")
+        good = {"SKILL.md": router_md, "LICENSE": b"MIT\n", "scripts/table.py": b"x\n", "scripts/shared.py": b"y\n",
+                "routes/table.md": b"# Table\n\n```bash\npython scripts/table.py in.csv\n```\n\nOr see "
+                                   b"other-skill/routes/elsewhere.md and `references/`.\n",
+                "references/detail.md": b"Smith et al. 2020\n"}
+        with tempfile.TemporaryDirectory() as tmp:
+            result = preflight.check(make_skill(tmp, good), None, None, router=True)
+            self.assertEqual(result["fail"], [])
+            self.assertEqual(result["warn"], ["script no instruction file or script names: scripts/shared.py"])
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = dict(good, **{"routes/table.md": b"# Table\n\nRun scripts/gone.py (Love et al. 2014).\n",
+                                "routes/orphan.md": b"# Orphan\n"})
+            fails = " | ".join(preflight.check(make_skill(tmp, bad), None, None, router=True)["fail"])
+            for expected in ("routed path missing: scripts/gone.py (routes/table.md:3)",
+                             "literature citation in an instruction file: routes/table.md:3",
+                             "route not named by SKILL.md or another route: routes/orphan.md"):
+                self.assertIn(expected, fails)
+        with tempfile.TemporaryDirectory() as tmp:
+            old = {"SKILL.md": GOOD_SKILL_MD.replace(b"Body.\n", b"# Demo\n" + b"prose\n" * 20 + b"| a | b |\n"),
+                   "LICENSE": b"MIT\n"}
+            skill = make_skill(tmp, old)
+            self.assertEqual(preflight.check(skill, None, None)["fail"], [])
+            fails = " | ".join(preflight.check(skill, None, None, router=True)["fail"])
+            for expected in ("not a `Use when", "no route table within 15 lines", "no routes/*.md files"):
+                self.assertIn(expected, fails)
+
 
 if __name__ == "__main__":
     unittest.main()

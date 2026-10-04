@@ -17,6 +17,18 @@ digest, mounts, command, resource assumptions, and output checks. Use native
 Windows only when the actual tool or integration requires it, and record why
 WSL and Docker are unsuitable and how to repeat the native run.
 
+From a Windows agent shell, save the commands as a script under
+`F:\OpenScience` with the Write tool and launch it from Git Bash with output
+to a log file; a command passed inline or left attached to the terminal hangs:
+
+```bash
+MSYS_NO_PATHCONV=1 timeout 250 wsl -d science -- bash -l /mnt/openscience/<path>/run.sh > run.log 2>&1 < /dev/null; cat run.log
+```
+
+Inside the script call an environment's interpreter by its full path
+(`<env>/bin/python`, `<env>/bin/Rscript`); piping `micromamba run` scrambles
+the output order.
+
 Install or update dependencies only in a tooling phase. Coordinate shared
 mutations with a lock, snapshot relevant versions, run from saved scripts when
 practical, kill only run-owned PIDs, and keep heavy artifacts outside the Skill

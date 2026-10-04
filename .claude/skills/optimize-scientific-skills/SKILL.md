@@ -176,15 +176,14 @@ already disqualifies.
 ### 2. Normalize every Skill
 
 Run `normalize-scientific-skill` before tooling or behavioral audit. Accept a
-normalize handoff only when `tools/skill_preflight.py` reports `PASS` for the
-normalized tree and its identity equals the handoff's, and its frontmatter
-`description` is a single `Use when <task or situation>.` trigger with no tool
-lists, coverage summaries, or pointers to other Skills. Check that line
-yourself at transition and reject a handoff that kept the long form. Reject
-one too whose `SKILL.md` still carries a `## References` section or inline
-literature citations; they belong in `references/citations.md`. Reject one
-whose first route table or command sits more than 15 lines below the title.
-A Skill
+normalize handoff only when `tools/skill_preflight.py --shape` reports `PASS`
+for the normalized tree and its identity equals the handoff's. `--shape`
+decides the router layout: a route table within 15 lines of the title, every
+route named, every routed path present, no literature citation in `SKILL.md`
+or a route, and a `Use when` description. Read the description yourself at
+transition and reject one that carries tool lists, coverage summaries, or
+pointers to other Skills. Reject a handoff that does not say, per script the
+normalizer wrote, whether it was run. A Skill
 already certified with a long description takes the one-line edit, with the
 exact old and new strings recorded in `edits.json` in its fix run directory,
 then a delta re-audit. A prior
