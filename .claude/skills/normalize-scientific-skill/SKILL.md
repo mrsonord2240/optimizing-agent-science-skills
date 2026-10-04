@@ -46,8 +46,22 @@ conditions, caveats, and scientific meaning.
 
 ## Normalize structure
 
-- Keep `SKILL.md` concise and imperative, with the always-needed workflow and
-  routing to conditional resources.
+- Cut the Skill to a router that gets more detailed as it branches. Fidelity
+  to the provider's text and layout is not a goal (Sam, 2026-10-04); correct
+  science, credit and licence are.
+  - `SKILL.md`: a table from what the user has to one route file, the few
+    rules that hold on every route, and nothing else. Tell the agent to read
+    one route and run its command before writing code of its own.
+  - `routes/<task>.md`: the command first, then only the rules that change
+    what the agent does on that route, then a "Done when" line.
+  - `scripts/`: one runnable entry point per route, which takes the user's
+    files and writes one results file. Build traps into the script (refuse a
+    missing reference level, stop on an un-normalized matrix) instead of
+    warning about them in prose.
+  - `references/`: per-tool and per-topic detail a route points to by name.
+  The worked example is `bio-differential-expression-deseq2-basics` on shelf
+  branch `eval/paved-paths`: on the pseudobulk eval task it went from 2 of 5
+  to 5 of 5, with every run reading the route and calling its script.
 - Start with the point. The first thing under the title is the route table or
   the default command, within 15 lines of the title. Tested versions shrink to
   one line at the end of the file.
@@ -68,9 +82,9 @@ conditions, caveats, and scientific meaning.
 - Keep source assets in `assets/` only when they belong in generated output.
 - Remove duplicate material after ensuring one authoritative copy remains.
 - Repair relative links and references made stale by the moves.
-- Preserve the frontmatter name, license obligations, attribution, provenance,
-  public behavior, and advertised scope unless an unambiguous structural
-  correction requires otherwise.
+- Preserve the frontmatter name, license obligations, attribution and
+  provenance. Keep every analysis the Skill could do reachable from a route;
+  drop human-facing guides and demos on simulated data that a script replaces.
 - Resolve version discrepancies throughout `SKILL.md`, routed references,
   scripts, examples, and dependency metadata. Default to the newer supported
   software version when live documentation or tooling confirms it and the
@@ -105,15 +119,19 @@ conditions, caveats, and scientific meaning.
   `__pycache__`, `*.pyc`, dot-prefixed paths, and LICENSE copies below the
   Skill root.
 
-Do not redesign scientific methods, change analytical defaults, add features,
-install tooling, or resolve behavioral findings unrelated to safe version
-normalization in this phase. Record such issues for audit.
+Do not redesign scientific methods, change analytical defaults, add analyses
+the Skill did not offer, install tooling, or resolve behavioral findings
+unrelated to safe version normalization in this phase. Record such issues for
+audit. A route's entry-point script that wraps the Skill's existing method is
+structure, not a new analysis; list every script you wrote in the handoff as
+unexecuted, so the tooling and audit workers run it.
 
 ## Verify the normalized tree
 
-Check that all routed files exist, `SKILL.md` remains self-contained for its
-core workflow, scripts retain their full content and executable entry points,
-and no required guidance became undiscoverable. Run lightweight link, metadata,
+Check that every path named in `SKILL.md` and the route files exists, each
+route names a command that exists in `scripts/` or is shown in full, every
+analysis the Skill offered is reachable from the route table, and the first
+route table sits within 15 lines of the title. Run lightweight link, metadata,
 and syntax checks when available; leave behavioral execution to tooling and
 audit workers.
 
