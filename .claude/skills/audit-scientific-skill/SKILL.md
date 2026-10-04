@@ -49,6 +49,11 @@ bounded case is available. When a program produces multiple materially
 different output families, generate and inspect one representative of each
 within reason. Execute any migrated executable whose preservation is uncertain.
 
+For a router-shaped Skill, run every core route's command as its route file
+shows it, on the staged input, and trip each trap a script builds in once (a
+missing reference level, an un-normalized matrix). The stop message must name
+the fix. An optional route follows the rules for optional surfaces.
+
 Save commands, inputs, versions, outputs, and assertions. Parse structured
 output and meaningful values; inspect scientific relationships and rendered
 readability where applicable. Syntax, imports, file existence, and exit code
@@ -74,6 +79,30 @@ inspection as execution.
 If missing tooling prevents meaningful diagnosis, stop that surface and route
 the lane to `prepare-scientific-skill-tooling`; do not install dependencies
 during scoring.
+
+## Run the routing check
+
+For a router-shaped Skill, run from the records repository root:
+
+```powershell
+python tools/routing_check.py <candidate-skill-dir> <routing-cases.json> --out <run-root>\routing
+```
+
+A cheap model gets each case's request and input and the Skill; the check
+passes a case when the model opens the right route first and then runs its
+script. It executes nothing from the Skill, costs a few cents, and needs
+Docker; when containers will not start, run `docker desktop restart` and
+rerun (Sam's standing permission).
+
+- `FAIL`: read the failing runs under `--out` and file a P1 finding on that
+  route that says why the agent went elsewhere: the table row does not
+  describe the request, the route needs a file the user does not have, or the
+  command is not first.
+- `ERROR`: infrastructure; rerun before judging.
+- A case whose request leads the agent, or whose input does not fit the
+  route, goes back to the tooling worker.
+
+Keep `routing.json` with the run evidence.
 
 ## Use the minor-repair budget narrowly
 

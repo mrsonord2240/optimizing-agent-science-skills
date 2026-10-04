@@ -29,6 +29,11 @@ Map every advertised or shipped runnable surface to its requirements:
 - remote services, authentication, licenses, registrations, hardware, and
   graphical or native-application requirements.
 
+In a router-shaped Skill (`routes/` under the Skill root) each route is one
+surface: its command, script, environment and input. Routes in the first table
+of `SKILL.md` that the Skill's main tool serves are core; a route to an
+alternative tool is optional.
+
 Classify each surface as core or optional. Core surfaces are the Skill's
 common end-to-end workflow and any materially distinct mode its `SKILL.md`
 workflow requires; optional surfaces are alternative tools or modes it offers.
@@ -88,14 +93,31 @@ Place `TOOLS.md` in the lane's durable records area, not the product Skill. It
 must contain:
 
 - full or delta mode and candidate tree identity;
-- one row per runnable surface with runtime/tool, environment, version,
-  invocation, smoke evidence, input/cache path, and status;
+- one row per runnable surface (per route in a router-shaped Skill) with
+  runtime/tool, environment, version, invocation, smoke evidence, input/cache
+  path, and status;
 - environment fingerprint and enough activation detail for a new worker;
 - public data/model provenance and cache location;
 - exact restricted, unavailable, or resource-infeasible blockers plus user
   action and rerun instructions;
 - surfaces verified unchanged during a delta pass;
 - items explicitly out of scope.
+
+## Write the routing cases
+
+For a router-shaped Skill, write `routing-cases.json` beside `TOOLS.md`: one
+case per route in the first table of `SKILL.md`. The audit worker runs them
+with `tools/routing_check.py`, whose header documents the format.
+
+- `request`: one or two sentences a user would type, describing their files
+  and question. Never name a route, a script, or a tool the table row does not
+  name.
+- `data`: a directory of small real input for that request, a few MB at most,
+  cut down from the staged input and kept under the ecosystem's `derived\`
+  with the script that made it. An agent that finds empty or placeholder files
+  stops to report them and never reaches the route.
+- `expect`: only when the route sends this request to a reference instead of a
+  script; name that reference.
 
 ## Hand off
 

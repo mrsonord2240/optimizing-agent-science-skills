@@ -45,6 +45,12 @@ when it represents a materially different supported mode and is applicable.
 When a program has materially different output families, ensure the combined
 current evidence contains one inspected representative of each within reason.
 
+For a router-shaped Skill, `tools/skill_preflight.py --shape` must report
+`PASS`, and `tools/routing_check.py` must be rerun on the exact candidate
+bytes with the lane's `routing-cases.json`; its report prints the identity it
+ran against. A fixer cannot have made a case pass by editing its request:
+diff the cases file against the audit's copy.
+
 Do not rerun every prior passing input merely because it exists. Earlier saved
 execution may remain part of the certification record when the auditor verifies
 that the relevant Skill bytes, dependencies/runtime fingerprint, interface,
@@ -80,7 +86,8 @@ of at most 20 lines. Anything larger gets the full re-audit above.
    the certified audit's recorded path). Every change must be one the brief
    lists; report any other change as a finding.
 3. Check each changed statement against the certified run's evidence or new
-   evidence. Execute any changed command or script path, including its
+   evidence. Rerun the routing check when the change touched the `SKILL.md`
+   route table, a route file, or a script's name or arguments. Execute any changed command or script path, including its
    intended failure guard.
 4. Carry the certified report's scores forward. Re-score only the dimensions
    and assertions the change touches, and mark resolved findings.
@@ -106,7 +113,9 @@ least 85, static score at least 80, execution average at least 85, Layer 1 at
 least 32, Layer 2 at least 48, assertion pass rate at least 90 percent, no veto
 or open P0, and representative inspected execution for every materially
 distinct required workflow or output family, using verified reusable evidence
-where allowed above. This result makes the exact working bytes `candidate-ready`;
+where allowed above. A router-shaped Skill also needs every core route's
+command executed, `--shape` `PASS`, and a routing check with every first-table
+case `PASS`. This result makes the exact working bytes `candidate-ready`;
 the orchestrator must still commit them to make them `ready` and pass intake to
 make them `done`.
 

@@ -51,6 +51,10 @@ For each Skill, record the finding IDs, changed files, and new identity in its
 handoff and fix log, and route it to `reaudit-scientific-skill` in delta mode.
 If a finding turns out to need a runnable change, leave it open and say so.
 
+In a router-shaped Skill a finding belongs to a route. Fix a routing-check
+finding in the Skill: the table row, the route file, or a missing entry point.
+Never edit a case's request to lead the agent there.
+
 ## Implement deliberately
 
 Prefer the smallest durable correction that addresses the underlying cause.
@@ -78,7 +82,8 @@ behavior with meaningful inputs. Save commands and versions; parse structured
 outputs, check meaningful scientific values and relationships, and inspect
 rendered readability where applicable. Exit code zero or file existence alone
 is insufficient. Rerun focused regressions for adjacent behavior affected by
-the change. Reuse immutable evidence for an unchanged surface when its bytes,
+the change. A change to a script or reference that several routes share reruns
+each of those routes' commands. Reuse immutable evidence for an unchanged surface when its bytes,
 dependency/runtime fingerprint, interface, and relevant upstream assumptions
 still match; do not replay expensive unrelated workflows ceremonially. A fix
 may remain blocked when access is unavailable, but it must not be marked
