@@ -1,0 +1,78 @@
+{
+  "origin": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "machine-learning/omics-classifiers",
+    "checkout_read_only": "F:\\OpenScience\\bioSkills-Improved\\machine-learning/omics-classifiers"
+  },
+  "candidate": {
+    "branch": "normalize/ml-lane3",
+    "commit": "29f5446e431db8eba803796e6f7dfc02f7886743",
+    "content_sha256": "a2d417f41e37007d7a2a3ea4d76b744cf1be42485be95576f42dee806584616f",
+    "identity_kind": "sha256-manifest",
+    "path": "F:\\OpenScience\\wt\\ml-lane3-normalize\\skills\\bio-machine-learning-omics-classifiers",
+    "file_count": 7,
+    "bytes": 50363,
+    "status_before": "untracked skill directory (by design)",
+    "status_after_execution": "unchanged: tools/skill_preflight.py --offline reports the same manifest hash before and after the delta audit; no Skill byte edited"
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "44ed2cf314af3b997fe0d097e07237e2137c8ee60951255aa765e92400050b95",
+      "bytes": 25773
+    },
+    {
+      "path": "references/failure-modes.md",
+      "sha256": "1df907dd05c96952866660048ba315949aab9737c5123f70481ce97ed2305f98",
+      "bytes": 2973
+    },
+    {
+      "path": "scripts/batch_checks.py",
+      "sha256": "bcc9a59ab72ea5b51b4784323ebc24052e874e5cbba5b3203356c149ddabb308",
+      "bytes": 4073
+    },
+    {
+      "path": "scripts/calibration_check.py",
+      "sha256": "f8fb4129599c285046f90ae20a6c27907bb77f211b17ac7351e7efb7bd69befb",
+      "bytes": 6330
+    },
+    {
+      "path": "scripts/logistic_regression.py",
+      "sha256": "06cf62e8d860827a640158dc1ccf5986025636ebcc09b1ea4cd382a30d6fa5d9",
+      "bytes": 2954
+    },
+    {
+      "path": "scripts/rf_xgboost_classifier.py",
+      "sha256": "09c3f58ed0d9ada23ef253dbbc0bdab5e923547fabcf950d9f008db87d62aeab",
+      "bytes": 3612
+    },
+    {
+      "path": "usage-guide.md",
+      "sha256": "5af260128318ca7cd5ec99b44ed09396c729b9d802515853c5cf33a667a891f0",
+      "bytes": 4648
+    }
+  ],
+  "tooling": {
+    "tools_md": "F:\\OpenScience\\audits\\bio-machine-learning-omics-classifiers\\TOOLS.md",
+    "tools_md_sha256": "10db0209615ba7f57514bcd4d89fe2d614552cbf09aeda5864e8dd72d77ea9b9",
+    "environment_fingerprint_sha256": "20291632e93a3881e9704027dfe1d61f2f02fb40d64667ea992bb557bbb336a6",
+    "environment_root": "F:\\OpenScience\\audit-envs\\cheminformatics-hit-triage-analyst",
+    "rubric_zip_sha256": "e54e9ff8b0c3677abcfe657ad6ed92ba34dbdb8ad205c7157ad881f25afcf0de"
+  },
+  "preflight_warnings": [
+    "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+  ],
+  "audit": {
+    "kind": "delta re-audit, independent of the normalizer, auditors and fixers",
+    "previous_identity": "906900fae480655dca3808442d858f84b17aace68513ed281607842a0151276f",
+    "previous_record": "candidate@906900fae480-reaudit2-lane3-20261003",
+    "fix_evidence": "F:\\OpenScience\u0007udits\bio-machine-learning-omics-classifiers\fix-description-20261003",
+    "delta_qualification": "scripts/revert_check.py on scratch copy reproduces 906900fae480...; diff -r shows only SKILL.md line 4",
+    "reused_evidence": "all execution evidence of the certifying record (behaviour unchanged: scripts, references and usage-guide hashes equal)"
+  },
+  "schema": "scientific-skill-audit-source-identity-v1",
+  "phase": "delta re-audit (frontmatter description trimmed)",
+  "skill_id": "bio-machine-learning-omics-classifiers",
+  "independent_auditor": true
+}
