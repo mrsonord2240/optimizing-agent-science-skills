@@ -1,7 +1,7 @@
 # Tooling: bio-workflows-crispr-screen-pipeline (recut router)
 
-- Mode: full. Date: 2026-10-04.
-- Candidate: `F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline`, tree identity `e242270b6fc053d495f12c86df5d2d8eb96f9b42fd3971d6435796c9bae5a71d` (`skill_preflight --offline --shape` PASS, 19 files). Bytes untouched.
+- Mode: full (2026-10-04), refreshed by a delta pass the same day after fix-001 (see Delta section).
+- Candidate: `F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline`, tree identity `4db139576e8d5f48cb118db1f2cacd2eef87ca596d63fd25ae5dc711aa94c9a7` (full pass ran on `e242270b6fc0`; `skill_preflight --offline --shape` PASS, 19 files). Bytes untouched.
 - Ecosystem root: `F:\OpenScience\audit-envs\crispr-screen-analyst\` (INDEX row `workflows/crispr-screen-pipeline`). Shared tool notes, patches and traps: its `TOOLS.md` (sections 2 and 6). Public inputs: its `public-data\README.md`.
 - Routing cases: `routing-cases.json` beside this file (11 cases, one per route of the first table; data under `public-data\derived\crispr-pipeline\<route>\`, built by `make_inputs.py` there).
 - Run evidence: `F:\OpenScience\fix-evidence\recut-crispr-pipeline\tooling\<route>\` (logs, outputs).
@@ -36,7 +36,7 @@ All commands run from the Skill's own route text unless a deviation is listed. E
 | branches | pointers to sibling Skills | none | not runnable | `derived\...\branches` (Papalexi 2021, 400 cells x 2,000 genes + 111 guide counts) for the routing case only | n/a (reference route) |
 | install.md | `references/install.md` | not run | `mageck-vispr` is Linux-only (ecosystem section 3) | | out of scope |
 
-## Route-text defects found while tooling (Skill not edited; for fix phase)
+## Route-text defects found in the full pass (items 1-5 fixed by fix-001; the Delta section lists one new defect)
 
 1. `routes/count.md` says library.csv columns are `sgRNA, Gene, Sequence`; `mageck count --list-seq` reads columns by position: id, sequence, gene. Following the text literally gives sequences in the Gene column and 0% mapped (reproduced).
 2. `routes/mle.md`: MAGeCK needs a tab-delimited count table; a comma-separated `.csv` fails with "Sample ... cannot be found".
@@ -59,3 +59,36 @@ mageck-vispr and MAGeCKFlute dashboards; CRISPResso/PRIDICT/BE-Hive (other categ
 ## Rerun
 
 `Scripts\python.exe ...\public-data\derived\crispr-pipeline\make_inputs.py` regenerates all route inputs (consensus inputs read `fix-evidence\recut-crispr-pipeline\*.txt`). CRISPRcleanR env rebuild: `tools\ccr-wsl\install.sh`, then `install2.sh`, `install3.sh`.
+
+## Delta (2026-10-04, after fix-001)
+
+Evidence: `F:\OpenScience\fix-evidence\recut-crispr-pipeline\tooling-delta-001\` (chronos, jacks, qc, routing, routing-b).
+
+Rerun from clean case directories, route text as shipped:
+
+| Surface | Result |
+|---|---|
+| chronos | snippet extracted verbatim from `routes/chronos.md`, run in chronos-venv: exit 0, 2m03s, 5 lines x 4,502 genes, 0 NaN, ribosomal mean -2.66 to -2.94, all-gene mean 0.00-0.01. Needs `NEGv1.txt` with a `Gene` header (see defect) |
+| jacks | route command, shared venv: exit 0, 21 s, 4,502 genes x 5 lines, RPL/RPS mean -1.04 (MV411) to -1.83 (A375), all-gene mean -0.03 to 0.02 |
+| qc | HAP1: FAIL as before (Gini 0.288, Pearson 0.789). Without `plasmid=` the WARNING line prints first, then FAIL |
+
+Unchanged and not rerun: count, bagel2, mle, drugz, consensus, branches, rra command, cn_correction.R (header comment only), environments.
+
+New route/data defect (Skill not edited): `routes/chronos.md` reads `NEGv1.txt` with `.Gene`, but the staged BAGEL `NEGv1.txt` header is `GENE`, so the snippet raises AttributeError on the standard file. The chronos case dir ships the standard file; the clean rerun used a copy with the header changed (`chronos\NEGv1.txt` in the evidence dir).
+
+### Routing cases (reworked)
+
+Real screens do not pass the Skill's own QC gates (HAP1 plasmid Gini 0.288; the Project Score A375 plasmid 0.34), so an agent that runs QC correctly stops. Two cases now use QC-passing tables **simulated from real data** (`derived\crispr-pipeline\make_inputs_qcpass.py`): real guide ids, genes and per-guide fold changes; counts resampled (tight lognormal plasmid pool, multinomial endpoints, 500 reads/guide). `qc.py` on both: PASS (plasmid Gini 0.072, endpoint 0.16-0.19, replicate Pearson 0.98).
+
+| Case | Data | allow_before | Check |
+|---|---|---|---|
+| rra | `rra-qcpass` (HAP1 TKOv3 ids, 14,320 guides: all CEGv2 genes + 3,000 others) | qc, bagel2 | 3/3 |
+| cn-correction | `cn-correction-qcpass` (KY library ids, 90,709 guides; A375_plasmid, A375_r1-r3) | qc | 2/3 |
+| mle | unchanged | qc, cn-correction | not rerun here (fix-001: 2/3 with this allow_before) |
+| jacks | unchanged | qc, cn-correction | not rerun here (fix-001: 3/3 with this allow_before) |
+
+The mle/jacks/chronos rerun in `routing-b` hit HTTP 402 (OpenRouter out of credit) and is void; `routing\` holds the valid rra and cn-correction runs.
+
+The old `rra\` and `cn-correction\` dirs stay (real data, used by the surface smoke runs). The routing image `bioeval-env` has no CRISPRcleanR; the check stops at the issued command, so none is needed.
+
+F-10 (real drug-screen dataset for drugz): deferred. The only staged drug data is the 9-guide olaparib demo, too small for drugZ, and no small public counts table was quick to stage. The drugz case still uses relabelled HAP1 columns.

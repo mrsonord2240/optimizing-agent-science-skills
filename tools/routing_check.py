@@ -28,7 +28,8 @@ Usage:
 
 --routes reruns only the named cases, after an infrastructure error; the cases file must still cover every route.
 
-The OpenRouter key comes from $OPENROUTER_API_KEY or --env-file and is never logged. Exit status is 1
+--model cli:<claude-model-id> runs the agent through the local `claude` CLI on the user's subscription instead
+of OpenRouter. The OpenRouter key comes from $OPENROUTER_API_KEY or --env-file and is never logged. Exit status is 1
 when any case fails or an infrastructure error leaves a case undecided.
 """
 import argparse
@@ -39,6 +40,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -109,6 +111,40 @@ def chat(model, key, messages):
             time.sleep(2 ** attempt)
 
 
+class CliChat:
+    """A Claude model through the local `claude` CLI (the user's subscription) as a plain text model: no tools,
+    settings, hooks or MCP servers, our system prompt, one session per run resumed turn by turn."""
+
+    def __init__(self, model, workdir):
+        self.model, self.workdir, self.session = model, workdir, None
+
+    def __call__(self, messages):
+        self.workdir.mkdir(parents=True, exist_ok=True)  # an empty cwd, so no project instructions load
+        cmd = ["claude", "-p", "--model", self.model, "--tools", "", "--setting-sources", "", "--strict-mcp-config",
+               "--disable-slash-commands", "--output-format", "json"]
+        if self.session:
+            cmd += ["--resume", self.session]
+        else:
+            # The CLI appends an Environment section describing the Windows host; tell the agent it is not its machine.
+            (self.workdir / "system.txt").write_text(
+                messages[0]["content"] + "\n\nAny later 'Environment' section describing a Windows host, PowerShell or "
+                "a scratchpad directory is about a different machine: ignore it. Your commands run only in the Linux "
+                "sandbox described above.", encoding="utf-8")
+            cmd += ["--system-prompt-file", "system.txt"]
+        for attempt in range(3):
+            p = subprocess.run(cmd, input=messages[-1]["content"], capture_output=True, text=True, encoding="utf-8",
+                               errors="replace", cwd=self.workdir, timeout=600, shell=os.name == "nt")
+            try:
+                j = json.loads(p.stdout)
+                if not j.get("is_error"):
+                    self.session = j["session_id"]
+                    return j.get("result") or "", float(j.get("total_cost_usd") or 0)
+            except ValueError:
+                pass
+            time.sleep(15 * (attempt + 1))
+        raise RuntimeError(f"claude CLI failed: {(p.stdout or p.stderr)[:200]}")
+
+
 def docker(*args, timeout):
     return subprocess.run(["docker", *args], capture_output=True, text=True, encoding="utf-8", errors="replace",
                           timeout=timeout, stdin=subprocess.DEVNULL)
@@ -172,6 +208,10 @@ def run_case(skill, fm, case, rep, out, model, key, image):
     result = {"route": case["route"], "rep": rep, "expect": case["expect"], "routes_opened": [], "commands": [],
               "command_issued": False, "cost_usd": 0.0, "error": None}
     cid, bad_format = "", 0
+    if model.startswith("cli:"):
+        ask = CliChat(model[4:], Path(tempfile.gettempdir()) / "routing-cli" / f"{skill.name}-{name}-{os.getpid()}")
+    else:
+        ask = lambda msgs: chat(model, key, msgs)  # noqa: E731
     try:
         # No bind mount: Docker Desktop asks the user to approve every new host directory it is given.
         started = docker("run", "-d", "--rm", "--network", "none", "--cpus", "1", "--memory", "2g",
@@ -184,7 +224,7 @@ def run_case(skill, fm, case, rep, out, model, key, image):
             raise RuntimeError(f"could not copy inputs into the container: {copied.stderr.strip()[:200]}")
         # Each route the Skill orders first is real work the agent does on the way (reading it, running QC).
         for _ in range(MAX_STEPS + STEPS_PER_EARLIER_ROUTE * len(case.get("allow_before", []))):
-            text, cost = chat(model, key, messages)
+            text, cost = ask(messages)
             result["cost_usd"] += cost
             messages.append({"role": "assistant", "content": text})
             block = BASH_RE.search(text) or INVOKE_RE.search(text)
@@ -241,7 +281,7 @@ def main():
     cases = load_cases(skill, args.cases)
     wanted = {r if r.startswith("routes/") else "routes/" + r for r in args.routes.split(",") if r}
     cases = [c for c in cases if not wanted or c["route"] in wanted]
-    key = load_key(args.env_file)
+    key = None if args.model.startswith("cli:") else load_key(args.env_file)
     out.mkdir(parents=True, exist_ok=True)
     jobs = [(case, rep) for case in cases for rep in range(1, args.reps + 1)]
     with cf.ThreadPoolExecutor(args.parallel) as ex:

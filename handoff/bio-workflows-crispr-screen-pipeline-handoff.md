@@ -1,65 +1,51 @@
-# Handoff: bio-workflows-crispr-screen-pipeline / fix-scientific-skill
+# Handoff: bio-workflows-crispr-screen-pipeline / prepare-scientific-skill-tooling (delta)
 
 - Updated: 2026-10-04
 - Lane: 1
 - Status: ready-for-phase
-- Owner leaving: fix-scientific-skill worker (fix-001)
-- Next role: prepare-scientific-skill-tooling (delta mode), then reaudit-scientific-skill
+- Owner leaving: tooling worker (delta after fix-001)
+- Next role: reaudit-scientific-skill
 
 ## Source identity
 
-- Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:workflows/crispr-screen-pipeline
-- Working tree: F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline
-- Branch/worktree: recut/crispr-screen-pipeline, base f162b3a; candidate bytes uncommitted
-- Starting identity: e242270b6fc053d495f12c86df5d2d8eb96f9b42fd3971d6435796c9bae5a71d (verified)
-- Candidate identity now: 4db139576e8d5f48cb118db1f2cacd2eef87ca596d63fd25ae5dc711aa94c9a7 (skill_preflight --offline --shape PASS, 19 files; only warn: no Skill-root LICENSE, see F-11)
-- Audit of the starting bytes: audits\skills\bio-workflows-crispr-screen-pipeline\candidate@e242270b6fc0-run-002\
+- Working tree: F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline (branch recut/crispr-screen-pipeline, base f162b3a; candidate bytes uncommitted, untouched by this phase)
+- Candidate identity: 6654a4f7d596c13a76b5b68b0346c9f521335f10e4d4a38ae7b58e2f3067d6dc. The orchestrator made one edit after the tooling delta, to the defect that delta reported: `routes/chronos.md` read the NEGv1 gene column as `.Gene` (the staged file's header is `GENE`); it now reads the first column, `.iloc[:, 0]`. Unexecuted: the re-auditor runs the chronos snippet as shipped against the standard NEGv1 file. Before that edit: 4db139576e8d5f48cb118db1f2cacd2eef87ca596d63fd25ae5dc711aa94c9a7 (skill_preflight --offline --shape PASS, 19 files; warn: no Skill-root LICENSE, F-11 deferred)
+- Fix ledger and evidence: F:\OpenScience\fix-evidence\recut-crispr-pipeline\fix-001\ (F-10 and F-11 deferred-with-rationale)
 
-## Finding ledger
+## Tooling
 
-| ID | Sev | State | Change | Evidence (fix-001 = F:\OpenScience\fix-evidence\recut-crispr-pipeline\fix-001) |
-|---|---|---|---|---|
-| F-01 | P0 | fixed | routes/chronos.md snippet rebuilt (cell_line_name, days, pDNA_batch, pDNA rows, negative_control_sgrnas) | fix-001\chronos: snippet extracted from the route runs exit 0; 5 lines x 4,502 genes, 0 NaN, ribosomal mean -2.70 to -2.96, all-gene mean ~0 |
-| F-02 | P1 | fixed | routes/jacks.md: path jacks/run_JACKS.py, replicatemap and guidemap columns | fix-001\jacks: exit 0; 4,502 genes x 5 lines, RPL/RPS mean -1.04 to -1.83 |
-| F-03 | P1 | fixed | routes/count.md: library read by position id, sequence, gene | fix-001\count: 100% mapped, 4 samples, Gini 0.074 to 0.115 |
-| F-04 | P1 | fixed (case defect remains) | rra row unchanged; the QC-first order is the Skill's own rule | rra: route-first passes once qc.md is allowed; the command is still not issued in 2/3 (routing, routing-b): the agent runs QC, which fails on HAP1 by construction, and stops to investigate. Tooling-delta |
-| F-05 | P1 | fixed (case defect remains) | cn row now says copy-number artifacts before hit calling; route states non-integer output and dropped guides | cn: 0/3 in both reruns, route-first passes, no agent issued the command: QC fails on A375 and the sandbox has no CRISPRcleanR, so it explores until the 10-command cap. Tooling-delta |
-| F-06 | P1 | fixed | mle row adds "or a design matrix" | mle 2/3 with allow_before; the miss opened jacks.md first |
-| F-07 | P1 | fixed | jacks row (replicate map and guide-to-gene map) and chronos row (copy-number-aware scores) disambiguated | jacks 3/3 with allow_before; chronos not rerun (was 3/3) |
-| F-08 | P2 | fixed | cn route states non-integer output and 30-read drop; "not run" claims removed from SKILL.md tested line and cn_correction.R header | grep for "not run", "UNEXECUTED": no survivors |
-| F-09 | P2 | fixed | qc.py prints a WARNING when plasmid= is absent; qc.md says so | fix-001\qc run on HAP1 without plasmid= prints it; QC verdict unchanged (FAIL) |
-| F-10 | P2 | deferred-with-rationale | paired drugZ and a real drug screen need a tooling-delta dataset | not needed for readiness |
-| F-11 | P2 | deferred-with-rationale | frontmatter has license: MIT; repository evidence: recut worktree LICENSE (upstream MIT, verbatim) and PROVENANCE.json; shape rules forbid nested copies | not needed for readiness |
+- TOOLS.md: F:\optimizing-agent-science-skills\audits\skills\bio-workflows-crispr-screen-pipeline\tooling\TOOLS.md (Delta section at the end)
+- Cases: ...\tooling\routing-cases.json (11 cases, rework below)
+- Environment fingerprint: unchanged from the full pass (TOOLS.md table); no environment rebuilt
+- Delta evidence: F:\OpenScience\fix-evidence\recut-crispr-pipeline\tooling-delta-001\
+- Ecosystem: F:\OpenScience\audit-envs\crispr-screen-analyst\ ; new inputs registered in public-data\README.md
 
-T-1.2 (mle comma table) did not reproduce: dropped. No new findings.
+## Delta results
 
-## Routing check
+- chronos route snippet, verbatim, clean dir: exit 0, 2m03s, 5 x 4,502, 0 NaN, ribosomal mean -2.66 to -2.94
+- jacks route command, clean dir: exit 0, 21 s, 4,502 x 5, RPL/RPS mean -1.04 to -1.83
+- qc.py: HAP1 still FAIL by construction; the no-plasmid WARNING prints
+- New route defect for the next fix: routes/chronos.md reads NEGv1.txt with `.Gene`; the BAGEL NEGv1.txt header is `GENE` (AttributeError on the standard file). Not blocking a re-audit of the fix.
 
-Run with a copy of the cases file that adds allow_before (fix-001\cases-allow.json); the audited routing-cases.json is untouched. Results: fix-001\routing (rra, cn-correction, mle, jacks), fix-001\routing-b (rra, cn-correction rerun). Rerun lines: mle PASS 2/3, jacks PASS 3/3, rra FAIL 1/3 and 1/3, cn-correction FAIL 0/3 twice. Cost about 0.16 USD; no HTTP 402.
+## Routing cases changed
 
-## Cases needing allow_before (tooling-delta; value as tested)
+- rra: data rra-qcpass (simulated QC-passing, real HAP1 guide ids/fold changes), allow_before qc, bagel2
+- cn-correction: data cn-correction-qcpass (simulated, KY library ids), allow_before qc
+- mle and jacks: allow_before qc, cn-correction
+- Check: rra PASS 3/3, cn-correction PASS 2/3 (tooling-delta-001\routing). mle/jacks allow_before not rerun: the confirming run hit HTTP 402 (OpenRouter out of credit; routing-b is void). fix-001 had mle 2/3 and jacks 3/3 with the same values
 
-- routes/cn-correction.md: ["routes/qc.md"]
-- routes/rra.md: ["routes/qc.md"]; the agents also read cn-correction.md (HAP1 is a cancer line) and bagel2.md (qc.md points to it), so add those if they open first
-- routes/mle.md: ["routes/qc.md", "routes/cn-correction.md"] (leukemia lines)
-- routes/jacks.md: ["routes/qc.md", "routes/cn-correction.md"]
+## Blockers and deferred
 
-Not enough for rra and cn-correction: the cases should use data that pass the QC gates (HAP1 and the A375 table fail) and, for cn-correction, a sandbox where the command can be issued without CRISPRcleanR being present, or the stop-at-command rule must tolerate it. The Skill's order and the "confirm four commitments" rule were not weakened.
-
-## Changed files
-
-SKILL.md (four table rows, read-first sentence, tested line); routes/chronos.md, jacks.md, count.md, cn-correction.md, qc.md; scripts/qc.py (warning), scripts/cn_correction.R (header only).
-
-## Tooling impact: changed
-
-Surfaces: chronos (route snippet now the executed construction, needs NEGv1 or control guide list), jacks (script path), count, qc (script output), cn-correction (header comment only), routing cases (allow_before). Environments unchanged. The tooling-delta should rerun the chronos and jacks route text from a clean case directory and rework the rra and cn-correction cases.
+- F-10 real drug-screen data for drugz: deferred (no small public counts table staged; drugz case uses relabelled HAP1 columns)
+- Simulated inputs: rra-qcpass, cn-correction-qcpass (said in TOOLS.md)
+- No heavy-optional surface
 
 ## Worktree safety
 
-- Run-owned: fix-001 evidence dir; the candidate edits above; this handoff
-- Untouched: test/validate.bats (user-owned), routing-cases.json, source checkouts, other worktree changes
-- Product commits/pushes: none
+- Run-owned: tooling-delta-001, derived\crispr-pipeline\{rra-qcpass,cn-correction-qcpass,make_inputs_qcpass.py,chronos\NEGv1.txt}, TOOLS.md, routing-cases.json, this handoff
+- Untouched: candidate bytes, test/validate.bats (user-owned), old rra and cn-correction case dirs
+- No commits or pushes
 
 ## Transition assertion
 
-- Next-phase prerequisites met: yes (route to prepare-scientific-skill-tooling delta)
+- Next-phase prerequisites met: yes (route to reaudit-scientific-skill)

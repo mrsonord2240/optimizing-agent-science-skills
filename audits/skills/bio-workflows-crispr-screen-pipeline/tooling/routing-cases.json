@@ -11,13 +11,20 @@
   },
   {
     "route": "routes/cn-correction.md",
-    "request": "This count table is from a knockout screen in the A375 melanoma cancer cell line (first sample column is the plasmid pool). Before I call any hits I need the amplified regions of this line handled.",
-    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/cn-correction"
+    "request": "This count table is from a knockout screen in the A375 melanoma cancer cell line (first sample column is the plasmid pool, then three day-14 replicates). Before I call any hits I need the amplified regions of this line handled.",
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/cn-correction-qcpass",
+    "allow_before": [
+      "routes/qc.md"
+    ]
   },
   {
     "route": "routes/rra.md",
     "request": "HAP1_T0 is the baseline and HAP1_T18A, HAP1_T18B, HAP1_T18C are three endpoint replicates of a knockout dropout screen. Which genes are depleted or enriched?",
-    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/rra"
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/rra-qcpass",
+    "allow_before": [
+      "routes/qc.md",
+      "routes/bagel2.md"
+    ]
   },
   {
     "route": "routes/bagel2.md",
@@ -27,7 +34,11 @@
   {
     "route": "routes/mle.md",
     "request": "Here are counts from a leukemia knockout screen in two cell lines (HL60 and KBM7) at initial and final time points, with my design matrix. I want a selection score per cell line.",
-    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/mle"
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/mle",
+    "allow_before": [
+      "routes/qc.md",
+      "routes/cn-correction.md"
+    ]
   },
   {
     "route": "routes/drugz.md",
@@ -37,7 +48,11 @@
   {
     "route": "routes/jacks.md",
     "request": "I screened five cell lines with the same guide library; the count table, a replicate map and a guide-to-gene map are here. I want gene effect scores for each cell line.",
-    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/jacks"
+    "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/jacks",
+    "allow_before": [
+      "routes/qc.md",
+      "routes/cn-correction.md"
+    ]
   },
   {
     "route": "routes/chronos.md",

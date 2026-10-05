@@ -99,8 +99,9 @@ rerun (Sam's standing permission).
   describe the request, the route needs a file the user does not have, or the
   command is not first.
 - `ERROR`: infrastructure; rerun those cases with `--routes a.md,b.md` before
-  judging. HTTP 402 means the OpenRouter account is out of credit: stop and
-  report it.
+  judging. HTTP 402 means the OpenRouter account is out of credit: rerun the
+  whole check with `--model cli:claude-haiku-4-5-20251001`, which uses the
+  local Claude subscription, and record the model in the report.
 - A route that fails only because the agent followed the Skill's own stated
   order (QC before hit calling) is a case defect: it needs `allow_before`
   from the tooling worker, not a finding on the Skill.
