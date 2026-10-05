@@ -6,63 +6,15 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ## P0 (1)
 
-### `bio-workflows-crispr-screen-pipeline` — chronos.md snippet cannot run (research-veto M4)
+### `bio-workflows-crispr-screen-pipeline` — qc.py Gini gate uses the wrong statistic (F-12)
 
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 6
-- Problem: The Chronos snippet fails on the first sequence_map assertion; fixing the column name then fails on a missing pDNA row and missing negative_control_sgrnas.
-- Root cause: Route shows a constructor call written from the docstring, not a tested one.
-- Fix: Replace the snippet with the tested construction: sequence_map columns sequence_ID, cell_line_name, days, pDNA_batch with a cell_line_name==pDNA row; negative_control_sgrnas per library; counts with sequence_ID rows. Execute it on the staged panel.
+- Skill: 85, Reject · candidate `6654a4f7d596` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@6654a4f7d596-reaudit-001/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: qc.py computes Gini on raw counts and gates plasmid at 0.1 and endpoints at 0.3. The cited MAGeCK-VISPR gates (plasmid or initial <=0.1, negative selection <=0.2) are on the MAGeCK Gini, computed on ln(count+1). On real data the two differ about 5x: HAP1 T0 0.288 vs 0.057, T18 0.34-0.38 vs 0.09-0.10, Project Score plasmid 0.342 vs 0.089, A375 endpoints 0.46-0.48 vs 0.16-0.17. A good screen is reported QC FAIL, and qc.py disagrees with the countsummary the count route points to (0.269 vs 0.074).
+- Root cause: gini() in scripts/qc.py is a textbook Gini of raw counts; the thresholds were copied from MAGeCK-VISPR without its definition.
+- Fix: Compute Gini on ln(count+1) as mageck count does; set the endpoint gate to the cited 0.2 (drop or source the 0.55 drug-screen figure); state which sample may be passed as plasmid= (the cloned library pool, not Day-0 cells). Rerun qc.py on the real HAP1 and A375 tables and expect Gini to pass; replicate Pearson 0.789 on HAP1 still fails. The simulated QC-passing inputs are then unnecessary.
 
-## P1 (43)
-
-### `bio-workflows-crispr-screen-pipeline` — jacks.md command fails: wrong script path and map columns
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 6
-- Problem: python run_JACKS.py at the clone root exits 2; the script lives in JACKS/jacks/. replicatemap needs a Control column and guidemap the same sgRNA/Gene headers.
-- Root cause: Command was never run from a clone.
-- Fix: Give the real path (JACKS/jacks/run_JACKS.py) and the required map columns; run the command as written.
-
-### `bio-workflows-crispr-screen-pipeline` — count.md library column order gives 0% mapped, exit 0
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 3
-- Problem: Route says library.csv columns are sgRNA, Gene, Sequence; mageck count reads id, sequence, gene by position. Following the text gives an all-zero table with exit 0.
-- Root cause: Column list written by name, tool reads by position.
-- Fix: State the order id, sequence, gene and make the 65-70% mapping check a stop, not a hint.
-
-### `bio-workflows-crispr-screen-pipeline` — rra route fails routing 0/3: agent opens qc.md first
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 1
-- Problem: For a two-condition dropout request the agent opens qc.md (and often cn-correction and bagel2) before rra.md and never runs rra.py within the step budget.
-- Root cause: SKILL.md line "Order on every screen: count, QC, copy-number correct..." reads as a reading order; the table row says nothing about the user already having counts.
-- Fix: Reword the order line as the analysis order the answer must respect (QC reported, not read first), and have the rra row name the case: counts in hand, baseline and endpoint known.
-
-### `bio-workflows-crispr-screen-pipeline` — cn-correction route fails routing 1/3
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 4
-- Problem: Agent opens qc.md first and in two of three runs never issues the Rscript command.
-- Root cause: Same ordering line pulls qc.md first; the row "A cancer cell line screen" is a property of the sample, not an action.
-- Fix: Phrase the row as the action (cancer line, count table in hand, remove amplicon bias) and fix the ordering line.
-
-### `bio-workflows-crispr-screen-pipeline` — mle route fails routing 0/3: row does not describe the reque
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 5
-- Problem: A two-cell-line initial/final design with a design matrix leads the agent to read every route file; none of three runs reaches mle.md first.
-- Root cause: Row text "Time course, several conditions, or several batches" does not match "per-cell-line selection score with a design matrix".
-- Fix: Name the design-matrix case in the row (design matrix, several cell lines or time points, beta scores).
-
-### `bio-workflows-crispr-screen-pipeline` — jacks route fails routing 0/3: panel request goes to chronos
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 6
-- Problem: Five cell lines with one library, a replicate map and a guide map: the agent opens chronos.md first, then reads most routes.
-- Root cause: jacks row "Several screens in one library" is beaten by chronos row "A DepMap-style panel of cell lines".
-- Fix: Differentiate the two rows (JACKS: replicate map and guide map, no copy-number input; Chronos: needs plasmid, days, negative controls).
+## P1 (38)
 
 ### `bio-outlier-splicing-detection` — AE reproducibility recipe is wrong in SKILL.md and incomplete in the example
 
@@ -71,6 +23,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
+
+### `bio-workflows-crispr-screen-pipeline` — Confirm-four-commitments rule stops agents before the route command (F-13)
+
+- Skill: 85, Reject · candidate `6654a4f7d596` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@6654a4f7d596-reaudit-001/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: With Haiku, cn-correction 0/3 (twice) and rra 0/3 then 1/3 open the right route first, then stop to ask for baseline, control classes, screen type and CN profile that the request or data already answer. No command is issued.
+- Root cause: SKILL.md rule 1 requires confirming all four with the user before any code, whatever the request states.
+- Fix: Ask only for a commitment the request and file do not state; otherwise state the four as assumptions in the answer and run the route command.
 
 ### `bio-single-cell-perturb-seq` — Verify the primary optax mixture backend
 
@@ -362,38 +322,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ## P2 (157)
 
-### `bio-workflows-crispr-screen-pipeline` — cn-correction.md omits non-integer output and dropped guides
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 4
-- Problem: Corrected table has 86,881 of 90,709 guides and non-integer counts; qc.py refuses it. Tested-with line and cn_correction.R header still say CRISPRcleanR was not run, but it ran unchanged.
-- Root cause: Route and script header predate execution.
-- Fix: State both properties and the qc-before-correction order; replace the stale UNEXECUTED header and the not-run clause in SKILL.md with the tested CRISPRcleanR 3.0.1 / R 4.4.3 versions.
-
-### `bio-workflows-crispr-screen-pipeline` — qc.py silently skips the plasmid gate when plasmid= is omitt
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 7
-- Problem: Without plasmid= the plasmid sample is held to the endpoint Gini 0.3 gate; HAP1_T0 (0.288) passes where the 0.1 gate would fail it.
-- Root cause: plasmid= is optional with no warning.
-- Fix: Print a one-line warning (or exit) when plasmid= is absent.
-
-### `bio-workflows-crispr-screen-pipeline` — drugz paired mode and a real drug screen not exercised
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: 5
-- Problem: Only the -unpaired variant ran, on HAP1 columns relabelled as a drug screen; the paired -c/-x two-replicate command and the vehicle-vs-drug biology are unverified.
-- Root cause: No staged public drug screen with two drug replicates.
-- Fix: Tooling-delta pass: stage a real public drug screen; static-only until then.
-
-### `bio-workflows-crispr-screen-pipeline` — no Skill-root LICENSE or provenance note
-
-- Skill: 77, Reject · candidate `e242270b6fc0` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e242270b6fc0-run-002/viewer.md)
-- Observed in inputs: —
-- Problem: skill_preflight warns: frontmatter says MIT, author GPTomics, but the Skill carries no LICENSE file and no origin statement.
-- Root cause: Recut dropped the license context.
-- Fix: Cite the repository license evidence in the manifest or restore a LICENSE at the Skill root.
-
 ### `bio-outlier-splicing-detection` — FRASER block stops at its last line when no sample has a call
 
 - Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
@@ -513,6 +441,38 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md says IncFormLen/SkipFormLen maxima are 'reached only for exons at least read-length long; short exons shorten them'. On the real chrX JC file SkipFormLen is 74 in all 958 rows (a 1 nt exon included), and exons of 74 nt (readLength - 1) already reach 148.
 - Root cause: The exon-length condition belongs to IncFormLen alone and its threshold is readLength - 1, not readLength.
 - Fix: Say 'IncFormLen reaches 2*(readLength - 1) for exons of at least readLength - 1 nt; SkipFormLen was readLength - 1 in every SE row here'. Text only. The operative advice (use the per-row lengths) is correct. (SQ-14)
+
+### `bio-workflows-crispr-screen-pipeline` — qc.py prints but does not enforce the guides>25 and skew gates; skew<2 attribution unverified (F-14)
+
+- Skill: 85, Reject · candidate `6654a4f7d596` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@6654a4f7d596-reaudit-001/viewer.md)
+- Observed in inputs: 1
+- Problem: pass uses only Gini and depth; the 99% above 25 reads and p90/p10<2 gates appear in qc.md but never fail a run (real HAP1 T0: 98.99%, 4.25). The Joung 2017 skew figure was not confirmed.
+- Root cause: The gate list in the route is wider than the script.
+- Fix: Enforce or label them advisory; verify the skew number against Joung 2017.
+
+### `bio-workflows-crispr-screen-pipeline` — Tooling delta edited a routing request and widened allow_before (F-15)
+
+- Skill: 85, Reject · candidate `6654a4f7d596` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@6654a4f7d596-reaudit-001/viewer.md)
+- Observed in inputs: 4
+- Problem: The cn-correction request text gained ", then three day-14 replicates" against the audit copy; allow_before was added to cn-correction, rra, mle, jacks. Neither explains the failures here (the stop is the confirmation rule), but the contract expects unchanged requests.
+- Root cause: Cases were reworked to match new inputs.
+- Fix: Record the intent in TOOLS.md, or restore the text once real QC-passing screens replace the simulated inputs.
+
+### `bio-workflows-crispr-screen-pipeline` — drugz paired mode and a real drug screen still unexercised (F-10, open)
+
+- Skill: 85, Reject · candidate `6654a4f7d596` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@6654a4f7d596-reaudit-001/viewer.md)
+- Observed in inputs: 5
+- Problem: Only -unpaired on relabelled HAP1 columns ran.
+- Root cause: No staged real drug-screen counts.
+- Fix: Stage a public drug-modifier counts table, or leave static-only and labelled.
+
+### `bio-workflows-crispr-screen-pipeline` — No Skill-root LICENSE (F-11, open)
+
+- Skill: 85, Reject · candidate `6654a4f7d596` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@6654a4f7d596-reaudit-001/viewer.md)
+- Observed in inputs: 1
+- Problem: skill_preflight warns; frontmatter says MIT, author GPTomics.
+- Root cause: The recut dropped the file.
+- Fix: Cite repository license evidence in the manifest or restore LICENSE.
 
 ### `bio-atac-seq-atac-qc` — Fragment-size PDF never visually inspected
 

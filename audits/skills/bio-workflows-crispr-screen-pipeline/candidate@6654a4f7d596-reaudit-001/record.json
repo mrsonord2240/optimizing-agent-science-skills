@@ -1,0 +1,162 @@
+{
+  "skill_id": "bio-workflows-crispr-screen-pipeline",
+  "version": "candidate@6654a4f7d596-reaudit-001",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "workflows/crispr-screen-pipeline",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline",
+    "subtree": "a69f1dad4a667e06a306b2794e121363ee35eef2"
+  },
+  "candidate": {
+    "identity": "6654a4f7d596c13a76b5b68b0346c9f521335f10e4d4a38ae7b58e2f3067d6dc",
+    "identity_kind": "sha256-manifest",
+    "branch": "recut/crispr-screen-pipeline",
+    "commit": "f162b3a9fd54e41c8f9e06bb969f86d079788518",
+    "content_sha256": "6654a4f7d596c13a76b5b68b0346c9f521335f10e4d4a38ae7b58e2f3067d6dc",
+    "path": "F:\\OpenScience\\wt\\recut-crispr-pipeline\\skills\\bio-workflows-crispr-screen-pipeline",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "git_blob": "4377582854d74ec13b65aac1b04abe42732570a6",
+        "sha256": "531dd565f663a3a9b97887b092f1cf3861690b9fe37e73124aa5d62b4be7ef24",
+        "bytes": 2647
+      },
+      {
+        "path": "references/background.md",
+        "git_blob": "52b93164b62487a8029343b04ad4658122c41c99",
+        "sha256": "1632d12e0d442cfdabd31145c8f18f9273f2d5103c0db7a3e8b9386a18d17940",
+        "bytes": 2688
+      },
+      {
+        "path": "references/citations.md",
+        "git_blob": "4f399aeb811dad29c6cb9afc94c83ec3d230f634",
+        "sha256": "d8d8962553f70a7ade8c44c760ffd671573bf6779e1d200ed2fdc96668dbe87a",
+        "bytes": 1938
+      },
+      {
+        "path": "references/install.md",
+        "git_blob": "82e36fcaf80d373913041de41fc3dcaf05b9b02c",
+        "sha256": "9cc542c1cfc8b91681fd4709fdf6a41d3ab9c7f2e677b14b17b4cf503a4fa887",
+        "bytes": 851
+      },
+      {
+        "path": "routes/bagel2.md",
+        "git_blob": "a8bb535d0c99666829669e530aa502c048f2159a",
+        "sha256": "438d8752a4442068dbbe49f098a1010ceb210f3efc7421301735a63407b317dd",
+        "bytes": 984
+      },
+      {
+        "path": "routes/branches.md",
+        "git_blob": "735ae4d4ef1c73a0e12e2b9bdf5bae52130c085e",
+        "sha256": "375496d1e449fa19b400848baaaf02151c1482b03e7470ed836728a050b7012b",
+        "bytes": 1031
+      },
+      {
+        "path": "routes/chronos.md",
+        "git_blob": "f8062dfa1d4cd8c670a9112229706375ab2921ad",
+        "sha256": "4f77ea6a2f6cba150c44de6393d6d99b46cf8239834ff69781fb8e167134af24",
+        "bytes": 2396
+      },
+      {
+        "path": "routes/cn-correction.md",
+        "git_blob": "c6b395d2a829f4ae599ce3da588ca92696305dd1",
+        "sha256": "289a506df6b11f0efa81c942e7e28f48af70c27bdf7692a333991a270ab6118e",
+        "bytes": 1184
+      },
+      {
+        "path": "routes/consensus.md",
+        "git_blob": "440960a1d46af32aab93fafff447e6e10eddc5f0",
+        "sha256": "c74ce6413dda698e767cb44807c7f3f6e6dd54059f17b1f83bac58205de506f3",
+        "bytes": 758
+      },
+      {
+        "path": "routes/count.md",
+        "git_blob": "d9fa83449fe52e5daa7790b8189bb97742f3d50a",
+        "sha256": "296ed3047728b3b6a83fd49b63d6efbe5c705fc172107f0bddaa67d5ccc77c6a",
+        "bytes": 1054
+      },
+      {
+        "path": "routes/drugz.md",
+        "git_blob": "b13fa7dd37d1cf9c4082f0dc1ef4912c4b60e4cd",
+        "sha256": "b3ca043ecfb33b7f65b5998a9c960c07f58905f35798eb9fc579505276c9b1b9",
+        "bytes": 659
+      },
+      {
+        "path": "routes/jacks.md",
+        "git_blob": "dc1e0f56928199be97f26d0a4484f1ab230f67b1",
+        "sha256": "4c8948c633736e47029d8bf94d1b9eb30932a87f4e760a088994d96396e9cfe3",
+        "bytes": 962
+      },
+      {
+        "path": "routes/mle.md",
+        "git_blob": "4d5f177a6c8694023ade9a0ded6d66d4bfc997f2",
+        "sha256": "d0ebbd6a15873ff107a2d994e30d22c16b20e8692f411c422ed55005501aaadc",
+        "bytes": 862
+      },
+      {
+        "path": "routes/qc.md",
+        "git_blob": "ca43ffcd4f763f6bd532d5826fad751c735b9a0c",
+        "sha256": "36579964cf356bfa25f0120bfacfebf4f82c279f504ca7b4c076432670562211",
+        "bytes": 1399
+      },
+      {
+        "path": "routes/rra.md",
+        "git_blob": "87908e6eff6796a9c105cd5a600392a5162541c3",
+        "sha256": "683154c84e24def2a537405833e42cdc68e6870eae33744354c8979bf51f9e24",
+        "bytes": 1005
+      },
+      {
+        "path": "scripts/cn_correction.R",
+        "git_blob": "1e984db48f1a44a6afb8c86a8479840a1a422374",
+        "sha256": "3ce7e4b626b33583b95f3613a2771af6e5b9061043547ec1358107fb5d5e70e9",
+        "bytes": 2918
+      },
+      {
+        "path": "scripts/consensus.py",
+        "git_blob": "c160d56b78ac6de742008be32922995201e4266b",
+        "sha256": "7f592e0cb2e7f5fc037be3ef1b226ecaebea8e2a9d8dd123b3e27fd3a4c82333",
+        "bytes": 2528
+      },
+      {
+        "path": "scripts/qc.py",
+        "git_blob": "20efc80905be10635efdf608897dc9a7cea234b6",
+        "sha256": "940ed8ee163b8bb4cfbdac2f62d8bc714335c7571f972538cb897eb3eb8ff423",
+        "bytes": 3768
+      },
+      {
+        "path": "scripts/rra.py",
+        "git_blob": "4650299491617bf106e4b8a22e261b95e11587e2",
+        "sha256": "68dbd1f5847ba64a5c3e65a083f364da4f9b2efbe1a8b1b2263a8b3cd12f5829",
+        "bytes": 4211
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-04",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@e242270b6fc0-run-002",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 8
+  }
+}
