@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (38)
+## P1 (37)
 
 ### `bio-outlier-splicing-detection` — AE reproducibility recipe is wrong in SKILL.md and incomplete in the example
 
@@ -25,14 +25,6 @@ None open.
 - Problem: The default assign_mixture_model route was not executable in the shared environment because optax is absent; only its documented fallback ran.
 - Root cause: The JAX extra is intentionally absent from the shared environment.
 - Fix: Create a compatible isolated pertpy[jax] environment without changing the shared one, then rerun primary mixture assignment on the same fixture.
-
-### `bio-workflows-crispr-screen-pipeline` — qc.py prints QC PASS when no replicate group exists (N-01)
-
-- Skill: 88, Production Ready · candidate `05e557c86e77` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@05e557c86e77-reaudit-002/viewer.md)
-- Observed in inputs: 1
-- Problem: The default pattern does not group Project Score names (A375_C902R1_P1D14). qc.py prints "no condition has two samples under this pattern", then QC PASS, exit 0. Grouped, the same table has Pearson 0.780 and fails. A QC script that skipped a gate must not report PASS.
-- Root cause: The no-group branch only prints; the failed flag is unchanged.
-- Fix: When no condition has two samples, exit 1 with "QC INCOMPLETE: replicate check not run" (or require an explicit option to skip); make the default pattern also strip a trailing R<digit>_<suffix>, or tell the route to pass pattern= for names it does not group. Under 20 lines in qc.py plus one line in routes/qc.md.
 
 ### `bio-crispr-screens-perturb-seq-analysis` — Stabilize SCEPTRE runtime exit
 
@@ -314,7 +306,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (157)
+## P2 (156)
 
 ### `bio-outlier-splicing-detection` — FRASER block stops at its last line when no sample has a call
 
@@ -780,38 +772,6 @@ None open.
 - Root cause: Parallel cleanup is fragile on this Windows runtime.
 - Fix: Document and verify a serial or controlled-worker option if reproducible.
 
-### `bio-workflows-crispr-screen-pipeline` — Replicate-Pearson gate has no action when it is the only failure (F-16)
-
-- Skill: 88, Production Ready · candidate `05e557c86e77` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@05e557c86e77-reaudit-002/viewer.md)
-- Observed in inputs: 1
-- Problem: Both real published screens fail 0.8 (HAP1 0.789, A375 0.780). The statistic is faithful to MAGeCK-VISPR, but the route says to drop the outlier and rerun while the real pairs (0.776/0.782/0.808; 0.767/0.781/0.792) have no outlier, and the "0.85 comfortable" figure has no source in Li 2015 Table 1. qc.py exits 1, so an agent may stop.
-- Root cause: A guideline value is treated as a hard stop with a remedy that does not fit.
-- Fix: State that 0.8 is the MAGeCK-VISPR guideline, report a miss as a caveat when depth, Gini and CEGv2 PR-AUC pass, and drop or source the 0.85 figure.
-
-### `bio-workflows-crispr-screen-pipeline` — drugz paired mode and a real drug screen still unexercised (F-10, open)
-
-- Skill: 88, Production Ready · candidate `05e557c86e77` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@05e557c86e77-reaudit-002/viewer.md)
-- Observed in inputs: 5
-- Problem: Only -unpaired on relabelled HAP1 columns ran.
-- Root cause: No staged real drug-screen counts.
-- Fix: Stage a public drug-modifier counts table, or leave static-only and labelled.
-
-### `bio-workflows-crispr-screen-pipeline` — No Skill-root LICENSE (F-11, open)
-
-- Skill: 88, Production Ready · candidate `05e557c86e77` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@05e557c86e77-reaudit-002/viewer.md)
-- Observed in inputs: 1
-- Problem: skill_preflight warns; frontmatter says MIT, author GPTomics.
-- Root cause: The recut dropped the file.
-- Fix: Cite repository license evidence in the manifest or restore LICENSE.
-
-### `bio-workflows-crispr-screen-pipeline` — Routing cases use resampled data and allow_before (F-15 residue)
-
-- Skill: 88, Production Ready · candidate `05e557c86e77` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@05e557c86e77-reaudit-002/viewer.md)
-- Observed in inputs: 4
-- Problem: Request text equals the audit copy, but cn-correction and rra point at QC-passing resampled tables, and allow_before was added for four cases.
-- Root cause: Real tables stop at QC by design.
-- Fix: Keep the TOOLS.md disclosure; replace with a real QC-passing screen if one is staged.
-
 ### `bio-crispr-screens-perturb-seq-analysis` — State executable limits for optional methods
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
@@ -843,6 +803,30 @@ None open.
 - Problem: Windows ReactomePA teardown remains unsuitable.
 - Root cause: ReactomePA 1.50.0 under Windows R 4.4 exited 2816 after bare load, while the matching private Linux R 4.4 stack exited 0.
 - Fix: Keep the private Linux route documented for audited execution.
+
+### `bio-workflows-crispr-screen-pipeline` — drugz paired mode and a real drug screen still unexercised (F-10, open)
+
+- Skill: 89, Production Ready · candidate `e609525649bd` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e609525649bd-reaudit-delta-001/viewer.md)
+- Observed in inputs: 5
+- Problem: Only -unpaired on relabelled HAP1 columns ran.
+- Root cause: No staged real drug-screen counts.
+- Fix: Stage a public drug-modifier counts table, or leave static-only and labelled.
+
+### `bio-workflows-crispr-screen-pipeline` — No Skill-root LICENSE (F-11, open)
+
+- Skill: 89, Production Ready · candidate `e609525649bd` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e609525649bd-reaudit-delta-001/viewer.md)
+- Observed in inputs: 1
+- Problem: skill_preflight warns; frontmatter says MIT, author GPTomics.
+- Root cause: The recut dropped the file.
+- Fix: Cite repository license evidence in the manifest or restore LICENSE.
+
+### `bio-workflows-crispr-screen-pipeline` — Routing cases use resampled data and allow_before (F-15 residue)
+
+- Skill: 89, Production Ready · candidate `e609525649bd` from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/candidate@e609525649bd-reaudit-delta-001/viewer.md)
+- Observed in inputs: 4
+- Problem: Request text equals the audit copy, but cn-correction and rra point at QC-passing resampled tables, and allow_before was added for four cases.
+- Root cause: Real tables stop at QC by design.
+- Fix: Keep the TOOLS.md disclosure; replace with a real QC-passing screen if one is staged.
 
 ### `bio-causal-genomics-transcriptome-wide-association` — Make optional-method execution boundaries clearer
 

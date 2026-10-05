@@ -1,0 +1,143 @@
+{
+  "skill_id": "bio-workflows-crispr-screen-pipeline",
+  "version": "candidate@e609525649bd-reaudit-delta-001",
+  "source": {
+    "repository": "GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "path": "workflows/crispr-screen-pipeline",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/crispr-screen-pipeline",
+    "subtree": "a69f1dad4a667e06a306b2794e121363ee35eef2"
+  },
+  "candidate": {
+    "identity": "e609525649bd5394ec66676a9025250ab8c27db23039968d44c6dfeb0c872c81",
+    "identity_kind": "sha256-manifest",
+    "branch": "recut/crispr-screen-pipeline",
+    "commit": "f162b3a9fd54e41c8f9e06bb969f86d079788518",
+    "content_sha256": "e609525649bd5394ec66676a9025250ab8c27db23039968d44c6dfeb0c872c81",
+    "path": "F:\\OpenScience\\wt\\recut-crispr-pipeline\\skills\\bio-workflows-crispr-screen-pipeline",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "a28ca67aba3037781c805f14f20f488e7d781759d27c92a7ad62b563bdd8867a",
+        "bytes": 2775
+      },
+      {
+        "path": "references/background.md",
+        "sha256": "1632d12e0d442cfdabd31145c8f18f9273f2d5103c0db7a3e8b9386a18d17940",
+        "bytes": 2688
+      },
+      {
+        "path": "references/citations.md",
+        "sha256": "375497b46df7f49bcb8d28817082220680ab121ed29d8693f5accf1538b10a8c",
+        "bytes": 1974
+      },
+      {
+        "path": "references/install.md",
+        "sha256": "9cc542c1cfc8b91681fd4709fdf6a41d3ab9c7f2e677b14b17b4cf503a4fa887",
+        "bytes": 851
+      },
+      {
+        "path": "routes/bagel2.md",
+        "sha256": "438d8752a4442068dbbe49f098a1010ceb210f3efc7421301735a63407b317dd",
+        "bytes": 984
+      },
+      {
+        "path": "routes/branches.md",
+        "sha256": "375496d1e449fa19b400848baaaf02151c1482b03e7470ed836728a050b7012b",
+        "bytes": 1031
+      },
+      {
+        "path": "routes/chronos.md",
+        "sha256": "4f77ea6a2f6cba150c44de6393d6d99b46cf8239834ff69781fb8e167134af24",
+        "bytes": 2396
+      },
+      {
+        "path": "routes/cn-correction.md",
+        "sha256": "289a506df6b11f0efa81c942e7e28f48af70c27bdf7692a333991a270ab6118e",
+        "bytes": 1184
+      },
+      {
+        "path": "routes/consensus.md",
+        "sha256": "c74ce6413dda698e767cb44807c7f3f6e6dd54059f17b1f83bac58205de506f3",
+        "bytes": 758
+      },
+      {
+        "path": "routes/count.md",
+        "sha256": "296ed3047728b3b6a83fd49b63d6efbe5c705fc172107f0bddaa67d5ccc77c6a",
+        "bytes": 1054
+      },
+      {
+        "path": "routes/drugz.md",
+        "sha256": "b3ca043ecfb33b7f65b5998a9c960c07f58905f35798eb9fc579505276c9b1b9",
+        "bytes": 659
+      },
+      {
+        "path": "routes/jacks.md",
+        "sha256": "4c8948c633736e47029d8bf94d1b9eb30932a87f4e760a088994d96396e9cfe3",
+        "bytes": 962
+      },
+      {
+        "path": "routes/mle.md",
+        "sha256": "d0ebbd6a15873ff107a2d994e30d22c16b20e8692f411c422ed55005501aaadc",
+        "bytes": 862
+      },
+      {
+        "path": "routes/qc.md",
+        "sha256": "7de168e88550f50d95fee8c159371ba15556984f61a90c347cf469d3fcea8826",
+        "bytes": 1971
+      },
+      {
+        "path": "routes/rra.md",
+        "sha256": "683154c84e24def2a537405833e42cdc68e6870eae33744354c8979bf51f9e24",
+        "bytes": 1005
+      },
+      {
+        "path": "scripts/cn_correction.R",
+        "sha256": "3ce7e4b626b33583b95f3613a2771af6e5b9061043547ec1358107fb5d5e70e9",
+        "bytes": 2918
+      },
+      {
+        "path": "scripts/consensus.py",
+        "sha256": "7f592e0cb2e7f5fc037be3ef1b226ecaebea8e2a9d8dd123b3e27fd3a4c82333",
+        "bytes": 2528
+      },
+      {
+        "path": "scripts/qc.py",
+        "sha256": "e474a3774443be22b92f87495e4dadfcf0458e475e3801ebc8670d7004507cfe",
+        "bytes": 4310
+      },
+      {
+        "path": "scripts/rra.py",
+        "sha256": "68dbd1f5847ba64a5c3e65a083f364da4f9b2efbe1a8b1b2263a8b3cd12f5829",
+        "bytes": 4211
+      }
+    ]
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-10-04",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "see published scripts and inputs"
+  },
+  "supersedes": "candidate@05e557c86e77-reaudit-002",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "source_identity": "source-identity.json",
+    "fixes": null,
+    "scripts": 3
+  }
+}

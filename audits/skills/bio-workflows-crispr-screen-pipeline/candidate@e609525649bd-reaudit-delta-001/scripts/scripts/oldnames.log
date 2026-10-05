@@ -1,0 +1,115 @@
+### old_r
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 300, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1645, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1904, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\common.py", line 930, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/f/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_r.txt'
+S_r3       0.0  0.035            500.0            100.0         2.812        0.2  True
+replicate Pearson S (3 samples): 0.985
+QC PASS | wrote F:/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_r.tsv
+exit=0
+### old_rep
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 300, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1645, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1904, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\common.py", line 930, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/f/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_rep.txt'
+S_rep3       0.0  0.035            500.0            100.0         2.812        0.2  True
+replicate Pearson S (3 samples): 0.985
+QC PASS | wrote F:/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_rep.tsv
+exit=0
+### old_A
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 300, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1645, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1904, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\common.py", line 930, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/f/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_A.txt'
+S_C       0.0  0.035            500.0            100.0         2.812        0.2  True
+replicate Pearson S (3 samples): 0.985
+QC PASS | wrote F:/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_A.tsv
+exit=0
+### old_2
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 300, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1645, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1904, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\common.py", line 930, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/f/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_2.txt'
+S_3       0.0  0.035            500.0            100.0         2.812        0.2  True
+replicate Pearson S (3 samples): 0.985
+QC PASS | wrote F:/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_2.tsv
+exit=0
+### old_lower
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 300, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1645, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\parsers\readers.py", line 1904, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "F:\OpenScience\audit-envs\crispr-screen-analyst\Lib\site-packages\pandas\io\common.py", line 930, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/f/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_lower.txt'
+T18C       0.0  0.035            500.0            100.0         2.812        0.2  True
+replicate Pearson T18 (3 samples): 0.985
+QC PASS | wrote F:/OpenScience/fix-evidence/recut-crispr-pipeline/reaudit-delta-001/old_lower.tsv
+exit=0
