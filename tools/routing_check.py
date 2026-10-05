@@ -70,6 +70,8 @@ Available skills:
 - {name}: {description}"""
 
 BASH_RE = re.compile(r"```(?:bash|sh)\s*\n(.*?)```", re.S)
+# Some models answer in their native tool-call markup instead of a fenced block; take its command the same way.
+INVOKE_RE = re.compile(r'invoke name="bash">.*?parameter name="command"[^>]*>(.*?)</[^>]*parameter>', re.S)
 ROUTE_RE = re.compile(r"routes/([\w.*?-]+)")
 RUNNER = r"(?:Rscript|python3?|bash|sh|source\(|\./)[^\n;|&]*"  # an interpreter, then the script on the same command
 SCRIPT_RE = re.compile(r"scripts/[\w.-]+")
@@ -178,7 +180,7 @@ def run_case(skill, fm, case, rep, out, model, key, image):
             text, cost = chat(model, key, messages)
             result["cost_usd"] += cost
             messages.append({"role": "assistant", "content": text})
-            block = BASH_RE.search(text)
+            block = BASH_RE.search(text) or INVOKE_RE.search(text)
             if not block:
                 bad_format += 1
                 if "```" not in text and "invoke" not in text or bad_format > 2:
