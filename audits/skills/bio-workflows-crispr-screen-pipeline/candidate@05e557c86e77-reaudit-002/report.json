@@ -1,0 +1,416 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-crispr-screen-pipeline",
+    "description": "Use when analyzing a pooled CRISPR knockout, CRISPRi or CRISPRa screen from FASTQ or guide counts to hit genes.",
+    "evaluated_on": "2026-10-04",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Citations and tested versions are stated; background.md discloses non-sourced thresholds."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Failed gates must be stated, not hidden; core-essential PR-AUC gate blocks novel hits. N-01: qc.py can print QC PASS with the replicate check not run (P1, see recommendations)."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "qc.py Gini is on ln(count+1) and equals mageck.mageckCount.mageckcount_gini on real HAP1 (0.057 / 0.101 / 0.091 / 0.091); gates 0.1 plasmid and 0.2 endpoint match MAGeCK-VISPR Table 1. Replicate Pearson on log counts matches MAGeCK-VISPR (pairwise Pearson of sample log read counts); the value is invariant to log base and median normalization (checked)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every shipped command and script ran; the chronos snippet works verbatim."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Gini matches MAGeCK (F-12 fixed). N-01: the default replicate pattern does not group A375 names, so qc.py prints QC PASS with no replicate check; the same table fails at 0.780 when grouped."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "All route commands ran as shipped; guards exit non-zero; seeded BAGEL2 reproducible; qc.py bad-label guard exits 1."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Routes of 0.7-2.4 KB, background and citations split out; context-lean."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Rule 1 restates stated commitments and runs the route command (cn-correction 3/3, rra 2/3 under Haiku). qc.md advice to drop the outlier has no outlier on the real replicate sets."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Plain routes with done-when lines; background separated."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No network, no shell injection; rra.py runs mageck by argument list."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Tested-with line present; stale UNEXECUTED header removed; no Skill-root LICENSE (F-11)."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "11/11 first-table cases PASS under Haiku (7 at 3/3, 4 at 2/3; misses were no-route-first or qc first)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.3,
+    "max": 100,
+    "assertion_pass_rate": 93.1,
+    "assertions_passed": 27,
+    "assertions_total": 29,
+    "layer1_avg": 35.4,
+    "layer2_avg": 52.9,
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "HAP1 and A375: qc.py (real, grouped, default pattern, QC-passing resampled) then rra.py on the QC-passing table",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Gini equals MAGeCK on real HAP1 and A375; real replicate Pearson 0.789 and 0.780 fails the 0.8 gate as the Skill states; rra.py on the QC-passing table ran (3,646 genes, 688 negative hits, POLR3H/PCNA/POLR2L top). N-01: default pattern on A375 prints QC PASS without a replicate check.",
+        "basic": 36,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "rra.py on real HAP1 returns 18,056 genes with core essentials at the top (POLR2L, EIF3A, GTPBP10, PES1, MRPL53) and TSC1/TSC2 enriched",
+            "result": "PASS",
+            "note": "negative hits 848, all lfc<0, max fdr 0.0500; volcano rendered legibly"
+          },
+          {
+            "text": "Hit tables are filtered by fdr 0.05 and |lfc| 0.5 and read from gene_summary",
+            "result": "PASS",
+            "note": "848 / 3 hits; positive TSC2 1.93, TSC1 1.66"
+          },
+          {
+            "text": "qc.py reports the same Gini the cited MAGeCK-VISPR gate (plasmid <0.1, negative selection <0.2) is defined on",
+            "result": "PASS",
+            "note": "HAP1 0.057/0.101/0.091/0.091 equals mageckcount_gini on ln(count+1); A375 plasmid 0.089, endpoints 0.155-0.174"
+          },
+          {
+            "text": "qc.py exits 1 and states the failed gate rather than hiding it",
+            "result": "PASS",
+            "note": "exit 1, QC FAIL printed; Pearson 0.789 also reported BELOW 0.8"
+          },
+          {
+            "text": "qc.py does not print QC PASS when the replicate-correlation check could not run",
+            "result": "FAIL",
+            "note": "A375 with default pattern: no condition has two samples, QC PASS, exit 0; with pattern R\\d(?=_P1D14$) Pearson 0.780, QC FAIL"
+          }
+        ],
+        "total": 88,
+        "assertions_total": 5,
+        "assertions_passed": 4
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "HAP1: BAGEL2 fc/bf/pr with --seed 42 (route commands), then consensus.py on three methods",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "BAGEL2 seeded rerun identical; consensus tiers match the earlier recorded run.",
+        "basic": 36,
+        "specialized": 56,
+        "assertions": [
+          {
+            "text": "bf with --seed 42 is reproducible",
+            "result": "PASS",
+            "note": "two seeded runs: max |dBF| 0.0"
+          },
+          {
+            "text": "BF output has GENE and BF with essentials at the top",
+            "result": "PASS",
+            "note": "18,053 genes, BF>6 1,746; POLR2L 131.6, POLR3H 129.5, RRM1 116.4; CEGv2 mean BF 42.9"
+          },
+          {
+            "text": "pr file carries Recall, Precision and FDR for the PR-AUC gate",
+            "result": "PASS",
+            "note": "columns Gene, BF, Recall, Precision, FDR"
+          },
+          {
+            "text": "consensus.py tiers three methods and refuses a single method",
+            "result": "PASS",
+            "note": "Tier-1 481, Tier-2 399, Tier-3 874, none 16,302 on the real three-method inputs; one method exits 1"
+          }
+        ],
+        "total": 92,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "count route: FASTQ to guide counts with library.csv columns as the route text states",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Corrected route text maps 100% of simulated reads; qc.py Gini now agrees with countsummary.",
+        "basic": 36,
+        "specialized": 56,
+        "assertions": [
+          {
+            "text": "route command runs on library.csv with columns sgRNA,Sequence,Gene",
+            "result": "PASS",
+            "note": "exit 0"
+          },
+          {
+            "text": "count table has 240 guides x 4 samples with 25,000 mapped reads per sample, 100% mapped",
+            "result": "PASS",
+            "note": "countsummary Percentage 1 for all four"
+          },
+          {
+            "text": "countsummary Gini agrees with the Gini qc.py later reports for the same sample",
+            "result": "PASS",
+            "note": "qc.py on the count-route table: Plasmid 0.074, endpoints 0.106-0.115, equal to countsummary"
+          },
+          {
+            "text": "Skill states the mapping gate as a stop",
+            "result": "PASS",
+            "note": "routes/count.md: below 65-70% check trim and library before going on"
+          }
+        ],
+        "total": 92,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Cancer line: cn_correction.R (WSL crispr-ccr, CRISPRcleanR 3.0.1) then rra.py on raw and corrected tables",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Script ran as shipped on the simulated KY-library table; non-integer guard fires.",
+        "basic": 35,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "cn_correction.R writes <prefix>_cleanr_corrected_counts.txt with the input layout",
+            "result": "PASS",
+            "note": "90,709 x 6, 0 NA, non-integer counts as the route says"
+          },
+          {
+            "text": "non-integer input is refused",
+            "result": "PASS",
+            "note": "EXIT_GUARD=1"
+          },
+          {
+            "text": "rra.py accepts the corrected table and the corrected run changes hit counts",
+            "result": "PASS",
+            "note": "negative genes at fdr<0.05: raw 897, corrected 622; MYC lfc -0.63 raw, -0.62 corrected"
+          },
+          {
+            "text": "route statement that low-count guides are dropped is exercised",
+            "result": "PASS",
+            "note": "reused: tooling-delta evidence 86,881 of 90,709 on the real A375 table (script body unchanged); this simulated table has no low-count guide"
+          }
+        ],
+        "total": 87,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "mle on MAGeCK demo leukemia table; drugz -unpaired on HAP1 columns relabelled as a drug screen",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Both commands run; drugz paired mode and a real drug screen remain unexercised (F-10).",
+        "basic": 33,
+        "specialized": 48,
+        "assertions": [
+          {
+            "text": "mageck mle with --permutation-round 10 writes per-cell-line beta/z/p/fdr",
+            "result": "PASS",
+            "note": "1,000 genes x 14 columns for HL60 and KBM7, top beta C1orf109 -1.80"
+          },
+          {
+            "text": "drugz route command runs and writes the documented columns",
+            "result": "PASS",
+            "note": "GENE,sumZ,numObs,normZ,pval/rank/fdr for synth and supp; 18,054 genes, 0 NaN"
+          },
+          {
+            "text": "drugz paired -c/-x two-replicate command executed on a real drug screen",
+            "result": "FAIL",
+            "note": "not exercised: no staged real drug-screen counts (F-10); relabelled HAP1 data carries no drug signal"
+          },
+          {
+            "text": "mle run time and genome-scale caveat are stated",
+            "result": "PASS",
+            "note": "route says genome-scale takes hours"
+          }
+        ],
+        "total": 81,
+        "assertions_total": 4,
+        "assertions_passed": 3
+      },
+      {
+        "index": 6,
+        "type": "Stress",
+        "label": "Five-line Project Score panel: jacks command and chronos snippet verbatim from the routes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both run as shipped, including the chronos snippet against the standard NEGv1 file.",
+        "basic": 36,
+        "specialized": 54,
+        "assertions": [
+          {
+            "text": "chronos snippet extracted verbatim runs on the standard NEGv1.txt (header GENE)",
+            "result": "PASS",
+            "note": "exit 0, 2m36s; 5 x 4,502, 0 NaN; ribosomal mean -2.72 to -2.95; all-gene mean 0.00-0.01"
+          },
+          {
+            "text": "jacks command as written runs and gives per-line gene effects",
+            "result": "PASS",
+            "note": "4,502 genes x 5 lines; RPL/RPS mean -1.04 (MV411) to -1.83 (A375); all-gene mean -0.03 to 0.02"
+          },
+          {
+            "text": "Ribosomal genes are clearly more depleted than the all-gene mean in every line for both methods",
+            "result": "PASS",
+            "note": "see values above"
+          },
+          {
+            "text": "Route states the dict-of-DataFrames and column-name requirements",
+            "result": "PASS",
+            "note": "routes/chronos.md lists readcounts=, nepochs, cell_line_name, pDNA"
+          }
+        ],
+        "total": 90,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Trap trips: normalized table, missing baseline, baseline inside treatment, absent or wrong plasmid label, non-integer cn input",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every guard exits non-zero with a specific message.",
+        "basic": 36,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "qc.py refuses the normalized count table",
+            "result": "PASS",
+            "note": "counts are not integers ... exit 1"
+          },
+          {
+            "text": "qc.py warns when plasmid= is omitted (F-09)",
+            "result": "PASS",
+            "note": "WARNING line prints first; HAP1_T0 then passes only the 0.3 gate"
+          },
+          {
+            "text": "rra.py refuses missing control= and a sample in both arms",
+            "result": "PASS",
+            "note": "exit 1 each with a message naming the baseline rule / overlap"
+          },
+          {
+            "text": "qc.py names unknown plasmid samples and lists columns",
+            "result": "PASS",
+            "note": "plasmid sample(s) not in the table: ['Plasmid']; exit 1"
+          }
+        ],
+        "total": 88,
+        "assertions_total": 4,
+        "assertions_passed": 4
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 53.0,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "F-12 fixed and verified two ways: qc.py Gini equals MAGeCK mageckcount_gini on real HAP1; real plasmids pass 0.1 and endpoints 0.2",
+    "All eleven routing cases PASS under Haiku, including the two that failed in reaudit-001",
+    "Replicate Pearson computed as MAGeCK-VISPR does (Pearson on log counts), checked invariant to log base and median normalization",
+    "Guards fail loudly; seeded BAGEL2, consensus and rra reproduce"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "qc.py prints QC PASS when no replicate group exists (N-01)",
+      "observed_in": [
+        1
+      ],
+      "problem": "The default pattern does not group Project Score names (A375_C902R1_P1D14). qc.py prints \"no condition has two samples under this pattern\", then QC PASS, exit 0. Grouped, the same table has Pearson 0.780 and fails. A QC script that skipped a gate must not report PASS.",
+      "root_cause": "The no-group branch only prints; the failed flag is unchanged.",
+      "fix": "When no condition has two samples, exit 1 with \"QC INCOMPLETE: replicate check not run\" (or require an explicit option to skip); make the default pattern also strip a trailing R<digit>_<suffix>, or tell the route to pass pattern= for names it does not group. Under 20 lines in qc.py plus one line in routes/qc.md."
+    },
+    {
+      "priority": "P2",
+      "title": "Replicate-Pearson gate has no action when it is the only failure (F-16)",
+      "observed_in": [
+        1
+      ],
+      "problem": "Both real published screens fail 0.8 (HAP1 0.789, A375 0.780). The statistic is faithful to MAGeCK-VISPR, but the route says to drop the outlier and rerun while the real pairs (0.776/0.782/0.808; 0.767/0.781/0.792) have no outlier, and the \"0.85 comfortable\" figure has no source in Li 2015 Table 1. qc.py exits 1, so an agent may stop.",
+      "root_cause": "A guideline value is treated as a hard stop with a remedy that does not fit.",
+      "fix": "State that 0.8 is the MAGeCK-VISPR guideline, report a miss as a caveat when depth, Gini and CEGv2 PR-AUC pass, and drop or source the 0.85 figure."
+    },
+    {
+      "priority": "P2",
+      "title": "drugz paired mode and a real drug screen still unexercised (F-10, open)",
+      "observed_in": [
+        5
+      ],
+      "problem": "Only -unpaired on relabelled HAP1 columns ran.",
+      "root_cause": "No staged real drug-screen counts.",
+      "fix": "Stage a public drug-modifier counts table, or leave static-only and labelled."
+    },
+    {
+      "priority": "P2",
+      "title": "No Skill-root LICENSE (F-11, open)",
+      "observed_in": [
+        1
+      ],
+      "problem": "skill_preflight warns; frontmatter says MIT, author GPTomics.",
+      "root_cause": "The recut dropped the file.",
+      "fix": "Cite repository license evidence in the manifest or restore LICENSE."
+    },
+    {
+      "priority": "P2",
+      "title": "Routing cases use resampled data and allow_before (F-15 residue)",
+      "observed_in": [
+        4
+      ],
+      "problem": "Request text equals the audit copy, but cn-correction and rra point at QC-passing resampled tables, and allow_before was added for four cases.",
+      "root_cause": "Real tables stop at QC by design.",
+      "fix": "Keep the TOOLS.md disclosure; replace with a real QC-passing screen if one is staged."
+    }
+  ]
+}

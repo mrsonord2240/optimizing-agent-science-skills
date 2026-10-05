@@ -1,0 +1,16 @@
+PASS routes/count.md 3/3
+PASS routes/qc.md 3/3
+PASS routes/cn-correction.md 3/3
+PASS routes/rra.md 2/3
+  r2: opened ['qc.md'] first
+PASS routes/bagel2.md 3/3
+PASS routes/mle.md 3/3
+PASS routes/drugz.md 2/3
+  r1: opened no route first
+PASS routes/jacks.md 2/3
+  r1: opened no route first
+PASS routes/chronos.md 2/3
+  r1: opened ['qc.md', 'cn-correction.md', 'chronos.md'] first
+PASS routes/consensus.md 3/3
+PASS routes/branches.md 3/3
+bio-workflows-crispr-screen-pipeline 05e557c86e778a8b2aded50be5391610b18ce2693750b54a662686571ec9acb5 cost=$7.9927
