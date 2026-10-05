@@ -2,58 +2,47 @@
 
 - Updated: 2026-10-04
 - Lane: 1
-- Status: phase-failed (final re-audit rejected the candidate)
-- Owner leaving: reaudit-scientific-skill worker (full mode, reaudit-001)
-- Next role: fix-scientific-skill
+- Status: fix-002 complete; ready for tooling-delta (changed)
+- Owner leaving: fix-scientific-skill worker (fix-002)
+- Next role: prepare-scientific-skill-tooling (delta), then reaudit-scientific-skill
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:workflows/crispr-screen-pipeline
-- Working tree: F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline (branch recut/crispr-screen-pipeline, base f162b3a; candidate bytes uncommitted, untouched by this phase)
-- Candidate tree hash: 6654a4f7d596c13a76b5b68b0346c9f521335f10e4d4a38ae7b58e2f3067d6dc (skill_preflight --offline --shape PASS, 19 files; warn: no Skill-root LICENSE)
-- Applicable audit: audits\skills\bio-workflows-crispr-screen-pipeline\candidate@6654a4f7d596-reaudit-001\ (published, indexed)
+- Working tree: F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline (branch recut/crispr-screen-pipeline; bytes uncommitted)
+- Candidate identity: 05e557c86e778a8b2aded50be5391610b18ce2693750b54a662686571ec9acb5 (skill_preflight --offline --shape PASS, 19 files; warn: no Skill-root LICENSE). Previous: 6654a4f7d596.
+- Rejected audit: audits\skills\bio-workflows-crispr-screen-pipeline\candidate@6654a4f7d596-reaudit-001\
 
-## Completed this phase
+## Finding dispositions (ledger: F:\OpenScience\fix-evidence\recut-crispr-pipeline\fix-002\ledger.md)
 
-- Full re-audit: static 83, execution avg 87.0, final 85, Layer 1 35.3, Layer 2 51.7, assertions 25/28 (89.3%). Grade Reject: research veto methodological_ground FAIL (F-12).
-- Routing (model cli:claude-haiku-4-5-20251001): 9 of 11 PASS 3/3; cn-correction FAIL 0/3, rra FAIL 0/3; diagnostic rerun cn-correction 0/3, rra 1/3.
-- Executed as shipped: count, qc, rra, bagel2, consensus, mle, drugz (unpaired), jacks, chronos (snippet verbatim, standard NEGv1), cn_correction.R (WSL).
-- Prior F-01, F-02, F-03, F-06, F-07, F-08, F-09 verified resolved.
+| ID | Sev | State |
+|---|---|---|
+| F-12 | P0 | fixed: qc.py Gini on ln(count+1), endpoint gate 0.2, 0.55 dropped, plasmid= = cloned library pool |
+| F-13 | P1 | fixed: SKILL.md rule 1 restates stated commitments as assumptions |
+| F-14 | P2 | fixed by labelling: guides>25 and skew reported, not gated; "skew<2" removed |
+| F-15 | P2 | tooling worker (below) |
+| F-10, F-11 | P2 | deferred-with-rationale |
+| N-01 | P2 | open: default pattern does not group A375 replicate names (see below) |
 
-## Required next actions
+Changed files: SKILL.md, scripts/qc.py, routes/qc.md, references/citations.md.
 
-1. F-12 (P0): in scripts/qc.py compute Gini on ln(count+1) like `mageck count`; endpoint gate 0.2 (the cited MAGeCK-VISPR value; source or drop the 0.55 drug figure); say `plasmid=` is for the cloned library pool, not Day-0 cells. Rerun qc.py on the real HAP1 and A375 tables (expect Gini pass; HAP1 Pearson 0.789 still fails).
-2. F-13 (P1): SKILL.md rule 1: ask only for commitments the request and data do not state; otherwise state them as assumptions and run the route command. Rerun routing for cn-correction and rra.
-3. F-14, F-15 (P2): enforce or label the guides>25 and skew gates and verify the skew<2 figure; tooling worker to record or restore the changed cn-correction request. F-10, F-11 stay deferred.
-4. After F-12, the simulated rra-qcpass and cn-correction-qcpass inputs can be replaced by the real tables.
+## Execution record (fix-002\)
 
-## Open findings and blockers
+- qc.py real HAP1: Gini 0.057 (T0, <0.1), 0.101/0.091/0.091 (<0.2); Pearson 0.789 -> QC FAIL (expected).
+- qc.py real A375: Gini 0.089 plasmid, 0.163/0.174/0.155; default pattern does not group names -> prints no-replicate notice and PASS; with pattern=`R\d(?=_P1D14$)` Pearson 0.780 -> FAIL.
+- Routing (cli:claude-haiku-4-5-20251001, routing\): cn-correction 2/3 PASS (r2 inspected R packages), rra 3/3 PASS. Run on bytes with CRLF endings in four files; text identical to the final LF bytes.
 
-| ID | Severity | State | Evidence | Required disposition |
-|---|---|---|---|---|
-| F-12 | P0 | open | reaudit-001\gini_mageck_def.log | fix qc.py statistic and gates |
-| F-13 | P1 | open | reaudit-001\routing\, routing-rerun\ | relax confirmation rule |
-| F-14 | P2 | open | report.json recommendations | enforce or label gates |
-| F-15 | P2 | open | scripts\routing-cases.json vs initial copy | record or restore |
-| F-10 | P2 | deferred | tooling TOOLS.md | real drug-screen counts |
-| F-11 | P2 | deferred | preflight warn | LICENSE or manifest citation |
+## Tooling impact: changed (surface qc, routing)
 
-Failed or blocked surfaces: routing cn-correction and rra (F-13); qc.py gate (F-12); drugz paired mode static-only (F-10).
-
-## Environment and evidence
-
-- Tool inventory: audits\skills\bio-workflows-crispr-screen-pipeline\tooling\TOOLS.md (environments unchanged, none rebuilt)
-- Run evidence: F:\OpenScience\fix-evidence\recut-crispr-pipeline\reaudit-001\ (native.log, chronos.log, cn.log, inspect_outputs.log, gini_mageck_def.log, routing\, routing-rerun\, work\)
-- Restricted-access items: none
-- Tooling impact: none expected from F-12/F-13 beyond rerunning qc and the two routing cases
+Tooling worker must:
+1. Rerun qc surface: expect numbers above, not the old Gini 0.288.
+2. routing-cases.json: restore the cn-correction request to the version in the initial copy of the cases (F-15; the changed request is recorded in the reaudit report). Keep requests unedited otherwise.
+3. Swap rra data to the real HAP1 table `derived\crispr-pipeline\qc\hap1.count.txt` (or rra\) and keep allow_before qc, bagel2: real HAP1 QC FAILS on Pearson 0.789, so an agent that obeys QC may stop; judge before swapping.
+4. Do NOT swap cn-correction to the real A375 table without deciding N-01: default qc.py passes it ungrouped, grouped it fails Pearson 0.78. Either leave cn-correction-qcpass or fix the pattern default.
+5. Update TOOLS.md qc row and the Gini note (plasmid Gini 0.288 is raw-count Gini, not the MAGeCK one).
 
 ## Worktree safety
 
-- Run-owned changes: reaudit-001 raw run root; published record candidate@6654a4f7d596-reaudit-001; regenerated audits\INDEX.md and BACKLOG.md; this handoff
-- Pre-existing/user-owned changes: test\validate.bats (untouched)
-- Records state: uncommitted
-- Product commits/pushes: none
-
-## Transition assertion
-
-- Next-phase prerequisites met: yes (fix-scientific-skill on F-12, F-13)
+- Run-owned: fix-002 run dir; the four files above; this handoff
+- Pre-existing/user-owned: test\validate.bats (untouched)
+- Product commits/pushes: none; records uncommitted
