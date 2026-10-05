@@ -53,6 +53,7 @@ PROVIDERS = ["GMICloud", "DeepInfra"]
 ENV_FILE = r"F:\Bio-Evals\runner\.env"
 IMAGE = "bioeval-env"
 MAX_STEPS = 10      # the layout evals reached the script by step 4 or 5
+STEPS_PER_EARLIER_ROUTE = 5
 MAX_TOKENS = 8000
 CMD_TIMEOUT_S = 60
 OBS_LIMIT = 8000
@@ -181,7 +182,8 @@ def run_case(skill, fm, case, rep, out, model, key, image):
         copied = docker("cp", f"{ws}{os.sep}.", f"{cid}:/work", timeout=300)
         if copied.returncode != 0:
             raise RuntimeError(f"could not copy inputs into the container: {copied.stderr.strip()[:200]}")
-        for _ in range(MAX_STEPS):
+        # Each route the Skill orders first is real work the agent does on the way (reading it, running QC).
+        for _ in range(MAX_STEPS + STEPS_PER_EARLIER_ROUTE * len(case.get("allow_before", []))):
             text, cost = chat(model, key, messages)
             result["cost_usd"] += cost
             messages.append({"role": "assistant", "content": text})
