@@ -11,7 +11,7 @@
   },
   {
     "route": "routes/cn-correction.md",
-    "request": "This count table is from a knockout screen in the A375 melanoma cancer cell line (first sample column is the plasmid pool, then three day-14 replicates). Before I call any hits I need the amplified regions of this line handled.",
+    "request": "This count table is from a knockout screen in the A375 melanoma cancer cell line (first sample column is the plasmid pool). Before I call any hits I need the amplified regions of this line handled.",
     "data": "F:/OpenScience/audit-envs/crispr-screen-analyst/public-data/derived/crispr-pipeline/cn-correction-qcpass",
     "allow_before": [
       "routes/qc.md"

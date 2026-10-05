@@ -1,48 +1,57 @@
-# Handoff: bio-workflows-crispr-screen-pipeline / fix-scientific-skill
+# Handoff: bio-workflows-crispr-screen-pipeline / reaudit-scientific-skill
 
 - Updated: 2026-10-04
 - Lane: 1
-- Status: fix-002 complete; ready for tooling-delta (changed)
-- Owner leaving: fix-scientific-skill worker (fix-002)
-- Next role: prepare-scientific-skill-tooling (delta), then reaudit-scientific-skill
+- Status: ready-for-phase (tooling-delta-002 complete)
+- Owner leaving: prepare-scientific-skill-tooling worker (delta-002)
+- Next role: reaudit-scientific-skill
 
 ## Source identity
 
 - Origin: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:workflows/crispr-screen-pipeline
-- Working tree: F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline (branch recut/crispr-screen-pipeline; bytes uncommitted)
-- Candidate identity: 05e557c86e778a8b2aded50be5391610b18ce2693750b54a662686571ec9acb5 (skill_preflight --offline --shape PASS, 19 files; warn: no Skill-root LICENSE). Previous: 6654a4f7d596.
-- Rejected audit: audits\skills\bio-workflows-crispr-screen-pipeline\candidate@6654a4f7d596-reaudit-001\
+- Working tree: F:\OpenScience\wt\recut-crispr-pipeline\skills\bio-workflows-crispr-screen-pipeline (branch recut/crispr-screen-pipeline; bytes uncommitted, untouched by tooling)
+- Candidate tree hash: 05e557c86e778a8b2aded50be5391610b18ce2693750b54a662686571ec9acb5 (skill_preflight --offline --shape PASS, 19 files; warn: no Skill-root LICENSE)
+- Applicable audit: none for these bytes. Rejected: audits\skills\bio-workflows-crispr-screen-pipeline\candidate@6654a4f7d596-reaudit-001\
+- Fix ledger: F:\OpenScience\fix-evidence\recut-crispr-pipeline\fix-002\ledger.md
 
-## Finding dispositions (ledger: F:\OpenScience\fix-evidence\recut-crispr-pipeline\fix-002\ledger.md)
+## Completed this phase
 
-| ID | Sev | State |
-|---|---|---|
-| F-12 | P0 | fixed: qc.py Gini on ln(count+1), endpoint gate 0.2, 0.55 dropped, plasmid= = cloned library pool |
-| F-13 | P1 | fixed: SKILL.md rule 1 restates stated commitments as assumptions |
-| F-14 | P2 | fixed by labelling: guides>25 and skew reported, not gated; "skew<2" removed |
-| F-15 | P2 | tooling worker (below) |
-| F-10, F-11 | P2 | deferred-with-rationale |
-| N-01 | P2 | open: default pattern does not group A375 replicate names (see below) |
+- qc surface rerun on shipped qc.py; numbers recorded in TOOLS.md Delta-002 (evidence: F:\OpenScience\fix-evidence\recut-crispr-pipeline\tooling-delta-002\).
+  - real HAP1: Gini 0.057 T0 / 0.101, 0.091, 0.091; Pearson 0.789 -> FAIL
+  - real A375 (default pattern): Gini 0.089 plasmid / 0.163, 0.174, 0.155; no replicate grouping -> PASS (N-01 open)
+  - cn-correction-qcpass: Gini 0.012 / 0.027; Pearson 0.977 PASS. rra-qcpass: Gini 0.012 / 0.035; Pearson 0.985 PASS
+- routing-cases.json: cn-correction request restored byte-for-byte to the audit's original (F-15). Nothing else changed.
+- rra and cn-correction cases keep the QC-passing resampled inputs (orchestrator decision); TOOLS.md says the inputs are resampled from real guide ids and fold changes, with synthetic counts, and why real tables stop at QC.
+- TOOLS.md qc row, header identity and stale Gini notes updated; old 0.288 explained as a raw-count Gini.
 
-Changed files: SKILL.md, scripts/qc.py, routes/qc.md, references/citations.md.
+## Required next actions
 
-## Execution record (fix-002\)
+1. Re-auditor runs `tools/routing_check.py` on routing-cases.json (not run by tooling). Last fix-002 routing: cn-correction 2/3, rra 3/3, with the old request text on cn-correction.
+2. Judge N-01 (default qc.py pattern does not group A375 replicate names) and F-10/F-11 deferrals.
 
-- qc.py real HAP1: Gini 0.057 (T0, <0.1), 0.101/0.091/0.091 (<0.2); Pearson 0.789 -> QC FAIL (expected).
-- qc.py real A375: Gini 0.089 plasmid, 0.163/0.174/0.155; default pattern does not group names -> prints no-replicate notice and PASS; with pattern=`R\d(?=_P1D14$)` Pearson 0.780 -> FAIL.
-- Routing (cli:claude-haiku-4-5-20251001, routing\): cn-correction 2/3 PASS (r2 inspected R packages), rra 3/3 PASS. Run on bytes with CRLF endings in four files; text identical to the final LF bytes.
+## Open findings and blockers
 
-## Tooling impact: changed (surface qc, routing)
+| ID | Severity | State | Evidence | Required disposition |
+|---|---|---|---|---|
+| N-01 | P2 | open | tooling-delta-002\qc_a375.log | re-audit decides |
+| F-10, F-11 | P2 | deferred-with-rationale | fix-002 ledger | re-audit decides |
+| routes/chronos.md NEGv1 header (`.Gene` vs `GENE`) | P2 | known, see TOOLS.md Delta-001 | TOOLS.md | re-audit decides |
 
-Tooling worker must:
-1. Rerun qc surface: expect numbers above, not the old Gini 0.288.
-2. routing-cases.json: restore the cn-correction request to the version in the initial copy of the cases (F-15; the changed request is recorded in the reaudit report). Keep requests unedited otherwise.
-3. Swap rra data to the real HAP1 table `derived\crispr-pipeline\qc\hap1.count.txt` (or rra\) and keep allow_before qc, bagel2: real HAP1 QC FAILS on Pearson 0.789, so an agent that obeys QC may stop; judge before swapping.
-4. Do NOT swap cn-correction to the real A375 table without deciding N-01: default qc.py passes it ungrouped, grouped it fails Pearson 0.78. Either leave cn-correction-qcpass or fix the pattern default.
-5. Update TOOLS.md qc row and the Gini note (plasmid Gini 0.288 is raw-count Gini, not the MAGeCK one).
+## Environment and evidence
+
+- Tool inventory: F:\optimizing-agent-science-skills\audits\skills\bio-workflows-crispr-screen-pipeline\tooling\TOOLS.md (env fingerprints inside; unchanged this pass)
+- Ecosystem: F:\OpenScience\audit-envs\crispr-screen-analyst\
+- Run evidence: tooling-delta-002\ (qc_hap1, qc_a375, qc_a375qp, qc_rraqp logs and tsv)
+- Restricted-access items: none
+- Tooling impact: none further (qc and routing cases refreshed; all other surfaces verified unchanged, not rerun)
 
 ## Worktree safety
 
-- Run-owned: fix-002 run dir; the four files above; this handoff
+- Run-owned changes: tooling\TOOLS.md, tooling\routing-cases.json, this handoff, tooling-delta-002\
 - Pre-existing/user-owned: test\validate.bats (untouched)
-- Product commits/pushes: none; records uncommitted
+- Records state: uncommitted
+- Product commits/pushes: none
+
+## Transition assertion
+
+- Next-phase prerequisites met: yes
