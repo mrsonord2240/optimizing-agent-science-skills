@@ -18,10 +18,15 @@ Cases file (JSON list), written by the tooling worker and kept beside TOOLS.md:
                                               A scripts/ path must be run; any other path (a reference the
                                               route sends this request to) must be opened.
 
+   "allow_before": ["routes/qc.md"]           optional; routes the Skill itself orders ahead of this one (a
+                                              pipeline's QC step). Opening or running them first is not a miss.
+
 Every route in the first table of SKILL.md needs a case; later tables (after-the-run routes) are optional.
 
 Usage:
-  routing_check.py SKILL_DIR CASES.json --out DIR [--reps 3] [--model SLUG] [--image NAME] [--parallel 3]
+  routing_check.py SKILL_DIR CASES.json --out DIR [--reps 3] [--routes a.md,b.md] [--model SLUG] [--image NAME]
+
+--routes reruns only the named cases, after an infrastructure error; the cases file must still cover every route.
 
 The OpenRouter key comes from $OPENROUTER_API_KEY or --env-file and is never logged. Exit status is 1
 when any case fails or an infrastructure error leaves a case undecided.
@@ -208,7 +213,8 @@ def run_case(skill, fm, case, rep, out, model, key, image):
         if cid:
             docker("rm", "-f", cid, timeout=60)
         shutil.rmtree(ws, ignore_errors=True)
-    opened = result["routes_opened"]
+    allowed = {Path(r).name for r in case.get("allow_before", [])}
+    opened = [r for r in result["routes_opened"] if r not in allowed]
     result["route_first"] = bool(opened) and opened[0] == Path(case["route"]).name
     result["passed"] = result["route_first"] and (result["command_issued"] or not case["expect"])
     result["cost_usd"] = round(result["cost_usd"], 5)
@@ -222,6 +228,7 @@ def main():
     ap.add_argument("cases")
     ap.add_argument("--out", required=True)
     ap.add_argument("--reps", type=int, default=3)
+    ap.add_argument("--routes", default="")
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--image", default=IMAGE)
     ap.add_argument("--parallel", type=int, default=3)
@@ -230,6 +237,8 @@ def main():
     skill, out = Path(args.skill).resolve(), Path(args.out).resolve()
     fm = frontmatter((skill / "SKILL.md").read_text(encoding="utf-8"))
     cases = load_cases(skill, args.cases)
+    wanted = {r if r.startswith("routes/") else "routes/" + r for r in args.routes.split(",") if r}
+    cases = [c for c in cases if not wanted or c["route"] in wanted]
     key = load_key(args.env_file)
     out.mkdir(parents=True, exist_ok=True)
     jobs = [(case, rep) for case in cases for rep in range(1, args.reps + 1)]
@@ -252,7 +261,8 @@ def main():
                 why = "command not issued" if r["route_first"] else f"opened {r['routes_opened'] or 'no route'} first"
                 print(f"  r{r['rep']}: {why}")
     report = {"skill": skill.name, "identity": identity(str(skill))[0], "model": args.model, "reps": args.reps,
-              "cost_usd": round(sum(r["cost_usd"] for r in runs), 4), "cases": summary, "runs": runs}
+              "cost_usd": round(sum(r["cost_usd"] for r in runs), 4), "cases": summary,
+              "runs": [{k: v for k, v in r.items() if k != "commands"} for r in runs]}  # commands stay in the per-run files
     (out / "routing.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
     print(f"{skill.name} {report['identity']} cost=${report['cost_usd']}")
     sys.exit(1 if failed else 0)

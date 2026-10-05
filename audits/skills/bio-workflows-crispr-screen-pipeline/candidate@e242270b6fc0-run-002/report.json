@@ -1,0 +1,489 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-crispr-screen-pipeline",
+    "description": "Use when analyzing a pooled CRISPR knockout, CRISPRi or CRISPRa screen from FASTQ or guide counts to hit genes.",
+    "evaluated_on": "2026-10-04",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "performed_by": "audit-scientific-skill worker (Claude Sonnet 5.5), initial audit run-002"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; every number traced to tool output or recorded public input"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research-only Skill; no clinical or prescriptive claims"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Baseline, control class, screen type and copy-number commitments are required before analysis; seeded BAGEL2; vehicle control for drug screens"
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "routes/chronos.md snippet raises on the first run and again after the first fix; routes/jacks.md command exits 2 as written (shipped scripts qc.py, rra.py, consensus.py and cn_correction.R all ran)"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 78,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Eleven routes cover count to consensus; count, jacks and chronos route text does not run as written"
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Scripts stop with the fix named on tripped traps; omitted plasmid= and all-zero mageck count are silent"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is a short router; routes and references are loaded on demand"
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Routing check fails 4 of 11 routes; the Order-on-every-screen line pulls agents to qc.md first"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Terse routes with clear Done-when lines; several omit prerequisites the tool needs"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or destructive operations; scripts take file paths and fixed option names only"
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Tested-with line and cn_correction.R header still say CRISPRcleanR was not run; no Skill-root LICENSE"
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Trigger description is a clean Use-when; four commitments gate and no-hits-first order are strong; route table rows for mle and jacks miss real requests"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 32
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "HAP1 TKOv3 table: qc.py then rra.py (route commands)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "QC FAIL reported as expected (plasmid Gini 0.288, replicate r 0.789); RRA 18,056 genes, 848 negative and 3 positive hits; volcano legible",
+        "basic": 34,
+        "specialized": 54,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "qc.py prints per-sample Gini and replicate Pearson and exits 1 on a failed gate",
+            "result": "PASS",
+            "note": "T0 Gini 0.288 > 0.1, T18 Gini 0.34-0.375 > 0.3, Pearson 0.789 < 0.8, exit 1"
+          },
+          {
+            "text": "rra.py writes gene_summary, both hit tables and a volcano",
+            "result": "PASS",
+            "note": "all four files present"
+          },
+          {
+            "text": "Hit table is internally consistent with gene_summary",
+            "result": "PASS",
+            "note": "848 neg hits all have neg|fdr<0.05 and |lfc|>=0.5"
+          },
+          {
+            "text": "Known essentials deplete",
+            "result": "PASS",
+            "note": "POLR2L lfc -7.0 fdr 0.001, RPL11 -5.7; RPS6 has one guide in this table (num=1) so is not called"
+          },
+          {
+            "text": "Volcano is readable",
+            "result": "PASS",
+            "note": "axes labelled, FDR line drawn, red negative/blue positive; y saturates at 3 because MAGeCK permutation FDR floors at 0.001"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "HAP1: BAGEL2 fc/bf/pr with --seed 42, then consensus.py",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "BF>6 for 1,746 of 18,053 genes; 93.7% of CEGv2 above BF 6; consensus on shipped HAP1 outputs Tier-1 481, Tier-2 399, Tier-3 874; two-method rerun on this run own outputs Tier-2 840, Tier-3 914",
+        "basic": 33,
+        "specialized": 53,
+        "total": 86,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "fc, bf, pr run as written and write the documented files",
+            "result": "PASS",
+            "note": "foldchange, bayes_factor.txt (GENE, BF), pr_curve.txt (Recall, Precision, FDR)"
+          },
+          {
+            "text": "Core essentials score high BF",
+            "result": "PASS",
+            "note": "CEGv2 mean BF 42.9; fraction BF>6 0.937"
+          },
+          {
+            "text": "consensus.py tiers agree with the per-method hit rules",
+            "result": "PASS",
+            "note": "n_hits column equals sum of method flags; two methods never give Tier-1"
+          },
+          {
+            "text": "Seeded run is reproducible",
+            "result": "PASS",
+            "note": "route-mandated --seed 42; background.md reports max BF difference 0.0 on rerun; not re-diffed here"
+          },
+          {
+            "text": "consensus.py rejects a single method",
+            "result": "PASS",
+            "note": "stops with \"a consensus of one method is not a consensus\""
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "count route: FASTQ to guide counts, library.csv columns as route text states",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Literal sgRNA,Gene,Sequence library: 0% of reads mapped, all 60 guides zero, Gini -1.03, exit 0 (silent). With id,sequence,gene order: 100% mapped, Gini 0.074 plasmid / 0.106 endpoint",
+        "basic": 24,
+        "specialized": 32,
+        "total": 56,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "mageck count runs with the route command",
+            "result": "PASS",
+            "note": "exit 0, count.txt and countsummary.txt written"
+          },
+          {
+            "text": "Library format stated by the route produces a usable table",
+            "result": "FAIL",
+            "note": "0 mapped reads, 60/60 zero-count guides"
+          },
+          {
+            "text": "Failure is surfaced rather than silent",
+            "result": "FAIL",
+            "note": "mageck exits 0 and writes an all-zero table; only the route bullet on mapping rate would catch it"
+          },
+          {
+            "text": "Corrected library order maps reads",
+            "result": "PASS",
+            "note": "100% mapped, 25,000 reads per sample, counts parse back"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "A375 cancer line: cn_correction.R (WSL crispr-ccr) then rra.py on the corrected table",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "CRISPRcleanR 3.0.1 ran the shipped script unchanged: 86,881 of 90,709 guides corrected; BRAF -3.5 to -2.7, MYC -2.4 to -3.1 (guide-level LFC); rra.py accepts the corrected table (952 negative hits); qc.py refuses it",
+        "basic": 33,
+        "specialized": 52,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Script runs as the route shows and writes the corrected table",
+            "result": "PASS",
+            "note": "screen_cleanr_corrected_counts.txt, same columns as input, 0 NA"
+          },
+          {
+            "text": "Correction changes amplified-locus genes in the expected direction",
+            "result": "PASS",
+            "note": "guide-level correlation raw vs corrected 0.917; BRAF and MYC shift; 3,828 low-count guides dropped"
+          },
+          {
+            "text": "Downstream caller reads the corrected table",
+            "result": "PASS",
+            "note": "rra.py exit 0, 17,995 genes"
+          },
+          {
+            "text": "Route states the corrected table is non-integer and shorter than the input",
+            "result": "FAIL",
+            "note": "only 0.8% of values are integers; 3,828 guides dropped; neither stated; qc.py refusal is not mentioned"
+          },
+          {
+            "text": "Non-integer input to the script stops with the fix named",
+            "result": "PASS",
+            "note": "T6: \"counts are not integers: give the raw .count.txt\""
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "mle on MAGeCK demo leukemia table; drugz on HAP1 relabelled as a drug screen",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "mle: 1,000 genes, per-line beta/z/p/fdr columns, KBM7 52 genes fdr<0.05; drugz: 18,054 genes, 0 NaN, 0 hits at 0.05 (no drug signal expected: labels only)",
+        "basic": 31,
+        "specialized": 48,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "mageck mle runs with the route command and design matrix",
+            "result": "PASS",
+            "note": "2m23s class run, 14 output columns"
+          },
+          {
+            "text": "mle output has per-condition beta scores and wald-fdr",
+            "result": "PASS",
+            "note": "KBM7 and HL60 beta/z/p/fdr/wald columns"
+          },
+          {
+            "text": "drugz runs with the route flags (-unpaired variant)",
+            "result": "PASS",
+            "note": "documented columns GENE..fdr_supp present, 0 NaN"
+          },
+          {
+            "text": "Both drugz modes exercised",
+            "result": "FAIL",
+            "note": "paired -c/-x with two drug replicates not run: no staged data has two drug replicates"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Stress",
+        "label": "Five-line panel: jacks and chronos, route text as written then tooled variants",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "jacks literal command: exit 2 (run_JACKS.py is in JACKS/jacks/); chronos literal snippet: AssertionError (cell_line_name), then pDNA row, then negative controls required. Tooled variants: jacks 4,502 genes x 5 lines, ribosomal mean -1.04 to -1.83; chronos ribosomal mean -2.7 to -2.9, all-gene mean 0",
+        "basic": 22,
+        "specialized": 30,
+        "total": 52,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "jacks route command runs as written",
+            "result": "FAIL",
+            "note": "python run_JACKS.py ... exit 2, file not found at the clone root"
+          },
+          {
+            "text": "chronos route snippet runs as written",
+            "result": "FAIL",
+            "note": "AssertionError on sequence_map columns; after fixing, needs a cell_line_name==pDNA row and negative_control_sgrnas"
+          },
+          {
+            "text": "Tooled jacks output shows ribosomal depletion and null mean near zero",
+            "result": "PASS",
+            "note": "ribosomal -1.04 to -1.83, all-gene mean about 0"
+          },
+          {
+            "text": "Tooled chronos output shows ribosomal depletion and null mean near zero",
+            "result": "PASS",
+            "note": "ribosomal -2.68 to -2.94, all-gene mean 0.00"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Trap trips: normalized table, missing baseline, one method, no plasmid label",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "qc.py and cn_correction.R refuse non-integer counts and name the fix; rra.py refuses missing control=; consensus.py refuses one method; qc.py without plasmid= silently applies the endpoint Gini gate to the plasmid (T0 Gini 0.288 passes)",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Non-integer table refused by qc.py with the fix named",
+            "result": "PASS",
+            "note": "T1, exit 1"
+          },
+          {
+            "text": "Non-integer table refused by cn_correction.R with the fix named",
+            "result": "PASS",
+            "note": "T6, exit 1"
+          },
+          {
+            "text": "Missing control= refused with the reason",
+            "result": "PASS",
+            "note": "T3 message names the baseline commitment"
+          },
+          {
+            "text": "Single-method consensus refused",
+            "result": "PASS",
+            "note": "T5"
+          },
+          {
+            "text": "Omitted plasmid= is flagged",
+            "result": "FAIL",
+            "note": "T2 prints no warning; plasmid sample passes the 0.3 endpoint gate instead of failing 0.1"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 31.2,
+    "dynamic_weighted": 45.4,
+    "score": 77,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Four-commitment gate and \"never call hits first\" order guard the failures that throw no error",
+    "Shipped scripts (qc.py, rra.py, consensus.py, cn_correction.R) ran on real public data and stop with the fix named on a normalized table or missing baseline",
+    "cn_correction.R ran unchanged under CRISPRcleanR 3.0.1 and shifted amplified loci (BRAF, MYC) as expected",
+    "Router stays short: routes and references load on demand"
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "chronos.md snippet cannot run (research-veto M4)",
+      "observed_in": [
+        6
+      ],
+      "problem": "The Chronos snippet fails on the first sequence_map assertion; fixing the column name then fails on a missing pDNA row and missing negative_control_sgrnas.",
+      "root_cause": "Route shows a constructor call written from the docstring, not a tested one.",
+      "fix": "Replace the snippet with the tested construction: sequence_map columns sequence_ID, cell_line_name, days, pDNA_batch with a cell_line_name==pDNA row; negative_control_sgrnas per library; counts with sequence_ID rows. Execute it on the staged panel."
+    },
+    {
+      "priority": "P1",
+      "title": "jacks.md command fails: wrong script path and map columns",
+      "observed_in": [
+        6
+      ],
+      "problem": "python run_JACKS.py at the clone root exits 2; the script lives in JACKS/jacks/. replicatemap needs a Control column and guidemap the same sgRNA/Gene headers.",
+      "root_cause": "Command was never run from a clone.",
+      "fix": "Give the real path (JACKS/jacks/run_JACKS.py) and the required map columns; run the command as written."
+    },
+    {
+      "priority": "P1",
+      "title": "count.md library column order gives 0% mapped, exit 0",
+      "observed_in": [
+        3
+      ],
+      "problem": "Route says library.csv columns are sgRNA, Gene, Sequence; mageck count reads id, sequence, gene by position. Following the text gives an all-zero table with exit 0.",
+      "root_cause": "Column list written by name, tool reads by position.",
+      "fix": "State the order id, sequence, gene and make the 65-70% mapping check a stop, not a hint."
+    },
+    {
+      "priority": "P1",
+      "title": "rra route fails routing 0/3: agent opens qc.md first",
+      "observed_in": [
+        1
+      ],
+      "problem": "For a two-condition dropout request the agent opens qc.md (and often cn-correction and bagel2) before rra.md and never runs rra.py within the step budget.",
+      "root_cause": "SKILL.md line \"Order on every screen: count, QC, copy-number correct...\" reads as a reading order; the table row says nothing about the user already having counts.",
+      "fix": "Reword the order line as the analysis order the answer must respect (QC reported, not read first), and have the rra row name the case: counts in hand, baseline and endpoint known."
+    },
+    {
+      "priority": "P1",
+      "title": "cn-correction route fails routing 1/3",
+      "observed_in": [
+        4
+      ],
+      "problem": "Agent opens qc.md first and in two of three runs never issues the Rscript command.",
+      "root_cause": "Same ordering line pulls qc.md first; the row \"A cancer cell line screen\" is a property of the sample, not an action.",
+      "fix": "Phrase the row as the action (cancer line, count table in hand, remove amplicon bias) and fix the ordering line."
+    },
+    {
+      "priority": "P1",
+      "title": "mle route fails routing 0/3: row does not describe the reque",
+      "observed_in": [
+        5
+      ],
+      "problem": "A two-cell-line initial/final design with a design matrix leads the agent to read every route file; none of three runs reaches mle.md first.",
+      "root_cause": "Row text \"Time course, several conditions, or several batches\" does not match \"per-cell-line selection score with a design matrix\".",
+      "fix": "Name the design-matrix case in the row (design matrix, several cell lines or time points, beta scores)."
+    },
+    {
+      "priority": "P1",
+      "title": "jacks route fails routing 0/3: panel request goes to chronos",
+      "observed_in": [
+        6
+      ],
+      "problem": "Five cell lines with one library, a replicate map and a guide map: the agent opens chronos.md first, then reads most routes.",
+      "root_cause": "jacks row \"Several screens in one library\" is beaten by chronos row \"A DepMap-style panel of cell lines\".",
+      "fix": "Differentiate the two rows (JACKS: replicate map and guide map, no copy-number input; Chronos: needs plasmid, days, negative controls)."
+    },
+    {
+      "priority": "P2",
+      "title": "cn-correction.md omits non-integer output and dropped guides",
+      "observed_in": [
+        4
+      ],
+      "problem": "Corrected table has 86,881 of 90,709 guides and non-integer counts; qc.py refuses it. Tested-with line and cn_correction.R header still say CRISPRcleanR was not run, but it ran unchanged.",
+      "root_cause": "Route and script header predate execution.",
+      "fix": "State both properties and the qc-before-correction order; replace the stale UNEXECUTED header and the not-run clause in SKILL.md with the tested CRISPRcleanR 3.0.1 / R 4.4.3 versions."
+    },
+    {
+      "priority": "P2",
+      "title": "qc.py silently skips the plasmid gate when plasmid= is omitt",
+      "observed_in": [
+        7
+      ],
+      "problem": "Without plasmid= the plasmid sample is held to the endpoint Gini 0.3 gate; HAP1_T0 (0.288) passes where the 0.1 gate would fail it.",
+      "root_cause": "plasmid= is optional with no warning.",
+      "fix": "Print a one-line warning (or exit) when plasmid= is absent."
+    },
+    {
+      "priority": "P2",
+      "title": "drugz paired mode and a real drug screen not exercised",
+      "observed_in": [
+        5
+      ],
+      "problem": "Only the -unpaired variant ran, on HAP1 columns relabelled as a drug screen; the paired -c/-x two-replicate command and the vehicle-vs-drug biology are unverified.",
+      "root_cause": "No staged public drug screen with two drug replicates.",
+      "fix": "Tooling-delta pass: stage a real public drug screen; static-only until then."
+    },
+    {
+      "priority": "P2",
+      "title": "no Skill-root LICENSE or provenance note",
+      "observed_in": [],
+      "problem": "skill_preflight warns: frontmatter says MIT, author GPTomics, but the Skill carries no LICENSE file and no origin statement.",
+      "root_cause": "Recut dropped the license context.",
+      "fix": "Cite the repository license evidence in the manifest or restore a LICENSE at the Skill root."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+PASS routes/count.md 3/3
+PASS routes/qc.md 3/3
+FAIL routes/cn-correction.md 1/3
+  r1: opened ['qc.md', 'cn-correction.md'] first
+  r3: opened ['qc.md', 'cn-correction.md', 'bagel2.md', 'rra.md'] first
+FAIL routes/rra.md 0/3
+  r1: opened ['qc.md', 'rra.md'] first
+  r2: opened ['qc.md', 'rra.md', 'cn-correction.md', 'bagel2.md', 'consensus.md'] first
+  r3: opened ['qc.md', 'rra.md'] first
+PASS routes/bagel2.md 3/3
+FAIL routes/mle.md 0/3
+  r1: opened ['qc.md', 'cn-correction.md', 'rra.md', 'jacks.md', 'mle.md', 'bagel2.md', 'drugz.md', 'consensus.md', 'branches.md'] first
+  r2: opened ['cn-correction.md', 'rra.md', 'qc.md', 'mle.md', 'bagel2.md', 'consensus.md'] first
+  r3: opened ['qc.md', 'cn-correction.md', 'rra.md', 'mle.md', 'bagel2.md', 'branches.md', 'consensus.md', 'drugz.md', 'jacks.md', 'chronos.md'] first
+PASS routes/drugz.md 3/3
+FAIL routes/jacks.md 0/3
+  r1: opened ['qc.md', 'chronos.md', 'cn-correction.md', 'rra.md', 'mle.md', 'bagel2.md', 'consensus.md'] first
+  r2: opened ['chronos.md', 'qc.md', 'cn-correction.md', 'mle.md', 'bagel2.md', 'branches.md'] first
+  r3: opened ['chronos.md', 'mle.md', 'qc.md', 'cn-correction.md', 'rra.md', 'bagel2.md', 'consensus.md', 'jacks.md', 'drugz.md', 'branches.md', 'count.md'] first
+PASS routes/chronos.md 3/3
+PASS routes/consensus.md 3/3
+PASS routes/branches.md 3/3
+bio-workflows-crispr-screen-pipeline e242270b6fc053d495f12c86df5d2d8eb96f9b42fd3971d6435796c9bae5a71d cost=$0.2096

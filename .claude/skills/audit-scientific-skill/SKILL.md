@@ -98,7 +98,12 @@ rerun (Sam's standing permission).
   route that says why the agent went elsewhere: the table row does not
   describe the request, the route needs a file the user does not have, or the
   command is not first.
-- `ERROR`: infrastructure; rerun before judging.
+- `ERROR`: infrastructure; rerun those cases with `--routes a.md,b.md` before
+  judging. HTTP 402 means the OpenRouter account is out of credit: stop and
+  report it.
+- A route that fails only because the agent followed the Skill's own stated
+  order (QC before hit calling) is a case defect: it needs `allow_before`
+  from the tooling worker, not a finding on the Skill.
 - A case whose request leads the agent, or whose input does not fit the
   route, goes back to the tooling worker.
 

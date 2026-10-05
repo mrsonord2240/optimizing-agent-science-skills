@@ -148,6 +148,8 @@ export async function loadAudits(auditsDirectory) {
     for (const version of await directories(
       path.join(auditsDirectory, "skills", skillId),
     )) {
+      // The tooling worker keeps TOOLS.md and routing-cases.json here; it is not an audit version.
+      if (version === "tooling") continue;
       const base = path.join(auditsDirectory, "skills", skillId, version);
       const record = await readJson(path.join(base, "record.json"));
       const report = await readJson(path.join(base, "report.json"));

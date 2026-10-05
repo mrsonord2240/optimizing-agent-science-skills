@@ -122,6 +122,9 @@ with `tools/routing_check.py`, whose header documents the format.
 - `expect`: only when the route sends this request to a reference instead of a
   script; name that reference. Leave it out for a route whose command is a
   tool call shown in the route.
+- `allow_before`: routes the Skill itself orders ahead of this one, such as a
+  pipeline's QC route before its hit-calling route. Without it the check
+  fails an agent for following the Skill's own order.
 - A route with no staged input gets one cut or simulated from real data, with
   the script that made it; say in `TOOLS.md` what is simulated.
 
