@@ -1,0 +1,26 @@
+diff --git a/skills/bio-single-cell-markers-annotation/SKILL.md b/skills/bio-single-cell-markers-annotation/SKILL.md
+index 4c4eebc..67e50fb 100644
+--- a/skills/bio-single-cell-markers-annotation/SKILL.md
++++ b/skills/bio-single-cell-markers-annotation/SKILL.md
+@@ -169,7 +169,7 @@ if not np.allclose(values, np.round(values)):
+ pb <- AggregateExpression(seurat_obj, group.by = c('cell_type', 'sample'), assays = 'RNA', layer = 'counts')$RNA
+ ```
+ 
+-Pull the summed counts slot, build a sample-level design (condition + covariates), and run DESeq2/edgeR; see differential-expression/deseq2-basics for the modeling step. Never run DE on batch-corrected or normalized expression. If raw counts were not retained, stop and reacquire the count matrix rather than converting normalized values into pseudobulk.
++Pull the summed counts slot, build a sample-level design (condition + covariates, and the donor when donors span both conditions), and run DESeq2/edgeR; see differential-expression/deseq2-basics for the modeling step, whose `scripts/pseudobulk_de.R` does the aggregation and the test in one run from a 10x directory. Never run DE on batch-corrected or normalized expression. If raw counts were not retained, stop and reacquire the count matrix rather than converting normalized values into pseudobulk.
+ 
+ ## Canonical PBMC markers (context-dependent, validate per dataset)
+ 
+diff --git a/skills/bio-workflows-scrnaseq-pipeline/SKILL.md b/skills/bio-workflows-scrnaseq-pipeline/SKILL.md
+index f9e0c57..04bdb7b 100644
+--- a/skills/bio-workflows-scrnaseq-pipeline/SKILL.md
++++ b/skills/bio-workflows-scrnaseq-pipeline/SKILL.md
+@@ -40,6 +40,8 @@ Note: the Cell Ranger `filtered_feature_bc_matrix` is cell-CALLING only, NOT amb
+ 
+ This is a workflow skill: it owns the chaining decisions and hand-offs, not the internals of any one step. Every step below cross-references the component skill that teaches its mechanism.
+ 
++Cells already annotated and the question is treated vs control within a cell type? Skip this pipeline and go to differential-expression/deseq2-basics and its `routes/pseudobulk.md`.
++
+ ## Made-once commitments (decided at `cellranger count`, inherited downstream)
+ 
+ | Commitment | Consequence inherited downstream |
