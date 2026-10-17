@@ -143,13 +143,6 @@ describes, on a small real input staged under `F:\OpenScience`. Find the
 ecosystem's environments and inputs through `F:\OpenScience\audit-envs\INDEX.md`
 and the `TOOLS.md` files it leads to.
 
-- Run every script at two settings or more: one where each filter drops rows
-  and one where it drops none. A script that passed its default run crashed
-  when a filter removed nothing (R cannot recycle a scalar into a zero-row
-  data frame).
-- Trip each trap once: the missing reference level, the un-normalized matrix.
-- A script whose packages are not installed stays unexecuted. Never report a
-  run that did not happen.
 
 ## Verify the normalized tree
 
