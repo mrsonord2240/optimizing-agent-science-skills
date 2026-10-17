@@ -24,6 +24,16 @@ route. The rules are in `.claude/skills/normalize-scientific-skill/SKILL.md`.
 | `ca-bio-machine-learning-omics-classifiers` | `bio-machine-learning-omics-classifiers` | Normalized only, not audited. Executed once: `logistic_regression.py --signature` on Golub (dense path crashed, fixed, not rerun). Unexecuted: `rf_xgboost_classifier.py`, `batch_checks.py`, `calibration_check.py`; SMOTE path untestable (no imblearn). |
 | `ca-bio-variant-annotation` | `bio-variant-annotation` | Normalized only, not audited. All scripts unexecuted (`annotate_vep.sh`, `annotate_vcf.sh`, `parse_csq.py`). |
 | `ca-bio-machine-learning-prediction-explanation` | `bio-machine-learning-prediction-explanation` | Normalized only, not audited. All scripts unexecuted (`shap_tree.py`, `lime_local.py`); lime in no WSL environment. |
+| `ca-bio-pathway-go-enrichment` | `bio-pathway-go-enrichment` | Normalized only, not audited. All scripts unexecuted (`ora_go.R`, `goseq_ora.R`, `groupgo.R`). |
+| `ca-bio-atac-seq-consensus-peakset` | `bio-atac-seq-consensus-peakset` | Normalized only, not audited. Scripts: `iterative_overlap.sh` (shelf copy, unchanged), `iterative_overlap.R`, `per_condition_consensus.sh` (new, unexecuted). |
+| `ca-bio-atac-seq-motif-deviation` | `bio-atac-seq-motif-deviation` | Normalized only, not audited. All scripts unexecuted after the recut (`chromvar_bulk.R`, `chromvar_signac.R`, `chromvar_archr.R`). |
+| `ca-bio-atac-seq-atac-qc` | `bio-atac-seq-atac-qc` | Normalized only, not audited. No new scripts; shelf copies unchanged (`library_complexity.py`, `atac_qc_metrics.R`, `encode_tss_enrichment.py`, `aggregate_qc.py`). |
+| `ca-bio-single-cell-multimodal-integration` | `bio-single-cell-multimodal-integration` | Normalized only, not audited. New, unexecuted: `cite_seq_wnn.R`, `cite_seq_muon.py`, `multiome_wnn.R`, `mofa_muon.py`, `glue_unpaired.py`; shelf copies unchanged: `totalvi_cite_seq.py`, `multivi_mosaic.py`, `seurat_bridge_integration.R`. |
+| `ca-bio-alignment-sorting` | `bio-alignment-sorting` | Normalized only, not audited. New, unexecuted: `sort_bam.sh`, `merge_bams.sh`, `check_order.py`; `align_sort.sh` is the shelf `sort_pipeline.sh`, renamed. |
+| `ca-bio-vcf-statistics` | `bio-vcf-statistics` | Normalized only, not audited. All scripts unexecuted (`vcf_qc.sh`, `vcf_stats.py`, `missing_hwe.sh`, `het_allele_balance.sh`, `identity_qc.sh`, `stratified_stats.sh`). |
+| `ca-bio-variant-normalization` | `bio-variant-normalization` | Normalized only, not audited. All scripts unexecuted (`normalize_vcf.sh`, `check_normalization.py`, `check_ref.sh`, `compare_callers.sh`). |
+| `ca-bio-microbiome-amplicon-processing` | `bio-microbiome-amplicon-processing` | Normalized only, not audited. All scripts unexecuted (`remove_primers.sh`, `dada2_asv.R`, `decontam_filter.R`); `dada2_asv.R --single` is new code. |
+| `ca-bio-microbiome-taxonomy-assignment` | `bio-microbiome-taxonomy-assignment` | Normalized only, not audited. All scripts unexecuted (`dada2_assign.R`, `idtaxa_classify.R`, `qiime2_region_nb.sh`, `qiime2_vsearch.sh`, `filter_organelle.sh`). |
 
 `shelf-pointer-edits.patch` holds two one-line edits to shelf Skills
 (`bio-workflows-scrnaseq-pipeline`, `bio-single-cell-markers-annotation`) that point
