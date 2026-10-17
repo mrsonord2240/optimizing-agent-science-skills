@@ -13,7 +13,7 @@ never Haiku.
 
 ## Load context
 
-Verify the candidate identity, surface inventory, working path and branch,
+Verify the candidate identity, working path and branch,
 lane ownership, existing `TOOLS.md`, and requested mode: `full` or `delta`.
 Inspect relevant Git status, preserve all pre-existing changes, keep source
 checkouts read-only, and work only on the Skills your brief assigns (one, or a batch the relay allows) and this phase only. Do not change Skill

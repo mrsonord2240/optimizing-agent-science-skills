@@ -36,7 +36,7 @@ Use the following worker Skills by exact name:
 
 | Phase | Worker Skill | Transition evidence |
 |---|---|---|
-| Normalize | `normalize-scientific-skill` | normalized tree identity and surface inventory |
+| Normalize | `normalize-scientific-skill` | normalized tree identity and the scripts it wrote |
 | Tool | `prepare-scientific-skill-tooling` | `TOOLS.md` and environment fingerprint |
 | Initial audit | `audit-scientific-skill` | diagnostic report and finding ledger |
 | Fix | `fix-scientific-skill` | finding dispositions and tooling impact |

@@ -37,8 +37,7 @@ the assigned Skill. Map:
 - inline and external runnable code;
 - conditional, method-specific, and reference-heavy guidance;
 - links among `SKILL.md`, `scripts/`, `references/`, and `assets/`;
-- licenses, attribution, author information, and provider provenance;
-- advertised runnable surfaces and dependency clues for the tooling worker.
+- licenses, attribution, author information, and provider provenance.
 
 Also compare software names, commands, APIs, formats, and version constraints
 across the entire tree with the currently supported software. Treat a mismatch
@@ -130,25 +129,13 @@ Do not redesign scientific methods, change analytical defaults, add analyses
 the Skill did not offer, install tooling, or resolve behavioral findings
 unrelated to safe version normalization in this phase. Record such issues for
 audit. A route's entry-point script that wraps the Skill's existing method is
-structure, not a new analysis; list every script you wrote in the handoff as
-executed (environment, input, settings, key numbers) or unexecuted, so the
-tooling and audit workers know what is left to run.
-
-## Run the scripts you wrote
-
-Run each entry-point script whose packages an existing environment already
-has; install nothing. Use the `science` WSL distro as
-`.claude/skills/optimize-scientific-skills/references/environment-policy.md`
-describes, on a small real input staged under `F:\OpenScience`. Find the
-ecosystem's environments and inputs through `F:\OpenScience\audit-envs\INDEX.md`
-and the `TOOLS.md` files it leads to.
-
+structure, not a new analysis; list every script you wrote in the handoff.
+Do not run them: tooling smoke-tests every route and audit runs every core one.
 
 ## Verify the normalized tree
 
-Check that each route names a command that exists in `scripts/` or is shown in
-full, and that every analysis the Skill offered is reachable from the route
-table. Leave behavioral audit of the science to tooling and audit workers.
+Check that every analysis the Skill offered is reachable from the route table.
+Leave behavioral audit of the science to tooling and audit workers.
 
 Then run, from the records repository root,
 `python tools/skill_preflight.py --shape <normalized-skill-dir>`. It must
@@ -166,8 +153,7 @@ deleted passage; the diff is that record.
 
 Replace the canonical handoff's current-state sections; do not append a diary
 or paste evidence. Keep it under 120 lines and link durable paths. Include the
-resulting candidate identity, concise structural summary, discovered
-runnable-surface inventory, dependency clues, open ambiguities, evidence paths,
-and all run-owned versus pre-existing changes. Set the next role to
+resulting candidate identity, concise structural summary, the scripts you
+wrote, open ambiguities, and all run-owned versus pre-existing changes. Set the next role to
 `prepare-scientific-skill-tooling`. Do not create a product commit, push, or
 continue into tooling.
