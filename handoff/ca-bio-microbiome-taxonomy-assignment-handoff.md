@@ -11,7 +11,7 @@
 - Origin: `F:\optimized-scientific-skills@f162b3a:skills/bio-microbiome-taxonomy-assignment` (read-only shelf)
 - Working tree: `F:\optimizing-agent-science-skills\skills\ca-bio-microbiome-taxonomy-assignment`
 - Branch/worktree: records repo working tree; no git writes made
-- Candidate identity (preflight `--shape`, PASS): `63c28b1c77130ca9272be8b43e627e3481c409484bdc73c0c5d06a74ec42e977`, 16 files
+- Candidate identity (preflight `--shape`, PASS): `0437987e81e97d0781a241b31a87e0ae167c2ff12539f012fb8d194774fd4142`, 16 files
 - Applicable audit: none
 - Warn carried: no Skill-root LICENSE (frontmatter `license: MIT`, `author: GPTomics` kept)
 

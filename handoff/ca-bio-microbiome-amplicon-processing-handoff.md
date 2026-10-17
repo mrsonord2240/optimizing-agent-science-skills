@@ -11,7 +11,7 @@
 - Origin: `F:\optimized-scientific-skills@f162b3a:skills/bio-microbiome-amplicon-processing` (read-only shelf)
 - Working tree: `F:\optimizing-agent-science-skills\skills\ca-bio-microbiome-amplicon-processing`
 - Branch/worktree: records repo working tree; no git writes made
-- Candidate identity (preflight `--shape`, PASS): `d5720c26a13ed82c2d4418cbd0ce453e23b85a0c1943c56075ce6c7443b78e8f`, 15 files
+- Candidate identity (preflight `--shape`, PASS): `e072e8a70244fcaf0bc89d6bc8045d60ffd7ec38e788ba025882f8ec7ed66afb`, 15 files
 - Applicable audit: none
 - Warn carried: no Skill-root LICENSE (frontmatter `license: MIT`, `author: GPTomics` kept)
 

@@ -8,7 +8,7 @@
 | Generate a VCF from alignments | `bio-variant-calling` |
 | Merge, intersect, compare VCFs beyond `isec` | `bio-vcf-manipulation` |
 | GATK HaplotypeCaller workflow | `bio-gatk-variant-calling` |
-| ClinVar lookup and clinical interpretation | `bio-clinical-interpretation` |
+| ClinVar lookup and clinical interpretation | `bio-variant-calling-clinical-interpretation` |
 | BAM format and reference handling | `bio-sam-bam-basics` |
 
 Done when you have opened that Skill's SKILL.md.

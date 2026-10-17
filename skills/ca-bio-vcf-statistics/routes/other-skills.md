@@ -8,7 +8,7 @@
 | View, query, understand VCF fields | `bio-vcf-basics` |
 | Compare and merge call sets | `bio-vcf-manipulation` |
 | Wire a contamination estimate into calling | `bio-gatk-variant-calling` |
-| Cohort genotyping | `bio-joint-calling` |
+| Cohort genotyping | `bio-variant-calling-joint-calling` |
 | Upstream alignment QC | `bio-bam-statistics` |
 
 Done when you have opened that Skill's SKILL.md.

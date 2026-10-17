@@ -11,7 +11,7 @@
 - Origin: `F:\optimized-scientific-skills@f162b3a:skills/bio-variant-normalization` (read-only shelf)
 - Working tree: `F:\optimizing-agent-science-skills\skills\ca-bio-variant-normalization`
 - Branch/worktree: records repo working tree; no git writes made
-- Candidate identity (preflight `--shape`, PASS): `7677b8b20031b285fafef4656f0612321ce55ac81a684d9993540044170c00da`, 18 files
+- Candidate identity (preflight `--shape`, PASS): `3d6e08326c89d4e6dc0dfc78f549c10d4dc89e96d12a8ade95d19ff2e6224fb9`, 18 files
 - Applicable audit: none
 - Warn carried: no Skill-root LICENSE (frontmatter `license: MIT`, `author: GPTomics` kept)
 

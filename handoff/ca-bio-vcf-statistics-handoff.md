@@ -11,7 +11,7 @@
 - Origin: `F:\optimized-scientific-skills@f162b3a:skills/bio-vcf-statistics` (read-only shelf)
 - Working tree: `F:\optimizing-agent-science-skills\skills\ca-bio-vcf-statistics`
 - Branch/worktree: records repo working tree; no git writes made
-- Candidate identity (preflight `--shape`, PASS): `536e57215b6687d7f0f3d37aea835efcdf214de77342b2bb29294853040efa10`, 17 files
+- Candidate identity (preflight `--shape`, PASS): `605de6a0e03853d28f76dbf31ffcf3170932d2f658c14be33fcbac92af34c75b`, 17 files
 - Applicable audit: none
 - Warn carried: no Skill-root LICENSE (frontmatter `license: MIT`, `author: GPTomics` kept)
 
