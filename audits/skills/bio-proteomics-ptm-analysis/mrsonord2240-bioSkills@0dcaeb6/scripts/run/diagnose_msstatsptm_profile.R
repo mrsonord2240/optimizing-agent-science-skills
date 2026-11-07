@@ -1,5 +1,0 @@
-cat("before-load\n")
-cat("R_PROFILE_USER=", Sys.getenv("R_PROFILE_USER"), "\n", sep = "")
-library(MSstatsPTM)
-cat("after-load\n")
-sessionInfo()

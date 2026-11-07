@@ -1,5 +1,0 @@
-suppressMessages(library(lipidr))
-ns <- ls(getNamespace("lipidr"), all.names = TRUE)
-cat(paste(ns, collapse="\n"))
-cat("\n\n=== annotate_lipids source ===\n")
-print(lipidr:::annotate_lipids)

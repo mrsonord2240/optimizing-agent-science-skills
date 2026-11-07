@@ -1,7 +1,0 @@
-suppressPackageStartupMessages(library(chromVAR))
-print(chromVAR::filterSamples)
-print(chromVAR::filterPeaks)
-print(getNamespace("chromVAR")$addGCBias)
-print(getNamespace("chromVAR")$deviationScores)
-print(args(getBackgroundPeaks))
-print(args(plotVariability))

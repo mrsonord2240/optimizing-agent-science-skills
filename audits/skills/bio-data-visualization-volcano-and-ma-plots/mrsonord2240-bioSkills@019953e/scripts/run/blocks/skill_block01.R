@@ -1,5 +1,0 @@
-library(DESeq2)
-dds <- DESeq(dds)
-res_apeglm <- lfcShrink(dds, coef = 'condition_treated_vs_control', type = 'apeglm')
-res_ashr <- lfcShrink(dds, contrast = c('condition', 'treated', 'control'), type = 'ashr')
-# ashr also returns svalue column (Stephens 2017 local false sign rate)

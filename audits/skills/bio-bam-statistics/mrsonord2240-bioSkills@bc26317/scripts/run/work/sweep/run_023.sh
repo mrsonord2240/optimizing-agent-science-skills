@@ -1,1 +1,0 @@
-samtools coverage input.bam

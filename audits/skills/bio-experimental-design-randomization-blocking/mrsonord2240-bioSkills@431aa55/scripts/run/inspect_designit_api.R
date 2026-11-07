@@ -1,5 +1,0 @@
-library(designit)
-cat("designit=", as.character(packageVersion("designit")), "\n", sep = "")
-print(formals(assign_in_order))
-print(formals(osat_score_generator))
-print(formals(BatchContainer$new))

@@ -1,1 +1,0 @@
-samtools depth -aa -b /mnt/openscience/audits/bio-bam-statistics/run/data/planted_depth.regions.bed /mnt/openscience/audits/bio-bam-statistics/run/data/planted_depth.bam   # every base of every region, zeros included

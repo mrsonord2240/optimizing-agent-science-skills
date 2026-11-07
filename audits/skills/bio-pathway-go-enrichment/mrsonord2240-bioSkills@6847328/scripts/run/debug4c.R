@@ -1,6 +1,0 @@
-suppressPackageStartupMessages({library(clusterProfiler)})
-cat('clusterProfiler:', as.character(packageVersion('clusterProfiler')), '\n')
-cat('GOSemSim:', as.character(packageVersion('GOSemSim')), '\n')
-showMethods('simplify')
-f <- selectMethod('simplify', 'enrichResult')
-print(f)

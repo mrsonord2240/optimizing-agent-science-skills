@@ -1,3 +1,0 @@
-lookup_and_overlap exit=1
-vep_annotation exit=1
-compara_homology exit=0

@@ -1,1 +1,0 @@
-samtools idxstats input.bam

@@ -1,5 +1,0 @@
-cat("before-load\n")
-library(MSstatsPTM)
-cat("after-load\n")
-sessionInfo()
-q(save = "no", status = 0, runLast = FALSE)
